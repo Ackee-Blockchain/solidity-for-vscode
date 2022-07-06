@@ -14,6 +14,14 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"languages": [
+			{
+				"id": "solidity",
+				"extensions": [".sol"],
+				"aliases": ["Solidity", "sol"],
+				"configuration": "./language-configuration.json"
+			}
+		],
 		"commands": [
 			{
 				"command": "abch-tools-for-solidity.helloWorld",
