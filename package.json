@@ -15,6 +15,57 @@
     ],
     "main": "./out/extension.js",
     "contributes": {
+        "configuration": {
+            "title": "ABCH Tools for Solidity",
+            "properties": {
+                "woke.compiler.solc.allow_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "Allow paths passed directly to the solc compiler"
+                },
+                "woke.compiler.solc.evm_version": {
+                    "type": "string",
+                    "enum": [
+                        "homestead",
+                        "tangerineWhistle",
+                        "spuriousDragon",
+                        "byzantium",
+                        "constantinople",
+                        "petersburg",
+                        "istanbul",
+                        "berlin",
+                        "london",
+                        ""
+                    ],
+                    "default": "",
+                    "description": "EVM version passed to the solc compiler"
+                },
+                "woke.compiler.solc.include_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": ["node_modules"],
+                    "description": "Include paths used to search for non-relative import paths"
+                },
+                "woke.compiler.solc.remappings": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "markdownDescription": "Compiler remappings (see [Solidity docs](https://docs.soliditylang.org/en/latest/using-the-compiler.html#base-path-and-import-remapping))"
+                },
+                "woke.compiler.solc.target_version": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The version of the solc compiler used to compile all project files"
+                }
+            }
+        },
         "languages": [
             {
                 "id": "solidity",
