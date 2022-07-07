@@ -31,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'solidity' }],
-        synchronize: {}
+        synchronize: { configurationSection: 'woke'}
     }
 
     client = new LanguageClient("ABCH Tools for Solidity LSP", serverOptions, clientOptions);
