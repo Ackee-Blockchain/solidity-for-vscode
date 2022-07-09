@@ -36,6 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     client = new LanguageClient("ABCH Tools for Solidity LSP", serverOptions, clientOptions);
     client.start();
+    client.outputChannel.show(true);
 }
 
 // this method is called when your extension is deactivated
