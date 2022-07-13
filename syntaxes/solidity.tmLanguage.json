@@ -352,18 +352,30 @@
             "name": "keyword.control.unchecked"
         },
         "control-pragma": {
-            "match": "\\b(pragma)(?:\\s+([A-Za-z_]\\w+)\\s+([0-9\\.~><=^\\s]+))?\\b",
-            "captures": {
-                "1": {
-                    "name": "keyword.control.pragma"
-                },
-                "2": {
-                    "name": "entity.name.tag.pragma"
-                },
-                "3": {
-                    "name": "constant.other.pragma"
+            "patterns": [
+                {
+                    "begin": "\\b(pragma)\\b",
+                    "beginCaptures": {
+                        "1": {
+                            "name": "keyword.control.pragma"
+                        }
+                    },
+                    "end": "(?=\\;)",
+                    "patterns": [
+                        {
+                            "match": "\\b(solidity)\\b",
+                            "name": "keyword.control.solidity"
+                        },
+                        {
+                            "include": "#comment-block"
+                        },
+                        {
+                            "match": "\\s+([0-9\\.~><=^\\s\\|\\-]+)",
+                            "name": "constant.other.pragma"
+                        }
+                    ]
                 }
-            }
+                ]
         },
         "control-underscore": {
             "match": "\\b(_)\\b",
