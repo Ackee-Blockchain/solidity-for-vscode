@@ -23,6 +23,13 @@
                 "configuration": "./language-configuration.json"
             }
         ],
+        "grammars": [
+            {
+            "language": "solidity",
+            "scopeName": "source.solidity",
+            "path": "./syntaxes/solidity.tmLanguage.json"
+        }
+        ],
         "commands": [
             {
                 "command": "abch-tools-for-solidity.helloWorld",
