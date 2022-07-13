@@ -519,12 +519,16 @@
                     "name": "variable.language.builtin.abi"
                 },
                 {
-                    "match": "\\b(msg\\.sender|msg|block|tx|now)\\b",
+                    "match": "\\b(msg\\.(?:data|sender|sig|value))\\b",
                     "name": "variable.language.transaction"
                 },
                 {
-                    "match": "\\b(tx\\.origin|tx\\.gasprice|msg\\.data|msg\\.sig|msg\\.value)\\b",
+                    "match": "\\b(tx\\.(?:gasprice|origin))\\b",
                     "name": "variable.language.transaction"
+                },
+                {
+                    "match": "\\b(block\\.(?:basefee|chainid|coinbase|difficulty|gaslimit|number|timestamp))",
+                    "name": "variable.language.block"
                 }
             ]
         },
