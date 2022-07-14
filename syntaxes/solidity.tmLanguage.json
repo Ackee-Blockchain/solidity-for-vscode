@@ -367,6 +367,18 @@
                             "name": "keyword.control.solidity"
                         },
                         {
+                            "match": "\\b(experimental)\\b",
+                            "name": "keyword.control.experimental"
+                        },
+                        {
+                            "match": "\\b(abicoder|SMTChecker)\\b",
+                            "name": "keyword.control.pragma.tags"
+                        },
+                        {
+                            "match": "\\b(v(?:1|2))",
+                            "name": "keyword.control.pragma.version"
+                        },
+                        {
                             "include": "#comment-block"
                         },
                         {
