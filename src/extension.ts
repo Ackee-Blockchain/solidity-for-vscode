@@ -31,8 +31,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'solidity' }],
-        synchronize: { configurationSection: 'woke'}
-    }
+        synchronize: { configurationSection: 'woke'},
+        outputChannel: vscode.window.createOutputChannel("ABCH Tools for Solidity", "abch-tools-for-solidity-output")
+    };
 
     client = new LanguageClient("ABCH-Tools-for-Solidity", "ABCH Tools for Solidity", serverOptions, clientOptions);
     client.start();

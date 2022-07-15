@@ -3,22 +3,46 @@
     "fileTypes": ".output",
     "patterns":[
         {
-            "include": "#test"
+            "include": "#errors"
         },
         {
             "include": "#primitive"
+        },
+        {
+            "include": "#operator"
         }
     ],
     "repository":{
-        "test": {
+        "primitive": {
             "patterns": [
                 {
-                    "match": "Error",
-                    "name": "entity.name.function"
+                    "include": "#string"
                 },
                 {
-                    "match": "abc",
-                    "name": "storage.type.enum"
+                    "include": "#number"
+                }
+            ]
+        },
+        "operator": {
+            "patterns": [
+                {
+                    "include": "#arrow"
+                }
+            ]
+        },
+        "errors": {
+            "patterns": [
+                {
+                    "match": "^\\[Info",
+                    "name": "entity.name.type.info"
+                },
+                {
+                    "match": "^\\[Warn",
+                    "name": "entity.name.type.warn"
+                },
+                {
+                    "match": "^\\[Error",
+                    "name": "entity.name.type.error"
                 }
             ]
         },
@@ -34,10 +58,19 @@
                 }
             ]
         },
-        "primitive": {
+        "number": {
             "patterns": [
-               {
-                    "include": "#string"
+                {
+                    "match": "[0-9]",
+                    "name": "constant.numeric.decimal"
+                }
+            ]
+        },
+        "arrow": {
+            "patterns": [
+                {
+                    "match": "\\s(->)\\s",
+                    "name": "keyword.operator.logic"
                 }
             ]
         }

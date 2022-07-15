@@ -86,14 +86,10 @@
                 "configuration": "./language-configuration.json"
             },
             {
-                "id": "abch-tools-for-solidity-output",
+            "id": "abch-tools-for-solidity-output",
             "extensions": [".output"],
             "configuration": "./resources/log.configuration.json",
             "mimetypes": [
-                "text/x-code-output",
-                "x-code-output",
-                "text/log",
-                "text/x-log",
                 "log"
             ]
         }
