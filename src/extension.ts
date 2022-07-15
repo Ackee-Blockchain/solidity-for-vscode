@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
         synchronize: { configurationSection: 'woke'}
     }
 
-    client = new LanguageClient("ABCH Tools for Solidity LSP", serverOptions, clientOptions);
+    client = new LanguageClient("ABCH-Tools-for-Solidity", "ABCH Tools for Solidity", serverOptions, clientOptions);
     client.start();
     client.outputChannel.show(true);
 }
