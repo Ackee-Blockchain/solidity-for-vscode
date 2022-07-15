@@ -11,7 +11,8 @@
     ],
     "activationEvents": [
         "onLanguage:solidity",
-        "workspaceContains:**/*.sol"
+        "workspaceContains:**/*.sol",
+        "onLanguage:woke-output"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -72,13 +73,29 @@
                 "extensions": [".sol"],
                 "aliases": ["Solidity", "sol"],
                 "configuration": "./language-configuration.json"
-            }
+            },
+            {
+            "id": "woke-output",
+            "configuration": "./resources/log.configuration.json",
+            "mimetypes": [
+                "text/x-code-output",
+                "x-code-output",
+                "text/log",
+                "text/x-log",
+                "log"
+            ]
+        }
         ],
         "grammars": [
             {
             "language": "solidity",
             "scopeName": "source.solidity",
             "path": "./syntaxes/solidity.tmLanguage.json"
+        },
+        {
+            "language": "woke-output",
+            "scopeName": "woke.output",
+            "path": "./syntaxes/woke-output.tmLanguage.json"
         }
         ],
         "commands": [
