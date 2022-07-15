@@ -88,10 +88,7 @@
             {
             "id": "abch-tools-for-solidity-output",
             "extensions": [".output"],
-            "configuration": "./resources/log.configuration.json",
-            "mimetypes": [
-                "log"
-            ]
+            "configuration": "./resources/log.configuration.json"
         }
         ],
         "grammars": [
