@@ -86,7 +86,8 @@
                 "configuration": "./language-configuration.json"
             },
             {
-            "id": "woke-output",
+                "id": "abch-tools-for-solidity-output",
+            "extensions": [".output"],
             "configuration": "./resources/log.configuration.json",
             "mimetypes": [
                 "text/x-code-output",
@@ -104,9 +105,9 @@
             "path": "./syntaxes/solidity.tmLanguage.json"
         },
         {
-            "language": "woke-output",
-            "scopeName": "woke.output",
-            "path": "./syntaxes/woke-output.tmLanguage.json"
+            "language": "abch-tools-for-solidity-output",
+            "scopeName": "source.woke.output",
+            "path": "./syntaxes/log.configuration.json"
         }
         ],
         "commands": [
@@ -116,6 +117,7 @@
             }
         ]
     },
+    
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",

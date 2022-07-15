@@ -1,0 +1,46 @@
+{
+    "scope-name": "woke.output",
+    "fileTypes": ".output",
+    "patterns":[
+        {
+            "include": "#test"
+        },
+        {
+            "include": "#primitive"
+        }
+    ],
+    "repository":{
+        "test": {
+            "patterns": [
+                {
+                    "match": "Error",
+                    "name": "entity.name.function"
+                },
+                {
+                    "match": "abc",
+                    "name": "storage.type.enum"
+                }
+            ]
+        },
+        "string": {
+            "patterns": [
+                {
+                    "match": "\\\".*?\\\"",
+                    "name": "string.quoted.double"
+                },
+                {
+                    "match": "\\'.*?\\'",
+                    "name": "string.quoted.single"
+                }
+            ]
+        },
+        "primitive": {
+            "patterns": [
+               {
+                    "include": "#string"
+                }
+            ]
+        }
+    },
+    "scopeName": "source.woke.output"
+}
