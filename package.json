@@ -133,6 +133,8 @@
         "@vscode/test-electron": "^2.1.5"
     },
     "dependencies": {
-        "vscode-languageclient": "^8.0.1"
+        "vscode-languageclient": "^8.0.1",
+        "get-port": "<6.0.0",
+        "wait-port": "^0.3.0"
     }
 }
