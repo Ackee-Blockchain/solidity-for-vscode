@@ -11,7 +11,8 @@
     ],
     "activationEvents": [
         "onLanguage:solidity",
-        "workspaceContains:**/*.sol"
+        "workspaceContains:**/*.sol",
+        "onLanguage:woke-output"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -83,13 +84,23 @@
                 "extensions": [".sol"],
                 "aliases": ["Solidity", "sol"],
                 "configuration": "./language-configuration.json"
-            }
+            },
+            {
+            "id": "abch-tools-for-solidity-output",
+            "extensions": [".output"],
+            "configuration": "./resources/log.configuration.json"
+        }
         ],
         "grammars": [
             {
             "language": "solidity",
             "scopeName": "source.solidity",
             "path": "./syntaxes/solidity.tmLanguage.json"
+        },
+        {
+            "language": "abch-tools-for-solidity-output",
+            "scopeName": "source.woke.output",
+            "path": "./syntaxes/log.configuration.json"
         }
         ],
         "commands": [
@@ -99,6 +110,7 @@
             }
         ]
     },
+    
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",

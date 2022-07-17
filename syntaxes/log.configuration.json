@@ -1,0 +1,110 @@
+{
+    "scope-name": "woke.output",
+    "fileTypes": ".output",
+    "patterns":[
+        {
+            "include": "#errors"
+        },
+        {
+            "include": "#primitive"
+        },
+        {
+            "include": "#operator"
+        },
+        {
+            "include": "#uri"
+        }
+    ],
+    "repository":{
+        "primitive": {
+            "patterns": [
+                {
+                    "include": "#string"
+                },
+                {
+                    "include": "#number"
+                }
+            ]
+        },
+        "operator": {
+            "patterns": [
+                {
+                    "include": "#arrow"
+                }
+            ]
+        },
+        "errors": {
+            "patterns": [
+                {
+                    "match": "^\\[(Info)",
+                        "captures": {
+                            "1": {
+                                "name": "storage.type"
+                             }
+                        }
+                },
+                {
+                    "match": "^\\[(Warn)",
+                        "captures": {
+                            "1": {
+                                "name": "keyword.control"
+                             }
+                        }
+                },
+                {
+                    "match": "^\\[(Error)",
+                        "captures": {
+                            "1": {
+                                "name": "keyword.control"
+                             }
+                        }
+                },
+                {
+                    "match": "^\\[(Trace)",
+                        "captures": {
+                            "1": {
+                                "name": "storage.type"
+                             }
+                        }
+                }
+            ]
+        },
+        "string": {
+            "patterns": [
+                {
+                    "match": "\\\".*?\\\"",
+                    "name": "string.quoted.double"
+                },
+                {
+                    "match": "\\'.*?\\'",
+                    "name": "string.quoted.single"
+                }
+            ]
+        },
+        "number": {
+            "patterns": [
+                {
+                    "match": "[0-9]",
+                    "name": "constant.numeric.decimal"
+                }
+            ]
+        },
+        "arrow": {
+            "patterns": [
+                {
+                    "match": "\\s(->)\\s",
+                    "name": "keyword.operator.logic"
+                }
+            ]
+        },
+        "uri": {
+            "patterns": [
+                {
+                    "match": "([a-z]+\\:\\/+)([^\\/\\s]+)([a-z0-9\\-@\\^=%&;\\/~\\+]*)[\\?]?([^ \\#\r\n]*)#?([^ \\#\r\n]*)",
+                    "name": "comment.block.documentation"
+                }
+            ]
+        }
+    },
+    "scopeName": "source.woke.output"
+}
