@@ -12,18 +12,74 @@ import {
 
 import getPort = require('get-port');
 import waitPort = require('wait-port');
-import { ChildProcess, execFile } from 'child_process';
+import { compare } from 'compare-versions';
+import { ChildProcess, execFile, execFileSync } from 'child_process';
 
 
 
 let client: LanguageClient;
 
+const TARGET_VERSION = "0.1.1";
+
+async function installWoke(outputChannel: vscode.OutputChannel) {
+    try {
+        outputChannel.appendLine("Running `python3 -m pip install abch-woke -U`");
+        let out = execFileSync("python3", ["-m", "pip", "install", "abch-woke", "-U"]).toString("utf8");
+        outputChannel.appendLine(out);
+
+    } catch(err) {
+        if (err instanceof Error) {
+            outputChannel.appendLine("Failed to install PyPi package abch-woke:");
+            outputChannel.appendLine(err.toString());
+        }
+    }
+
+}
+
+function getWokeVersion(): string {
+    return execFileSync("woke", ["--version"]).toString("utf8").trim();
+}
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
     const outputChannel = vscode.window.createOutputChannel("ABCH Tools for Solidity", "abch-tools-for-solidity-output");
     outputChannel.show(true);
+
+    let version: string;
+
+    try {
+        version = getWokeVersion();
+
+        if (compare(version, TARGET_VERSION, "<")) {
+            outputChannel.appendLine(`Woke in version ${version} installed but target minimal version is ${TARGET_VERSION}`);
+            await installWoke(outputChannel);
+            version = getWokeVersion();
+        }
+
+    } catch(err) {
+        if (err instanceof Error) {
+            outputChannel.appendLine(err.toString());
+        }
+        outputChannel.appendLine("Installing PyPi package abch-woke");
+        await installWoke(outputChannel);
+    }
+
+    try {
+        version = getWokeVersion();
+        if (compare(version, TARGET_VERSION, "<")) {
+            outputChannel.appendLine(`Woke in version ${version} installed but target minimal version is ${TARGET_VERSION}`);
+            outputChannel.appendLine(`Unable to install PyPi package abch-woke in version ${TARGET_VERSION} or newer. Exiting...`);
+            return;
+        }
+    } catch(err) {
+        if (err instanceof Error) {
+            outputChannel.appendLine(err.toString());
+        }
+        outputChannel.appendLine(`Unable to install PyPi package abch-woke in version ${TARGET_VERSION} or newer. Exiting...`);
+        return;
+    }
 
     const serverOptions: ServerOptions = async () => {
         const freePort: number = await getPort();
