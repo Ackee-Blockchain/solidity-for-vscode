@@ -19,7 +19,7 @@ import { ChildProcess, execFile, execFileSync } from 'child_process';
 
 let client: LanguageClient;
 
-const TARGET_VERSION = "0.1.1";
+const TARGET_VERSION = "0.1.2";
 
 async function installWoke(outputChannel: vscode.OutputChannel) {
     try {
