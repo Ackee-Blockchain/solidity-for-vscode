@@ -23,13 +23,13 @@ const TARGET_VERSION = "0.1.2";
 
 async function installWoke(outputChannel: vscode.OutputChannel) {
     try {
-        outputChannel.appendLine("Running `python3 -m pip install abch-woke -U`");
+        outputChannel.appendLine("Running 'python3 -m pip install abch-woke -U'");
         let out = execFileSync("python3", ["-m", "pip", "install", "abch-woke", "-U"]).toString("utf8");
         outputChannel.appendLine(out);
 
     } catch(err) {
         if (err instanceof Error) {
-            outputChannel.appendLine("Failed to install PyPi package abch-woke:");
+            outputChannel.appendLine("Failed to install PyPi package 'abch-woke':");
             outputChannel.appendLine(err.toString());
         }
     }
@@ -40,6 +40,25 @@ function getWokeVersion(): string {
     return execFileSync("woke", ["--version"]).toString("utf8").trim();
 }
 
+async function checkWokeInstalled(outputChannel: vscode.OutputChannel) {
+    try {
+        const version: string = getWokeVersion();
+
+        if (compare(version, TARGET_VERSION, "<")) {
+            outputChannel.appendLine(`PyPi package 'abch-woke' in version ${version} installed but the target minimal version is ${TARGET_VERSION}.`);
+            await installWoke(outputChannel);
+        }
+
+    } catch(err) {
+        if (err instanceof Error) {
+            outputChannel.appendLine(err.toString());
+        }
+        outputChannel.appendLine("Installing PyPi package 'abch-woke'.");
+        await installWoke(outputChannel);
+    }
+
+}
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -47,37 +66,24 @@ export async function activate(context: vscode.ExtensionContext) {
     const outputChannel = vscode.window.createOutputChannel("ABCH Tools for Solidity", "abch-tools-for-solidity-output");
     outputChannel.show(true);
 
-    let version: string;
+    const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("ABCH-Tools-for-Solidity");
+    const autoInstall: boolean = extensionConfig.get<boolean>('Woke.autoInstall', true);
 
-    try {
-        version = getWokeVersion();
-
-        if (compare(version, TARGET_VERSION, "<")) {
-            outputChannel.appendLine(`Woke in version ${version} installed but target minimal version is ${TARGET_VERSION}`);
-            await installWoke(outputChannel);
-            version = getWokeVersion();
-        }
-
-    } catch(err) {
-        if (err instanceof Error) {
-            outputChannel.appendLine(err.toString());
-        }
-        outputChannel.appendLine("Installing PyPi package abch-woke");
-        await installWoke(outputChannel);
+    if (autoInstall) {
+        await checkWokeInstalled(outputChannel);
     }
 
     try {
-        version = getWokeVersion();
+        const version: string = getWokeVersion();
         if (compare(version, TARGET_VERSION, "<")) {
-            outputChannel.appendLine(`Woke in version ${version} installed but target minimal version is ${TARGET_VERSION}`);
-            outputChannel.appendLine(`Unable to install PyPi package abch-woke in version ${TARGET_VERSION} or newer. Exiting...`);
+            outputChannel.appendLine(`PyPi package 'abch-woke' in version ${version} installed but the target minimal version is ${TARGET_VERSION}. Exiting...`);
             return;
         }
     } catch(err) {
         if (err instanceof Error) {
             outputChannel.appendLine(err.toString());
         }
-        outputChannel.appendLine(`Unable to install PyPi package abch-woke in version ${TARGET_VERSION} or newer. Exiting...`);
+        outputChannel.appendLine(`Unable to determine the version of 'abch-woke' PyPi package. Please make sure that 'woke' executable is in your PATH. Exiting...`);
         return;
     }
 
