@@ -75,6 +75,11 @@
                     ],
                     "default": "off",
                     "description": "Traces the communication between VS Code and the language server."
+                },
+                "ABCH-Tools-for-Solidity.Woke.autoInstall": {
+                    "type": "boolean",
+                    "default": "true",
+                    "description": "Automatically install and update 'abch-woke' PyPi package needed by ABCH Tools for Solidity"
                 }
             }
         },
