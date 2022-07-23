@@ -141,6 +141,6 @@
         "vscode-languageclient": "^8.0.1",
         "get-port": "<6.0.0",
         "wait-port": "^0.3.0",
-        "compare-versions": "^4.1.2"
+        "@renovatebot/pep440": "^2.0.0"
     }
 }

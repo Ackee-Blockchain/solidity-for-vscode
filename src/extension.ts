@@ -12,7 +12,7 @@ import {
 
 import getPort = require('get-port');
 import waitPort = require('wait-port');
-import { compare } from 'compare-versions';
+import { compare } from '@renovatebot/pep440';
 import { ChildProcess, execFile, execFileSync } from 'child_process';
 
 
@@ -44,7 +44,7 @@ async function checkWokeInstalled(outputChannel: vscode.OutputChannel) {
     try {
         const version: string = getWokeVersion();
 
-        if (compare(version, TARGET_VERSION, "<")) {
+        if (compare(version, TARGET_VERSION) < 0) {
             outputChannel.appendLine(`PyPi package 'abch-woke' in version ${version} installed but the target minimal version is ${TARGET_VERSION}.`);
             await installWoke(outputChannel);
         }
@@ -75,7 +75,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     try {
         const version: string = getWokeVersion();
-        if (compare(version, TARGET_VERSION, "<")) {
+        if (compare(version, TARGET_VERSION) < 0) {
             outputChannel.appendLine(`PyPi package 'abch-woke' in version ${version} installed but the target minimal version is ${TARGET_VERSION}. Exiting...`);
             return;
         }
