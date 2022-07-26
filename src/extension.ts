@@ -70,6 +70,21 @@ export async function activate(context: vscode.ExtensionContext) {
     const autoInstall: boolean = extensionConfig.get<boolean>('Woke.autoInstall', true);
 
     if (autoInstall) {
+        try {
+            const pythonVersion = execFileSync("python3", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).toString("utf8").trim();
+
+            if (compare(pythonVersion, "3.7.0") < 0) {
+                outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
+                return;
+            }
+
+        } catch(err) {
+            if (err instanceof Error) {
+                outputChannel.appendLine(err.toString());
+            }
+            outputChannel.appendLine("Unable to determine the version of Python. Python >=3.7 must be installed.");
+            return;
+        }
         await checkWokeInstalled(outputChannel);
     }
 
