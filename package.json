@@ -48,6 +48,14 @@
                     "default": "",
                     "description": "EVM version passed to the solc compiler"
                 },
+                "woke.compiler.solc.ignore_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": ["node_modules", ".woke-build"],
+                    "description": "Files in these paths are ignored from LSP analysis unless imported from other non-ignored files"
+                },
                 "woke.compiler.solc.include_paths": {
                     "type": "array",
                     "items": {
