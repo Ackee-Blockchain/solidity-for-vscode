@@ -65,6 +65,11 @@
                     "default": "",
                     "description": "The version of the solc compiler used to compile all project files"
                 },
+                "woke.lsp.find_references.include_declarations": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Also include declarations in 'Go to references' results"
+                },
                 "ABCH-Tools-for-Solidity.trace.server": {
                     "scope": "window",
                     "type": "string",
