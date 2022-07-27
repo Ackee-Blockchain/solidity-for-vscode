@@ -1,70 +1,80 @@
-# abch-tools-for-solidity README
-
-This is the README for your extension "abch-tools-for-solidity". After writing up a brief description, we recommend including the following sections.
+# Ackee Blockchain Tools for Solidity
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Go to definition
 
-For example if there is an image subfolder under your extension project workspace:
+![Go to definition preview](images/go-to-definition.gif)
 
-\!\[feature X\]\(images/feature-x.png\)
+### Go to type definition
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![Go to type definition preview](images/go-to-type-definition.gif)
+
+### Go to implementation
+
+Find implementations of an unimplemented function or modifier.
+
+![Go to implementation preview](images/go-to-implementation.gif)
+
+### Find references
+
+![Find references preview](images/find-references.gif)
+
+### Type hierarchy
+
+![Contract type hierarchy preview](images/contract-type-hierarchy.gif)
+
+Also works for virtual functions.
+
+![Function type hierarchy preview](images/function-type-hierarchy.gif)
+
+### Document links
+
+![Document links preview](images/document-links.gif)
+
+### Code lens
+
+Number of references is shown above each declaration.
+
+![Code lens preview](images/code-lens.png)
+
+### Document symbols
+
+![Document symbols preview](images/document-symbols.png)
+
+### Diagnostics
+
+![Diagnostics preview](images/diagnostics-1.gif)
+
+![Diagnostics preview](images/diagnostics-2.png)
+
+### Rename
+
+![Rename preview](images/rename.gif)
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+This extension uses the PyPi package [abch-woke](https://pypi.org/project/abch-woke/) which requires Python 3.7 or higher.
+The package [abch-woke](https://pypi.org/project/abch-woke/) is installed automatically when this extension is activated. Alternatively, it can be installed manually using `python3 -m pip install abch-woke`.
 
-## Extension Settings
+## Supported commands
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+- Woke: Force Recompile Project (`woke.lsp.force_recompile`): Force recompile the opened project/files.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+### Files created/modified/deleted outside of VS Code are not properly analysed
 
-## Release Notes
+The extension currently does not handle changes external to VS Code. This especially means that files installed into `node_modules` are not detected. Please run the `Woke: Force Recompile Project` command after installing node packages as a workaround.
 
-Users appreciate release notes as you update your extension.
+### `Go to references`, number of references and other features do not work correctly with no workspace open
 
-### 1.0.0
+It is always recommended to open a project as a folder (`File -> Open folder`). `Open file` should only be used when opening a single file or several files inside the same folder.
 
-Initial release of ...
+### Analysis does not work when the workspace contains compilation errors
 
-### 1.0.1
+The extension relies on the `solc` compiler. For this reason, files containing compilation errors and files importing these files cannot be analysed.
 
-Fixed issue #.
+## Acknowledgements
 
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Base of our Solidity grammar: [juanfranblanco/vscode-solidity](https://github.com/juanfranblanco/vscode-solidity/blob/master/syntaxes/solidity.json)
