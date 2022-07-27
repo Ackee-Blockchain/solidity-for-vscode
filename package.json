@@ -115,8 +115,8 @@
         ],
         "commands": [
             {
-                "command": "abch-tools-for-solidity.helloWorld",
-                "title": "Hello World"
+                "command": "woke.lsp.force_recompile",
+                "title": "Woke: Force Recompile Project"
             }
         ]
     },
