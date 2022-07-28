@@ -19,12 +19,19 @@ import { ChildProcess, execFile, execFileSync } from 'child_process';
 
 let client: LanguageClient;
 
-const TARGET_VERSION = "0.1.2";
+const WOKE_TARGET_VERSION = "0.1.3rc2";
+const WOKE_PRERELEASE = true;
 
 async function installWoke(outputChannel: vscode.OutputChannel): Promise<boolean> {
     try {
-        outputChannel.appendLine("Running 'python3 -m pip install abch-woke -U'");
-        let out = execFileSync("python3", ["-m", "pip", "install", "abch-woke", "-U"]).toString("utf8");
+        let out;
+        if (WOKE_PRERELEASE) {
+            outputChannel.appendLine("Running 'python3 -m pip install abch-woke -U --pre'");
+            out = execFileSync("python3", ["-m", "pip", "install", "abch-woke", "-U", "--pre"]).toString("utf8");
+        } else {
+            outputChannel.appendLine("Running 'python3 -m pip install abch-woke -U'");
+            out = execFileSync("python3", ["-m", "pip", "install", "abch-woke", "-U"]).toString("utf8");
+        }
         outputChannel.appendLine(out);
         return true;
     } catch(err) {
@@ -44,8 +51,8 @@ async function checkWokeInstalled(outputChannel: vscode.OutputChannel): Promise<
     try {
         const version: string = getWokeVersion();
 
-        if (compare(version, TARGET_VERSION) < 0) {
-            outputChannel.appendLine(`PyPi package 'abch-woke' in version ${version} installed but the target minimal version is ${TARGET_VERSION}.`);
+        if (compare(version, WOKE_TARGET_VERSION) < 0) {
+            outputChannel.appendLine(`PyPi package 'abch-woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}.`);
             return await installWoke(outputChannel);
         }
         return true;
@@ -90,8 +97,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     try {
         const version: string = getWokeVersion();
-        if (compare(version, TARGET_VERSION) < 0) {
-            outputChannel.appendLine(`PyPi package 'abch-woke' in version ${version} installed but the target minimal version is ${TARGET_VERSION}. Exiting...`);
+        if (compare(version, WOKE_TARGET_VERSION) < 0) {
+            outputChannel.appendLine(`PyPi package 'abch-woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}. Exiting...`);
             return;
         }
     } catch(err) {
