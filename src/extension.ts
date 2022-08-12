@@ -10,6 +10,8 @@ import {
     StreamInfo
 } from 'vscode-languageclient/node';
 
+const path = require('node:path');
+
 import getPort = require('get-port');
 import waitPort = require('wait-port');
 import { compare } from '@renovatebot/pep440';
@@ -43,13 +45,13 @@ async function installWoke(outputChannel: vscode.OutputChannel): Promise<boolean
     }
 }
 
-function getWokeVersion(): string {
-    return execFileSync("woke", ["--version"]).toString("utf8").trim();
+function getWokeVersion(cwd?: string): string {
+    return execFileSync("woke", ["--version"], {"cwd": cwd}).toString("utf8").trim();
 }
 
-async function checkWokeInstalled(outputChannel: vscode.OutputChannel): Promise<boolean> {
+async function checkWokeInstalled(outputChannel: vscode.OutputChannel, cwd?: string): Promise<boolean> {
     try {
-        const version: string = getWokeVersion();
+        const version: string = getWokeVersion(cwd);
 
         if (compare(version, WOKE_TARGET_VERSION) < 0) {
             outputChannel.appendLine(`PyPi package 'abch-woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}.`);
@@ -57,12 +59,33 @@ async function checkWokeInstalled(outputChannel: vscode.OutputChannel): Promise<
         }
         return true;
     } catch(err) {
-        if (err instanceof Error) {
-            outputChannel.appendLine(err.toString());
-        }
-        outputChannel.appendLine("Installing PyPi package 'abch-woke'.");
-        return await installWoke(outputChannel);
+        return false;
     }
+}
+
+async function findWokeDir(outputChannel: vscode.OutputChannel): Promise<string|boolean|undefined> {
+    let installed: boolean = await checkWokeInstalled(outputChannel);
+    let cwd: string|undefined = undefined;
+
+    if (!installed) {
+        const userPackages = execFileSync("python3", ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).toString("utf8").trim();
+        installed = await checkWokeInstalled(outputChannel, userPackages);
+        if (installed) {
+            cwd = userPackages;
+        }
+    }
+    if (!installed) {
+        const globalPackages = execFileSync("python3", ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).toString("utf8").trim();
+        installed = await checkWokeInstalled(outputChannel, globalPackages);
+        if (installed) {
+            cwd = globalPackages;
+        }
+    }
+    if (!installed) {
+        return false;
+    }
+
+    return cwd;
 }
 
 
@@ -75,6 +98,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("ABCH-Tools-for-Solidity");
     const autoInstall: boolean = extensionConfig.get<boolean>('Woke.autoInstall', true);
     let installed: boolean = false;
+    let cwd: string|undefined = undefined;
 
     if (autoInstall) {
         try {
@@ -92,11 +116,29 @@ export async function activate(context: vscode.ExtensionContext) {
             outputChannel.appendLine("Unable to determine the version of Python. Python >=3.7 must be installed.");
             return;
         }
-        installed = await checkWokeInstalled(outputChannel);
+
+        let result: string|boolean|undefined = await findWokeDir(outputChannel);
+        if (result === false || result === true) {
+            outputChannel.appendLine("Installing PyPi package 'abch-woke'.");
+            installed = await installWoke(outputChannel);
+
+            if (installed) {
+                result = await findWokeDir(outputChannel);
+
+                if (result === false || result === true) {
+                    outputChannel.appendLine("'abch-woke' installed but cannot be found in PATH or pip site-packages.");
+                }
+                else {
+                    cwd = result;
+                }
+            }
+        } else {
+            cwd = result;
+        }
     }
 
     try {
-        const version: string = getWokeVersion();
+        const version: string = getWokeVersion(cwd);
         if (compare(version, WOKE_TARGET_VERSION) < 0) {
             outputChannel.appendLine(`PyPi package 'abch-woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}. Exiting...`);
             return;
@@ -105,12 +147,6 @@ export async function activate(context: vscode.ExtensionContext) {
         if (err instanceof Error) {
             outputChannel.appendLine(err.toString());
         }
-        if (installed) {
-            try {
-                const binPath = execFileSync("python3", ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).toString("utf8").trim();
-                outputChannel.appendLine(`Unable to determine the version of 'abch-woke' PyPi package. 'woke' executable should be available in '${binPath}'. Please add this directory to your PATH.`);
-            } catch(err) {}
-        }
         outputChannel.appendLine(`Unable to determine the version of 'abch-woke' PyPi package.`);
         return;
     }
@@ -118,8 +154,13 @@ export async function activate(context: vscode.ExtensionContext) {
     const serverOptions: ServerOptions = async () => {
         const freePort: number = await getPort();
 
-        outputChannel.appendLine(`Running 'woke lsp --port ${freePort}'`);
-        const process: ChildProcess = execFile("woke", ["lsp", "--port", String(freePort)], (error, stdout, stderr) => {
+        let wokePath: string = "woke";
+        if (cwd !== undefined) {
+            wokePath = path.join(cwd, "woke");
+        }
+
+        outputChannel.appendLine(`Running '${wokePath} lsp --port ${freePort}'`);
+        const process: ChildProcess = execFile("woke", ["lsp", "--port", String(freePort)], {cwd: cwd}, (error, stdout, stderr) => {
             if (error) {
                 outputChannel.appendLine(error.message);
                 throw error;
