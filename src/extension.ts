@@ -118,6 +118,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const serverOptions: ServerOptions = async () => {
         const freePort: number = await getPort();
 
+        outputChannel.appendLine(`Running 'woke lsp --port ${freePort}'`);
         const process: ChildProcess = execFile("woke", ["lsp", "--port", String(freePort)], (error, stdout, stderr) => {
             if (error) {
                 outputChannel.appendLine(error.message);
@@ -125,11 +126,13 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         });
 
-        await waitPort({
+        if (!await waitPort({
             host: "127.0.0.1",
             port: freePort,
-            timeout: 5000
-        });
+            timeout: 15000
+        })) {
+            outputChannel.appendLine(`Timed out waiting for port ${freePort} to open.`);
+        }
 
         let socket = net.connect({
             port: freePort,
