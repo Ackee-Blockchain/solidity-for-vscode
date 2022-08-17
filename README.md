@@ -32,6 +32,12 @@ Also works for virtual functions.
 
 ![Document links preview](images/document-links.gif)
 
+### Hover
+
+Includes links to documentation for OpenZeppelin contracts.
+
+![Hover preview](images/hover.gif)
+
 ### Code lens
 
 Number of references is shown above each declaration.
