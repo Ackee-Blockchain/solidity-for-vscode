@@ -19,7 +19,8 @@ import { ChildProcess, execFile, execFileSync } from 'child_process';
 
 
 
-let client: LanguageClient;
+let client: LanguageClient | undefined = undefined;
+let wokeProcess: ChildProcess | undefined = undefined;
 
 const WOKE_TARGET_VERSION = "0.1.3rc3";
 const WOKE_PRERELEASE = true;
@@ -160,12 +161,13 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         outputChannel.appendLine(`Running '${wokePath} lsp --port ${freePort}'`);
-        const process: ChildProcess = execFile("woke", ["lsp", "--port", String(freePort)], {cwd: cwd}, (error, stdout, stderr) => {
+        wokeProcess = execFile("woke", ["lsp", "--port", String(freePort)], {cwd: cwd}, (error, stdout, stderr) => {
             if (error) {
                 outputChannel.appendLine(error.message);
                 throw error;
             }
         });
+        wokeProcess.on('exit', () => wokeProcess = undefined);
 
         if (!await waitPort({
             host: "127.0.0.1",
@@ -198,9 +200,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
-    if (!client) {
-        return undefined;
+    if (client !== undefined) {
+        client.stop();
     }
-
-    return client.stop();
+    if (wokeProcess !== undefined) {
+        if (!wokeProcess.kill()) {
+            wokeProcess.kill("SIGKILL");
+        }
+    }
 }
