@@ -1,7 +1,20 @@
 {
     "name": "abch-tools-for-solidity",
     "displayName": "ABCH Tools for Solidity",
-    "description": "Language server for Solidity",
+    "description": "Visual Studio Code plugin implementing a language server for Solidity",
+    "keywords": [
+        "solidity",
+        "ethereum",
+        "blockchain",
+        "review",
+        "audit",
+        "security",
+        "compiler",
+        "solidity audit",
+        "solidity security"
+      ],
+    "publisher": "ackeeblockchain",
+    "license": "ISC",
     "repository": {
         "type": "git",
         "url": "https://github.com/Ackee-Blockchain/abch-tools-for-solidity-vscode.git"
@@ -11,7 +24,7 @@
         "vscode": "^1.67.0"
     },
     "categories": [
-        "Other"
+        "Programming Languages"
     ],
     "activationEvents": [
         "onLanguage:solidity",
