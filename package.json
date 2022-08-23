@@ -15,14 +15,14 @@
         "solidity audit",
         "solidity security"
       ],
-    "license": "ISC",
+    "license": "SEE LICENSE IN LICENSE",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Ackee-Blockchain/abch-tools-for-solidity-vscode.git"
+        "url": "https://github.com/Ackee-Blockchain/abch-tools-for-solidity-vscode/blob/main/LICENSE"
     },
     "icon": "images/icon.png",
     "galleryBanner": {
-        "color": "#0000FF",
+        "color": "#000000",
         "theme": "dark"
       },
     "engines": {

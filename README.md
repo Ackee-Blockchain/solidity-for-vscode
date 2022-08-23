@@ -1,6 +1,35 @@
 # Ackee Blockchain Tools for Solidity
 
-## Features
+ABCH tools for Solidity is a [Visual Studio Code](https://code.visualstudio.com/) plugin that implements a language server for Solidity. 
+
+**This extension provides the following features:**
+
+- Go to definition
+- Go to type definition
+- Go to implementation 
+- Find references
+- Type hierarchy
+- Document links
+- Code lens
+- Document symbols
+- Diagnostics
+- Rename
+
+## Dependencies
+
+The ABCH Tools extension uses the PyPi package [abch-woke](https://pypi.org/project/abch-woke/) which requires Python 3.7 or higher.
+
+## Installation
+
+The package [abch-woke](https://pypi.org/project/abch-woke/) is installed `automatically` when this extension is activated. 
+
+Alternatively, it can be installed `manually` using: 
+
+```shell
+python3 -m pip install abch-woke
+```
+
+## Features 
 
 ### Go to definition
 
@@ -58,29 +87,29 @@ Number of references is shown above each declaration.
 
 ![Rename preview](images/rename.gif)
 
-## Requirements
-
-This extension uses the PyPi package [abch-woke](https://pypi.org/project/abch-woke/) which requires Python 3.7 or higher.
-The package [abch-woke](https://pypi.org/project/abch-woke/) is installed automatically when this extension is activated. Alternatively, it can be installed manually using `python3 -m pip install abch-woke`.
-
 ## Supported commands
 
-- Woke: Force Recompile Project (`woke.lsp.force_recompile`): Force recompile the opened project/files.
+- **Woke: Force Recompile Project**
+
+```shell
+woke.lsp.force_recompile
+``` 
+Force recompile the opened project/files.
 
 ## Known Issues
 
-### Files created/modified/deleted outside of VS Code are not properly analysed
+- **Files created/modified/deleted outside of VS Code are not properly analysed**
 
 The extension currently does not handle changes external to VS Code. This especially means that files installed into `node_modules` are not detected. Please run the `Woke: Force Recompile Project` command after installing node packages as a workaround.
 
-### `Go to references`, number of references and other features do not work correctly with no workspace open
+- **`Go to references`, number of references and other features do not work correctly with no workspace open**
 
 It is always recommended to open a project as a folder (`File -> Open folder`). `Open file` should only be used when opening a single file or several files inside the same folder.
 
-### Analysis does not work when the workspace contains compilation errors
+- **Analysis does not work when the workspace contains compilation errors**
 
 The extension relies on the `solc` compiler. For this reason, files containing compilation errors and files importing these files cannot be analysed.
 
 ## Acknowledgements
 
-Base of our Solidity grammar: [juanfranblanco/vscode-solidity](https://github.com/juanfranblanco/vscode-solidity/blob/master/syntaxes/solidity.json)
+We used [juanfranblanco/vscode-solidity](https://github.com/juanfranblanco/vscode-solidity/blob/master/syntaxes/solidity.json) as a base of our Solidity grammar.
