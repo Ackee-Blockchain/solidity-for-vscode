@@ -3,7 +3,7 @@
     "displayName": "ABCH Tools for Solidity",
     "version": "0.1.0-rc3",
     "publisher": "ackeeblockchain",
-    "description": "Visual Studio Code plugin implementing a language server for Solidity",
+    "description": "Visual Studio Code plugin that implements a language server for Solidity",
     "keywords": [
         "solidity",
         "ethereum",
@@ -12,7 +12,6 @@
         "audit",
         "security",
         "compiler",
-        "solidity audit",
         "solidity security"
       ],
     "license": "SEE LICENSE IN LICENSE",
