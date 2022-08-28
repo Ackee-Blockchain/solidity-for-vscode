@@ -111,6 +111,11 @@
                     "default": 200,
                     "description": "Configuration of the optimizer specifying how many times the code is intended to be run. Lower values optimize more for initial deployment cost, while higher values optimize more for high-frequency usage."
                 },
+                "woke.lsp.code_lens.enable": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable code lens with number of references"
+                },
                 "woke.lsp.find_references.include_declarations": {
                     "type": "boolean",
                     "default": false,
