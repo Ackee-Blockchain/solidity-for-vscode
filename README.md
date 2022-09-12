@@ -1,12 +1,12 @@
 # Ackee Blockchain Tools for Solidity
 
-ABCH tools for Solidity is a [Visual Studio Code](https://code.visualstudio.com/) plugin that implements a language server for Solidity. 
+ABCH tools for Solidity is a [Visual Studio Code](https://code.visualstudio.com/) plugin that implements a language server for Solidity.
 
 **This extension provides the following features:**
 
 - Go to definition
 - Go to type definition
-- Go to implementation 
+- Go to implementation
 - Find references
 - Type hierarchy
 - Document links
@@ -21,15 +21,15 @@ The ABCH Tools extension uses the PyPi package [abch-woke](https://pypi.org/proj
 
 ## Installation
 
-The package [abch-woke](https://pypi.org/project/abch-woke/) is installed `automatically` when this extension is activated. 
+The package [abch-woke](https://pypi.org/project/abch-woke/) is installed `automatically` when this extension is activated.
 
-Alternatively, it can be installed `manually` using: 
+Alternatively, it can be installed `manually` using:
 
 ```shell
 python3 -m pip install abch-woke
 ```
 
-## Features 
+## Features
 
 ### Go to definition
 
@@ -93,7 +93,7 @@ Number of references is shown above each declaration.
 
 ```shell
 woke.lsp.force_recompile
-``` 
+```
 Force recompile the opened project/files.
 
 ## Known Issues
