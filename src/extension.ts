@@ -93,10 +93,10 @@ async function findWokeDir(outputChannel: vscode.OutputChannel): Promise<string|
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-    const outputChannel = vscode.window.createOutputChannel("ABCH Tools for Solidity", "abch-tools-for-solidity-output");
+    const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
     outputChannel.show(true);
 
-    const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("ABCH-Tools-for-Solidity");
+    const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
     const autoInstall: boolean = extensionConfig.get<boolean>('Woke.autoInstall', true);
     let installed: boolean = false;
     let cwd: string|undefined = undefined;
@@ -194,7 +194,7 @@ export async function activate(context: vscode.ExtensionContext) {
         outputChannel: outputChannel
     };
 
-    client = new LanguageClient("ABCH-Tools-for-Solidity", "ABCH Tools for Solidity", serverOptions, clientOptions);
+    client = new LanguageClient("Tools-for-Solidity", "Tools for Solidity", serverOptions, clientOptions);
     client.start();
 }
 
