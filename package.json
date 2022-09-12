@@ -1,6 +1,6 @@
 {
-    "name": "abch-tools-for-solidity",
-    "displayName": "ABCH Tools for Solidity",
+    "name": "tools-for-solidity",
+    "displayName": "Tools for Solidity",
     "version": "0.1.0-rc3",
     "publisher": "ackeeblockchain",
     "description": "Visual Studio Code plugin that implements a language server for Solidity",
@@ -17,7 +17,7 @@
     "license": "SEE LICENSE IN LICENSE",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Ackee-Blockchain/abch-tools-for-solidity-vscode/blob/main/LICENSE"
+        "url": "https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/blob/main/LICENSE"
     },
     "icon": "images/icon.png",
     "galleryBanner": {
@@ -38,7 +38,7 @@
     "main": "./out/extension.js",
     "contributes": {
         "configuration": {
-            "title": "ABCH Tools for Solidity",
+            "title": "Tools for Solidity",
             "properties": {
                 "woke.compiler.solc.allow_paths": {
                     "type": "array",
@@ -116,7 +116,7 @@
                     "default": false,
                     "description": "Also include declarations in 'Go to references' results"
                 },
-                "ABCH-Tools-for-Solidity.trace.server": {
+                "Tools-for-Solidity.trace.server": {
                     "scope": "window",
                     "type": "string",
                     "enum": [
@@ -127,10 +127,10 @@
                     "default": "off",
                     "description": "Traces the communication between VS Code and the language server."
                 },
-                "ABCH-Tools-for-Solidity.Woke.autoInstall": {
+                "Tools-for-Solidity.Woke.autoInstall": {
                     "type": "boolean",
                     "default": "true",
-                    "description": "Automatically install and update 'abch-woke' PyPi package needed by ABCH Tools for Solidity"
+                    "description": "Automatically install and update 'abch-woke' PyPi package needed by Tools for Solidity"
                 }
             }
         },
@@ -142,7 +142,7 @@
                 "configuration": "./language-configuration.json"
             },
             {
-            "id": "abch-tools-for-solidity-output",
+            "id": "tools-for-solidity-output",
             "extensions": [".output"],
             "configuration": "./resources/log.configuration.json"
         }
@@ -154,7 +154,7 @@
             "path": "./syntaxes/solidity.tmLanguage.json"
         },
         {
-            "language": "abch-tools-for-solidity-output",
+            "language": "tools-for-solidity-output",
             "scopeName": "source.woke.output",
             "path": "./syntaxes/log.configuration.json"
         }
