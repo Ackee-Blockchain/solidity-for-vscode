@@ -1,4 +1,4 @@
-# Ackee Blockchain Tools for Solidity
+# [Ackee Blockchain](https://ackeeblockchain.com) Tools for Solidity
 
 Tools for Solidity is a [Visual Studio Code](https://code.visualstudio.com/) plugin that implements a language server for Solidity.
 
@@ -10,6 +10,7 @@ Tools for Solidity is a [Visual Studio Code](https://code.visualstudio.com/) plu
 - Find references
 - Type hierarchy
 - Document links
+- Hover
 - Code lens
 - Document symbols
 - Diagnostics
