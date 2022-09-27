@@ -18,16 +18,16 @@ Tools for Solidity is a [Visual Studio Code](https://code.visualstudio.com/) plu
 
 ## Dependencies
 
-The Tools for Solidity extension uses the PyPi package [abch-woke](https://pypi.org/project/abch-woke/) which requires Python 3.7 or higher.
+The Tools for Solidity extension uses the PyPi package [woke](https://pypi.org/project/woke/) which requires Python 3.7 or higher.
 
 ## Installation
 
-The package [abch-woke](https://pypi.org/project/abch-woke/) is installed `automatically` when this extension is activated.
+The package [woke](https://pypi.org/project/woke/) is installed `automatically` when this extension is activated.
 
 Alternatively, it can be installed `manually` using:
 
 ```shell
-python3 -m pip install abch-woke
+python3 -m pip install woke
 ```
 
 ## Features
