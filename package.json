@@ -135,7 +135,7 @@
                 "Tools-for-Solidity.Woke.autoInstall": {
                     "type": "boolean",
                     "default": "true",
-                    "description": "Automatically install and update 'abch-woke' PyPi package needed by Tools for Solidity"
+                    "description": "Automatically install and update 'woke' PyPi package needed by Tools for Solidity"
                 }
             }
         },
