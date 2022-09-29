@@ -3,7 +3,7 @@
     "displayName": "Tools for Solidity",
     "version": "0.1.0-rc3",
     "publisher": "ackeeblockchain",
-    "description": "Visual Studio Code plugin that implements a language server for Solidity",
+    "description": "Tools for Solidity utilizing the Woke tool",
     "keywords": [
         "solidity",
         "ethereum",
@@ -14,16 +14,20 @@
         "compiler",
         "solidity security"
       ],
-    "license": "SEE LICENSE IN LICENSE",
+    "homepage": "https://ackeeblockchain.com/blog/introducing-tools-for-solidity/",
+    "bugs": {
+        "url": "https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/issues"
+    },
     "repository": {
         "type": "git",
-        "url": "https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/blob/main/LICENSE"
+        "url": "https://github.com/Ackee-Blockchain/tools-for-solidity-vscode.git"
     },
     "icon": "images/icon.png",
     "engines": {
         "vscode": "^1.67.0"
     },
     "categories": [
+        "Linters",
         "Programming Languages"
     ],
     "activationEvents": [
@@ -131,7 +135,7 @@
                 "Tools-for-Solidity.Woke.autoInstall": {
                     "type": "boolean",
                     "default": "true",
-                    "description": "Automatically install and update 'woke' PyPi package needed by Tools for Solidity"
+                    "description": "Automatically install 'woke' PyPi package needed by Tools for Solidity"
                 }
             }
         },

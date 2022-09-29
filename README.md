@@ -2,7 +2,7 @@
 
 Tools for Solidity is a [Visual Studio Code](https://code.visualstudio.com/) plugin that implements a language server for Solidity.
 
-**This extension provides the following features:**
+**This extension provides the following language server features:**
 
 - Go to definition
 - Go to type definition
@@ -83,6 +83,12 @@ Number of references is shown above each declaration.
 ![Diagnostics preview](images/diagnostics-1.gif)
 
 ![Diagnostics preview](images/diagnostics-2.png)
+
+Together with compiler errors, diagnostics also include results from Woke vulnerability detectors.
+
+![Diagnostics preview](images/diagnostics-3.png)
+
+![Diagnostics preview](images/diagnostics-4.png)
 
 ### Rename
 
