@@ -13,7 +13,7 @@
         "security",
         "compiler",
         "solidity security"
-      ],
+    ],
     "homepage": "https://ackeeblockchain.com/blog/introducing-tools-for-solidity/",
     "bugs": {
         "url": "https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/issues"
@@ -35,7 +35,7 @@
         "workspaceContains:**/*.sol",
         "onLanguage:woke-output"
     ],
-    "main": "./out/extension.js",
+    "main": "./dist/extension",
     "contributes": {
         "configuration": {
             "title": "Tools for Solidity",
@@ -70,7 +70,10 @@
                     "items": {
                         "type": "string"
                     },
-                    "default": ["node_modules", ".woke-build"],
+                    "default": [
+                        "node_modules",
+                        ".woke-build"
+                    ],
                     "description": "Files in these paths are ignored from LSP analysis unless imported from other non-ignored files"
                 },
                 "woke.compiler.solc.include_paths": {
@@ -78,7 +81,9 @@
                     "items": {
                         "type": "string"
                     },
-                    "default": ["node_modules"],
+                    "default": [
+                        "node_modules"
+                    ],
                     "description": "Include paths used to search for non-relative import paths"
                 },
                 "woke.compiler.solc.remappings": {
@@ -95,15 +100,29 @@
                     "description": "The version of the solc compiler used to compile all project files"
                 },
                 "woke.compiler.solc.via_IR": {
-                    "type": ["boolean", "null"],
+                    "type": [
+                        "boolean",
+                        "null"
+                    ],
                     "default": null,
-                    "enum": [null, true, false],
+                    "enum": [
+                        null,
+                        true,
+                        false
+                    ],
                     "markdownDescription": "Compile the code via the Yul intermediate language (see [Solidity docs](https://docs.soliditylang.org/en/latest/ir-breaking-changes.html)). If not set (null), let the compiler decide."
                 },
                 "woke.compiler.solc.optimizer.enabled": {
-                    "type": ["boolean", "null"],
+                    "type": [
+                        "boolean",
+                        "null"
+                    ],
                     "default": null,
-                    "enum": [null, true, false],
+                    "enum": [
+                        null,
+                        true,
+                        false
+                    ],
                     "description": "Compile the project with solc optimizations enabled. Setting this to 'null' (unset) disables most of the available optimizations. Setting this to 'false' disables all optimizations for Solidity <0.8.6 and has the same behavior as 'null' for Solidity >=0.8.6."
                 },
                 "woke.compiler.solc.optimizer.runs": {
@@ -147,27 +166,34 @@
         "languages": [
             {
                 "id": "solidity",
-                "extensions": [".sol"],
-                "aliases": ["Solidity", "sol"],
+                "extensions": [
+                    ".sol"
+                ],
+                "aliases": [
+                    "Solidity",
+                    "sol"
+                ],
                 "configuration": "./language-configuration.json"
             },
             {
-            "id": "tools-for-solidity-output",
-            "extensions": [".output"],
-            "configuration": "./resources/log.configuration.json"
-        }
+                "id": "tools-for-solidity-output",
+                "extensions": [
+                    ".output"
+                ],
+                "configuration": "./resources/log.configuration.json"
+            }
         ],
         "grammars": [
             {
-            "language": "solidity",
-            "scopeName": "source.solidity",
-            "path": "./syntaxes/solidity.tmLanguage.json"
-        },
-        {
-            "language": "tools-for-solidity-output",
-            "scopeName": "source.woke.output",
-            "path": "./syntaxes/log.configuration.json"
-        }
+                "language": "solidity",
+                "scopeName": "source.solidity",
+                "path": "./syntaxes/solidity.tmLanguage.json"
+            },
+            {
+                "language": "tools-for-solidity-output",
+                "scopeName": "source.woke.output",
+                "path": "./syntaxes/log.configuration.json"
+            }
         ],
         "commands": [
             {
@@ -176,32 +202,33 @@
             }
         ]
     },
-    
     "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "pretest": "npm run compile && npm run lint",
-        "lint": "eslint src --ext ts",
-        "test": "node ./out/test/runTest.js"
+        "vscode:prepublish": "npm run package",
+        "webpack": "webpack --mode development",
+        "webpack-dev": "webpack --mode development --watch",
+        "package": "webpack --mode production --devtool hidden-source-map",
+        "test-compile": "tsc -p ./"
     },
     "devDependencies": {
-        "@types/vscode": "^1.67.0",
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.1",
         "@types/node": "16.x",
+        "@types/vscode": "^1.67.0",
         "@typescript-eslint/eslint-plugin": "^5.30.0",
         "@typescript-eslint/parser": "^5.30.0",
+        "@vscode/test-electron": "^2.1.5",
         "eslint": "^8.18.0",
         "glob": "^8.0.3",
         "mocha": "^10.0.0",
+        "ts-loader": "^9.4.1",
         "typescript": "^4.7.4",
-        "@vscode/test-electron": "^2.1.5"
+        "webpack": "^5.74.0",
+        "webpack-cli": "^4.10.0"
     },
     "dependencies": {
-        "vscode-languageclient": "^8.0.1",
+        "@renovatebot/pep440": "^2.0.0",
         "get-port": "<6.0.0",
-        "wait-port": "^0.3.0",
-        "@renovatebot/pep440": "^2.0.0"
+        "vscode-languageclient": "^8.0.1",
+        "wait-port": "^0.3.0"
     }
 }
