@@ -1,7 +1,7 @@
 {
     "name": "tools-for-solidity",
     "displayName": "Tools for Solidity",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "ackeeblockchain",
     "description": "Tools for Solidity utilizing the Woke tool",
     "keywords": [
