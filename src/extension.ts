@@ -22,7 +22,7 @@ import { ChildProcess, execFile, execFileSync } from 'child_process';
 let client: LanguageClient | undefined = undefined;
 let wokeProcess: ChildProcess | undefined = undefined;
 
-const WOKE_TARGET_VERSION = "1.0.1";
+const WOKE_TARGET_VERSION = "1.0.2";
 const WOKE_PRERELEASE = false;
 
 async function installWoke(outputChannel: vscode.OutputChannel): Promise<boolean> {
