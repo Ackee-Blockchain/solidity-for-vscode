@@ -3,7 +3,7 @@
     "displayName": "Tools for Solidity",
     "version": "1.0.1",
     "publisher": "ackeeblockchain",
-    "description": "Tools for Solidity utilizing the Woke tool",
+    "description": "Advanced Solidity support and vulnerability detectors developed by Ackee Blockchain",
     "keywords": [
         "solidity",
         "ethereum",
