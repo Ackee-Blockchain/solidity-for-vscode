@@ -1,6 +1,6 @@
 # [Ackee Blockchain](https://ackeeblockchain.com) Tools for Solidity
 
-Tools for Solidity is a [Visual Studio Code](https://code.visualstudio.com/) plugin that implements a language server for Solidity.
+Tools for Solidity is an extension for Visual Studio Code that implements a language server for Solidity. It offers most of the language server features and displays results of vulnerability detectors along with compiler warnings and errors.
 
 **This extension provides the following language server features:**
 
