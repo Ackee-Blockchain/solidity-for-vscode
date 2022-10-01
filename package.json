@@ -1,7 +1,7 @@
 {
     "name": "tools-for-solidity",
     "displayName": "Tools for Solidity",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "publisher": "ackeeblockchain",
     "description": "Advanced Solidity support and vulnerability detectors developed by Ackee Blockchain",
     "keywords": [

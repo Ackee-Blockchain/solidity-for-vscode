@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.2]
+
+- Extension description updated
+
 ## [1.0.1]
 
 - Fixed LSP features for Solidity symbols in inline assembly blocks not working
