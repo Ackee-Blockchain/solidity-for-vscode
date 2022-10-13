@@ -1,6 +1,6 @@
 # [Ackee Blockchain](https://ackeeblockchain.com) Tools for Solidity
 
-Tools for Solidity is an extension for Visual Studio Code that implements a language server for Solidity. It offers most of the language server features and displays results of vulnerability detectors along with compiler warnings and errors.
+Tools for Solidity is an extension for Visual Studio Code that implements a language server for Solidity. It offers most of the language server features and displays results of vulnerability detectors along with compiler warnings and errors. Different graph types can be generated to better vizualize the relations in the code.
 
 **This extension provides the following language server features:**
 
@@ -16,9 +16,22 @@ Tools for Solidity is an extension for Visual Studio Code that implements a lang
 - Diagnostics
 - Rename
 
+**The following types of graphs can be generated:**
+
+- Control flow graph of a function
+- Inheritance graph of a contract
+- Inheritance graph of a whole project
+- Linearized inheritance graph of a contract
+
 ## Dependencies
 
 The Tools for Solidity extension uses the PyPi package [woke](https://pypi.org/project/woke/) which requires Python 3.7 or higher.
+
+To display the generated graphs, one of the supported Graphviz (DOT) extensions must be installed:
+
+- [Graphviz (dot) language support for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=joaompinto.vscode-graphviz) (recommended)
+- [Graphviz Preview](https://marketplace.visualstudio.com/items?itemName=EFanZh.graphviz-preview)
+- [Graphviz Interactive Preview](https://marketplace.visualstudio.com/items?itemName=tintinweb.graphviz-interactive-preview)
 
 ## Installation
 
@@ -31,6 +44,14 @@ python3 -m pip install woke
 ```
 
 ## Features
+
+### Control flow graphs
+
+![Control flow graph](images/control_flow_graph.png)
+
+### Inheritance graphs
+
+![Inheritance graph](images/inheritance_graph.png)
 
 ### Go to definition
 
@@ -102,6 +123,13 @@ Together with compiler errors, diagnostics also include results from Woke vulner
 woke.lsp.force_recompile
 ```
 Force recompile the opened project/files.
+
+- **Tools for Solidity: Generate Inheritance Graph**
+
+```shell
+Tools-for-Solidity.generate.inheritance_graph
+```
+Generate an inheritance graph for the whole project.
 
 ## Known Issues
 
