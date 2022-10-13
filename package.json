@@ -130,6 +130,54 @@
                     "default": 200,
                     "description": "Configuration of the optimizer specifying how many times the code is intended to be run. Lower values optimize more for initial deployment cost, while higher values optimize more for high-frequency usage."
                 },
+                "woke.generator.control_flow_graph.direction": {
+                    "type": "string",
+                    "enum": [
+                        "TB",
+                        "BT",
+                        "LR",
+                        "RL"
+                    ],
+                    "default": "TB",
+                    "markdownDescription": "The direction of the generated control flow graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                },
+                "woke.generator.control_flow_graph.vscode_urls": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Generate vscode:// URLs in the generated control flow graph"
+                },
+                "woke.generator.inheritance_graph.direction": {
+                    "type": "string",
+                    "enum": [
+                        "TB",
+                        "BT",
+                        "LR",
+                        "RL"
+                    ],
+                    "default": "BT",
+                    "markdownDescription": "The direction of the generated inheritance graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                },
+                "woke.generator.inheritance_graph.vscode_urls": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Generate vscode:// URLs in the generated inheritance graph"
+                },
+                "woke.generator.inheritance_graph_full.direction": {
+                    "type": "string",
+                    "enum": [
+                        "TB",
+                        "BT",
+                        "LR",
+                        "RL"
+                    ],
+                    "default": "BT",
+                    "markdownDescription": "The direction of the inheritance graph generated for the whole project (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                },
+                "woke.generator.inheritance_graph_full.vscode_urls": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Generate vscode:// URLs in the inheritance graph generated for the whole project"
+                },
                 "woke.lsp.code_lens.enable": {
                     "type": "boolean",
                     "default": true,
