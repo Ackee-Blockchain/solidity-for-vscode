@@ -132,7 +132,7 @@
                 },
                 "woke.lsp.code_lens.enable": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "Enable code lens with number of references"
                 },
                 "woke.lsp.detectors.enable": {
