@@ -247,6 +247,10 @@
             {
                 "command": "woke.lsp.force_recompile",
                 "title": "Tools for Solidity: Force Recompile Project"
+            },
+            {
+                "command": "Tools-for-Solidity.generate.inheritance_graph",
+                "title": "Tools for Solidity: Generate Inheritance Graph"
             }
         ]
     },
