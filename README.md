@@ -96,7 +96,7 @@ Together with compiler errors, diagnostics also include results from Woke vulner
 
 ## Supported commands
 
-- **Woke: Force Recompile Project**
+- **Tools for Solidity: Force Recompile Project**
 
 ```shell
 woke.lsp.force_recompile

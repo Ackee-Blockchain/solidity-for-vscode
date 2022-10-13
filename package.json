@@ -246,7 +246,7 @@
         "commands": [
             {
                 "command": "woke.lsp.force_recompile",
-                "title": "Woke: Force Recompile Project"
+                "title": "Tools for Solidity: Force Recompile Project"
             }
         ]
     },
