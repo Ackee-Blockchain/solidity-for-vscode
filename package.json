@@ -125,6 +125,22 @@
                     ],
                     "description": "Compile the project with solc optimizations enabled. Setting this to 'null' (unset) disables most of the available optimizations. Setting this to 'false' disables all optimizations for Solidity <0.8.6 and has the same behavior as 'null' for Solidity >=0.8.6."
                 },
+                "woke.detectors.exclude": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "List of detectors (identified by their string or integer IDs) to exclude from the analysis"
+                },
+                "woke.detectors.only": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "List of detectors (identified by their string or integer IDs) to only use in the analysis"
+                },
                 "woke.compiler.solc.optimizer.runs": {
                     "type": "number",
                     "default": 200,
