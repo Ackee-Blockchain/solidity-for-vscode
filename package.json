@@ -265,6 +265,10 @@
                 "title": "Tools for Solidity: Force Recompile Project"
             },
             {
+                "command": "woke.lsp.force_rerun_detectors",
+                "title": "Tools for Solidity: Force Rerun Detectors"
+            },
+            {
                 "command": "Tools-for-Solidity.generate.inheritance_graph",
                 "title": "Tools for Solidity: Generate Inheritance Graph"
             }

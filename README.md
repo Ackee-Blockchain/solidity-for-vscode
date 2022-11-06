@@ -124,6 +124,14 @@ woke.lsp.force_recompile
 ```
 Force recompile the opened project/files.
 
+- **Tools for Solidity: Force Rerun Detectors**
+
+```shell
+woke.lsp.force_rerun_detectors
+```
+
+Force rerun Woke vulnerability and issue detectors on the opened project/files.
+
 - **Tools for Solidity: Generate Inheritance Graph**
 
 ```shell
