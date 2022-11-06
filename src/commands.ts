@@ -52,3 +52,8 @@ export async function generateLinearizedInheritanceGraphHandler(out: vscode.Outp
     const graph: string = await vscode.commands.executeCommand('woke.generate.linearized_inheritance_graph', documentUri, canonicalName);
     await showDot(graph, out);
 }
+
+export async function copyToClipboardHandler(text: string) {
+    await vscode.env.clipboard.writeText(text);
+    await vscode.window.showInformationMessage("Copied to clipboard.");
+}
