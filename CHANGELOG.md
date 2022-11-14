@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.2.1]
+- Fixed `unsafe-address-balance-use` detector reporting all `addr.balance` uses
+
 ## [1.2.0]
 - Added new [Head Overflow Calldata Tuple ABI-Reencoding Bug](https://blog.soliditylang.org/2022/08/08/calldata-tuple-reencoding-head-overflow-bug/) detector
 - Added `woke.detectors.exclude` and `woke.detectors.only` config options to exclude some detectors from the analysis / to only run certain detectors
