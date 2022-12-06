@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.3.0]
+- EXPERIMENTAL: Use old LSP compilation artifacts when cannot successfully compile current version of sources
+    - Implemented for `Go to definition`, `Document links` (imports), `Hover` and `Go to type definition`
+- Reduced LSP server compilation time by merging compilation units
+- Ignore all detections originating in `ignore_paths` and having all subdetections also in `ignore_paths`
+- Fixed re-entrancy detector not able to detect issues in overridden functions
+- Fixed LSP list config options parsing issue
+
 ## [1.2.1]
 - Fixed `unsafe-address-balance-use` detector reporting all `addr.balance` uses
 
