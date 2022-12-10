@@ -27,15 +27,15 @@ let wokeProcess: ChildProcess | undefined = undefined;
 const WOKE_TARGET_VERSION = "1.3.0";
 const WOKE_PRERELEASE = false;
 
-async function installWoke(outputChannel: vscode.OutputChannel): Promise<boolean> {
+async function installWoke(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<boolean> {
     try {
         let out;
         if (WOKE_PRERELEASE) {
-            outputChannel.appendLine("Running 'python3 -m pip install woke -U --pre'");
-            out = execFileSync("python3", ["-m", "pip", "install", "woke", "-U", "--pre"]).toString("utf8");
+            outputChannel.appendLine(`Running '${pythonExecutable} -m pip install woke -U --pre'`);
+            out = execFileSync(pythonExecutable, ["-m", "pip", "install", "woke", "-U", "--pre"]).toString("utf8");
         } else {
-            outputChannel.appendLine("Running 'python3 -m pip install woke -U'");
-            out = execFileSync("python3", ["-m", "pip", "install", "woke", "-U"]).toString("utf8");
+            outputChannel.appendLine(`Running '${pythonExecutable} -m pip install woke -U'`);
+            out = execFileSync(pythonExecutable, ["-m", "pip", "install", "woke", "-U"]).toString("utf8");
         }
         outputChannel.appendLine(out);
         return true;
@@ -52,13 +52,13 @@ function getWokeVersion(cwd?: string): string {
     return execFileSync("woke", ["--version"], {"cwd": cwd}).toString("utf8").trim();
 }
 
-async function checkWokeInstalled(outputChannel: vscode.OutputChannel, cwd?: string): Promise<boolean> {
+async function checkWokeInstalled(outputChannel: vscode.OutputChannel, pythonExecutable: string, cwd?: string): Promise<boolean> {
     try {
         const version: string = getWokeVersion(cwd);
 
         if (compare(version, WOKE_TARGET_VERSION) < 0) {
             outputChannel.appendLine(`PyPi package 'woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}.`);
-            return await installWoke(outputChannel);
+            return await installWoke(outputChannel, pythonExecutable);
         }
         return true;
     } catch(err) {
@@ -66,19 +66,19 @@ async function checkWokeInstalled(outputChannel: vscode.OutputChannel, cwd?: str
     }
 }
 
-async function findWokeDir(outputChannel: vscode.OutputChannel): Promise<string|boolean|undefined> {
-    let installed: boolean = await checkWokeInstalled(outputChannel);
+async function findWokeDir(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<string|boolean|undefined> {
+    let installed: boolean = await checkWokeInstalled(outputChannel, pythonExecutable);
     let cwd: string|undefined = undefined;
 
     if (!installed) {
-        const userPackages = execFileSync("python3", ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).toString("utf8").trim();
+        const userPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).toString("utf8").trim();
         installed = await checkWokeInstalled(outputChannel, userPackages);
         if (installed) {
             cwd = userPackages;
         }
     }
     if (!installed) {
-        const globalPackages = execFileSync("python3", ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).toString("utf8").trim();
+        const globalPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).toString("utf8").trim();
         installed = await checkWokeInstalled(outputChannel, globalPackages);
         if (installed) {
             cwd = globalPackages;
@@ -89,6 +89,31 @@ async function findWokeDir(outputChannel: vscode.OutputChannel): Promise<string|
     }
 
     return cwd;
+}
+
+function findPython(outputChannel: vscode.OutputChannel): string {
+    try {
+        const pythonVersion = execFileSync("python3", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).toString("utf8").trim();
+
+        if (compare(pythonVersion, "3.7.0") < 0) {
+            outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
+            throw new Error("Python version too old");
+        }
+        return "python3";
+    } catch(err) {
+        try {
+            const pythonVersion = execFileSync("python", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).toString("utf8").trim();
+
+            if (compare(pythonVersion, "3.7.0") < 0) {
+                outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
+                throw new Error("Python version too old");
+            }
+            return "python";
+        } catch(err) {
+            outputChannel.appendLine("Python >=3.7 must be installed.");
+            throw new Error("Python not found");
+        }
+    }
 }
 
 
@@ -104,29 +129,15 @@ export async function activate(context: vscode.ExtensionContext) {
     let cwd: string|undefined = undefined;
 
     if (autoInstall) {
-        try {
-            const pythonVersion = execFileSync("python3", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).toString("utf8").trim();
+        const pythonExecutable = findPython(outputChannel);
 
-            if (compare(pythonVersion, "3.7.0") < 0) {
-                outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
-                return;
-            }
-
-        } catch(err) {
-            if (err instanceof Error) {
-                outputChannel.appendLine(err.toString());
-            }
-            outputChannel.appendLine("Unable to determine the version of Python. Python >=3.7 must be installed.");
-            return;
-        }
-
-        let result: string|boolean|undefined = await findWokeDir(outputChannel);
+        let result: string|boolean|undefined = await findWokeDir(outputChannel, pythonExecutable);
         if (result === false || result === true) {
             outputChannel.appendLine("Installing PyPi package 'woke'.");
-            installed = await installWoke(outputChannel);
+            installed = await installWoke(outputChannel, pythonExecutable);
 
             if (installed) {
-                result = await findWokeDir(outputChannel);
+                result = await findWokeDir(outputChannel, pythonExecutable);
 
                 if (result === false || result === true) {
                     outputChannel.appendLine("'woke' installed but cannot be found in PATH or pip site-packages.");
