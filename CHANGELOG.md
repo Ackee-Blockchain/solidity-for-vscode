@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.3.1]
+- Fixed Woke auto-install not working with `python` executable (without `python3` alias)
+- Fixed reusing LSP build artifacts causing code lens glitches
+
 ## [1.3.0]
 - EXPERIMENTAL: Use old LSP compilation artifacts when cannot successfully compile current version of sources
     - Implemented for `Go to definition`, `Document links` (imports), `Hover` and `Go to type definition`
