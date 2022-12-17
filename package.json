@@ -352,6 +352,14 @@
             {
                 "command": "Tools-for-Solidity.foundry.import_remappings",
                 "title": "Tools for Solidity: Import Foundry Remappings"
+            },
+            {
+                "command": "Tools-for-Solidity.coverage.show",
+                "title": "Tools for Solidity: Show Coverage"
+            },
+            {
+                "command": "Tools-for-Solidity.coverage.hide",
+                "title": "Tools for Solidity: Hide Coverage"
             }
         ]
     },
