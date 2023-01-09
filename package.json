@@ -72,7 +72,8 @@
                     },
                     "default": [
                         "node_modules",
-                        ".woke-build"
+                        ".woke-build",
+                        "lib"
                     ],
                     "description": "Files in these paths are ignored from LSP analysis unless imported from other non-ignored files"
                 },
