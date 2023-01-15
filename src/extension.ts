@@ -165,31 +165,31 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
     }
 
+    const freePort: number = await getPort();
+
+    let wokePath: string = "woke";
+    if (cwd !== undefined) {
+        wokePath = path.join(cwd, "woke");
+    }
+
+    outputChannel.appendLine(`Running '${wokePath} lsp --port ${freePort}'`);
+    wokeProcess = execFile("woke", ["lsp", "--port", String(freePort)], {cwd: cwd}, (error, stdout, stderr) => {
+        if (error) {
+            outputChannel.appendLine(error.message);
+            throw error;
+        }
+    });
+    wokeProcess.on('exit', () => wokeProcess = undefined);
+
+    if (!await waitPort({
+        host: "127.0.0.1",
+        port: freePort,
+        timeout: 15000
+    })) {
+        outputChannel.appendLine(`Timed out waiting for port ${freePort} to open.`);
+    }
+
     const serverOptions: ServerOptions = async () => {
-        const freePort: number = await getPort();
-
-        let wokePath: string = "woke";
-        if (cwd !== undefined) {
-            wokePath = path.join(cwd, "woke");
-        }
-
-        outputChannel.appendLine(`Running '${wokePath} lsp --port ${freePort}'`);
-        wokeProcess = execFile("woke", ["lsp", "--port", String(freePort)], {cwd: cwd}, (error, stdout, stderr) => {
-            if (error) {
-                outputChannel.appendLine(error.message);
-                throw error;
-            }
-        });
-        wokeProcess.on('exit', () => wokeProcess = undefined);
-
-        if (!await waitPort({
-            host: "127.0.0.1",
-            port: freePort,
-            timeout: 15000
-        })) {
-            outputChannel.appendLine(`Timed out waiting for port ${freePort} to open.`);
-        }
-
         let socket = net.connect({
             port: freePort,
             host: "127.0.0.1"
