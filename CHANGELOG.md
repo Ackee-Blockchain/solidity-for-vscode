@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.4.0]
+- Introduced new `Tools for Solidity: Import Foundry Remappings` command to automatically configure remappings for Foundry projects
+- Added `lib` directory to default `ignore_paths`
+- Fixed an issue when `woke` instances would have been left running on an LSP server crash
+
 ## [1.3.1]
 - Fixed Woke auto-install not working with `python` executable (without `python3` alias)
 - Fixed reusing LSP build artifacts causing code lens glitches
