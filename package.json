@@ -272,6 +272,10 @@
             {
                 "command": "Tools-for-Solidity.generate.inheritance_graph",
                 "title": "Tools for Solidity: Generate Inheritance Graph"
+            },
+            {
+                "command": "Tools-for-Solidity.foundry.import_remappings",
+                "title": "Tools for Solidity: Import Foundry Remappings"
             }
         ]
     },
