@@ -327,5 +327,8 @@
         "get-port": "<6.0.0",
         "vscode-languageclient": "^8.0.1",
         "wait-port": "^0.3.0"
-    }
+    },
+    "extensionDependencies": [
+        "joaompinto.vscode-graphviz"
+    ]
 }
