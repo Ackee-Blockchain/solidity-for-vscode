@@ -37,217 +37,244 @@
     ],
     "main": "./dist/extension",
     "contributes": {
-        "configuration": {
-            "title": "Tools for Solidity",
-            "properties": {
-                "woke.compiler.solc.allow_paths": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
+        "configuration":[
+            {
+                "title": "Tools for Solidity",
+                "order": -1,
+                "properties": {
+                    "Tools-for-Solidity.trace.server": {
+                        "scope": "window",
+                        "type": "string",
+                        "enum": [
+                            "off",
+                            "messages",
+                            "verbose"
+                        ],
+                        "default": "off",
+                        "description": "Traces the communication between VS Code and the language server."
                     },
-                    "default": [],
-                    "description": "Allow paths passed directly to the solc compiler"
-                },
-                "woke.compiler.solc.evm_version": {
-                    "type": "string",
-                    "enum": [
-                        "homestead",
-                        "tangerineWhistle",
-                        "spuriousDragon",
-                        "byzantium",
-                        "constantinople",
-                        "petersburg",
-                        "istanbul",
-                        "berlin",
-                        "london",
-                        "paris",
-                        ""
-                    ],
-                    "default": "",
-                    "description": "EVM version passed to the solc compiler"
-                },
-                "woke.compiler.solc.ignore_paths": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
+                    "Tools-for-Solidity.Woke.autoInstall": {
+                        "type": "boolean",
+                        "default": "true",
+                        "description": "Automatically install 'woke' PyPi package needed by Tools for Solidity"
+                    }
+                }
+            },
+            {
+                "title": "Compiler",
+                "order": 0,
+                "properties": {
+                    "woke.compiler.solc.allow_paths": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Allow paths passed directly to the solc compiler"
                     },
-                    "default": [
-                        "node_modules",
-                        ".woke-build",
-                        "venv",
-                        "lib"
-                    ],
-                    "description": "Files in these paths are ignored from LSP analysis unless imported from other non-ignored files"
-                },
-                "woke.compiler.solc.include_paths": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
+                    "woke.compiler.solc.evm_version": {
+                        "type": "string",
+                        "enum": [
+                            "homestead",
+                            "tangerineWhistle",
+                            "spuriousDragon",
+                            "byzantium",
+                            "constantinople",
+                            "petersburg",
+                            "istanbul",
+                            "berlin",
+                            "london",
+                            "paris",
+                            ""
+                        ],
+                        "default": "",
+                        "description": "EVM version passed to the solc compiler"
                     },
-                    "default": [
-                        "node_modules"
-                    ],
-                    "description": "Include paths used to search for non-relative import paths"
-                },
-                "woke.compiler.solc.remappings": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
+                    "woke.compiler.solc.ignore_paths": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [
+                            "node_modules",
+                            ".woke-build",
+                            "venv",
+                            "lib"
+                        ],
+                        "description": "Files in these paths are ignored from LSP analysis unless imported from other non-ignored files"
                     },
-                    "default": [],
-                    "markdownDescription": "Compiler remappings (see [Solidity docs](https://docs.soliditylang.org/en/latest/using-the-compiler.html#base-path-and-import-remapping))"
-                },
-                "woke.compiler.solc.target_version": {
-                    "type": "string",
-                    "default": "",
-                    "description": "The version of the solc compiler used to compile all project files"
-                },
-                "woke.compiler.solc.via_IR": {
-                    "type": [
-                        "boolean",
-                        "null"
-                    ],
-                    "default": null,
-                    "enum": [
-                        null,
-                        true,
-                        false
-                    ],
-                    "markdownDescription": "Compile the code via the Yul intermediate language (see [Solidity docs](https://docs.soliditylang.org/en/latest/ir-breaking-changes.html)). If not set (null), let the compiler decide."
-                },
-                "woke.compiler.solc.optimizer.enabled": {
-                    "type": [
-                        "boolean",
-                        "null"
-                    ],
-                    "default": null,
-                    "enum": [
-                        null,
-                        true,
-                        false
-                    ],
-                    "description": "Compile the project with solc optimizations enabled. Setting this to 'null' (unset) disables most of the available optimizations. Setting this to 'false' disables all optimizations for Solidity <0.8.6 and has the same behavior as 'null' for Solidity >=0.8.6."
-                },
-                "woke.detectors.exclude": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
+                    "woke.compiler.solc.include_paths": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [
+                            "node_modules"
+                        ],
+                        "description": "Include paths used to search for non-relative import paths"
                     },
-                    "default": [],
-                    "description": "List of detectors (identified by their string or integer IDs) to exclude from the analysis"
-                },
-                "woke.detectors.only": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
+                    "woke.compiler.solc.remappings": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "markdownDescription": "Compiler remappings (see [Solidity docs](https://docs.soliditylang.org/en/latest/using-the-compiler.html#base-path-and-import-remapping))"
                     },
-                    "default": [],
-                    "description": "List of detectors (identified by their string or integer IDs) to only use in the analysis"
-                },
-                "woke.detectors.ignore_paths": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
+                    "woke.compiler.solc.target_version": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The version of the solc compiler used to compile all project files"
                     },
-                    "default": [
-                        "node_modules",
-                        ".woke-build",
-                        "venv",
-                        "lib"
-                    ],
-                    "description": "Detections with subdetections in these paths are ignored"
-                },
-                "woke.compiler.solc.optimizer.runs": {
-                    "type": "number",
-                    "default": 200,
-                    "description": "Configuration of the optimizer specifying how many times the code is intended to be run. Lower values optimize more for initial deployment cost, while higher values optimize more for high-frequency usage."
-                },
-                "woke.generator.control_flow_graph.direction": {
-                    "type": "string",
-                    "enum": [
-                        "TB",
-                        "BT",
-                        "LR",
-                        "RL"
-                    ],
-                    "default": "TB",
-                    "markdownDescription": "The direction of the generated control flow graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
-                },
-                "woke.generator.control_flow_graph.vscode_urls": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Generate vscode:// URLs in the generated control flow graph"
-                },
-                "woke.generator.inheritance_graph.direction": {
-                    "type": "string",
-                    "enum": [
-                        "TB",
-                        "BT",
-                        "LR",
-                        "RL"
-                    ],
-                    "default": "BT",
-                    "markdownDescription": "The direction of the generated inheritance graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
-                },
-                "woke.generator.inheritance_graph.vscode_urls": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Generate vscode:// URLs in the generated inheritance graph"
-                },
-                "woke.generator.inheritance_graph_full.direction": {
-                    "type": "string",
-                    "enum": [
-                        "TB",
-                        "BT",
-                        "LR",
-                        "RL"
-                    ],
-                    "default": "BT",
-                    "markdownDescription": "The direction of the inheritance graph generated for the whole project (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
-                },
-                "woke.generator.inheritance_graph_full.vscode_urls": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Generate vscode:// URLs in the inheritance graph generated for the whole project"
-                },
-                "woke.lsp.compilation_delay": {
-                    "type": "number",
-                    "default": 0,
-                    "description": "Delay in seconds before the project is compiled after a keystroke"
-                },
-                "woke.lsp.code_lens.enable": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable code lens with number of references"
-                },
-                "woke.lsp.detectors.enable": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable Woke vulnerability detectors"
-                },
-                "woke.lsp.find_references.include_declarations": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Also include declarations in 'Go to references' results"
-                },
-                "Tools-for-Solidity.trace.server": {
-                    "scope": "window",
-                    "type": "string",
-                    "enum": [
-                        "off",
-                        "messages",
-                        "verbose"
-                    ],
-                    "default": "off",
-                    "description": "Traces the communication between VS Code and the language server."
-                },
-                "Tools-for-Solidity.Woke.autoInstall": {
-                    "type": "boolean",
-                    "default": "true",
-                    "description": "Automatically install 'woke' PyPi package needed by Tools for Solidity"
+                    "woke.compiler.solc.via_IR": {
+                        "type": [
+                            "boolean",
+                            "null"
+                        ],
+                        "default": null,
+                        "enum": [
+                            null,
+                            true,
+                            false
+                        ],
+                        "markdownDescription": "Compile the code via the Yul intermediate language (see [Solidity docs](https://docs.soliditylang.org/en/latest/ir-breaking-changes.html)). If not set (null), let the compiler decide."
+                    },
+                    "woke.compiler.solc.optimizer.enabled": {
+                        "type": [
+                            "boolean",
+                            "null"
+                        ],
+                        "default": null,
+                        "enum": [
+                            null,
+                            true,
+                            false
+                        ],
+                        "description": "Compile the project with solc optimizations enabled. Setting this to 'null' (unset) disables most of the available optimizations. Setting this to 'false' disables all optimizations for Solidity <0.8.6 and has the same behavior as 'null' for Solidity >=0.8.6."
+                    },
+                    "woke.compiler.solc.optimizer.runs": {
+                        "type": "number",
+                        "default": 200,
+                        "description": "Configuration of the optimizer specifying how many times the code is intended to be run. Lower values optimize more for initial deployment cost, while higher values optimize more for high-frequency usage."
+                    }
+                }
+            },
+            {
+                "title": "Detectors",
+                "order": 1,
+                "properties": {
+                    "woke.detectors.exclude": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "List of detectors (identified by their string or integer IDs) to exclude from the analysis"
+                    },
+                    "woke.detectors.only": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "List of detectors (identified by their string or integer IDs) to only use in the analysis"
+                    },
+                    "woke.detectors.ignore_paths": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [
+                            "node_modules",
+                            ".woke-build",
+                            "venv",
+                            "lib"
+                        ],
+                        "description": "Detections with subdetections in these paths are ignored"
+                    }
+                }
+            },
+            {
+                "title": "Graphs",
+                "order": 2,
+                "properties": {
+                    "woke.generator.control_flow_graph.direction": {
+                        "type": "string",
+                        "enum": [
+                            "TB",
+                            "BT",
+                            "LR",
+                            "RL"
+                        ],
+                        "default": "TB",
+                        "markdownDescription": "The direction of the generated control flow graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                    },
+                    "woke.generator.control_flow_graph.vscode_urls": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Generate vscode:// URLs in the generated control flow graph"
+                    },
+                    "woke.generator.inheritance_graph.direction": {
+                        "type": "string",
+                        "enum": [
+                            "TB",
+                            "BT",
+                            "LR",
+                            "RL"
+                        ],
+                        "default": "BT",
+                        "markdownDescription": "The direction of the generated inheritance graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                    },
+                    "woke.generator.inheritance_graph.vscode_urls": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Generate vscode:// URLs in the generated inheritance graph"
+                    },
+                    "woke.generator.inheritance_graph_full.direction": {
+                        "type": "string",
+                        "enum": [
+                            "TB",
+                            "BT",
+                            "LR",
+                            "RL"
+                        ],
+                        "default": "BT",
+                        "markdownDescription": "The direction of the inheritance graph generated for the whole project (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                    },
+                    "woke.generator.inheritance_graph_full.vscode_urls": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Generate vscode:// URLs in the inheritance graph generated for the whole project"
+                    }
+                }
+            },
+            {
+                "title": "LSP",
+                "order": 3,
+                "properties": {
+                    "woke.lsp.compilation_delay": {
+                        "type": "number",
+                        "default": 0,
+                        "description": "Delay in seconds before the project is compiled after a keystroke"
+                    },
+                    "woke.lsp.code_lens.enable": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Enable code lens with number of references"
+                    },
+                    "woke.lsp.detectors.enable": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Enable Woke vulnerability detectors"
+                    },
+                    "woke.lsp.find_references.include_declarations": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Also include declarations in 'Go to references' results"
+                    }
                 }
             }
-        },
+        ],
         "languages": [
             {
                 "id": "solidity",
