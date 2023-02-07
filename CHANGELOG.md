@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.5.0]
+- Updated minimal version of Woke to 2.0.0
+    - Some LSP features may be available during compilation
+    - Stability improvements
+- Added `woke.detectors.ignore_paths` and `woke.lsp.compilation_delay` config options
+- Added `venv` to `woke.compiler.ignore_paths` config default value
+- Added `joaompinto.vscode-graphviz` to extension dependencies
+
 ## [1.4.0]
 - Introduced new `Tools for Solidity: Import Foundry Remappings` command to automatically configure remappings for Foundry projects
 - Added `lib` directory to default `ignore_paths`
