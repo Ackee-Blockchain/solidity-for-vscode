@@ -60,6 +60,7 @@
                         "istanbul",
                         "berlin",
                         "london",
+                        "paris",
                         ""
                     ],
                     "default": "",
@@ -73,6 +74,7 @@
                     "default": [
                         "node_modules",
                         ".woke-build",
+                        "venv",
                         "lib"
                     ],
                     "description": "Files in these paths are ignored from LSP analysis unless imported from other non-ignored files"
@@ -142,6 +144,19 @@
                     "default": [],
                     "description": "List of detectors (identified by their string or integer IDs) to only use in the analysis"
                 },
+                "woke.detectors.ignore_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [
+                        "node_modules",
+                        ".woke-build",
+                        "venv",
+                        "lib"
+                    ],
+                    "description": "Detections with subdetections in these paths are ignored"
+                },
                 "woke.compiler.solc.optimizer.runs": {
                     "type": "number",
                     "default": 200,
@@ -194,6 +209,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Generate vscode:// URLs in the inheritance graph generated for the whole project"
+                },
+                "woke.lsp.compilation_delay": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "Delay in seconds before the project is compiled after a keystroke"
                 },
                 "woke.lsp.code_lens.enable": {
                     "type": "boolean",
