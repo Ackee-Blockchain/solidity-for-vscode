@@ -139,6 +139,13 @@ Tools-for-Solidity.generate.inheritance_graph
 ```
 Generate an inheritance graph for the whole project.
 
+- **Tools for Solidity: Generate Imports Graph**
+
+```shell
+Tools-for-Solidity.generate.imports_graph
+```
+Generate an imports graph for the whole project.
+
 ## Known Issues
 
 - **Files created/modified/deleted outside of VS Code are not properly analysed**

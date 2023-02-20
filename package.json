@@ -214,6 +214,31 @@
                         "default": true,
                         "description": "Generate vscode:// URLs in the generated control flow graph"
                     },
+                    "woke.generator.imports_graph.direction": {
+                        "type": "string",
+                        "enum": [
+                            "TB",
+                            "BT",
+                            "LR",
+                            "RL"
+                        ],
+                        "default": "TB",
+                        "markdownDescription": "The direction of the generated imports graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                    },
+                    "woke.generator.imports_graph.imports_direction": {
+                        "type": "string",
+                        "enum": [
+                            "imported-to-importing",
+                            "importing-to-imported"
+                        ],
+                        "default": "imported-to-importing",
+                        "markdownDescription": "The direction of arrows in the generated imports graph"
+                    },
+                    "woke.generator.imports_graph.vscode_urls": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Generate vscode:// URLs in the generated imports graph"
+                    },
                     "woke.generator.inheritance_graph.direction": {
                         "type": "string",
                         "enum": [
@@ -315,6 +340,10 @@
             {
                 "command": "woke.lsp.force_rerun_detectors",
                 "title": "Tools for Solidity: Force Rerun Detectors"
+            },
+            {
+                "command": "Tools-for-Solidity.generate.imports_graph",
+                "title": "Tools for Solidity: Generate Imports Graph"
             },
             {
                 "command": "Tools-for-Solidity.generate.inheritance_graph",
