@@ -94,3 +94,8 @@ export async function importFoundryRemappings(out: vscode.OutputChannel) {
     vscode.workspace.getConfiguration("woke.compiler.solc").update("remappings", remappings, vscode.ConfigurationTarget.Workspace);
     vscode.window.showInformationMessage(`Imported ${remappings.length} remappings.`);
 }
+
+export async function generateImportsGraphHandler(out: vscode.OutputChannel) {
+    const graph: string = await vscode.commands.executeCommand('woke.generate.imports_graph');
+    await showDot(graph);
+}
