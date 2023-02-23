@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.6.0]
+- Added support for Solidity 0.8.19
+- Added new command `Tools for Solidity: Generate Imports Graph`
+- Improved highlighted range of some vulnerability/code quality detections
+
 ## [1.5.0]
 - Updated minimal version of Woke to 2.0.0
     - Some LSP features may be available during compilation
