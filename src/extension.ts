@@ -49,7 +49,12 @@ async function installWoke(outputChannel: vscode.OutputChannel, pythonExecutable
 }
 
 function getWokeVersion(cwd?: string): string {
-    return execFileSync("woke", ["--version"], {"cwd": cwd}).toString("utf8").trim();
+    if (cwd === undefined) {
+        return execFileSync("woke", ["--version"]).toString("utf8").trim();
+    }
+    else {
+        return execFileSync("./woke", ["--version"], {"cwd": cwd}).toString("utf8").trim();
+    }
 }
 
 async function checkWokeInstalled(outputChannel: vscode.OutputChannel, pythonExecutable: string, cwd?: string): Promise<boolean> {
@@ -72,15 +77,17 @@ async function findWokeDir(outputChannel: vscode.OutputChannel, pythonExecutable
 
     if (!installed) {
         const userPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).toString("utf8").trim();
-        installed = await checkWokeInstalled(outputChannel, userPackages);
+        installed = await checkWokeInstalled(outputChannel, pythonExecutable, userPackages);
         if (installed) {
+            outputChannel.appendLine(`Consider adding '${userPackages}' to your PATH environment variable.`);
             cwd = userPackages;
         }
     }
     if (!installed) {
         const globalPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).toString("utf8").trim();
-        installed = await checkWokeInstalled(outputChannel, globalPackages);
+        installed = await checkWokeInstalled(outputChannel, pythonExecutable, globalPackages);
         if (installed) {
+            outputChannel.appendLine(`Consider adding '${globalPackages}' to your PATH environment variable.`);
             cwd = globalPackages;
         }
     }
@@ -173,12 +180,21 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     outputChannel.appendLine(`Running '${wokePath} lsp --port ${freePort}'`);
-    wokeProcess = execFile("woke", ["lsp", "--port", String(freePort)], {cwd: cwd}, (error, stdout, stderr) => {
-        if (error) {
-            outputChannel.appendLine(error.message);
-            throw error;
-        }
-    });
+    if (cwd === undefined) {
+        wokeProcess = execFile("woke", ["lsp", "--port", String(freePort)], (error, stdout, stderr) => {
+            if (error) {
+                outputChannel.appendLine(error.message);
+                throw error;
+            }
+        });
+    } else {
+        wokeProcess = execFile("./woke", ["lsp", "--port", String(freePort)], {cwd: cwd}, (error, stdout, stderr) => {
+            if (error) {
+                outputChannel.appendLine(error.message);
+                throw error;
+            }
+        });
+    }
     wokeProcess.on('exit', () => wokeProcess = undefined);
 
     if (!await waitPort({
