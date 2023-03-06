@@ -41,10 +41,28 @@ async function installWoke(outputChannel: vscode.OutputChannel, pythonExecutable
         return true;
     } catch(err) {
         if (err instanceof Error) {
-            outputChannel.appendLine("Failed to install PyPi package 'woke':");
+            outputChannel.appendLine("Failed to execute the previous command:");
             outputChannel.appendLine(err.toString());
         }
-        return false;
+
+        try {
+            let out;
+            if (WOKE_PRERELEASE) {
+                outputChannel.appendLine(`Running '${pythonExecutable} -m pip install woke -U --pre --user'`);
+                out = execFileSync(pythonExecutable, ["-m", "pip", "install", "woke", "-U", "--pre", "--user"]).toString("utf8");
+            } else {
+                outputChannel.appendLine(`Running '${pythonExecutable} -m pip install woke -U --user'`);
+                out = execFileSync(pythonExecutable, ["-m", "pip", "install", "woke", "-U", "--user"]).toString("utf8");
+            }
+            outputChannel.appendLine(out);
+            return true;
+        } catch(err) {
+            if (err instanceof Error) {
+                outputChannel.appendLine("Failed to install PyPi package 'woke':");
+                outputChannel.appendLine(err.toString());
+            }
+            return false;
+        }
     }
 }
 
@@ -76,19 +94,19 @@ async function findWokeDir(outputChannel: vscode.OutputChannel, pythonExecutable
     let cwd: string|undefined = undefined;
 
     if (!installed) {
-        const userPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).toString("utf8").trim();
-        installed = await checkWokeInstalled(outputChannel, pythonExecutable, userPackages);
-        if (installed) {
-            outputChannel.appendLine(`Consider adding '${userPackages}' to your PATH environment variable.`);
-            cwd = userPackages;
-        }
-    }
-    if (!installed) {
         const globalPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).toString("utf8").trim();
         installed = await checkWokeInstalled(outputChannel, pythonExecutable, globalPackages);
         if (installed) {
             outputChannel.appendLine(`Consider adding '${globalPackages}' to your PATH environment variable.`);
             cwd = globalPackages;
+        }
+    }
+    if (!installed) {
+        const userPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).toString("utf8").trim();
+        installed = await checkWokeInstalled(outputChannel, pythonExecutable, userPackages);
+        if (installed) {
+            outputChannel.appendLine(`Consider adding '${userPackages}' to your PATH environment variable.`);
+            cwd = userPackages;
         }
     }
     if (!installed) {
