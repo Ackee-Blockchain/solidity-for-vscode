@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.7.0]
+- Added experimental support for Python 3.11
+- Fixed potential problems with `woke` installation, especially on macOS
+
 ## [1.6.0]
 - Added support for Solidity 0.8.19
 - Added new command `Tools for Solidity: Generate Imports Graph`
