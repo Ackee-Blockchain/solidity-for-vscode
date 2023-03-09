@@ -80,7 +80,11 @@ async function checkWokeInstalled(outputChannel: vscode.OutputChannel, cwd?: str
         const version: string = getWokeVersion(cwd);
 
         if (compare(version, WOKE_TARGET_VERSION) < 0) {
-            outputChannel.appendLine(`PyPi package 'woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}.`);
+            if (cwd === undefined) {
+                outputChannel.appendLine(`Found 'woke' in version ${version} in PATH but the target minimal version is ${WOKE_TARGET_VERSION}.`);
+            } else {
+                outputChannel.appendLine(`Found 'woke' in version ${version} in '${cwd}' but the target minimal version is ${WOKE_TARGET_VERSION}.`);
+            }
             return false;
         }
         return true;
