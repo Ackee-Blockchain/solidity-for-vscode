@@ -75,13 +75,13 @@ function getWokeVersion(cwd?: string): string {
     }
 }
 
-async function checkWokeInstalled(outputChannel: vscode.OutputChannel, pythonExecutable: string, cwd?: string): Promise<boolean> {
+async function checkWokeInstalled(outputChannel: vscode.OutputChannel, cwd?: string): Promise<boolean> {
     try {
         const version: string = getWokeVersion(cwd);
 
         if (compare(version, WOKE_TARGET_VERSION) < 0) {
             outputChannel.appendLine(`PyPi package 'woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}.`);
-            return await installWoke(outputChannel, pythonExecutable);
+            return false;
         }
         return true;
     } catch(err) {
@@ -90,12 +90,12 @@ async function checkWokeInstalled(outputChannel: vscode.OutputChannel, pythonExe
 }
 
 async function findWokeDir(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<string|boolean|undefined> {
-    let installed: boolean = await checkWokeInstalled(outputChannel, pythonExecutable);
+    let installed: boolean = await checkWokeInstalled(outputChannel);
     let cwd: string|undefined = undefined;
 
     if (!installed) {
         const globalPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).toString("utf8").trim();
-        installed = await checkWokeInstalled(outputChannel, pythonExecutable, globalPackages);
+        installed = await checkWokeInstalled(outputChannel, globalPackages);
         if (installed) {
             outputChannel.appendLine(`Consider adding '${globalPackages}' to your PATH environment variable.`);
             cwd = globalPackages;
@@ -103,7 +103,7 @@ async function findWokeDir(outputChannel: vscode.OutputChannel, pythonExecutable
     }
     if (!installed) {
         const userPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).toString("utf8").trim();
-        installed = await checkWokeInstalled(outputChannel, pythonExecutable, userPackages);
+        installed = await checkWokeInstalled(outputChannel, userPackages);
         if (installed) {
             outputChannel.appendLine(`Consider adding '${userPackages}' to your PATH environment variable.`);
             cwd = userPackages;
