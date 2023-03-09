@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.7.1]
+- Fixed an issue when the first `woke` installation found was taken as canonical instead of searching for other installation locations
+
 ## [1.7.0]
 - Added experimental support for Python 3.11
 - Fixed potential problems with `woke` installation, especially on macOS
