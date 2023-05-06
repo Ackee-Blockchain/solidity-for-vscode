@@ -1,6 +1,6 @@
 import { execFile, execFileSync } from 'child_process';
 import * as vscode from 'vscode';
-import { URI } from 'vscode-languageclient/node';
+import { URI, Position } from 'vscode-languageclient/node';
 import * as os from 'os';
 const fs = require("fs");
 
@@ -98,4 +98,22 @@ export async function importFoundryRemappings(out: vscode.OutputChannel) {
 export async function generateImportsGraphHandler(out: vscode.OutputChannel) {
     const graph: string = await vscode.commands.executeCommand('woke.generate.imports_graph');
     await showDot(graph);
+}
+
+export async function executeReferencesHandler(out: vscode.OutputChannel, documentUri: URI, position: Position, declarationPositions: Array<Position>) {
+    const uri = vscode.Uri.parse(documentUri);
+    let res: Array<vscode.Location> = await vscode.commands.executeCommand('vscode.executeReferenceProvider', uri, position);
+    if (res !== undefined) {
+        res = res.filter((location: vscode.Location) => {
+            for (const declarationPosition of declarationPositions) {
+                if (location.range.start.line === declarationPosition.line && location.range.start.character === declarationPosition.character) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        res = res.filter((location: vscode.Location) => location.range.start.line !== position.line && location.range.start.character !== position.character);
+        await vscode.commands.executeCommand('editor.action.goToLocations', uri, new vscode.Position(position.line, position.character), res, "peek", "No references found.");
+    }
 }
