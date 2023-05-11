@@ -67,7 +67,10 @@ async function installWoke(outputChannel: vscode.OutputChannel, pythonExecutable
     }
 }
 
-function getWokeVersion(cwd?: string): string {
+function getWokeVersion(pathToExecutable: string|null, cwd?: string): string {
+    if (pathToExecutable) {
+        return execFileSync(pathToExecutable, ["--version"]).toString("utf8").trim();
+    }
     if (cwd === undefined) {
         return execFileSync("woke", ["--version"]).toString("utf8").trim();
     }
@@ -78,7 +81,7 @@ function getWokeVersion(cwd?: string): string {
 
 async function checkWokeInstalled(outputChannel: vscode.OutputChannel, cwd?: string): Promise<boolean> {
     try {
-        const version: string = getWokeVersion(cwd);
+        const version: string = getWokeVersion(null, cwd);
 
         if (compare(version, WOKE_TARGET_VERSION) < 0) {
             if (cwd === undefined) {
@@ -155,10 +158,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
     const autoInstall: boolean = extensionConfig.get<boolean>('Woke.autoInstall', true);
+    const pathToExecutable: string|null = extensionConfig.get<string | null>('Woke.pathToExecutable', null);
     let installed: boolean = false;
     let cwd: string|undefined = undefined;
 
-    if (autoInstall) {
+    if (autoInstall && !pathToExecutable) {
         const pythonExecutable = findPython(outputChannel);
 
         let result: string|boolean|undefined = await findWokeDir(outputChannel, pythonExecutable);
@@ -182,7 +186,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     try {
-        const version: string = getWokeVersion(cwd);
+        const version: string = getWokeVersion(pathToExecutable, cwd);
         if (compare(version, WOKE_TARGET_VERSION) < 0) {
             outputChannel.appendLine(`PyPi package 'woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}. Exiting...`);
             return;
@@ -197,21 +201,21 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const freePort: number = await getPort();
 
-    let wokePath: string = "woke";
-    if (cwd !== undefined) {
+    let wokePath: string = pathToExecutable ?? "woke";
+    if (!pathToExecutable && cwd !== undefined) {
         wokePath = path.join(cwd, "woke");
     }
 
     outputChannel.appendLine(`Running '${wokePath} lsp --port ${freePort}'`);
     if (cwd === undefined) {
-        wokeProcess = execFile("woke", ["lsp", "--port", String(freePort)], (error, stdout, stderr) => {
+        wokeProcess = execFile(wokePath, ["lsp", "--port", String(freePort)], (error, stdout, stderr) => {
             if (error) {
                 outputChannel.appendLine(error.message);
                 throw error;
             }
         });
     } else {
-        wokeProcess = execFile("./woke", ["lsp", "--port", String(freePort)], {cwd: cwd}, (error, stdout, stderr) => {
+        wokeProcess = execFile(wokePath, ["lsp", "--port", String(freePort)], {cwd: cwd}, (error, stdout, stderr) => {
             if (error) {
                 outputChannel.appendLine(error.message);
                 throw error;
