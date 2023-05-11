@@ -57,6 +57,10 @@
                         "type": "boolean",
                         "default": "true",
                         "description": "Automatically install 'woke' PyPi package needed by Tools for Solidity"
+                    },
+                    "Tools-for-Solidity.Woke.pathToExecutable": {
+                        "type": "string",
+                        "description": "Path to woke executable, overrides Tools-for-Solidity.Woke.autoInstall"
                     }
                 }
             },
