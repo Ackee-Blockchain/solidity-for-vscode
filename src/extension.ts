@@ -162,10 +162,11 @@ export async function activate(context: vscode.ExtensionContext) {
     if (pathToExecutable?.trim()?.length === 0) {
         pathToExecutable = null;
     }
+    let wokePort: number|undefined = extensionConfig.get('Woke.port', undefined);
     let installed: boolean = false;
     let cwd: string|undefined = undefined;
 
-    if (autoInstall && !pathToExecutable) {
+    if (autoInstall && !pathToExecutable && !wokePort) {
         const pythonExecutable = findPython(outputChannel);
 
         let result: string|boolean|undefined = await findWokeDir(outputChannel, pythonExecutable);
@@ -188,56 +189,60 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     }
 
-    try {
-        const version: string = getWokeVersion(pathToExecutable, cwd);
-        if (compare(version, WOKE_TARGET_VERSION) < 0) {
-            outputChannel.appendLine(`PyPi package 'woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}. Exiting...`);
+    if (!wokePort) {
+        try {
+            const version: string = getWokeVersion(pathToExecutable, cwd);
+            if (compare(version, WOKE_TARGET_VERSION) < 0) {
+                outputChannel.appendLine(`PyPi package 'woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}. Exiting...`);
+                return;
+            }
+        } catch(err) {
+            if (err instanceof Error) {
+                outputChannel.appendLine(err.toString());
+            }
+            outputChannel.appendLine(`Unable to determine the version of 'woke' PyPi package.`);
             return;
         }
-    } catch(err) {
-        if (err instanceof Error) {
-            outputChannel.appendLine(err.toString());
+
+        wokePort = await getPort();
+
+        let wokePath: string = pathToExecutable ?? "woke";
+        if (!pathToExecutable && cwd !== undefined) {
+            wokePath = path.join(cwd, "woke");
         }
-        outputChannel.appendLine(`Unable to determine the version of 'woke' PyPi package.`);
-        return;
-    }
 
-    const freePort: number = await getPort();
-
-    let wokePath: string = pathToExecutable ?? "woke";
-    if (!pathToExecutable && cwd !== undefined) {
-        wokePath = path.join(cwd, "woke");
-    }
-
-    outputChannel.appendLine(`Running '${wokePath} lsp --port ${freePort}'`);
-    if (cwd === undefined) {
-        wokeProcess = execFile(wokePath, ["lsp", "--port", String(freePort)], (error, stdout, stderr) => {
-            if (error) {
-                outputChannel.appendLine(error.message);
-                throw error;
-            }
-        });
+        outputChannel.appendLine(`Running '${wokePath} lsp --port ${wokePort}'`);
+        if (cwd === undefined) {
+            wokeProcess = execFile(wokePath, ["lsp", "--port", String(wokePort)], (error, stdout, stderr) => {
+                if (error) {
+                    outputChannel.appendLine(error.message);
+                    throw error;
+                }
+            });
+        } else {
+            wokeProcess = execFile(wokePath, ["lsp", "--port", String(wokePort)], {cwd: cwd}, (error, stdout, stderr) => {
+                if (error) {
+                    outputChannel.appendLine(error.message);
+                    throw error;
+                }
+            });
+        }
+        wokeProcess.on('exit', () => wokeProcess = undefined);
     } else {
-        wokeProcess = execFile(wokePath, ["lsp", "--port", String(freePort)], {cwd: cwd}, (error, stdout, stderr) => {
-            if (error) {
-                outputChannel.appendLine(error.message);
-                throw error;
-            }
-        });
+        outputChannel.appendLine(`Connecting to running 'woke' server on port ${wokePort}`);
     }
-    wokeProcess.on('exit', () => wokeProcess = undefined);
 
     if (!await waitPort({
         host: "127.0.0.1",
-        port: freePort,
+        port: wokePort,
         timeout: 15000
     })) {
-        outputChannel.appendLine(`Timed out waiting for port ${freePort} to open.`);
+        outputChannel.appendLine(`Timed out waiting for port ${wokePort} to open.`);
     }
 
     const serverOptions: ServerOptions = async () => {
         let socket = net.connect({
-            port: freePort,
+            port: wokePort ?? 65432,
             host: "127.0.0.1"
         });
         let result: StreamInfo = {
