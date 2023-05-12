@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.10.0]
+- Implemented hover with helper text for Yul instructions
+- Implemented auto-completions for imports
+- Implemented quick-fixes for some compiler warnings and errors
+- References count in code lens is now clickable
+- Document links for imports now work even with compilation errors
+- Fixed LSP crashes caused by source unit aliases created in import directives
+
 ## [1.9.0]
 - Configured `autoClosingPairs` (brackets, quotes, multi-line comments) for Solidity files
 - Fixed LSP crash when an identifier path part references a source unit
