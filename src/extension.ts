@@ -158,7 +158,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
     const autoInstall: boolean = extensionConfig.get<boolean>('Woke.autoInstall', true);
-    const pathToExecutable: string|null = extensionConfig.get<string | null>('Woke.pathToExecutable', null);
+    let pathToExecutable: string|null = extensionConfig.get<string | null>('Woke.pathToExecutable', null);
+    if (pathToExecutable?.trim()?.length === 0) {
+        pathToExecutable = null;
+    }
     let installed: boolean = false;
     let cwd: string|undefined = undefined;
 
