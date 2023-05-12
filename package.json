@@ -61,6 +61,10 @@
                     "Tools-for-Solidity.Woke.pathToExecutable": {
                         "type": "string",
                         "description": "Path to woke executable, overrides Tools-for-Solidity.Woke.autoInstall"
+                    },
+                    "Tools-for-Solidity.Woke.port": {
+                        "type": "integer",
+                        "description": "Port on which woke is listening. Overrides both Tools-for-Solidity.Woke.autoInstall and Tools-for-Solidity.Woke.pathToExecutable."
                     }
                 }
             },
