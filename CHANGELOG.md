@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.10.1]
+- Fixed language server crashes on macOS and Windows
+
 ## [1.10.0]
 - Implemented hover with helper text for Yul instructions
 - Implemented auto-completions for imports
