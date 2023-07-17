@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.10.2]
+- Fixed compilation crashes
+- Fixed secondary locations of solc compiler errors not provided
+- Fixed vulnerability detectors causing crashes
+
 ## [1.10.1]
 - Fixed language server crashes on macOS and Windows
 
