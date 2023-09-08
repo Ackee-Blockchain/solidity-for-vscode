@@ -18,7 +18,7 @@ const path = require('node:path');
 import getPort = require('get-port');
 import waitPort = require('wait-port');
 import { compare } from '@renovatebot/pep440';
-import { ChildProcess, execFile, execFileSync } from 'child_process';
+import { ChildProcess, execFileSync, spawn } from 'child_process';
 
 
 
@@ -213,20 +213,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
         outputChannel.appendLine(`Running '${wokePath} lsp --port ${wokePort}'`);
         if (cwd === undefined) {
-            wokeProcess = execFile(wokePath, ["lsp", "--port", String(wokePort)], (error, stdout, stderr) => {
-                if (error) {
-                    outputChannel.appendLine(error.message);
-                    throw error;
-                }
-            });
+            wokeProcess = spawn(wokePath, ["lsp", "--port", String(wokePort)], {stdio: 'ignore'});
         } else {
-            wokeProcess = execFile(wokePath, ["lsp", "--port", String(wokePort)], {cwd: cwd}, (error, stdout, stderr) => {
-                if (error) {
-                    outputChannel.appendLine(error.message);
-                    throw error;
-                }
-            });
+            wokeProcess = spawn(wokePath, ["lsp", "--port", String(wokePort)], {cwd, stdio: 'ignore'});
         }
+        wokeProcess.on('error', (error) => {
+            if (error) {
+                outputChannel.appendLine(error.message);
+                throw error;
+            }
+        });
         wokeProcess.on('exit', () => wokeProcess = undefined);
     } else {
         outputChannel.appendLine(`Connecting to running 'woke' server on port ${wokePort}`);
