@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.10.3]
+- Fixed language server crashes caused by `woke` process stdout/stderr buffer overflow
+
 ## [1.10.2]
 - Fixed compilation crashes
 - Fixed secondary locations of solc compiler errors not provided
