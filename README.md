@@ -27,6 +27,8 @@ Tools for Solidity is an extension for Visual Studio Code that implements a lang
 
 The Tools for Solidity extension uses the PyPi package [woke](https://pypi.org/project/woke/) which requires Python 3.7 or higher.
 
+Rosetta is required to be enabled on Apple Silicon (M1 & M2) Macs.
+
 To display the generated graphs, one of the supported Graphviz (DOT) extensions must be installed:
 
 - [Graphviz (dot) language support for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=joaompinto.vscode-graphviz) (recommended)
