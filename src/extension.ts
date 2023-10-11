@@ -9,7 +9,8 @@ import {
     LanguageClientOptions,
     ServerOptions,
     StreamInfo,
-    integer
+    integer,
+    Diagnostic as LSPDiagnostic
 } from 'vscode-languageclient/node';
 
 import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler } from './commands';
@@ -287,11 +288,11 @@ export async function activate(context: vscode.ExtensionContext) {
     diagnosticCollection = vscode.languages.createDiagnosticCollection('wake-test')
 
     client.onNotification("textDocument/publishDiagnostics", (params) => {
-        let diag = (params as Diagnostic)
+        let diag = (params as [uri: string, diagnostics: LSPDiagnostic[]]);
         onNotification(outputChannel, diag);
         diagnosticCollection.set(diag.uri, diag.diagnostics);
     });
-    
+
     wakeDetectionsProvider = new WakeDetectionsProvider(outputChannel);
     solcDetectionsProvider = new SolcDetectionsProvider(outputChannel);
     vscode.window.registerTreeDataProvider('wake-detections', wakeDetectionsProvider);
