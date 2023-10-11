@@ -4,10 +4,12 @@ import * as vscode from 'vscode';
 import * as net from 'net';
 
 import {
+    GenericNotificationHandler,
     LanguageClient,
     LanguageClientOptions,
     ServerOptions,
-    StreamInfo
+    StreamInfo,
+    integer
 } from 'vscode-languageclient/node';
 
 import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler } from './commands';
@@ -19,14 +21,38 @@ import getPort = require('get-port');
 import waitPort = require('wait-port');
 import { compare } from '@renovatebot/pep440';
 import { ChildProcess, execFileSync, spawn } from 'child_process';
-
-
+import { SolcDetectionsProvider, WakeDetectionsProvider } from './detections';
+import { WakeDiagnostic } from './detections';
 
 let client: LanguageClient | undefined = undefined;
 let wokeProcess: ChildProcess | undefined = undefined;
+let wakeDetectionsProvider : SolcDetectionsProvider | undefined = undefined;
+let solcDetectionsProvider: WakeDetectionsProvider | undefined = undefined;
+let diagnosticCollection: vscode.DiagnosticCollection
 
 const WOKE_TARGET_VERSION = "3.6.1";
 const WOKE_PRERELEASE = false;
+
+export interface Diagnostic {
+    uri: vscode.Uri;
+    diagnostics: WakeDiagnostic[];
+}
+vscode.Diagnostic
+
+function onNotification(outputChannel: vscode.OutputChannel, diagnostic: Diagnostic){
+    outputChannel.appendLine(JSON.stringify(diagnostic));
+
+    try {
+        diagnostic.diagnostics.filter( item => item.source == "Woke").forEach(element => {
+            //wakeDetectionsMap.set(notification.uri, element);
+            outputChannel.appendLine(element.message);
+        });
+    } catch(err) {
+        if (err instanceof Error) {
+            outputChannel.appendLine(err.toString());
+        }
+    }    
+}
 
 async function installWoke(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<boolean> {
     try {
@@ -64,7 +90,7 @@ async function installWoke(outputChannel: vscode.OutputChannel, pythonExecutable
             }
             return false;
         }
-    }
+    } 
 }
 
 function getWokeVersion(pathToExecutable: string|null, cwd?: string): string {
@@ -155,6 +181,9 @@ function findPython(outputChannel: vscode.OutputChannel): string {
 export async function activate(context: vscode.ExtensionContext) {
     const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
     outputChannel.show(true);
+    //vscode.window.createTreeView('wake-detections', {
+    //    treeDataProvider: new WakeDetections(outputChannel)
+    //});
 
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
     const autoInstall: boolean = extensionConfig.get<boolean>('Woke.autoInstall', true);
@@ -255,6 +284,18 @@ export async function activate(context: vscode.ExtensionContext) {
     };
 
     client = new LanguageClient("Tools-for-Solidity", "Tools for Solidity", serverOptions, clientOptions);
+    diagnosticCollection = vscode.languages.createDiagnosticCollection('wake-test')
+
+    client.onNotification("textDocument/publishDiagnostics", (params) => {
+        let diag = (params as Diagnostic)
+        onNotification(outputChannel, diag);
+        diagnosticCollection.set(diag.uri, diag.diagnostics);
+    });
+    
+    wakeDetectionsProvider = new WakeDetectionsProvider(outputChannel);
+    solcDetectionsProvider = new SolcDetectionsProvider(outputChannel);
+    vscode.window.registerTreeDataProvider('wake-detections', wakeDetectionsProvider);
+    vscode.window.registerTreeDataProvider('wake-solc-detections', solcDetectionsProvider);
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.control_flow_graph", async (documentUri, canonicalName) => await generateCfgHandler(outputChannel, documentUri, canonicalName)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.inheritance_graph", async (documentUri, canonicalName) => await generateInheritanceGraphHandler({documentUri, canonicalName, out: outputChannel})));
