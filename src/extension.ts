@@ -10,7 +10,8 @@ import {
     ServerOptions,
     StreamInfo,
     integer,
-    Diagnostic as LSPDiagnostic
+    Diagnostic,
+    DiagnosticSeverity
 } from 'vscode-languageclient/node';
 
 import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler } from './commands';
@@ -22,32 +23,34 @@ import getPort = require('get-port');
 import waitPort = require('wait-port');
 import { compare } from '@renovatebot/pep440';
 import { ChildProcess, execFileSync, spawn } from 'child_process';
-import { SolcDetectionsProvider, WakeDetectionsProvider } from './detections';
-import { WakeDiagnostic } from './detections';
+import { WakeDetectionsProvider } from './detections';
+import { WakeDetection } from './detections';
+import { convertDiagnostics } from './util'
 
 let client: LanguageClient | undefined = undefined;
 let wokeProcess: ChildProcess | undefined = undefined;
-let wakeDetectionsProvider : SolcDetectionsProvider | undefined = undefined;
-let solcDetectionsProvider: WakeDetectionsProvider | undefined = undefined;
+let wakeDetectionsProvider: WakeDetectionsProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
+export let context :vscode.ExtensionContext
 
 const WOKE_TARGET_VERSION = "3.6.1";
 const WOKE_PRERELEASE = false;
 
-export interface Diagnostic {
-    uri: vscode.Uri;
-    diagnostics: WakeDiagnostic[];
+interface DiagnosticNotification{
+    uri: string;
+    diagnostics: Diagnostic[]
 }
-vscode.Diagnostic
 
-function onNotification(outputChannel: vscode.OutputChannel, diagnostic: Diagnostic){
-    outputChannel.appendLine(JSON.stringify(diagnostic));
+function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification){
+
+    let diags = detection.diagnostics.map(convertDiagnostics);
+    diagnosticCollection.set(vscode.Uri.parse(detection.uri), diags);
 
     try {
-        diagnostic.diagnostics.filter( item => item.source == "Woke").forEach(element => {
-            //wakeDetectionsMap.set(notification.uri, element);
-            outputChannel.appendLine(element.message);
-        });
+        let uri = vscode.Uri.parse(detection.uri);
+        let wakeDetections = diags.filter( item => item.source == "Woke").map(it => new WakeDetection(uri, it))
+        wakeDetectionsProvider?.add(uri, wakeDetections);
+
     } catch(err) {
         if (err instanceof Error) {
             outputChannel.appendLine(err.toString());
@@ -179,12 +182,10 @@ function findPython(outputChannel: vscode.OutputChannel): string {
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(ctx: vscode.ExtensionContext) {
+    context = ctx
     const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
     outputChannel.show(true);
-    //vscode.window.createTreeView('wake-detections', {
-    //    treeDataProvider: new WakeDetections(outputChannel)
-    //});
 
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
     const autoInstall: boolean = extensionConfig.get<boolean>('Woke.autoInstall', true);
@@ -281,36 +282,56 @@ export async function activate(context: vscode.ExtensionContext) {
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'solidity' }],
         synchronize: { configurationSection: 'woke'},
-        outputChannel: outputChannel
+        outputChannel: outputChannel,
+        initializationOptions: {
+            toolsForSolidityVersion: context.extension.packageJSON.version
+        }
     };
 
     client = new LanguageClient("Tools-for-Solidity", "Tools for Solidity", serverOptions, clientOptions);
-    diagnosticCollection = vscode.languages.createDiagnosticCollection('wake-test')
+    diagnosticCollection = vscode.languages.createDiagnosticCollection('Wake')
 
     client.onNotification("textDocument/publishDiagnostics", (params) => {
-        let diag = (params as [uri: string, diagnostics: LSPDiagnostic[]]);
+        //outputChannel.appendLine(JSON.stringify(params));
+        let diag = params as DiagnosticNotification;
         onNotification(outputChannel, diag);
-        diagnosticCollection.set(diag.uri, diag.diagnostics);
     });
 
     wakeDetectionsProvider = new WakeDetectionsProvider(outputChannel);
-    solcDetectionsProvider = new SolcDetectionsProvider(outputChannel);
     vscode.window.registerTreeDataProvider('wake-detections', wakeDetectionsProvider);
-    vscode.window.registerTreeDataProvider('wake-solc-detections', solcDetectionsProvider);
 
+    registerCommands(outputChannel)
+
+    initCoverage(outputChannel);
+
+    client.start();
+}
+
+function registerCommands(outputChannel : vscode.OutputChannel){
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.control_flow_graph", async (documentUri, canonicalName) => await generateCfgHandler(outputChannel, documentUri, canonicalName)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.inheritance_graph", async (documentUri, canonicalName) => await generateInheritanceGraphHandler({documentUri, canonicalName, out: outputChannel})));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.inheritance_graph", async (documentUri, canonicalName) => await generateInheritanceGraphHandler({ documentUri, canonicalName, out: outputChannel })));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.linearized_inheritance_graph", async (documentUri, canonicalName) => await generateLinearizedInheritanceGraphHandler(outputChannel, documentUri, canonicalName)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.copy_to_clipboard", async (text) => await copyToClipboardHandler(text)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.foundry.import_remappings", async () => await importFoundryRemappings(outputChannel)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.imports_graph", async () => await generateImportsGraphHandler(outputChannel)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.execute.references", async (documentUri, position, declarationPositions) => await executeReferencesHandler(outputChannel, documentUri, position, declarationPositions)));
 
-    initCoverage(outputChannel);
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.coverage.show", showCoverageCallback));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.coverage.hide", hideCoverageCallback));
 
-    client.start();
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.open_file", async (uri, range) => await openFile(uri, range)));
+}
+
+function openFile(uri : vscode.Uri, range : vscode.Range){
+    vscode.workspace.openTextDocument(uri).then((file) => {
+        vscode.window.showTextDocument(file).then(async (editor) => {
+            if (vscode.window.activeTextEditor) {
+                const target = new vscode.Selection(range.start.line, range.start.character, range.end.line, range.end.character);
+                vscode.window.activeTextEditor.selection = target;
+                vscode.window.activeTextEditor.revealRange(target, vscode.TextEditorRevealType.InCenter);
+            }
+        });
+    });
 }
 
 // this method is called when your extension is deactivated
