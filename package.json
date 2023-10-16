@@ -374,7 +374,7 @@
             "activitybar": [
                 {
                     "id": "tools-for-solidity",
-                    "title": "Detections",
+                    "title": "Tools for Solidity",
                     "icon": "images/icon.png"
                 }
             ]
@@ -384,10 +384,6 @@
                 {
                     "id": "wake-detections",
                     "name": "Wake Detections"
-                },
-                {
-                    "id": "wake-solc-detections",
-                    "name": "Solc Detections"
                 }
             ]
         }

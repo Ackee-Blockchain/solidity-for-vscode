@@ -1,119 +1,247 @@
 import * as vscode from 'vscode';
-import {Diagnostic} from './extension';
-import { DiagnosticSeverity, integer } from 'vscode-languageclient';
+import { context } from './extension'
+import { Command, DiagnosticSeverity, integer } from 'vscode-languageclient';
+import {
+    Diagnostic
+} from 'vscode-languageclient/node';
 
-export interface WakeDiagnostic extends vscode.Diagnostic {
-    
-}
+export class WakeDetection {
+    uri: vscode.Uri;
+    diagnostic: vscode.Diagnostic;
 
-class SeverityItem extends vscode.TreeItem {
-    constructor(severity : integer, collapsibleState?: vscode.TreeItemCollapsibleState) {
-        let label : string
-        switch (severity) {
-            case 1:
-                label = "Error"
-                break;
-            case 2:
-                label = "Warning"
-                break;
-            case 3:
-                label = "Info"
-                break;
-            default:
-                label = ""
-                break;
-        }
-        super(label, collapsibleState)
+    constructor(uri : vscode.Uri, diagnostic: vscode.Diagnostic){
+        this.uri = uri;
+        this.diagnostic = diagnostic;
+    }
+
+    getId() : string{
+        return [this.uri.toString(), this.diagnostic.message, this.diagnostic.range.start.line, this.diagnostic.range.start.character, this.diagnostic.range.end.line, this.diagnostic.range.end.character].join(":");
     }
 }
 
-class ImpactItem extends vscode.TreeItem {
-    constructor(imapct: integer, collapsibleState?: vscode.TreeItemCollapsibleState) {
+class BaseItem<T> extends vscode.TreeItem {
+    originalLabel: string;
+    childs: T[] = [];
+    childsMap: Map<string, T> = new Map<string, T>();
+
+    constructor(label : string, collapsibleState : vscode.TreeItemCollapsibleState | undefined){
+        super(label, collapsibleState);
+        this.originalLabel = label
+    }
+
+    addChild(id: string, item: T){
+        this.childsMap.set(id, item);
+        this.childs.push(item);
+    }
+
+    getChild(id: string): T | undefined{
+        return this.childsMap.get(id);
+    }
+
+    clearChilds() {
+        this.childsMap.clear()
+        while (this.childs.length != 0) {
+            this.childs.pop();
+        }
+    }
+
+    setIcon(name : string){
+        this.iconPath = {
+            light: context.asAbsolutePath("resources/icons/" + name + ".png"),
+            dark: context.asAbsolutePath("resources/icons/" + name + ".png"),
+        };
+    }
+
+    updateLabel() {
+        this.label = this.originalLabel + " (" + this.childs.length + ")";
+    }
+}
+
+class ImpactItem extends BaseItem<FileItem> {
+    impact: string;
+
+    constructor(impact: string) {
         let label: string
-        switch (imapct) {
-            case 1:
+        switch (impact) {
+            case "high":
                 label = "High"
                 break;
-            case 2:
+            case "medium":
                 label = "Medium"
                 break;
-            case 3:
+            case "low":
                 label = "Low"
                 break;
-            case 4:
+            case "warning":
                 label = "Warning"
                 break;
-            case 5:
+            case "info":
                 label = "Info"
                 break;
             default:
-                label = ""
+                label = "All"
                 break;
         }
-        super(label, collapsibleState)
+        super(label, vscode.TreeItemCollapsibleState.Expanded);
+        this.originalLabel = label
+        this.impact = impact;
+        this.setIcon("impact_" + impact)
+    }
+
+    updateLabel() {
+        let detectionsCount = 0;
+        this.childs.forEach( it => {
+            detectionsCount += it.childs.length
+        })
+        this.label = this.originalLabel + " (" + detectionsCount + ")";     
     }
 }
 
-export class DetectionItem extends vscode.TreeItem {
+class FileItem extends BaseItem<DetectionItem> {
+    uri : vscode.Uri;
 
-    constructor(label: string, collapsibleState?: vscode.TreeItemCollapsibleState){
-        super(label, collapsibleState)
+    constructor(uri : vscode.Uri){
+        super(uri.path.substring(uri.path.lastIndexOf("/") + 1), vscode.TreeItemCollapsibleState.Collapsed);
+        this.uri = uri;
+    }
+
+    addChild(id: string, item: DetectionItem) {
+        super.addChild(id, item);
+        this.childs.sort((a: DetectionItem, b: DetectionItem) => {
+            if (a.detection.diagnostic.range.start.line > b.detection.diagnostic.range.start.line){
+                return 1;
+            }
+            else if (a.detection.diagnostic.range.start.line < b.detection.diagnostic.range.start.line) {
+                return -1;
+            } else {
+                if (a.detection.diagnostic.range.start.character > b.detection.diagnostic.range.start.character) {
+                    return 1;
+                }
+                else if (a.detection.diagnostic.range.start.character < b.detection.diagnostic.range.start.character) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        });
     }
 }
 
-export class BaseDetectionsProvider implements vscode.TreeDataProvider<DetectionItem>{
+class DetectionItem extends BaseItem<any> {
 
-    outputChannel: vscode.OutputChannel | undefined;
-    detectionsMap: Map<vscode.Uri, WakeDiagnostic> = new Map<vscode.Uri, WakeDiagnostic>()
-    nodes: vscode.TreeItem[] = new Array();
+    detection: WakeDetection;
+
+    constructor(detection: WakeDetection, collapsibleState?: vscode.TreeItemCollapsibleState) {
+        super("[Ln " + detection.diagnostic.range.start.line + "] " + detection.diagnostic.message, collapsibleState);
+        this.detection = detection;
+        this.command = {
+            title: "Open",
+            command: "Tools-for-Solidity.detections.open_file",
+            arguments: [detection.uri, detection.diagnostic.range]
+        };
+    }
+}
+
+export class DetectionsProvider implements vscode.TreeDataProvider<vscode.TreeItem>{
+
+    outputChannel: vscode.OutputChannel;
+    detectionsMap: Map<vscode.Uri, WakeDetection[]> = new Map<vscode.Uri, WakeDetection[]>()
+    rootNodesMap: Map<string, ImpactItem> = new Map<string, ImpactItem>()
+    rootNodes: ImpactItem[] = [];
+
+    _onDidChangeTreeData: vscode.EventEmitter<undefined> = new vscode.EventEmitter<undefined>();
+    onDidChangeTreeData: vscode.Event<undefined> = this._onDidChangeTreeData.event;
 
     constructor(outputChannel: vscode.OutputChannel){
         this.outputChannel = outputChannel;
     }
 
-    onDidChangeTreeData?: vscode.Event<void | vscode.TreeItem | vscode.TreeItem[] | null | undefined> | undefined;
+    addRoot(node: ImpactItem){
+        this.rootNodesMap.set(node.impact, node);
+        this.rootNodes.push(node);
+    }
 
-    add(notification : Diagnostic){
-        
+    add(uri: vscode.Uri, detections: WakeDetection[]){
+        this.detectionsMap.set(uri, detections);
+        this.refresh();
     }
 
     refresh(){
+        this.rootNodes.forEach( it => {
+            it.clearChilds();
+        })
 
+        for (const [key, value] of this.detectionsMap) {
+            value.forEach(detection => {
+
+                let impact : string;
+                switch (detection.diagnostic.severity) {
+                    case 0:
+                        impact = "high"
+                        break;
+                    case 1:
+                        impact = "medium"
+                        break;
+                    case 2:
+                        impact = "low"
+                        break;
+                    case 3:
+                        impact = "warning"
+                        break;
+                    default:
+                        impact = "info"
+                        break;
+                }
+
+                let rootNode = this.rootNodesMap.get(impact)
+
+                if (rootNode != undefined){
+                    let fileItem = rootNode.getChild(detection.uri.toString());
+                    if (fileItem == undefined){
+                        fileItem = new FileItem(detection.uri);
+                        rootNode.addChild(detection.uri.toString(), fileItem);
+                    }
+                    fileItem.addChild(detection.getId(), new DetectionItem(detection));
+                }
+                
+            })
+        }
+        this.updateRootLabels();
+        this._onDidChangeTreeData.fire(undefined);
+    }
+
+    updateRootLabels(){
+        this.rootNodes.forEach(it => {
+            it.updateLabel();
+            it.childs.forEach(it =>{
+                it.updateLabel();
+            })
+        })
     }
 
     getTreeItem(element: vscode.TreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
-        this.outputChannel?.appendLine("getTreeItem: " + element.label)
         return element;
     }
 
     getChildren(element?: vscode.TreeItem | undefined): vscode.ProviderResult<vscode.TreeItem[]> {
-        this.outputChannel?.appendLine("getChildren: " + element?.label)
-        if (element == undefined){
-            return this.nodes;
-        } else {
-            
+        let item = (element as BaseItem<any>)
+        if (item == undefined){
+            return this.rootNodes;
+        } 
+        else {
+            return item.childs;
         }
     }
     
 }
 
-export class WakeDetectionsProvider extends BaseDetectionsProvider {
+export class WakeDetectionsProvider extends DetectionsProvider {
     constructor(outputChannel: vscode.OutputChannel) {
         super(outputChannel);
-        this.nodes.push(new ImpactItem(1));
-        this.nodes.push(new ImpactItem(2));
-        this.nodes.push(new ImpactItem(3));
-        this.nodes.push(new ImpactItem(4));
-        this.nodes.push(new ImpactItem(5));
-    }
-}
-
-export class SolcDetectionsProvider extends BaseDetectionsProvider {
-    constructor(outputChannel: vscode.OutputChannel) {
-        super(outputChannel);
-        this.nodes.push(new SeverityItem(1));
-        this.nodes.push(new SeverityItem(2));
-        this.nodes.push(new SeverityItem(3));
-        this.nodes.push(new SeverityItem(4));
+        this.addRoot(new ImpactItem("high"));
+        this.addRoot(new ImpactItem("medium"));
+        this.addRoot(new ImpactItem("low"));
+        this.addRoot(new ImpactItem("warning"));
+        this.addRoot(new ImpactItem("info"));
     }
 }
