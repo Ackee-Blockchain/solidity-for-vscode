@@ -4,8 +4,10 @@ import {
     DiagnosticSeverity,
     Range
 } from 'vscode-languageclient/node';
+import { WakeDiagnostic,
+        DiagnosticData  } from './detections';
 
-export function convertDiagnostics(it: Diagnostic): vscode.Diagnostic {
+export function convertDiagnostics(it: Diagnostic): WakeDiagnostic {
     let severity: vscode.DiagnosticSeverity;
     switch (it.severity) {
         case DiagnosticSeverity.Information:
@@ -21,10 +23,11 @@ export function convertDiagnostics(it: Diagnostic): vscode.Diagnostic {
             severity = vscode.DiagnosticSeverity.Hint
             break;
     }
-    let result = new vscode.Diagnostic(convertRange(it.range), it.message, severity)
+    let result = new WakeDiagnostic(convertRange(it.range), it.message, severity, it.data)
     result.source = it.source;
     result.code = it.code;
     result.relatedInformation = it.relatedInformation?.map(it => new vscode.DiagnosticRelatedInformation(new vscode.Location(vscode.Uri.parse(it.location.uri), convertRange(it.location.range)), it.message));
+    result.data = it.data as DiagnosticData
     result.tags = it.tags;
     return result;
 }

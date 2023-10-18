@@ -32,9 +32,11 @@ let wokeProcess: ChildProcess | undefined = undefined;
 let wakeDetectionsProvider: WakeDetectionsProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
 export let context :vscode.ExtensionContext
+export let log: Log
 
 const WOKE_TARGET_VERSION = "3.6.0";
 const WOKE_PRERELEASE = false;
+const LOG_LEVEL = 0;
 
 interface DiagnosticNotification{
     uri: string;
@@ -42,8 +44,8 @@ interface DiagnosticNotification{
 }
 
 function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification){
-
-    let diags = detection.diagnostics.map(convertDiagnostics);
+    log.d(JSON.stringify(detection));
+    let diags = detection.diagnostics.map(it => convertDiagnostics(it));
     diagnosticCollection.set(vscode.Uri.parse(detection.uri), diags);
 
     try {
@@ -185,6 +187,7 @@ function findPython(outputChannel: vscode.OutputChannel): string {
 export async function activate(ctx: vscode.ExtensionContext) {
     context = ctx
     const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
+    log = new Log(outputChannel, LOG_LEVEL);
     outputChannel.show(true);
 
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
@@ -345,3 +348,22 @@ export function deactivate() {
         }
     }
 }
+
+export class Log{
+
+    outputChannel : vscode.OutputChannel
+    level : integer;
+
+    constructor(outputChannel : vscode.OutputChannel, level : integer){
+        this.outputChannel = outputChannel;
+        this.level = level;
+    }
+
+    d(message : string){
+        if(this.level >= 0)
+            this.outputChannel.appendLine(message)
+    }
+
+}
+
+
