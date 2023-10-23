@@ -375,7 +375,7 @@
                 {
                     "id": "tools-for-solidity",
                     "title": "Tools for Solidity",
-                    "icon": "images/icon.png"
+                    "icon": "resources/icons/activity_bar_wake.png"
                 }
             ]
         },
@@ -384,6 +384,10 @@
                 {
                     "id": "wake-detections",
                     "name": "Wake Detections"
+                },
+                {
+                    "id": "solc-detections",
+                    "name": "Compiler"
                 }
             ]
         }
