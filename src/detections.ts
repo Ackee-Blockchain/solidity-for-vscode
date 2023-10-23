@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
-import { context, log } from './extension'
+import { Log, context, log } from './extension'
 import { Command, DiagnosticSeverity, integer } from 'vscode-languageclient';
 import {
     Diagnostic
 } from 'vscode-languageclient/node';
+import { filter } from '@renovatebot/pep440';
 
 export class WakeDiagnostic extends vscode.Diagnostic {
     data: DiagnosticData
@@ -41,10 +42,11 @@ export interface DiagnosticData{
     sourceUnitName: string;
 }
 
-class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
+abstract class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
     originalLabel: string;
     childs: T[] = [];
     childsMap: Map<string, T> = new Map<string, T>();
+    leafsCount = 0;
 
     constructor(label: string, collapsibleState: vscode.TreeItemCollapsibleState | undefined){
         super(label, collapsibleState);
@@ -73,6 +75,10 @@ class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
         }
     }
 
+    addLeaf(leaf: WakeDetection, level?: number) {
+        this.leafsCount += 1;
+    }
+
     getId(): string{
         return this.originalLabel;
     }
@@ -89,40 +95,12 @@ class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
     }
 }
 
-class RootItem extends BaseItem<PathItem> {
+abstract class RootItem extends BaseItem<any> {
     key: string;
-    leafsCount = 0;
 
-    constructor(type: string, key:string, label: string) {
+    constructor(key:string, label: string) {
         super(label, vscode.TreeItemCollapsibleState.Expanded);
         this.key = key;
-        this.setIcon(type + "_" + key)
-    }
-
-    addLeaf(leaf: WakeDetection) {
-        let segments = leaf.diagnostic.data.sourceUnitName.split("/");
-        let currentNode: BaseItem<RootItem | PathItem | FileItem> = this;
-        let fileNode: FileItem | undefined;
-
-        if (segments.length > 1) {
-
-            for (let i = 0; i < segments.length - 1; i++) {
-                let segment = segments[i];
-                let childNode: PathItem | FileItem | undefined = currentNode?.childsMap.get(segment);
-                if (childNode == undefined) {
-                    childNode = new PathItem(segment);
-                    currentNode.addChild(childNode);
-                }
-                currentNode = childNode;
-            }
-        }
-        fileNode = currentNode.getChild(segments[segments.length - 1]) as FileItem
-        if (fileNode == undefined) {
-            fileNode = new FileItem(leaf.uri);
-            currentNode.addChild(fileNode)
-        }
-        fileNode.addChild(new DetectionItem(leaf));
-        this.leafsCount++;
     }
 
     updateLabel() {
@@ -133,40 +111,45 @@ class RootItem extends BaseItem<PathItem> {
         super.clearChilds()
         this.leafsCount = 0;
     }
+
+    addLeaf(leaf: WakeDetection, level? : number) {
+        let segments = leaf.diagnostic.data.sourceUnitName.split("/");
+        if (segments.length > 1) {
+            let childNode = this.childsMap.get(segments[0]);
+            if (childNode == undefined) {
+                childNode = new PathItem(segments[0]);
+                this.addChild(childNode);
+            }
+            childNode.addLeaf(leaf, 1)
+            super.addLeaf(leaf, level)
+        }
+    }
 }
 
 class ImpactItem extends RootItem {
 
     constructor(impact: string) {
-        let label: string
-        let icon: vscode.ThemeIcon | undefined = undefined
-        switch (impact) {
-            case "high":
-                label = "High"
-                break;
-            case "medium":
-                label = "Medium"
-                break;
-            case "low":
-                label = "Low"
-                break;
-            case "warning":
-                label = "Warning"
-                icon = new vscode.ThemeIcon('warning', new vscode.ThemeColor("notificationsWarningIcon.foreground"))
-                break;
-            default:
-                label = "Info"
-                icon = new vscode.ThemeIcon('info', new vscode.ThemeColor("notificationsInfoIcon.foreground"))
-                break;
-        }
-        super("impact", impact, label);
-        if (icon != undefined) {
-            this.iconPath = icon;
+        super(impact, impact[0].toUpperCase() + impact.slice(1));
+
+        if(impact == "warning") {
+            this.iconPath = new vscode.ThemeIcon('warning', new vscode.ThemeColor("notificationsWarningIcon.foreground"));
+        } else if (impact == "info") {
+            this.iconPath = new vscode.ThemeIcon('info', new vscode.ThemeColor("notificationsInfoIcon.foreground"))
+        } else {
+            this.setIcon("impact_" + impact);
         }
     }
 }
 
-class SeverityItem extends RootItem {
+class ConfidenceItem extends RootItem {
+
+    constructor(confidence: string) {
+        super(confidence, confidence[0].toUpperCase() + confidence.slice(1));
+        this.setIcon("confidence_" + confidence);
+    }
+}
+
+class SeverityItem extends RootItem{
 
     constructor(severity: string) {
         let label: string
@@ -185,19 +168,56 @@ class SeverityItem extends RootItem {
                 icon = new vscode.ThemeIcon('info', new vscode.ThemeColor("notificationsInfoIcon.foreground"))
                 break;
         }
-        super("severity", severity, label);
+        super(severity, label);
         this.iconPath = icon;
+    }
+
+    addLeaf(leaf: WakeDetection) {
+        let segments = leaf.diagnostic.data.sourceUnitName.split("/");
+        if (segments.length > 1) {
+            let childNode: PathItem | undefined = this.childsMap.get(segments[0]);
+            if (childNode == undefined) {
+                childNode = new PathItem(segments[0]);
+                this.addChild(childNode);
+            }
+            childNode.addLeaf(leaf, 1)
+        }
+        super.addLeaf(leaf);
     }
 }
 
-class PathItem extends BaseItem<PathItem | FileItem> {
+class PathItem extends RootItem {
     constructor(segment: string) {
-        super(segment, vscode.TreeItemCollapsibleState.Expanded);
+        super(segment, segment);
         this.setIcon("folder");
     }
 
     addChild(item: PathItem | FileItem): void {
         super.addChild(item)
+    }
+
+    addLeaf(leaf: WakeDetection, level: integer){
+        let segments = leaf.diagnostic.data.sourceUnitName.split("/");
+        let fileNode: FileItem | undefined;
+
+        if (segments.length - level > 1) {
+            let segment = segments[level];
+
+            let pathNode = this.childsMap.get(segment) as PathItem;
+            if (pathNode == undefined) {
+                pathNode = new PathItem(segment);
+                this.addChild(pathNode);
+            }
+            pathNode.addLeaf(leaf, level + 1)
+        } else {
+            fileNode = this.getChild(segments[segments.length - 1]) as FileItem
+            if (fileNode == undefined) {
+                fileNode = new FileItem(leaf.uri);
+                this.addChild(fileNode)
+            }
+            fileNode.addChild(new DetectionItem(leaf));
+        }
+        this.leafsCount++;
     }
 
     sortChilds(): void {
@@ -293,6 +313,8 @@ export abstract class BaseProvider implements vscode.TreeDataProvider<vscode.Tre
     _onDidChangeTreeData: vscode.EventEmitter<undefined> = new vscode.EventEmitter<undefined>();
     onDidChangeTreeData: vscode.Event<undefined> = this._onDidChangeTreeData.event;
 
+    abstract refresh(): void;
+
     addRoot(node: RootItem){
         this.rootNodesMap.set(node.key, node);
         this.rootNodes.push(node);
@@ -303,27 +325,9 @@ export abstract class BaseProvider implements vscode.TreeDataProvider<vscode.Tre
         this.refresh();
     }
 
-    refresh(){
-        this.rootNodes.forEach( it => {
-            it.clearChilds();
-        })
-
-        for (const [key, value] of this.detectionsMap) {
-            value.forEach(detection => {
-                let rootNode = this.rootNodesMap.get(this.getRoot(detection.diagnostic));
-
-                if (rootNode != undefined){
-                    rootNode.addLeaf(detection);
-                }
-            })
-        }
-
-        this.rootNodes.forEach( it => {
-            it.sortChilds();
-        })
-
-        this.updateRootLabels();
-        this._onDidChangeTreeData.fire(undefined);
+    clear(){
+        this.rootNodes = [];
+        this.rootNodesMap.clear();
     }
 
     updateRootLabels(){
@@ -345,36 +349,201 @@ export abstract class BaseProvider implements vscode.TreeDataProvider<vscode.Tre
             return item.childs;
         }
     }
+}
 
-    abstract getRoot(diagnostic: WakeDiagnostic): string;
+export enum GroupBy {
+    IMPACT,
+    PATH,
+    CONFIDENCE,
+    DETECTOR
+}
+
+export enum Impact {
+    HIGH,
+    MEDIUM,
+    LOW,
+    WARNING,
+    INFO
+}
+
+export enum Confidence {
+    HIGH,
+    MEDIUM,
+    LOW
 }
 
 export class WakeDetectionsProvider extends BaseProvider{
 
+    groupBy: GroupBy = GroupBy.IMPACT;
+    filterImpact: Impact = Impact.INFO;
+    filterConfidence: Confidence = Confidence.LOW;
+
     constructor() {
         super()
-        this.addRoot(new ImpactItem("high"));
-        this.addRoot(new ImpactItem("medium"));
-        this.addRoot(new ImpactItem("low"));
-        this.addRoot(new ImpactItem("warning"));
-        this.addRoot(new ImpactItem("info"));
     }
 
     getRoot(diagnostic: WakeDiagnostic): string {
         return diagnostic.data.impact;
     }
+
+    refresh(): void {
+        this.clear();
+
+        switch (this.groupBy) {
+            case GroupBy.IMPACT:
+                this.buildTreeByImpact();
+                break;
+            case GroupBy.PATH:
+                this.buildTreeByPath();
+                break;
+            case GroupBy.CONFIDENCE:
+                this.buildTreeByConfidence();
+                break;
+            default:
+                break;
+        }
+        
+        this.rootNodes = this.rootNodes.filter(it => it.leafsCount > 0)
+
+        this.rootNodes.forEach(it => {
+            it.sortChilds();
+        })
+
+        this.updateRootLabels();
+        this._onDidChangeTreeData.fire(undefined);
+    }
+
+    buildTreeByImpact(){
+        this.addRoot(new ImpactItem("high"));
+        this.addRoot(new ImpactItem("medium"));
+        this.addRoot(new ImpactItem("low"));
+        this.addRoot(new ImpactItem("warning"));
+        this.addRoot(new ImpactItem("info"));
+
+        for (const [key, value] of this.detectionsMap) {
+            value.filter(it => this.filterDetections(it)).forEach(detection => {
+                let rootNode = this.rootNodesMap.get(detection.diagnostic.data.impact);
+
+                if (rootNode != undefined) {
+                    rootNode.addLeaf(detection);
+                }
+            })
+        }
+    }
+
+    buildTreeByPath() {
+        for (const [key, value] of this.detectionsMap) {
+            value.filter(it => this.filterDetections(it)).forEach(detection => {
+                let segments = detection.diagnostic.data.sourceUnitName.split("/");
+                let rootNode = this.rootNodesMap.get(segments[0]);
+
+                if(rootNode == undefined){
+                    rootNode = new PathItem(segments[0])
+                    this.addRoot(rootNode)
+                }
+                
+                rootNode.addLeaf(detection, 1);
+            })
+        }
+    }
+
+    buildTreeByConfidence() {
+        this.addRoot(new ConfidenceItem("high"));
+        this.addRoot(new ConfidenceItem("medium"));
+        this.addRoot(new ConfidenceItem("low"));
+
+        for (const [key, value] of this.detectionsMap) {
+            value.filter(it => this.filterDetections(it)).forEach(detection => {
+                let rootNode = this.rootNodesMap.get(detection.diagnostic.data.confidence);
+
+                if (rootNode != undefined) {
+                    rootNode.addLeaf(detection);
+                }
+            })
+        }
+    }
+
+    filterDetections(detection : WakeDetection): boolean{
+        var filterImpact = true
+        var filterConfidence = true
+
+        switch (this.filterImpact) {
+            case Impact.HIGH:
+                if (detection.diagnostic.data.impact == "medium") {
+                    filterImpact = false;
+                }
+            case Impact.MEDIUM:
+                if (detection.diagnostic.data.impact == "low") {
+                    filterImpact = false;
+                }
+            case Impact.LOW:
+                if (detection.diagnostic.data.impact == "warning") {
+                    filterImpact = false;
+                }
+            case Impact.WARNING:
+                if (detection.diagnostic.data.impact == "info") {
+                    filterImpact = false;
+                }
+                break;
+            default:
+                break;
+        }
+        switch (this.filterConfidence) {
+            case Confidence.HIGH:
+                if (detection.diagnostic.data.confidence == "medium") {
+                    filterConfidence = false;
+                }
+            case Confidence.MEDIUM:
+                if (detection.diagnostic.data.confidence == "low") {
+                    filterConfidence = false;
+                }
+                break;
+            default:
+                break;
+        }
+        return filterImpact && filterConfidence;
+    }
+
+    setGroupBy(groupBy : GroupBy){
+        this.groupBy = groupBy;
+        this.refresh();
+    }
+
+    setFilterImpact(minImpact : Impact){
+        this.filterImpact = minImpact;
+        this.refresh();
+    }
+
+    setFilterConfidence(minConfidence: Confidence) {
+        this.filterConfidence = minConfidence;
+        this.refresh();
+    }
 }
 
 export class SolcDetectionsProvider extends BaseProvider{
 
-    constructor() {
-        super()
+    refresh(): void {
+        this.clear();
+
         this.addRoot(new SeverityItem("error"));
         this.addRoot(new SeverityItem("warning"));
         this.addRoot(new SeverityItem("info"));
-    }
 
-    getRoot(diagnostic: WakeDiagnostic): string {
-        return diagnostic.data.severity;
+        for (const [key, value] of this.detectionsMap) {
+            value.forEach(detection => {
+                let rootNode = this.rootNodesMap.get(detection.diagnostic.data.severity);
+
+                if (rootNode != undefined) {
+                    rootNode.addLeaf(detection);
+                }
+            })
+        }
+
+        this.rootNodes.forEach(it => {
+            it.sortChilds();
+        })
+
+        this.updateRootLabels();
+        this._onDidChangeTreeData.fire(undefined);
     }
 }

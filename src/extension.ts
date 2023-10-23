@@ -23,7 +23,7 @@ import getPort = require('get-port');
 import waitPort = require('wait-port');
 import { compare } from '@renovatebot/pep440';
 import { ChildProcess, execFileSync, spawn } from 'child_process';
-import { WakeDetectionsProvider, SolcDetectionsProvider, WakeDetection } from './detections';
+import { WakeDetectionsProvider, SolcDetectionsProvider, WakeDetection, GroupBy, Impact, Confidence } from './detections';
 import { convertDiagnostics } from './util'
 
 let client: LanguageClient | undefined = undefined;
@@ -327,6 +327,20 @@ function registerCommands(outputChannel : vscode.OutputChannel){
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.coverage.hide", hideCoverageCallback));
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.open_file", async (uri, range) => await openFile(uri, range)));
+
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.impact", async () => wakeProvider?.setGroupBy(GroupBy.IMPACT)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.path", async () => wakeProvider?.setGroupBy(GroupBy.PATH)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.confidence", async () => wakeProvider?.setGroupBy(GroupBy.CONFIDENCE)));
+
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.high", async () => wakeProvider?.setFilterImpact(Impact.HIGH)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.medium", async () => wakeProvider?.setFilterImpact(Impact.MEDIUM)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.low", async () => wakeProvider?.setFilterImpact(Impact.LOW)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.warning", async () => wakeProvider?.setFilterImpact(Impact.WARNING)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.info", async () => wakeProvider?.setFilterImpact(Impact.INFO)));
+
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.confidence.high", async () => wakeProvider?.setFilterConfidence(Confidence.HIGH)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.confidence.medium", async () => wakeProvider?.setFilterConfidence(Confidence.MEDIUM)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.confidence.low", async () => wakeProvider?.setFilterConfidence(Confidence.LOW)));
 }
 
 function openFile(uri : vscode.Uri, range : vscode.Range){
@@ -367,7 +381,6 @@ export class Log{
         if(this.level >= 0)
             this.outputChannel.appendLine(message)
     }
-
 }
 
 
