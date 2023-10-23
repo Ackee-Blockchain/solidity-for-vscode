@@ -39,6 +39,22 @@
     "contributes": {
         "configuration": [
             {
+                "title": "Configuration",
+                "order": -2,
+                "properties": {
+                    "woke.configuration.use_toml_if_present": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Use the configuration TOML file if present instead of the VS Code settings"
+                    },
+                    "woke.configuration.toml_path": {
+                        "type": "string",
+                        "default": "woke.toml",
+                        "description": "Path to the TOML configuration file relative to the workspace root"
+                    }
+                }
+            },
+            {
                 "title": "Tools for Solidity",
                 "order": -1,
                 "properties": {
