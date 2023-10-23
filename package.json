@@ -359,11 +359,13 @@
         "commands": [
             {
                 "command": "woke.lsp.force_recompile",
-                "title": "Tools for Solidity: Force Recompile Project"
+                "title": "Tools for Solidity: Force Recompile Project",
+                "icon": "$(play)"
             },
             {
                 "command": "woke.lsp.force_rerun_detectors",
-                "title": "Tools for Solidity: Force Rerun Detectors"
+                "title": "Tools for Solidity: Force Rerun Detectors",
+                "icon": "$(refresh)"
             },
             {
                 "command": "Tools-for-Solidity.generate.imports_graph",
@@ -384,6 +386,50 @@
             {
                 "command": "Tools-for-Solidity.coverage.hide",
                 "title": "Tools for Solidity: Hide Coverage"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.group.impact",
+                "title": "Group by Impact"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.group.path",
+                "title": "Group by Path"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.group.confidence",
+                "title": "Group by Confidence"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.impact.high",
+                "title": "Impact: High"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.impact.medium",
+                "title": "Impact: High/Medium"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.impact.low",
+                "title": "Impact: High/Medium/Low"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.impact.warning",
+                "title": "Impact: High/Medium/Low/Warning"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.impact.info",
+                "title": "Impact: All"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.confidence.high",
+                "title": "Confidence: High"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.confidence.medium",
+                "title": "Confidence: High/Medium"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.confidence.low",
+                "title": "Confidence: All"
             }
         ],
         "viewsContainers": {
@@ -406,7 +452,87 @@
                     "name": "Compiler"
                 }
             ]
-        }
+        },
+        "menus": {
+            "view/title": [
+                {
+                    "command": "woke.lsp.force_rerun_detectors",
+                    "when": "view == wake-detections",
+                    "group": "navigation@3"
+                },
+                {
+                    "submenu": "tools-for-solidity.detections.group",
+                    "when": "view == wake-detections",
+                    "group": "navigation@1"
+                },
+                {
+                    "submenu": "tools-for-solidity.detections.filter",
+                    "when": "view == wake-detections",
+                    "group": "navigation@2"
+                }
+
+            ],
+            "tools-for-solidity.detections.filter": [
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.high",
+                    "group": "1_impact@2"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.medium",
+                    "group": "1_impact@3"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.low",
+                    "group": "1_impact@4"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.warning",
+                    "group": "1_impact@5"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.info",
+                    "group": "1_impact@1"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.high",
+                    "group": "2_confidence@2"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.medium",
+                    "group": "2_confidence@3"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.low",
+                    "group": "2_confidence@1"
+                }
+            ],
+            "tools-for-solidity.detections.group": [
+                {
+                    "command": "Tools-for-Solidity.detections.group.path",
+                    "group": "group@1"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.impact",
+                    "group": "group@2"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.confidence",
+                    "group": "group@3"
+                }
+            ]
+        },
+        "submenus": [
+            {
+                "id": "tools-for-solidity.detections.filter",
+                "label": "Filter",
+                "icon": "$(filter)"
+            },
+            {
+                "id": "tools-for-solidity.detections.group",
+                "label": "Group by",
+                "icon": "$(list-tree)"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run package",
