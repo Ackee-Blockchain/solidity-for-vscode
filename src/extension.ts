@@ -23,13 +23,13 @@ import getPort = require('get-port');
 import waitPort = require('wait-port');
 import { compare } from '@renovatebot/pep440';
 import { ChildProcess, execFileSync, spawn } from 'child_process';
-import { WakeDetectionsProvider } from './detections';
-import { WakeDetection } from './detections';
+import { WakeDetectionsProvider, SolcDetectionsProvider, WakeDetection } from './detections';
 import { convertDiagnostics } from './util'
 
 let client: LanguageClient | undefined = undefined;
 let wokeProcess: ChildProcess | undefined = undefined;
-let wakeDetectionsProvider: WakeDetectionsProvider | undefined = undefined;
+let wakeProvider: WakeDetectionsProvider | undefined = undefined;
+let solcProvider: SolcDetectionsProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
 export let context :vscode.ExtensionContext
 export let log: Log
@@ -51,7 +51,9 @@ function onNotification(outputChannel: vscode.OutputChannel, detection: Diagnost
     try {
         let uri = vscode.Uri.parse(detection.uri);
         let wakeDetections = diags.filter( item => item.source == "Woke").map(it => new WakeDetection(uri, it))
-        wakeDetectionsProvider?.add(uri, wakeDetections);
+        wakeProvider?.add(uri, wakeDetections);
+        let solcDetections = diags.filter(item => item.source == "Woke(solc)").map(it => new WakeDetection(uri, it))
+        solcProvider?.add(uri, solcDetections);
 
     } catch(err) {
         if (err instanceof Error) {
@@ -300,8 +302,10 @@ export async function activate(ctx: vscode.ExtensionContext) {
         onNotification(outputChannel, diag);
     });
 
-    wakeDetectionsProvider = new WakeDetectionsProvider(outputChannel);
-    vscode.window.registerTreeDataProvider('wake-detections', wakeDetectionsProvider);
+    wakeProvider = new WakeDetectionsProvider();
+    solcProvider = new SolcDetectionsProvider();
+    vscode.window.registerTreeDataProvider('wake-detections', wakeProvider);
+    vscode.window.registerTreeDataProvider('solc-detections', solcProvider);
 
     registerCommands(outputChannel)
 

@@ -5,10 +5,10 @@ import {
     Diagnostic
 } from 'vscode-languageclient/node';
 
-export class WakeDiagnostic extends vscode.Diagnostic{
-    data : DiagnosticData
+export class WakeDiagnostic extends vscode.Diagnostic {
+    data: DiagnosticData
 
-    constructor(range: vscode.Range, message: string, severity: vscode.DiagnosticSeverity, data : DiagnosticData){
+    constructor(range: vscode.Range, message: string, severity: vscode.DiagnosticSeverity, data: DiagnosticData) {
         super(range, message, severity);
         this.data = data;
     }
@@ -18,25 +18,26 @@ export class WakeDetection {
     uri: vscode.Uri;
     diagnostic: WakeDiagnostic;
 
-    constructor(uri : vscode.Uri, diagnostic: WakeDiagnostic){
+    constructor(uri: vscode.Uri, diagnostic: WakeDiagnostic){
         this.uri = uri;
         this.diagnostic = diagnostic;
     }
 
-    getId() : string{
+    getId(): string{
         return [this.uri.toString(), this.diagnostic.message, this.diagnostic.range.start.line, this.diagnostic.range.start.character, this.diagnostic.range.end.line, this.diagnostic.range.end.character].join(":");
     }
 
-    getImpact() : string | undefined{
+    getImpact(): string | undefined{
         log.d(this.diagnostic.data.impact);
         return this.diagnostic.data.impact;
     }
 }
 
 export interface DiagnosticData{
-    impact : string;
-    confidence : string;
-    ignored : boolean;
+    severity: string;
+    impact: string;
+    confidence: string;
+    ignored: boolean;
     sourceUnitName: string;
 }
 
@@ -45,7 +46,7 @@ class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
     childs: T[] = [];
     childsMap: Map<string, T> = new Map<string, T>();
 
-    constructor(label : string, collapsibleState : vscode.TreeItemCollapsibleState | undefined){
+    constructor(label: string, collapsibleState: vscode.TreeItemCollapsibleState | undefined){
         super(label, collapsibleState);
         this.originalLabel = label
     }
@@ -72,11 +73,11 @@ class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
         }
     }
 
-    getId() : string{
+    getId(): string{
         return this.originalLabel;
     }
 
-    setIcon(name : string){
+    setIcon(name: string){
         this.iconPath = {
             light: context.asAbsolutePath("resources/icons/" + name + ".png"),
             dark: context.asAbsolutePath("resources/icons/" + name + ".png"),
@@ -88,12 +89,57 @@ class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
     }
 }
 
-class ImpactItem extends BaseItem<PathItem> {
-    impact: string;
-    detectionsCount = 0;
+class RootItem extends BaseItem<PathItem> {
+    key: string;
+    leafsCount = 0;
+
+    constructor(type: string, key:string, label: string) {
+        super(label, vscode.TreeItemCollapsibleState.Expanded);
+        this.key = key;
+        this.setIcon(type + "_" + key)
+    }
+
+    addLeaf(leaf: WakeDetection) {
+        let segments = leaf.diagnostic.data.sourceUnitName.split("/");
+        let currentNode: BaseItem<RootItem | PathItem | FileItem> = this;
+        let fileNode: FileItem | undefined;
+
+        if (segments.length > 1) {
+
+            for (let i = 0; i < segments.length - 1; i++) {
+                let segment = segments[i];
+                let childNode: PathItem | FileItem | undefined = currentNode?.childsMap.get(segment);
+                if (childNode == undefined) {
+                    childNode = new PathItem(segment);
+                    currentNode.addChild(childNode);
+                }
+                currentNode = childNode;
+            }
+        }
+        fileNode = currentNode.getChild(segments[segments.length - 1]) as FileItem
+        if (fileNode == undefined) {
+            fileNode = new FileItem(leaf.uri);
+            currentNode.addChild(fileNode)
+        }
+        fileNode.addChild(new DetectionItem(leaf));
+        this.leafsCount++;
+    }
+
+    updateLabel() {
+        this.label = this.originalLabel + " (" + this.leafsCount + ")";
+    }
+
+    clearChilds(): void {
+        super.clearChilds()
+        this.leafsCount = 0;
+    }
+}
+
+class ImpactItem extends RootItem {
 
     constructor(impact: string) {
         let label: string
+        let icon: vscode.ThemeIcon | undefined = undefined
         switch (impact) {
             case "high":
                 label = "High"
@@ -106,90 +152,46 @@ class ImpactItem extends BaseItem<PathItem> {
                 break;
             case "warning":
                 label = "Warning"
-                break;
-            case "info":
-                label = "Info"
+                icon = new vscode.ThemeIcon('warning', new vscode.ThemeColor("notificationsWarningIcon.foreground"))
                 break;
             default:
-                label = "All"
+                label = "Info"
+                icon = new vscode.ThemeIcon('info', new vscode.ThemeColor("notificationsInfoIcon.foreground"))
                 break;
         }
-        super(label, vscode.TreeItemCollapsibleState.Expanded);
-        this.impact = impact;
-        this.setIcon("impact_" + impact)
-    }
-
-    addDetection(detection : WakeDetection){
-        let segments = detection.diagnostic.data.sourceUnitName.split("/");
-        let currentNode : BaseItem<ImpactItem | PathItem | FileItem> = this;
-        let fileNode : FileItem | undefined;
-
-        if(segments.length > 1){
-
-            for (let i = 0; i < segments.length-1; i++) {
-                let segment = segments[i];
-                let childNode : PathItem | FileItem | undefined = currentNode?.childsMap.get(segment);
-                if (childNode == undefined){
-                    childNode = new PathItem(segment);
-                    currentNode.addChild(childNode);
-                }
-                currentNode = childNode;
-            }
+        super("impact", impact, label);
+        if (icon != undefined) {
+            this.iconPath = icon;
         }
-        fileNode = currentNode.getChild(segments[segments.length - 1]) as FileItem
-        if (fileNode == undefined) {
-            fileNode = new FileItem(detection.uri);
-            currentNode.addChild(fileNode)
-        }
-        fileNode.addChild(new DetectionItem(detection));
-        this.detectionsCount++;
-    }
-
-    updateLabel() {
-        this.label = this.originalLabel + " (" + this.detectionsCount + ")";
-    }
-
-    clearChilds(): void {
-        super.clearChilds()
-        this.detectionsCount = 0;
     }
 }
 
-class SeverityItem extends BaseItem<FileItem> {
-    severity: integer;
+class SeverityItem extends RootItem {
 
-    constructor(severity: integer) {
+    constructor(severity: string) {
         let label: string
+        let icon: vscode.ThemeIcon
         switch (severity) {
-            case 1:
+            case "error":
                 label = "Error"
+                icon = new vscode.ThemeIcon('error', new vscode.ThemeColor("notificationsErrorIcon.foreground"))
                 break;
-            case 2:
+            case "warning":
                 label = "Warning"
-                break;
-            case 3:
-                label = "Info"
+                icon = new vscode.ThemeIcon('warning', new vscode.ThemeColor("notificationsWarningIcon.foreground"))
                 break;
             default:
-                label = "Hide"
+                label = "Info"
+                icon = new vscode.ThemeIcon('info', new vscode.ThemeColor("notificationsInfoIcon.foreground"))
                 break;
         }
-        super(label, vscode.TreeItemCollapsibleState.Expanded);
-        this.severity = severity;
-        this.setIcon("severity_" + severity)
-    }
-
-    updateLabel() {
-        let detectionsCount = 0;
-        this.childs.forEach( it => {
-            detectionsCount += it.childs.length
-        })
-        this.label = this.originalLabel + " (" + detectionsCount + ")";     
+        super("severity", severity, label);
+        this.iconPath = icon;
     }
 }
 
 class PathItem extends BaseItem<PathItem | FileItem> {
-    constructor(segment : string) {
+    constructor(segment: string) {
         super(segment, vscode.TreeItemCollapsibleState.Expanded);
         this.setIcon("folder");
     }
@@ -213,9 +215,9 @@ class PathItem extends BaseItem<PathItem | FileItem> {
 }
 
 class FileItem extends BaseItem<DetectionItem> {
-    uri : vscode.Uri;
+    uri: vscode.Uri;
 
-    constructor(uri : vscode.Uri){
+    constructor(uri: vscode.Uri){
         super(uri.path.substring(uri.path.lastIndexOf("/") + 1), vscode.TreeItemCollapsibleState.Expanded);
         this.uri = uri;
         this.setIcon("solidity");
@@ -251,33 +253,48 @@ class DetectionItem extends BaseItem<any> {
     detection: WakeDetection;
 
     constructor(detection: WakeDetection, collapsibleState?: vscode.TreeItemCollapsibleState) {
-        super("L" + detection.diagnostic.range.start.line + ": " + detection.diagnostic.message, collapsibleState);
+        super("L" + (detection.diagnostic.range.start.line + 1) + ": " + detection.diagnostic.message, collapsibleState);
         this.detection = detection;
         this.command = {
             title: "Open",
             command: "Tools-for-Solidity.detections.open_file",
             arguments: [detection.uri, detection.diagnostic.range]
         };
-        this.setIcon("detection_" + detection.diagnostic.data.impact + "_" + detection.diagnostic.data.confidence);
+
+        if(detection.diagnostic.data.impact != undefined){
+            this.setIcon("detection_" + detection.diagnostic.data.impact + "_" + detection.diagnostic.data.confidence);
+        } else {
+            this.setIconBySeverity();
+        }
+    }
+
+    setIconBySeverity(){
+        switch(this.detection.diagnostic.severity){
+            case 0:
+                this.iconPath = new vscode.ThemeIcon('error', new vscode.ThemeColor("notificationsErrorIcon.foreground"))
+                break;
+            case 1:
+                this.iconPath = new vscode.ThemeIcon('warning', new vscode.ThemeColor("notificationsWarningIcon.foreground"))
+                break;
+            case 2:
+                this.iconPath = new vscode.ThemeIcon('info', new vscode.ThemeColor("notificationsInfoIcon.foreground"))
+                break;
+            default:
+        }
     }
 }
 
-export class DetectionsProvider implements vscode.TreeDataProvider<vscode.TreeItem>{
+export abstract class BaseProvider implements vscode.TreeDataProvider<vscode.TreeItem>{
 
-    outputChannel: vscode.OutputChannel;
     detectionsMap: Map<string, WakeDetection[]> = new Map<string, WakeDetection[]>()
-    rootNodesMap: Map<string, ImpactItem> = new Map<string, ImpactItem>()
-    rootNodes: ImpactItem[] = [];
+    rootNodesMap: Map<string, RootItem> = new Map<string, RootItem>()
+    rootNodes: RootItem[] = [];
 
     _onDidChangeTreeData: vscode.EventEmitter<undefined> = new vscode.EventEmitter<undefined>();
     onDidChangeTreeData: vscode.Event<undefined> = this._onDidChangeTreeData.event;
 
-    constructor(outputChannel: vscode.OutputChannel){
-        this.outputChannel = outputChannel;
-    }
-
-    addRoot(node: ImpactItem){
-        this.rootNodesMap.set(node.impact, node);
+    addRoot(node: RootItem){
+        this.rootNodesMap.set(node.key, node);
         this.rootNodes.push(node);
     }
 
@@ -293,18 +310,11 @@ export class DetectionsProvider implements vscode.TreeDataProvider<vscode.TreeIt
 
         for (const [key, value] of this.detectionsMap) {
             value.forEach(detection => {
-                let rootNode = this.rootNodesMap.get(detection.diagnostic.data.impact)
+                let rootNode = this.rootNodesMap.get(this.getRoot(detection.diagnostic));
 
                 if (rootNode != undefined){
-                    rootNode.addDetection(detection);
-                    //let child = rootNode.getChild(detection.uri.toString());
-                    //if (fileItem == undefined){
-                    //    fileItem = new FileItem(detection.uri);
-                    //    rootNode.addChild(detection.uri.toString(), fileItem);
-                    // }
-                    // fileItem.addChild(detection.getId(), new DetectionItem(detection));
+                    rootNode.addLeaf(detection);
                 }
-                
             })
         }
 
@@ -319,9 +329,6 @@ export class DetectionsProvider implements vscode.TreeDataProvider<vscode.TreeIt
     updateRootLabels(){
         this.rootNodes.forEach(it => {
             it.updateLabel();
-            //it.childs.forEach(it =>{
-            //   it.updateLabel();
-            //})
         })
     }
 
@@ -338,15 +345,36 @@ export class DetectionsProvider implements vscode.TreeDataProvider<vscode.TreeIt
             return item.childs;
         }
     }
+
+    abstract getRoot(diagnostic: WakeDiagnostic): string;
 }
 
-export class WakeDetectionsProvider extends DetectionsProvider {
-    constructor(outputChannel: vscode.OutputChannel) {
-        super(outputChannel);
+export class WakeDetectionsProvider extends BaseProvider{
+
+    constructor() {
+        super()
         this.addRoot(new ImpactItem("high"));
         this.addRoot(new ImpactItem("medium"));
         this.addRoot(new ImpactItem("low"));
         this.addRoot(new ImpactItem("warning"));
         this.addRoot(new ImpactItem("info"));
+    }
+
+    getRoot(diagnostic: WakeDiagnostic): string {
+        return diagnostic.data.impact;
+    }
+}
+
+export class SolcDetectionsProvider extends BaseProvider{
+
+    constructor() {
+        super()
+        this.addRoot(new SeverityItem("error"));
+        this.addRoot(new SeverityItem("warning"));
+        this.addRoot(new SeverityItem("info"));
+    }
+
+    getRoot(diagnostic: WakeDiagnostic): string {
+        return diagnostic.data.severity;
     }
 }
