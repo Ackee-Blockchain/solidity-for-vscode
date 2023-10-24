@@ -5,6 +5,7 @@ import {
     Diagnostic
 } from 'vscode-languageclient/node';
 import { filter } from '@renovatebot/pep440';
+import { unwatchFile } from 'fs';
 
 export class WakeDiagnostic extends vscode.Diagnostic {
     data: DiagnosticData
@@ -45,6 +46,7 @@ export interface DiagnosticData{
 abstract class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
     originalLabel: string;
     childs: T[] = [];
+    parent: BaseItem<any> | undefined;
     childsMap: Map<string, T> = new Map<string, T>();
     leafsCount = 0;
 
@@ -54,6 +56,7 @@ abstract class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
     }
 
     addChild(item: T){
+        item.parent = this;
         this.childsMap.set(item.getId(), item);
         this.childs.push(item);
     }
@@ -91,7 +94,9 @@ abstract class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
     }
 
     updateLabel() {
-        this.label = this.originalLabel + " (" + this.childs.length + ")";
+        this.childs.forEach(it => {
+            it.updateLabel();
+        })
     }
 }
 
@@ -104,7 +109,10 @@ abstract class RootItem extends BaseItem<any> {
     }
 
     updateLabel() {
-        this.label = this.originalLabel + " (" + this.leafsCount + ")";
+        if(this.parent == undefined){
+            this.label = this.originalLabel + " (" + this.leafsCount + ")";
+        }
+        super.updateLabel();
     }
 
     clearChilds(): void {
@@ -138,6 +146,13 @@ class ImpactItem extends RootItem {
         } else {
             this.setIcon("impact_" + impact);
         }
+    }
+}
+
+class DetectorItem extends RootItem {
+
+    constructor(detector: string) {
+        super(detector, detector);
     }
 }
 
@@ -266,6 +281,10 @@ class FileItem extends BaseItem<DetectionItem> {
             }
         });
     }
+
+    // updateLabel() {
+    //     this.label = this.originalLabel + " (" + this.childs.length + ")";
+    // }
 }
 
 class DetectionItem extends BaseItem<any> {
@@ -330,7 +349,7 @@ export abstract class BaseProvider implements vscode.TreeDataProvider<vscode.Tre
         this.rootNodesMap.clear();
     }
 
-    updateRootLabels(){
+    updateLabels(){
         this.rootNodes.forEach(it => {
             it.updateLabel();
         })
@@ -353,7 +372,7 @@ export abstract class BaseProvider implements vscode.TreeDataProvider<vscode.Tre
 
 export enum GroupBy {
     IMPACT,
-    PATH,
+    FILE,
     CONFIDENCE,
     DETECTOR
 }
@@ -393,11 +412,14 @@ export class WakeDetectionsProvider extends BaseProvider{
             case GroupBy.IMPACT:
                 this.buildTreeByImpact();
                 break;
-            case GroupBy.PATH:
+            case GroupBy.FILE:
                 this.buildTreeByPath();
                 break;
             case GroupBy.CONFIDENCE:
                 this.buildTreeByConfidence();
+                break;
+            case GroupBy.DETECTOR:
+                this.buildTreeByDetector();
                 break;
             default:
                 break;
@@ -409,7 +431,7 @@ export class WakeDetectionsProvider extends BaseProvider{
             it.sortChilds();
         })
 
-        this.updateRootLabels();
+        this.updateLabels();
         this._onDidChangeTreeData.fire(undefined);
     }
 
@@ -423,7 +445,7 @@ export class WakeDetectionsProvider extends BaseProvider{
         for (const [key, value] of this.detectionsMap) {
             value.filter(it => this.filterDetections(it)).forEach(detection => {
                 let rootNode = this.rootNodesMap.get(detection.diagnostic.data.impact);
-
+                
                 if (rootNode != undefined) {
                     rootNode.addLeaf(detection);
                 }
@@ -459,6 +481,30 @@ export class WakeDetectionsProvider extends BaseProvider{
                 if (rootNode != undefined) {
                     rootNode.addLeaf(detection);
                 }
+            })
+        }
+    }
+
+    buildTreeByDetector() {
+        for (const [key, value] of this.detectionsMap) {
+            value.filter(it => this.filterDetections(it)).forEach(detection => {
+                let detector = detection.diagnostic.code;
+                let segments = detection.diagnostic.data.sourceUnitName.split("/");
+
+                if (detection.diagnostic.code == undefined){
+                    detector = "unknown";
+                } else {
+                    detector = detection.diagnostic.code as string;
+                }
+
+                let rootNode = this.rootNodesMap.get(detector);
+
+                if (rootNode == undefined) {
+                    rootNode = new DetectorItem(detector);
+                    this.addRoot(rootNode)
+                }
+
+                rootNode.addLeaf(detection, 0);
             })
         }
     }
@@ -532,7 +578,7 @@ export class SolcDetectionsProvider extends BaseProvider{
         for (const [key, value] of this.detectionsMap) {
             value.forEach(detection => {
                 let rootNode = this.rootNodesMap.get(detection.diagnostic.data.severity);
-
+                
                 if (rootNode != undefined) {
                     rootNode.addLeaf(detection);
                 }
@@ -543,7 +589,7 @@ export class SolcDetectionsProvider extends BaseProvider{
             it.sortChilds();
         })
 
-        this.updateRootLabels();
+        this.updateLabels();
         this._onDidChangeTreeData.fire(undefined);
     }
 }
