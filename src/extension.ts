@@ -329,8 +329,9 @@ function registerCommands(outputChannel : vscode.OutputChannel){
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.open_file", async (uri, range) => await openFile(uri, range)));
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.impact", async () => wakeProvider?.setGroupBy(GroupBy.IMPACT)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.path", async () => wakeProvider?.setGroupBy(GroupBy.PATH)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.file", async () => wakeProvider?.setGroupBy(GroupBy.FILE)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.confidence", async () => wakeProvider?.setGroupBy(GroupBy.CONFIDENCE)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.detector", async () => wakeProvider?.setGroupBy(GroupBy.DETECTOR)));
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.high", async () => wakeProvider?.setFilterImpact(Impact.HIGH)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.medium", async () => wakeProvider?.setFilterImpact(Impact.MEDIUM)));
