@@ -4,8 +4,8 @@ import {
     DiagnosticSeverity,
     Range
 } from 'vscode-languageclient/node';
-import { WakeDiagnostic,
-        DiagnosticData  } from './detections';
+import { WakeDiagnostic } from './detections/model/WakeDetection';
+import { DiagnosticData } from './detections/model/WakeDetection';
 
 export function convertDiagnostics(it: Diagnostic): WakeDiagnostic {
     let severity: vscode.DiagnosticSeverity;
