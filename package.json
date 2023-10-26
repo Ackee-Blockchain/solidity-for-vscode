@@ -402,7 +402,7 @@
             {
                 "command": "Tools-for-Solidity.detections.group.detector",
                 "title": "Group by Detector"
-            },            
+            },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.high",
                 "title": "Impact: High"
@@ -474,7 +474,6 @@
                     "when": "view == wake-detections",
                     "group": "navigation@2"
                 }
-
             ],
             "tools-for-solidity.detections.filter": [
                 {
