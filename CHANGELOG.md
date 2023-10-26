@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.10.4]
+- Fixed language server crashes caused by overloaded functions imported in import directives
+- Fixed language server crashes caused by new expressions being top-level expressions in expression statements
+
 ## [1.10.3]
 - Fixed language server crashes caused by `woke` process stdout/stderr buffer overflow
 
