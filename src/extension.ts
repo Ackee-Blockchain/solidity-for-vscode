@@ -25,7 +25,7 @@ import { GroupBy, Impact, Confidence } from "./detections/WakeTreeDataProvider";
 import { SolcTreeDataProvider } from './detections/SolcTreeDataProvider';
 import { WakeTreeDataProvider } from './detections/WakeTreeDataProvider';
 import { WakeDetection } from './detections/model/WakeDetection';
-import { convertDiagnostics } from './util'
+import { convertDiagnostics } from './detections/util'
 
 let client: LanguageClient | undefined = undefined;
 let wokeProcess: ChildProcess | undefined = undefined;

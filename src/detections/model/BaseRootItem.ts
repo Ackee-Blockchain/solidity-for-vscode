@@ -13,7 +13,7 @@ export abstract class BaseRootItem extends BaseItem<any> {
         if (this.parent == undefined) {
             this.label = this.originalLabel + " (" + this.leafsCount + ")";
         }
-        super.updateLabel();
+        // super.updateChildLabels();
     }
 
     clearChilds(): void {
