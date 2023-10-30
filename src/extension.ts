@@ -4,14 +4,12 @@ import * as vscode from 'vscode';
 import * as net from 'net';
 
 import {
-    GenericNotificationHandler,
     LanguageClient,
     LanguageClientOptions,
     ServerOptions,
     StreamInfo,
     integer,
     Diagnostic,
-    DiagnosticSeverity
 } from 'vscode-languageclient/node';
 
 import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler } from './commands';
@@ -23,15 +21,17 @@ import getPort = require('get-port');
 import waitPort = require('wait-port');
 import { compare } from '@renovatebot/pep440';
 import { ChildProcess, execFileSync, spawn } from 'child_process';
-import { WakeDetectionsProvider, SolcDetectionsProvider, WakeDetection, GroupBy, Impact, Confidence } from './detections';
-import { convertDiagnostics } from './util'
+import { GroupBy, Impact, Confidence } from "./detections/WakeTreeDataProvider";
+import { SolcTreeDataProvider } from './detections/SolcTreeDataProvider';
+import { WakeTreeDataProvider } from './detections/WakeTreeDataProvider';
+import { WakeDetection } from './detections/model/WakeDetection';
+import { convertDiagnostics } from './detections/util'
 
 let client: LanguageClient | undefined = undefined;
 let wokeProcess: ChildProcess | undefined = undefined;
-let wakeProvider: WakeDetectionsProvider | undefined = undefined;
-let solcProvider: SolcDetectionsProvider | undefined = undefined;
+let wakeProvider: WakeTreeDataProvider | undefined = undefined;
+let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
-export let context :vscode.ExtensionContext
 export let log: Log
 
 const WOKE_TARGET_VERSION = "3.6.1";
@@ -44,7 +44,6 @@ interface DiagnosticNotification{
 }
 
 function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification){
-    log.d(JSON.stringify(detection));
     let diags = detection.diagnostics.map(it => convertDiagnostics(it));
     diagnosticCollection.set(vscode.Uri.parse(detection.uri), diags);
 
@@ -186,8 +185,7 @@ function findPython(outputChannel: vscode.OutputChannel): string {
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export async function activate(ctx: vscode.ExtensionContext) {
-    context = ctx
+export async function activate(context: vscode.ExtensionContext) {
     const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
     log = new Log(outputChannel, LOG_LEVEL);
     outputChannel.show(true);
@@ -302,19 +300,19 @@ export async function activate(ctx: vscode.ExtensionContext) {
         onNotification(outputChannel, diag);
     });
 
-    wakeProvider = new WakeDetectionsProvider();
-    solcProvider = new SolcDetectionsProvider();
+    wakeProvider = new WakeTreeDataProvider(context);
+    solcProvider = new SolcTreeDataProvider(context);
     vscode.window.registerTreeDataProvider('wake-detections', wakeProvider);
     vscode.window.registerTreeDataProvider('solc-detections', solcProvider);
 
-    registerCommands(outputChannel)
+    registerCommands(outputChannel, context);
 
     initCoverage(outputChannel);
 
     client.start();
 }
 
-function registerCommands(outputChannel : vscode.OutputChannel){
+function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext){
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.control_flow_graph", async (documentUri, canonicalName) => await generateCfgHandler(outputChannel, documentUri, canonicalName)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.inheritance_graph", async (documentUri, canonicalName) => await generateInheritanceGraphHandler({ documentUri, canonicalName, out: outputChannel })));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.linearized_inheritance_graph", async (documentUri, canonicalName) => await generateLinearizedInheritanceGraphHandler(outputChannel, documentUri, canonicalName)));
@@ -329,8 +327,9 @@ function registerCommands(outputChannel : vscode.OutputChannel){
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.open_file", async (uri, range) => await openFile(uri, range)));
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.impact", async () => wakeProvider?.setGroupBy(GroupBy.IMPACT)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.path", async () => wakeProvider?.setGroupBy(GroupBy.PATH)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.file", async () => wakeProvider?.setGroupBy(GroupBy.FILE)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.confidence", async () => wakeProvider?.setGroupBy(GroupBy.CONFIDENCE)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.detector", async () => wakeProvider?.setGroupBy(GroupBy.DETECTOR)));
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.high", async () => wakeProvider?.setFilterImpact(Impact.HIGH)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.medium", async () => wakeProvider?.setFilterImpact(Impact.MEDIUM)));

@@ -392,12 +392,16 @@
                 "title": "Group by Impact"
             },
             {
-                "command": "Tools-for-Solidity.detections.group.path",
-                "title": "Group by Path"
+                "command": "Tools-for-Solidity.detections.group.file",
+                "title": "Group by File"
             },
             {
                 "command": "Tools-for-Solidity.detections.group.confidence",
                 "title": "Group by Confidence"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.group.detector",
+                "title": "Group by Detector"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.high",
@@ -470,7 +474,6 @@
                     "when": "view == wake-detections",
                     "group": "navigation@2"
                 }
-
             ],
             "tools-for-solidity.detections.filter": [
                 {
@@ -508,7 +511,7 @@
             ],
             "tools-for-solidity.detections.group": [
                 {
-                    "command": "Tools-for-Solidity.detections.group.path",
+                    "command": "Tools-for-Solidity.detections.group.file",
                     "group": "group@1"
                 },
                 {
@@ -518,6 +521,10 @@
                 {
                     "command": "Tools-for-Solidity.detections.group.confidence",
                     "group": "group@3"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.detector",
+                    "group": "group@4"
                 }
             ]
         },
