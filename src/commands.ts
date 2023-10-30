@@ -34,7 +34,7 @@ async function showDot(content: string, out?: vscode.OutputChannel) {
 }
 
 export async function generateCfgHandler(out: vscode.OutputChannel, documentUri: URI, canonicalName: string) {
-    const cfg: string = await vscode.commands.executeCommand('woke.generate.control_flow_graph', documentUri, canonicalName);
+    const cfg: string = await vscode.commands.executeCommand('wake.generate.control_flow_graph', documentUri, canonicalName);
 
     await showDot(cfg, out);
 }
@@ -42,17 +42,17 @@ export async function generateCfgHandler(out: vscode.OutputChannel, documentUri:
 export async function generateInheritanceGraphHandler({ documentUri, canonicalName, out }: {documentUri: URI, canonicalName: string, out: vscode.OutputChannel}) {
     let graph: string;
     if (documentUri === undefined || canonicalName === undefined || out === undefined) {
-        graph = await vscode.commands.executeCommand('woke.generate.inheritance_graph_full');
+        graph = await vscode.commands.executeCommand('wake.generate.inheritance_graph_full');
         await showDot(graph);
     }
     else {
-        graph = await vscode.commands.executeCommand('woke.generate.inheritance_graph', documentUri, canonicalName);
+        graph = await vscode.commands.executeCommand('wake.generate.inheritance_graph', documentUri, canonicalName);
         await showDot(graph, out);
     }
 }
 
 export async function generateLinearizedInheritanceGraphHandler(out: vscode.OutputChannel, documentUri: URI, canonicalName: string) {
-    const graph: string = await vscode.commands.executeCommand('woke.generate.linearized_inheritance_graph', documentUri, canonicalName);
+    const graph: string = await vscode.commands.executeCommand('wake.generate.linearized_inheritance_graph', documentUri, canonicalName);
     await showDot(graph, out);
 }
 
@@ -91,12 +91,12 @@ export async function importFoundryRemappings(out: vscode.OutputChannel) {
     }
 
     remappings = remappings.filter((remapping: string) => remapping !== "");
-    vscode.workspace.getConfiguration("woke.compiler.solc").update("remappings", remappings, vscode.ConfigurationTarget.Workspace);
+    vscode.workspace.getConfiguration("wake.compiler.solc").update("remappings", remappings, vscode.ConfigurationTarget.Workspace);
     vscode.window.showInformationMessage(`Imported ${remappings.length} remappings.`);
 }
 
 export async function generateImportsGraphHandler(out: vscode.OutputChannel) {
-    const graph: string = await vscode.commands.executeCommand('woke.generate.imports_graph');
+    const graph: string = await vscode.commands.executeCommand('wake.generate.imports_graph');
     await showDot(graph);
 }
 

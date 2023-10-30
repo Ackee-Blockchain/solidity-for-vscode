@@ -108,7 +108,7 @@ function loadCoverage(data: Uint8Array) {
     const coverage = JSON.parse(jsonString) as CoverageHeader;
 
     if (compare(coverage.version, '1.0.0') < 0) {
-        const message = `Coverage data version ${coverage.version} is not supported. Please collect new coverage data with up-to-date version of Woke.`;
+        const message = `Coverage data version ${coverage.version} is not supported. Please collect new coverage data with up-to-date version of Wake.`;
         outputChannel.appendLine(message);
         vscode.window.showErrorMessage(message);
         return;

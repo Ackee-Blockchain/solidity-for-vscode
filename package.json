@@ -33,7 +33,7 @@
     "activationEvents": [
         "onLanguage:solidity",
         "workspaceContains:**/*.sol",
-        "onLanguage:woke-output"
+        "onLanguage:wake-output"
     ],
     "main": "./dist/extension",
     "contributes": {
@@ -42,14 +42,14 @@
                 "title": "Configuration",
                 "order": -2,
                 "properties": {
-                    "woke.configuration.use_toml_if_present": {
+                    "wake.configuration.use_toml_if_present": {
                         "type": "boolean",
                         "default": true,
                         "description": "Use the configuration TOML file if present instead of the VS Code settings"
                     },
-                    "woke.configuration.toml_path": {
+                    "wake.configuration.toml_path": {
                         "type": "string",
-                        "default": "woke.toml",
+                        "default": "wake.toml",
                         "description": "Path to the TOML configuration file relative to the workspace root"
                     }
                 }
@@ -69,18 +69,18 @@
                         "default": "off",
                         "description": "Traces the communication between VS Code and the language server."
                     },
-                    "Tools-for-Solidity.Woke.autoInstall": {
+                    "Tools-for-Solidity.Wake.autoInstall": {
                         "type": "boolean",
                         "default": "true",
-                        "description": "Automatically install 'woke' PyPi package needed by Tools for Solidity"
+                        "description": "Automatically install 'wake-eth' PyPi package needed by Tools for Solidity"
                     },
-                    "Tools-for-Solidity.Woke.pathToExecutable": {
+                    "Tools-for-Solidity.Wake.pathToExecutable": {
                         "type": "string",
-                        "description": "Path to woke executable, overrides Tools-for-Solidity.Woke.autoInstall"
+                        "description": "Path to Wake executable, overrides Tools-for-Solidity.Wake.autoInstall"
                     },
-                    "Tools-for-Solidity.Woke.port": {
+                    "Tools-for-Solidity.Wake.port": {
                         "type": "integer",
-                        "description": "Port on which woke is listening. Overrides both Tools-for-Solidity.Woke.autoInstall and Tools-for-Solidity.Woke.pathToExecutable."
+                        "description": "Port on which Wake is listening. Overrides both Tools-for-Solidity.Wake.autoInstall and Tools-for-Solidity.Wake.pathToExecutable."
                     }
                 }
             },
@@ -88,7 +88,7 @@
                 "title": "Compiler",
                 "order": 0,
                 "properties": {
-                    "woke.compiler.solc.allow_paths": {
+                    "wake.compiler.solc.allow_paths": {
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -96,7 +96,7 @@
                         "default": [],
                         "description": "Allow paths passed directly to the solc compiler"
                     },
-                    "woke.compiler.solc.evm_version": {
+                    "wake.compiler.solc.evm_version": {
                         "type": "string",
                         "enum": [
                             "homestead",
@@ -114,20 +114,21 @@
                         "default": "",
                         "description": "EVM version passed to the solc compiler"
                     },
-                    "woke.compiler.solc.ignore_paths": {
+                    "wake.compiler.solc.exclude_paths": {
                         "type": "array",
                         "items": {
                             "type": "string"
                         },
                         "default": [
                             "node_modules",
-                            ".woke-build",
                             "venv",
-                            "lib"
+                            "lib",
+                            "script",
+                            "test"
                         ],
-                        "description": "Files in these paths are ignored from LSP analysis unless imported from other non-ignored files"
+                        "description": "Files in these paths are excluded from LSP analysis unless imported from other non-excluded files"
                     },
-                    "woke.compiler.solc.include_paths": {
+                    "wake.compiler.solc.include_paths": {
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -137,7 +138,7 @@
                         ],
                         "description": "Include paths used to search for non-relative import paths"
                     },
-                    "woke.compiler.solc.remappings": {
+                    "wake.compiler.solc.remappings": {
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -145,12 +146,12 @@
                         "default": [],
                         "markdownDescription": "Compiler remappings (see [Solidity docs](https://docs.soliditylang.org/en/latest/using-the-compiler.html#base-path-and-import-remapping))"
                     },
-                    "woke.compiler.solc.target_version": {
+                    "wake.compiler.solc.target_version": {
                         "type": "string",
                         "default": "",
                         "description": "The version of the solc compiler used to compile all project files"
                     },
-                    "woke.compiler.solc.via_IR": {
+                    "wake.compiler.solc.via_IR": {
                         "type": [
                             "boolean",
                             "null"
@@ -163,7 +164,7 @@
                         ],
                         "markdownDescription": "Compile the code via the Yul intermediate language (see [Solidity docs](https://docs.soliditylang.org/en/latest/ir-breaking-changes.html)). If not set (null), let the compiler decide."
                     },
-                    "woke.compiler.solc.optimizer.enabled": {
+                    "wake.compiler.solc.optimizer.enabled": {
                         "type": [
                             "boolean",
                             "null"
@@ -176,7 +177,7 @@
                         ],
                         "description": "Compile the project with solc optimizations enabled. Setting this to 'null' (unset) disables most of the available optimizations. Setting this to 'false' disables all optimizations for Solidity <0.8.6 and has the same behavior as 'null' for Solidity >=0.8.6."
                     },
-                    "woke.compiler.solc.optimizer.runs": {
+                    "wake.compiler.solc.optimizer.runs": {
                         "type": "number",
                         "default": 200,
                         "description": "Configuration of the optimizer specifying how many times the code is intended to be run. Lower values optimize more for initial deployment cost, while higher values optimize more for high-frequency usage."
@@ -187,7 +188,7 @@
                 "title": "Detectors",
                 "order": 1,
                 "properties": {
-                    "woke.detectors.exclude": {
+                    "wake.detectors.exclude": {
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -195,7 +196,7 @@
                         "default": [],
                         "description": "List of detectors (identified by their string or integer IDs) to exclude from the analysis"
                     },
-                    "woke.detectors.only": {
+                    "wake.detectors.only": {
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -203,18 +204,27 @@
                         "default": [],
                         "description": "List of detectors (identified by their string or integer IDs) to only use in the analysis"
                     },
-                    "woke.detectors.ignore_paths": {
+                    "wake.detectors.ignore_paths": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [
+                            "test",
+                            "venv"
+                        ],
+                        "description": "Any (sub)detections ending in these paths are removed. Intended for project Solidity test files."
+                    },
+                    "wake.detectors.exclude_paths": {
                         "type": "array",
                         "items": {
                             "type": "string"
                         },
                         "default": [
                             "node_modules",
-                            ".woke-build",
-                            "venv",
                             "lib"
                         ],
-                        "description": "Detections with subdetections in these paths are ignored"
+                        "description": "A detection is removed if whole (including subdetections) ends up in these paths. Intended for project Solidity dependencies."
                     }
                 }
             },
@@ -222,7 +232,7 @@
                 "title": "Graphs",
                 "order": 2,
                 "properties": {
-                    "woke.generator.control_flow_graph.direction": {
+                    "wake.generator.control_flow_graph.direction": {
                         "type": "string",
                         "enum": [
                             "TB",
@@ -233,12 +243,12 @@
                         "default": "TB",
                         "markdownDescription": "The direction of the generated control flow graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
                     },
-                    "woke.generator.control_flow_graph.vscode_urls": {
+                    "wake.generator.control_flow_graph.vscode_urls": {
                         "type": "boolean",
                         "default": true,
                         "description": "Generate vscode:// URLs in the generated control flow graph"
                     },
-                    "woke.generator.imports_graph.direction": {
+                    "wake.generator.imports_graph.direction": {
                         "type": "string",
                         "enum": [
                             "TB",
@@ -249,7 +259,7 @@
                         "default": "TB",
                         "markdownDescription": "The direction of the generated imports graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
                     },
-                    "woke.generator.imports_graph.imports_direction": {
+                    "wake.generator.imports_graph.imports_direction": {
                         "type": "string",
                         "enum": [
                             "imported-to-importing",
@@ -258,12 +268,12 @@
                         "default": "imported-to-importing",
                         "markdownDescription": "The direction of arrows in the generated imports graph"
                     },
-                    "woke.generator.imports_graph.vscode_urls": {
+                    "wake.generator.imports_graph.vscode_urls": {
                         "type": "boolean",
                         "default": true,
                         "description": "Generate vscode:// URLs in the generated imports graph"
                     },
-                    "woke.generator.inheritance_graph.direction": {
+                    "wake.generator.inheritance_graph.direction": {
                         "type": "string",
                         "enum": [
                             "TB",
@@ -274,12 +284,12 @@
                         "default": "BT",
                         "markdownDescription": "The direction of the generated inheritance graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
                     },
-                    "woke.generator.inheritance_graph.vscode_urls": {
+                    "wake.generator.inheritance_graph.vscode_urls": {
                         "type": "boolean",
                         "default": true,
                         "description": "Generate vscode:// URLs in the generated inheritance graph"
                     },
-                    "woke.generator.inheritance_graph_full.direction": {
+                    "wake.generator.inheritance_graph_full.direction": {
                         "type": "string",
                         "enum": [
                             "TB",
@@ -290,7 +300,7 @@
                         "default": "BT",
                         "markdownDescription": "The direction of the inheritance graph generated for the whole project (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
                     },
-                    "woke.generator.inheritance_graph_full.vscode_urls": {
+                    "wake.generator.inheritance_graph_full.vscode_urls": {
                         "type": "boolean",
                         "default": true,
                         "description": "Generate vscode:// URLs in the inheritance graph generated for the whole project"
@@ -301,22 +311,22 @@
                 "title": "LSP",
                 "order": 3,
                 "properties": {
-                    "woke.lsp.compilation_delay": {
+                    "wake.lsp.compilation_delay": {
                         "type": "number",
                         "default": 0,
                         "description": "Delay in seconds before the project is compiled after a keystroke"
                     },
-                    "woke.lsp.code_lens.enable": {
+                    "wake.lsp.code_lens.enable": {
                         "type": "boolean",
                         "default": true,
                         "description": "Enable code lens with number of references"
                     },
-                    "woke.lsp.detectors.enable": {
+                    "wake.lsp.detectors.enable": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Enable Woke vulnerability detectors"
+                        "description": "Enable Wake vulnerability detectors"
                     },
-                    "woke.lsp.find_references.include_declarations": {
+                    "wake.lsp.find_references.include_declarations": {
                         "type": "boolean",
                         "default": false,
                         "description": "Also include declarations in 'Go to references' results"
@@ -352,18 +362,18 @@
             },
             {
                 "language": "tools-for-solidity-output",
-                "scopeName": "source.woke.output",
+                "scopeName": "source.wake.output",
                 "path": "./syntaxes/log.configuration.json"
             }
         ],
         "commands": [
             {
-                "command": "woke.lsp.force_recompile",
+                "command": "wake.lsp.force_recompile",
                 "title": "Tools for Solidity: Force Recompile Project",
                 "icon": "$(play)"
             },
             {
-                "command": "woke.lsp.force_rerun_detectors",
+                "command": "wake.lsp.force_rerun_detectors",
                 "title": "Tools for Solidity: Force Rerun Detectors",
                 "icon": "$(refresh)"
             },
@@ -460,7 +470,7 @@
         "menus": {
             "view/title": [
                 {
-                    "command": "woke.lsp.force_rerun_detectors",
+                    "command": "wake.lsp.force_rerun_detectors",
                     "when": "view == wake-detections",
                     "group": "navigation@3"
                 },

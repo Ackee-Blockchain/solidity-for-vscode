@@ -25,7 +25,7 @@ Tools for Solidity is an extension for Visual Studio Code that implements a lang
 
 ## Dependencies
 
-The Tools for Solidity extension uses the PyPi package [woke](https://pypi.org/project/woke/) which requires Python 3.7 or higher.
+The Tools for Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.7 or higher.
 
 Rosetta is required to be enabled on Apple Silicon (M1 & M2) Macs.
 
@@ -37,12 +37,12 @@ To display the generated graphs, one of the supported Graphviz (DOT) extensions 
 
 ## Installation
 
-The package [woke](https://pypi.org/project/woke/) is installed `automatically` when this extension is activated.
+The package [eth-wake](https://pypi.org/project/eth-wake/) is installed `automatically` when this extension is activated.
 
 Alternatively, it can be installed `manually` using:
 
 ```shell
-python3 -m pip install woke
+python3 -m pip install eth-wake
 ```
 
 ## Features
@@ -107,7 +107,7 @@ Number of references is shown above each declaration.
 
 ![Diagnostics preview](images/diagnostics-2.png)
 
-Together with compiler errors, diagnostics also include results from Woke vulnerability detectors.
+Together with compiler errors, diagnostics also include results from Wake vulnerability detectors.
 
 ![Diagnostics preview](images/diagnostics-3.png)
 
@@ -122,17 +122,17 @@ Together with compiler errors, diagnostics also include results from Woke vulner
 - **Tools for Solidity: Force Recompile Project**
 
 ```shell
-woke.lsp.force_recompile
+wake.lsp.force_recompile
 ```
 Force recompile the opened project/files.
 
 - **Tools for Solidity: Force Rerun Detectors**
 
 ```shell
-woke.lsp.force_rerun_detectors
+wake.lsp.force_rerun_detectors
 ```
 
-Force rerun Woke vulnerability and issue detectors on the opened project/files.
+Force rerun Wake vulnerability and issue detectors on the opened project/files.
 
 - **Tools for Solidity: Generate Inheritance Graph**
 
@@ -152,7 +152,7 @@ Generate an imports graph for the whole project.
 
 - **Files created/modified/deleted outside of VS Code are not properly analysed**
 
-The extension currently does not handle changes external to VS Code. This especially means that files installed into `node_modules` are not detected. Please run the `Woke: Force Recompile Project` command after installing node packages as a workaround.
+The extension currently does not handle changes external to VS Code. This especially means that files installed into `node_modules` are not detected. Please run the `Wake: Force Recompile Project` command after installing node packages as a workaround.
 
 - **`Go to references`, number of references and other features do not work correctly with no workspace open**
 
