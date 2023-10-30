@@ -34,7 +34,7 @@ let diagnosticCollection: vscode.DiagnosticCollection
 export let context :vscode.ExtensionContext
 export let log: Log
 
-const WOKE_TARGET_VERSION = "3.6.0";
+const WOKE_TARGET_VERSION = "3.6.1";
 const WOKE_PRERELEASE = false;
 const LOG_LEVEL = 0;
 
