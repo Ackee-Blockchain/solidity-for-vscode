@@ -1,5 +1,5 @@
 {
-    "scope-name": "woke.output",
+    "scope-name": "wake.output",
     "fileTypes": ".output",
     "patterns":[
         {
@@ -106,5 +106,5 @@
             ]
         }
     },
-    "scopeName": "source.woke.output"
+    "scopeName": "source.wake.output"
 }

@@ -28,14 +28,14 @@ import { WakeDetection } from './detections/model/WakeDetection';
 import { convertDiagnostics } from './detections/util'
 
 let client: LanguageClient | undefined = undefined;
-let wokeProcess: ChildProcess | undefined = undefined;
+let wakeProcess: ChildProcess | undefined = undefined;
 let wakeProvider: WakeTreeDataProvider | undefined = undefined;
 let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
 export let log: Log
 
-const WOKE_TARGET_VERSION = "3.6.1";
-const WOKE_PRERELEASE = false;
+const WAKE_TARGET_VERSION = "4.0.0a4";
+const WAKE_PRERELEASE = true;
 const LOG_LEVEL = 0;
 
 interface DiagnosticNotification{
@@ -44,14 +44,15 @@ interface DiagnosticNotification{
 }
 
 function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification){
+    outputChannel.appendLine(JSON.stringify(detection));
     let diags = detection.diagnostics.map(it => convertDiagnostics(it));
     diagnosticCollection.set(vscode.Uri.parse(detection.uri), diags);
 
     try {
         let uri = vscode.Uri.parse(detection.uri);
-        let wakeDetections = diags.filter( item => item.source == "Woke").map(it => new WakeDetection(uri, it))
+        let wakeDetections = diags.filter( item => item.source == "Wake").map(it => new WakeDetection(uri, it))
         wakeProvider?.add(uri, wakeDetections);
-        let solcDetections = diags.filter(item => item.source == "Woke(solc)").map(it => new WakeDetection(uri, it))
+        let solcDetections = diags.filter(item => item.source == "Wake(solc)").map(it => new WakeDetection(uri, it))
         solcProvider?.add(uri, solcDetections);
 
     } catch(err) {
@@ -61,15 +62,15 @@ function onNotification(outputChannel: vscode.OutputChannel, detection: Diagnost
     }    
 }
 
-async function installWoke(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<boolean> {
+async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<boolean> {
     try {
         let out;
-        if (WOKE_PRERELEASE) {
-            outputChannel.appendLine(`Running '${pythonExecutable} -m pip install woke -U --pre'`);
-            out = execFileSync(pythonExecutable, ["-m", "pip", "install", "woke", "-U", "--pre"]).toString("utf8");
+        if (WAKE_PRERELEASE) {
+            outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --pre'`);
+            out = execFileSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre"]).toString("utf8");
         } else {
-            outputChannel.appendLine(`Running '${pythonExecutable} -m pip install woke -U'`);
-            out = execFileSync(pythonExecutable, ["-m", "pip", "install", "woke", "-U"]).toString("utf8");
+            outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U'`);
+            out = execFileSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U"]).toString("utf8");
         }
         outputChannel.appendLine(out);
         return true;
@@ -81,18 +82,18 @@ async function installWoke(outputChannel: vscode.OutputChannel, pythonExecutable
 
         try {
             let out;
-            if (WOKE_PRERELEASE) {
-                outputChannel.appendLine(`Running '${pythonExecutable} -m pip install woke -U --pre --user'`);
-                out = execFileSync(pythonExecutable, ["-m", "pip", "install", "woke", "-U", "--pre", "--user"]).toString("utf8");
+            if (WAKE_PRERELEASE) {
+                outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --pre --user'`);
+                out = execFileSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre", "--user"]).toString("utf8");
             } else {
-                outputChannel.appendLine(`Running '${pythonExecutable} -m pip install woke -U --user'`);
-                out = execFileSync(pythonExecutable, ["-m", "pip", "install", "woke", "-U", "--user"]).toString("utf8");
+                outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --user'`);
+                out = execFileSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--user"]).toString("utf8");
             }
             outputChannel.appendLine(out);
             return true;
         } catch(err) {
             if (err instanceof Error) {
-                outputChannel.appendLine("Failed to install PyPi package 'woke':");
+                outputChannel.appendLine("Failed to install PyPi package 'eth-wake':");
                 outputChannel.appendLine(err.toString());
             }
             return false;
@@ -100,27 +101,27 @@ async function installWoke(outputChannel: vscode.OutputChannel, pythonExecutable
     } 
 }
 
-function getWokeVersion(pathToExecutable: string|null, cwd?: string): string {
+function getWakeVersion(pathToExecutable: string|null, cwd?: string): string {
     if (pathToExecutable) {
         return execFileSync(pathToExecutable, ["--version"]).toString("utf8").trim();
     }
     if (cwd === undefined) {
-        return execFileSync("woke", ["--version"]).toString("utf8").trim();
+        return execFileSync("wake", ["--version"]).toString("utf8").trim();
     }
     else {
-        return execFileSync("./woke", ["--version"], {"cwd": cwd}).toString("utf8").trim();
+        return execFileSync("./wake", ["--version"], {"cwd": cwd}).toString("utf8").trim();
     }
 }
 
-async function checkWokeInstalled(outputChannel: vscode.OutputChannel, cwd?: string): Promise<boolean> {
+async function checkWakeInstalled(outputChannel: vscode.OutputChannel, cwd?: string): Promise<boolean> {
     try {
-        const version: string = getWokeVersion(null, cwd);
+        const version: string = getWakeVersion(null, cwd);
 
-        if (compare(version, WOKE_TARGET_VERSION) < 0) {
+        if (compare(version, WAKE_TARGET_VERSION) < 0) {
             if (cwd === undefined) {
-                outputChannel.appendLine(`Found 'woke' in version ${version} in PATH but the target minimal version is ${WOKE_TARGET_VERSION}.`);
+                outputChannel.appendLine(`Found 'eth-wake' in version ${version} in PATH but the target minimal version is ${WAKE_TARGET_VERSION}.`);
             } else {
-                outputChannel.appendLine(`Found 'woke' in version ${version} in '${cwd}' but the target minimal version is ${WOKE_TARGET_VERSION}.`);
+                outputChannel.appendLine(`Found 'eth-wake' in version ${version} in '${cwd}' but the target minimal version is ${WAKE_TARGET_VERSION}.`);
             }
             return false;
         }
@@ -130,13 +131,13 @@ async function checkWokeInstalled(outputChannel: vscode.OutputChannel, cwd?: str
     }
 }
 
-async function findWokeDir(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<string|boolean|undefined> {
-    let installed: boolean = await checkWokeInstalled(outputChannel);
+async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<string|boolean|undefined> {
+    let installed: boolean = await checkWakeInstalled(outputChannel);
     let cwd: string|undefined = undefined;
 
     if (!installed) {
         const globalPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).toString("utf8").trim();
-        installed = await checkWokeInstalled(outputChannel, globalPackages);
+        installed = await checkWakeInstalled(outputChannel, globalPackages);
         if (installed) {
             outputChannel.appendLine(`Consider adding '${globalPackages}' to your PATH environment variable.`);
             cwd = globalPackages;
@@ -144,7 +145,7 @@ async function findWokeDir(outputChannel: vscode.OutputChannel, pythonExecutable
     }
     if (!installed) {
         const userPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).toString("utf8").trim();
-        installed = await checkWokeInstalled(outputChannel, userPackages);
+        installed = await checkWakeInstalled(outputChannel, userPackages);
         if (installed) {
             outputChannel.appendLine(`Consider adding '${userPackages}' to your PATH environment variable.`);
             cwd = userPackages;
@@ -191,28 +192,28 @@ export async function activate(context: vscode.ExtensionContext) {
     outputChannel.show(true);
 
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
-    const autoInstall: boolean = extensionConfig.get<boolean>('Woke.autoInstall', true);
-    let pathToExecutable: string|null = extensionConfig.get<string | null>('Woke.pathToExecutable', null);
+    const autoInstall: boolean = extensionConfig.get<boolean>('Wake.autoInstall', true);
+    let pathToExecutable: string|null = extensionConfig.get<string | null>('Wake.pathToExecutable', null);
     if (pathToExecutable?.trim()?.length === 0) {
         pathToExecutable = null;
     }
-    let wokePort: number|undefined = extensionConfig.get('Woke.port', undefined);
+    let wakePort: number|undefined = extensionConfig.get('Wake.port', undefined);
     let installed: boolean = false;
     let cwd: string|undefined = undefined;
 
-    if (autoInstall && !pathToExecutable && !wokePort) {
+    if (autoInstall && !pathToExecutable && !wakePort) {
         const pythonExecutable = findPython(outputChannel);
 
-        let result: string|boolean|undefined = await findWokeDir(outputChannel, pythonExecutable);
+        let result: string|boolean|undefined = await findWakeDir(outputChannel, pythonExecutable);
         if (result === false || result === true) {
-            outputChannel.appendLine("Installing PyPi package 'woke'.");
-            installed = await installWoke(outputChannel, pythonExecutable);
+            outputChannel.appendLine("Installing PyPi package 'eth-wake'.");
+            installed = await installWake(outputChannel, pythonExecutable);
 
             if (installed) {
-                result = await findWokeDir(outputChannel, pythonExecutable);
+                result = await findWakeDir(outputChannel, pythonExecutable);
 
                 if (result === false || result === true) {
-                    outputChannel.appendLine("'woke' installed but cannot be found in PATH or pip site-packages.");
+                    outputChannel.appendLine("'eth-wake' installed but cannot be found in PATH or pip site-packages.");
                 }
                 else {
                     cwd = result;
@@ -223,56 +224,56 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     }
 
-    if (!wokePort) {
+    if (!wakePort) {
         try {
-            const version: string = getWokeVersion(pathToExecutable, cwd);
-            if (compare(version, WOKE_TARGET_VERSION) < 0) {
-                outputChannel.appendLine(`PyPi package 'woke' in version ${version} installed but the target minimal version is ${WOKE_TARGET_VERSION}. Exiting...`);
+            const version: string = getWakeVersion(pathToExecutable, cwd);
+            if (compare(version, WAKE_TARGET_VERSION) < 0) {
+                outputChannel.appendLine(`PyPi package 'eth-wake' in version ${version} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`);
                 return;
             }
         } catch(err) {
             if (err instanceof Error) {
                 outputChannel.appendLine(err.toString());
             }
-            outputChannel.appendLine(`Unable to determine the version of 'woke' PyPi package.`);
+            outputChannel.appendLine(`Unable to determine the version of 'eth-wake' PyPi package.`);
             return;
         }
 
-        wokePort = await getPort();
+        wakePort = await getPort();
 
-        let wokePath: string = pathToExecutable ?? "woke";
+        let wakePath: string = pathToExecutable ?? "wake";
         if (!pathToExecutable && cwd !== undefined) {
-            wokePath = path.join(cwd, "woke");
+            wakePath = path.join(cwd, "wake");
         }
 
-        outputChannel.appendLine(`Running '${wokePath} lsp --port ${wokePort}'`);
+        outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}'`);
         if (cwd === undefined) {
-            wokeProcess = spawn(wokePath, ["lsp", "--port", String(wokePort)], {stdio: 'ignore'});
+            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort)], {stdio: 'ignore'});
         } else {
-            wokeProcess = spawn(wokePath, ["lsp", "--port", String(wokePort)], {cwd, stdio: 'ignore'});
+            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort)], {cwd, stdio: 'ignore'});
         }
-        wokeProcess.on('error', (error) => {
+        wakeProcess.on('error', (error) => {
             if (error) {
                 outputChannel.appendLine(error.message);
                 throw error;
             }
         });
-        wokeProcess.on('exit', () => wokeProcess = undefined);
+        wakeProcess.on('exit', () => wakeProcess = undefined);
     } else {
-        outputChannel.appendLine(`Connecting to running 'woke' server on port ${wokePort}`);
+        outputChannel.appendLine(`Connecting to running 'wake' server on port ${wakePort}`);
     }
 
     if (!await waitPort({
         host: "127.0.0.1",
-        port: wokePort,
+        port: wakePort,
         timeout: 15000
     })) {
-        outputChannel.appendLine(`Timed out waiting for port ${wokePort} to open.`);
+        outputChannel.appendLine(`Timed out waiting for port ${wakePort} to open.`);
     }
 
     const serverOptions: ServerOptions = async () => {
         let socket = net.connect({
-            port: wokePort ?? 65432,
+            port: wakePort ?? 65432,
             host: "127.0.0.1"
         });
         let result: StreamInfo = {
@@ -284,7 +285,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'solidity' }],
-        synchronize: { configurationSection: 'woke'},
+        synchronize: { configurationSection: 'wake'},
         outputChannel: outputChannel,
         initializationOptions: {
             toolsForSolidityVersion: context.extension.packageJSON.version
@@ -359,9 +360,9 @@ export function deactivate() {
     if (client !== undefined) {
         client.stop();
     }
-    if (wokeProcess !== undefined) {
-        if (!wokeProcess.kill()) {
-            wokeProcess.kill("SIGKILL");
+    if (wakeProcess !== undefined) {
+        if (!wakeProcess.kill()) {
+            wakeProcess.kill("SIGKILL");
         }
     }
 }
