@@ -53,9 +53,9 @@ export abstract class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem 
         };
     }
 
-    updateLabel() {
+    updateChildLabels() {
         this.childs.forEach(it => {
-            it.updateLabel();
+            it.updateChildLabels();
         });
     }
 }
