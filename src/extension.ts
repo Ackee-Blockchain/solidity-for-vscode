@@ -191,6 +191,8 @@ export async function activate(context: vscode.ExtensionContext) {
     log = new Log(outputChannel, LOG_LEVEL);
     outputChannel.show(true);
 
+    migrateConfig();
+
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
     const autoInstall: boolean = extensionConfig.get<boolean>('Wake.autoInstall', true);
     let pathToExecutable: string|null = extensionConfig.get<string | null>('Wake.pathToExecutable', null);
@@ -364,6 +366,76 @@ export function deactivate() {
         if (!wakeProcess.kill()) {
             wakeProcess.kill("SIGKILL");
         }
+    }
+}
+
+function migrateConfig(){
+
+    if (vscode.workspace.getConfiguration("Tools-for-Solidity").has("Woke")){
+        log.d("Config TFS WOKE exists")
+        let cfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
+        migrateConfigKey(cfg, cfg, "Woke.trace.server", "Wake.trace.server");
+        migrateConfigKey(cfg, cfg, "Woke.autoInstall", "Wake.autoInstall");
+        migrateConfigKey(cfg, cfg, "Woke.pathToExecutable", "Wake.pathToExecutable");
+        migrateConfigKey(cfg, cfg, "Woke.port", "Wake.port");
+
+        log.d("Config TFS WOKE migrated")
+    }
+
+    if (vscode.workspace.getConfiguration().has("woke")){
+        log.d("Config WOKE exists")
+
+        let wokeCfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("woke");
+        let wakeCfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("wake");
+
+        migrateConfigKey(wokeCfg, wakeCfg, "configuration.use_toml_if_present");
+        migrateConfigKey(wokeCfg, wakeCfg, "configuration.toml_path");
+
+        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.allow_paths");
+        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.evm_version");
+        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.ignore_paths", "compiler.solc.exclude_paths");
+        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.include_paths");
+        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.remappings");
+        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.target_version");
+        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.via_IR");
+        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.optimizer.enabled");
+        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.optimizer.runs");
+
+        migrateConfigKey(wokeCfg, wakeCfg, "detectors.exclude");
+        migrateConfigKey(wokeCfg, wakeCfg, "detectors.only");
+        migrateConfigKey(wokeCfg, wakeCfg, "detectors.ignore_paths", "detectors.exclude_paths");
+
+        migrateConfigKey(wokeCfg, wakeCfg, "generator.control_flow_graph.direction");
+        migrateConfigKey(wokeCfg, wakeCfg, "generator.control_flow_graph.vscode_urls");
+        migrateConfigKey(wokeCfg, wakeCfg, "generator.imports_graph.direction");
+        migrateConfigKey(wokeCfg, wakeCfg, "generator.imports_graph.imports_direction");
+        migrateConfigKey(wokeCfg, wakeCfg, "generator.generator.imports_graph.vscode_urls");
+        migrateConfigKey(wokeCfg, wakeCfg, "generator.inheritance_graph.direction");
+        migrateConfigKey(wokeCfg, wakeCfg, "generator.inheritance_graph.vscode_urls");
+        migrateConfigKey(wokeCfg, wakeCfg, "generator.inheritance_graph_full.direction");
+        migrateConfigKey(wokeCfg, wakeCfg, "generator.inheritance_graph_full.vscode_urls");
+
+        migrateConfigKey(wokeCfg, wakeCfg, "lsp.compilation_delay");
+        migrateConfigKey(wokeCfg, wakeCfg, "lsp.code_lens.enable");
+        migrateConfigKey(wokeCfg, wakeCfg, "lsp.detectors.enable");
+        migrateConfigKey(wokeCfg, wakeCfg, "lsp.find_references.include_declarations");
+
+        vscode.workspace.getConfiguration()
+        log.d("Config WOKE migrated")
+    }
+}
+
+function migrateConfigKey(from: vscode.WorkspaceConfiguration, to: vscode.WorkspaceConfiguration, fromKey: string, toKey?: string | undefined){
+    let key = toKey == undefined ? fromKey : toKey;
+    let value = from.inspect(fromKey);
+    log.d("Migrating value - global: " + value?.globalValue + ", workspace: " + value?.workspaceValue);
+    if (value?.globalValue != undefined){
+        to.update(key, value?.globalValue, vscode.ConfigurationTarget.Global);
+        from.update(fromKey, undefined, vscode.ConfigurationTarget.Global);
+    }
+    if (value?.workspaceValue != undefined) {
+        to.update(key, value?.workspaceValue, vscode.ConfigurationTarget.Workspace);
+        from.update(fromKey, undefined, vscode.ConfigurationTarget.Workspace);
     }
 }
 

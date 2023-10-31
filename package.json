@@ -1,7 +1,7 @@
 {
     "name": "tools-for-solidity",
     "displayName": "Tools for Solidity",
-    "version": "1.10.4",
+    "version": "1.11.0",
     "publisher": "ackeeblockchain",
     "description": "Advanced Solidity support and vulnerability detectors developed by Ackee Blockchain",
     "keywords": [
@@ -576,6 +576,7 @@
     },
     "dependencies": {
         "@renovatebot/pep440": "^2.0.0",
+        "@vscode/vsce": "^2.22.0",
         "get-port": "<6.0.0",
         "vscode-languageclient": "^8.0.1",
         "wait-port": "^0.3.0"
