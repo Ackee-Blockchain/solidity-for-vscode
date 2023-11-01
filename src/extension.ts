@@ -32,11 +32,10 @@ let wakeProcess: ChildProcess | undefined = undefined;
 let wakeProvider: WakeTreeDataProvider | undefined = undefined;
 let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
-export let log: Log
+//export let log: Log
 
 const WAKE_TARGET_VERSION = "4.0.0a4";
 const WAKE_PRERELEASE = true;
-const LOG_LEVEL = 0;
 
 interface DiagnosticNotification{
     uri: string;
@@ -44,7 +43,7 @@ interface DiagnosticNotification{
 }
 
 function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification){
-    outputChannel.appendLine(JSON.stringify(detection));
+    //outputChannel.appendLine(JSON.stringify(detection));
     let diags = detection.diagnostics.map(it => convertDiagnostics(it));
     diagnosticCollection.set(vscode.Uri.parse(detection.uri), diags);
 
@@ -188,7 +187,6 @@ function findPython(outputChannel: vscode.OutputChannel): string {
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
     const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
-    log = new Log(outputChannel, LOG_LEVEL);
     outputChannel.show(true);
 
     migrateConfig();
@@ -372,19 +370,14 @@ export function deactivate() {
 function migrateConfig(){
 
     if (vscode.workspace.getConfiguration("Tools-for-Solidity").has("Woke")){
-        log.d("Config TFS WOKE exists")
         let cfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
         migrateConfigKey(cfg, cfg, "Woke.trace.server", "Wake.trace.server");
         migrateConfigKey(cfg, cfg, "Woke.autoInstall", "Wake.autoInstall");
         migrateConfigKey(cfg, cfg, "Woke.pathToExecutable", "Wake.pathToExecutable");
         migrateConfigKey(cfg, cfg, "Woke.port", "Wake.port");
-
-        log.d("Config TFS WOKE migrated")
     }
 
     if (vscode.workspace.getConfiguration().has("woke")){
-        log.d("Config WOKE exists")
-
         let wokeCfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("woke");
         let wakeCfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("wake");
 
@@ -421,14 +414,12 @@ function migrateConfig(){
         migrateConfigKey(wokeCfg, wakeCfg, "lsp.find_references.include_declarations");
 
         vscode.workspace.getConfiguration()
-        log.d("Config WOKE migrated")
     }
 }
 
 function migrateConfigKey(from: vscode.WorkspaceConfiguration, to: vscode.WorkspaceConfiguration, fromKey: string, toKey?: string | undefined){
     let key = toKey == undefined ? fromKey : toKey;
     let value = from.inspect(fromKey);
-    log.d("Migrating value - global: " + value?.globalValue + ", workspace: " + value?.workspaceValue);
     if (value?.globalValue != undefined){
         to.update(key, value?.globalValue, vscode.ConfigurationTarget.Global);
         from.update(fromKey, undefined, vscode.ConfigurationTarget.Global);

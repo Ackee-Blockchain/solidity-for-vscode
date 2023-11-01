@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { WakeDetection } from './WakeDetection';
 import { BaseRootItem } from './BaseRootItem';
-import { DetectionItem } from './DetectionItem';
 import { FileItem } from './FileItem';
 
 
@@ -34,7 +33,7 @@ export class PathItem extends BaseRootItem {
                 fileNode = new FileItem(leaf.uri, this.context);
                 this.addChild(fileNode);
             }
-            fileNode.addChild(new DetectionItem(leaf, this.context));
+            fileNode.addLeaf(leaf);
         }
         this.leafsCount++;
     }
