@@ -5,6 +5,7 @@ import { DetectorItem } from './model/DetectorItem';
 import { ConfidenceItem } from './model/ConfidenceItem';
 import { PathItem } from './model/PathItem';
 import { BaseTreeProvider } from './BaseTreeProvider';
+import { FileItem } from './model/FileItem';
 
 export class WakeTreeDataProvider extends BaseTreeProvider {
 
@@ -67,15 +68,28 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
             value.filter(it => this.filterDetections(it)).forEach(detection => {
                 let segments = detection.diagnostic.data.sourceUnitName.split("/");
                 let rootNode = this.rootNodesMap.get(segments[0]);
-
                 if (rootNode == undefined) {
-                    rootNode = new PathItem(segments[0], this.context);
-                    this.addRoot(rootNode);
+                    if(segments.length > 1){
+                        rootNode = new PathItem(segments[0], this.context);
+                        this.addRoot(rootNode);
+                    } else {
+                        rootNode = new FileItem(detection.uri, this.context);
+                        this.addRoot(rootNode);
+                    }
                 }
-
                 rootNode.addLeaf(detection, 1);
             });
         }
+
+        this.rootNodes.sort((a: PathItem | FileItem, b: PathItem | FileItem) => {
+            if (a instanceof PathItem && b instanceof FileItem) {
+                return -1;
+            } else if (a instanceof FileItem && b instanceof PathItem) {
+                return 1;
+            } else {
+                return a.originalLabel.localeCompare(b.originalLabel);
+            }
+        });
     }
 
     buildTreeByConfidence() {

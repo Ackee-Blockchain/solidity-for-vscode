@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { BaseRootItem } from './BaseRootItem';
 import { WakeDetection } from './WakeDetection';
 import { PathItem } from './PathItem';
+import { FileItem } from './FileItem';
+import { DetectionItem } from './DetectionItem';
 
 export class ImpactItem extends BaseRootItem {
 
@@ -19,6 +21,7 @@ export class ImpactItem extends BaseRootItem {
 
     addLeaf(leaf: WakeDetection, level?: number) {
         let segments = leaf.diagnostic.data.sourceUnitName.split("/");
+        let childNode = this.childsMap.get(segments[0]);
         if (segments.length > 1) {
             let childNode = this.childsMap.get(segments[0]);
             if (childNode == undefined) {
@@ -26,8 +29,14 @@ export class ImpactItem extends BaseRootItem {
                 this.addChild(childNode);
             }
             childNode.addLeaf(leaf, 1)
-            super.addLeaf(leaf, level)
+        } else {
+            if (childNode == undefined) {
+                childNode = new FileItem(leaf.uri, this.context);
+                this.addChild(childNode);
+            }
+            childNode.addChild(new DetectionItem(leaf, this.context));
         }
+        super.addLeaf(leaf, level)
     }
 
 }
