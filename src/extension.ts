@@ -12,7 +12,7 @@ import {
     Diagnostic,
 } from 'vscode-languageclient/node';
 
-import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler } from './commands';
+import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler, newDetector, newPrinter } from './commands';
 import { hideCoverageCallback, initCoverage, showCoverageCallback } from './coverage';
 
 const path = require('node:path');
@@ -326,6 +326,11 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.coverage.hide", hideCoverageCallback));
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.open_file", async (uri, range) => await openFile(uri, range)));
+
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.init.detector", async () => await newDetector(false)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.init.global_detector", async () => await newDetector(true)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.init.printer", async () => await newPrinter(false)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.init.global_printer", async () => await newPrinter(true)));
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.impact", async () => wakeProvider?.setGroupBy(GroupBy.IMPACT)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.file", async () => wakeProvider?.setGroupBy(GroupBy.FILE)));

@@ -398,6 +398,22 @@
                 "title": "Tools for Solidity: Hide Coverage"
             },
             {
+                "command": "Tools-for-Solidity.init.detector",
+                "title": "Tools for Solidity: New Detector"
+            },
+            {
+                "command": "Tools-for-Solidity.init.global_detector",
+                "title": "Tools for Solidity: New Global Detector"
+            },
+            {
+                "command": "Tools-for-Solidity.init.printer",
+                "title": "Tools for Solidity: New Printer"
+            },
+            {
+                "command": "Tools-for-Solidity.init.global_printer",
+                "title": "Tools for Solidity: New Global Printer"
+            },
+            {
                 "command": "Tools-for-Solidity.detections.group.impact",
                 "title": "Group by Impact"
             },
