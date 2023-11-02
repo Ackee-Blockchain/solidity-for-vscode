@@ -117,3 +117,27 @@ export async function executeReferencesHandler(out: vscode.OutputChannel, docume
         await vscode.commands.executeCommand('editor.action.goToLocations', uri, new vscode.Position(position.line, position.character), res, "peek", "No references found.");
     }
 }
+
+export async function newDetector(global: boolean) {
+    const name = await vscode.window.showInputBox({ prompt: "Detector name" });
+    if (name === undefined) {
+            return;
+        }
+
+    const res: string = await vscode.commands.executeCommand('wake.init.detector', name, global);
+    if (res !== undefined && res !== "") {
+        await vscode.window.showTextDocument(vscode.Uri.parse("file://" + res));
+    }
+}
+
+export async function newPrinter(global: boolean) {
+    const name = await vscode.window.showInputBox({ prompt: "Printer name" });
+    if (name === undefined) {
+        return;
+    }
+        
+    const res: string = await vscode.commands.executeCommand('wake.init.printer', name, global);
+    if (res !== undefined && res !== "") {
+        await vscode.window.showTextDocument(vscode.Uri.parse("file://" + res));
+    }
+}
