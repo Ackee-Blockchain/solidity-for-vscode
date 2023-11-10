@@ -1,7 +1,7 @@
 {
     "name": "tools-for-solidity",
     "displayName": "Tools for Solidity",
-    "version": "1.11.0",
+    "version": "1.11.1",
     "publisher": "ackeeblockchain",
     "description": "Advanced Solidity support and vulnerability detectors developed by Ackee Blockchain",
     "keywords": [
@@ -370,7 +370,7 @@
             {
                 "command": "wake.lsp.force_recompile",
                 "title": "Tools for Solidity: Force Recompile Project",
-                "icon": "$(play)"
+                "icon": "$(refresh)"
             },
             {
                 "command": "wake.lsp.force_rerun_detectors",
@@ -499,6 +499,11 @@
                     "submenu": "tools-for-solidity.detections.filter",
                     "when": "view == wake-detections",
                     "group": "navigation@2"
+                },
+                {
+                    "command": "wake.lsp.force_recompile",
+                    "when": "view == solc-detections",
+                    "group": "navigation@3"
                 }
             ],
             "tools-for-solidity.detections.filter": [

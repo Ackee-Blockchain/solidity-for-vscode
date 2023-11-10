@@ -26,6 +26,16 @@ export function convertDiagnostics(it: Diagnostic): WakeDiagnostic {
     let result = new WakeDiagnostic(convertRange(it.range), it.message, severity, it.data)
     result.source = it.source;
     result.code = it.code;
+
+    if (it.codeDescription?.href != undefined && it.code != undefined){
+        result.code = {
+            value: it.code,
+            target: vscode.Uri.parse(it.codeDescription.href)
+        }
+    } else {
+        result.code = it.code
+    }
+
     result.relatedInformation = it.relatedInformation?.map(it => new vscode.DiagnosticRelatedInformation(new vscode.Location(vscode.Uri.parse(it.location.uri), convertRange(it.location.range)), it.message));
     result.data = it.data as DiagnosticData
     result.tags = it.tags;
@@ -33,5 +43,5 @@ export function convertDiagnostics(it: Diagnostic): WakeDiagnostic {
 }
 
 function convertRange(it : Range) : vscode.Range{
-    return new vscode.Range(new vscode.Position(it.start.line, it.start.character), new vscode.Position(it.start.line, it.start.character))
+    return new vscode.Range(new vscode.Position(it.start.line, it.start.character), new vscode.Position(it.end.line, it.end.character))
 }

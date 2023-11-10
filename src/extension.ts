@@ -44,7 +44,7 @@ interface DiagnosticNotification{
 
 function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification){
     //outputChannel.appendLine(JSON.stringify(detection));
-    let diags = detection.diagnostics.map(it => convertDiagnostics(it));
+    let diags = detection.diagnostics.map(it => convertDiagnostics(it)).filter(item => !item.data.ignored);
     diagnosticCollection.set(vscode.Uri.parse(detection.uri), diags);
 
     try {
