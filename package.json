@@ -74,6 +74,11 @@
                         "default": "true",
                         "description": "Automatically install 'wake-eth' PyPi package needed by Tools for Solidity"
                     },
+                    "Tools-for-Solidity.Wake.usePipx": {
+                        "type": "boolean",
+                        "default": "true",
+                        "description": "Use pipx (if available) to install 'wake-eth' PyPi package if auto-install is enabled"
+                    },
                     "Tools-for-Solidity.Wake.pathToExecutable": {
                         "type": "string",
                         "description": "Path to Wake executable, overrides Tools-for-Solidity.Wake.autoInstall"

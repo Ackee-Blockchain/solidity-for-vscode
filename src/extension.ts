@@ -58,7 +58,7 @@ function onNotification(outputChannel: vscode.OutputChannel, detection: Diagnost
         if (err instanceof Error) {
             outputChannel.appendLine(err.toString());
         }
-    }    
+    }
 }
 
 async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<boolean> {
@@ -97,7 +97,7 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
             }
             return false;
         }
-    } 
+    }
 }
 
 function getWakeVersion(pathToExecutable: string|null, cwd?: string): string {
@@ -182,6 +182,33 @@ function findPython(outputChannel: vscode.OutputChannel): string {
     }
 }
 
+async function pipxInstall(outputChannel: vscode.OutputChannel): Promise<void> {
+    let out: string = "";
+    if (WAKE_PRERELEASE) {
+        outputChannel.appendLine(`Running 'pipx install --pip-args=--pre eth-wake'`);
+        out = execFileSync("pipx", ["install", "--pip-args=--pre", "eth-wake"]).toString("utf8");
+    } else {
+        outputChannel.appendLine(`Running 'pipx install eth-wake'`);
+        out = execFileSync("pipx", ["install", "eth-wake"]).toString("utf8");
+    }
+    if (out.trim().length > 0) {
+        outputChannel.appendLine(out);
+    }
+}
+
+async function pipxUpgrade(outputChannel: vscode.OutputChannel): Promise<void> {
+    let out: string = "";
+    if (WAKE_PRERELEASE) {
+        outputChannel.appendLine(`Running 'pipx upgrade --pip-args=--pre eth-wake'`);
+        out = execFileSync("pipx", ["upgrade", "--pip-args=--pre", "eth-wake"]).toString("utf8");
+    } else {
+        outputChannel.appendLine(`Running 'pipx upgrade eth-wake'`);
+        out = execFileSync("pipx", ["upgrade", "eth-wake"]).toString("utf8");
+    }
+    if (out.trim().length > 0) {
+        outputChannel.appendLine(out);
+    }
+}
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -193,6 +220,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
     const autoInstall: boolean = extensionConfig.get<boolean>('Wake.autoInstall', true);
+    let usePipx: boolean = extensionConfig.get<boolean>('Wake.usePipx', true);
     let pathToExecutable: string|null = extensionConfig.get<string | null>('Wake.pathToExecutable', null);
     if (pathToExecutable?.trim()?.length === 0) {
         pathToExecutable = null;
@@ -202,25 +230,62 @@ export async function activate(context: vscode.ExtensionContext) {
     let cwd: string|undefined = undefined;
 
     if (autoInstall && !pathToExecutable && !wakePort) {
-        const pythonExecutable = findPython(outputChannel);
+        if (usePipx) {
+            let pipxList;
+            try {
+                pipxList = JSON.parse(execFileSync("pipx", ["list", "--json"]).toString("utf8").trim());
+            } catch(err) {
+                usePipx = false;
+            }
 
-        let result: string|boolean|undefined = await findWakeDir(outputChannel, pythonExecutable);
-        if (result === false || result === true) {
-            outputChannel.appendLine("Installing PyPi package 'eth-wake'.");
-            installed = await installWake(outputChannel, pythonExecutable);
+            if (usePipx) {
+                try {
+                    if (!("eth-wake" in pipxList.venvs)) {
+                        await pipxInstall(outputChannel);
+                        pipxList = JSON.parse(execFileSync("pipx", ["list", "--json"]).toString("utf8").trim());
+                    }
 
-            if (installed) {
-                result = await findWakeDir(outputChannel, pythonExecutable);
-
-                if (result === false || result === true) {
-                    outputChannel.appendLine("'eth-wake' installed but cannot be found in PATH or pip site-packages.");
-                }
-                else {
-                    cwd = result;
+                    for (const appPath of pipxList.venvs["eth-wake"].metadata.main_package.app_paths) {
+                        if (appPath.__Path__.endsWith("eth-wake")) {
+                            pathToExecutable = appPath.__Path__;
+                            break;
+                        }
+                    }
+                    const version: string = getWakeVersion(pathToExecutable, cwd);
+                    if (compare(version, WAKE_TARGET_VERSION) < 0) {
+                        outputChannel.appendLine(`Found 'eth-wake' in version ${version} in ${pathToExecutable} but the target minimal version is ${WAKE_TARGET_VERSION}.`);
+                        await pipxUpgrade(outputChannel);
+                    }
+                } catch(err) {
+                    if (err instanceof Error) {
+                        outputChannel.appendLine(err.toString());
+                    }
+                    return;
                 }
             }
-        } else {
-            cwd = result;
+        }
+
+        if (!usePipx) {
+            const pythonExecutable = findPython(outputChannel);
+
+            let result: string|boolean|undefined = await findWakeDir(outputChannel, pythonExecutable);
+            if (result === false || result === true) {
+                outputChannel.appendLine("Installing PyPi package 'eth-wake'.");
+                installed = await installWake(outputChannel, pythonExecutable);
+
+                if (installed) {
+                    result = await findWakeDir(outputChannel, pythonExecutable);
+
+                    if (result === false || result === true) {
+                        outputChannel.appendLine("'eth-wake' installed but cannot be found in PATH or pip site-packages.");
+                    }
+                    else {
+                        cwd = result;
+                    }
+                }
+            } else {
+                cwd = result;
+            }
         }
     }
 
