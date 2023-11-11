@@ -109,6 +109,22 @@ Number of references is shown above each declaration.
 
 Together with compiler errors, diagnostics also include results from Wake vulnerability detectors.
 
+Detections and compiler warnings may be ignored by adding a comment in one of the following formats:
+
+- `// wake-disable-line` disables diagnostics for the current line,
+- `// wake-disable-next-line` disables diagnostics for the next line,
+- `// wake-disable` disables diagnostics for the current line and all following lines until `// wake-enable` is encountered,
+- `// wake-enable` re-enables diagnostics after `// wake-disable`.
+
+All comment types may be followed by a list of detector names and compiler warning codes separated by commas.
+Whitespace is ignored. For example:
+
+```solidity
+// wake-disable-line reentrancy, 1349
+```
+
+Compiler errors cannot be ignored. If no detectors or warning codes are specified, all diagnostics are ignored (or re-enabled in case of `// wake-enable`).
+
 ![Diagnostics preview](images/diagnostics-3.png)
 
 ![Diagnostics preview](images/diagnostics-4.png)
