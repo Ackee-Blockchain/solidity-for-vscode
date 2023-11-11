@@ -25,7 +25,7 @@ Tools for Solidity is an extension for Visual Studio Code that implements a lang
 
 ## Dependencies
 
-The Tools for Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.7 or higher.
+The Tools for Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.7 or higher. Python 3.12 is experimentally supported.
 
 Rosetta is required to be enabled on Apple Silicon (M1 & M2) Macs.
 
