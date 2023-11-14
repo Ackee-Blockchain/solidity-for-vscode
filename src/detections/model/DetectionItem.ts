@@ -21,6 +21,7 @@ export class DetectionItem extends BaseItem<any> {
         } else {
             this.setIconBySeverity();
         }
+        this.tooltip = detection.diagnostic.data.sourceUnitName;
     }
 
     setIconBySeverity() {

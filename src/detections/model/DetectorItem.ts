@@ -1,14 +1,18 @@
 import * as vscode from "vscode";
 import { BaseRootItem } from './BaseRootItem';
-import { WakeDetection } from "./WakeDetection";
+import { WakeDetection, Detector } from "./WakeDetection";
 import { PathItem } from "./PathItem";
 import { FileItem } from "./FileItem";
 import { DetectionItem } from "./DetectionItem";
 
 export class DetectorItem extends BaseRootItem {
 
-    constructor(detector: string, context: vscode.ExtensionContext) {
-        super(detector, detector, context);
+    detector : Detector
+
+    constructor(detector: Detector, context: vscode.ExtensionContext) {
+        super(detector.id, detector.id, context);
+        this.detector = detector;
+        this.contextValue = 'DETECTOR';
     }
 
     addLeaf(leaf: WakeDetection, level?: number) {
