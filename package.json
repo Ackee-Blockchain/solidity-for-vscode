@@ -419,6 +419,11 @@
                 "title": "Tools for Solidity: New Global Printer"
             },
             {
+                "command": "Tools-for-Solidity.detections.open_docs",
+                "title": "Open Documentation",
+                "icon": "$(book)"
+            },
+            {
                 "command": "Tools-for-Solidity.detections.group.impact",
                 "title": "Group by Impact"
             },
@@ -509,6 +514,13 @@
                     "command": "wake.lsp.force_recompile",
                     "when": "view == solc-detections",
                     "group": "navigation@3"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "Tools-for-Solidity.detections.open_docs",
+                    "when": "view == wake-detections && viewItem == DETECTOR",
+                    "group": "inline"
                 }
             ],
             "tools-for-solidity.detections.filter": [

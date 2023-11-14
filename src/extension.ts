@@ -24,8 +24,9 @@ import { ChildProcess, execFileSync, spawn } from 'child_process';
 import { GroupBy, Impact, Confidence } from "./detections/WakeTreeDataProvider";
 import { SolcTreeDataProvider } from './detections/SolcTreeDataProvider';
 import { WakeTreeDataProvider } from './detections/WakeTreeDataProvider';
-import { WakeDetection } from './detections/model/WakeDetection';
+import { Detector, WakeDetection } from './detections/model/WakeDetection';
 import { convertDiagnostics } from './detections/util'
+import { DetectorItem } from './detections/model/DetectorItem';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ChildProcess | undefined = undefined;
@@ -34,7 +35,7 @@ let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
 //export let log: Log
 
-const WAKE_TARGET_VERSION = "4.0.0a4";
+const WAKE_TARGET_VERSION = "4.0.0a6";
 const WAKE_PRERELEASE = true;
 
 interface DiagnosticNotification{
@@ -390,7 +391,8 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.coverage.show", showCoverageCallback));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.coverage.hide", hideCoverageCallback));
 
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.open_file", async (uri, range) => await openFile(uri, range)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.open_file", async (uri, range) => openFile(uri, range)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.open_docs", async (item) => openWeb((item as DetectorItem).detector)));
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.init.detector", async () => await newDetector(false)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.init.global_detector", async () => await newDetector(true)));
@@ -423,6 +425,14 @@ function openFile(uri : vscode.Uri, range : vscode.Range){
             }
         });
     });
+}
+
+function openWeb(detector : Detector){
+    if(detector.docs != undefined){
+        vscode.env.openExternal(detector.docs);
+        //let panel = vscode.window.createWebviewPanel('detector-docs', "Detector Documentation (" + detector.id + ")", vscode.ViewColumn.Beside);
+        //panel.webview.html = `<html><body>TODO</body></html>`;
+    }
 }
 
 // this method is called when your extension is deactivated

@@ -1,5 +1,4 @@
-import { WakeDetection } from './model/WakeDetection';
-import { WakeDiagnostic } from './model/WakeDetection';
+import { WakeDiagnostic, WakeDetection, Code } from './model/WakeDetection';
 import { ImpactItem } from './model/ImpactItem';
 import { DetectorItem } from './model/DetectorItem';
 import { ConfidenceItem } from './model/ConfidenceItem';
@@ -111,25 +110,20 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
     buildTreeByDetector() {
         for (const [key, value] of this.detectionsMap) {
             value.filter(it => this.filterDetections(it)).forEach(detection => {
-                let detector = detection.diagnostic.code;
-                let segments = detection.diagnostic.data.sourceUnitName.split("/");
-
-                if (detection.diagnostic.code == undefined) {
-                    detector = "unknown";
-                } else {
-                    detector = detection.diagnostic.code as string;
-                }
-
-                let rootNode = this.rootNodesMap.get(detector);
+                let rootNode = this.rootNodesMap.get(detection.detector.id);
 
                 if (rootNode == undefined) {
-                    rootNode = new DetectorItem(detector, this.context);
+                    rootNode = new DetectorItem(detection.detector, this.context);
                     this.addRoot(rootNode);
                 }
 
                 rootNode.addLeaf(detection, 0);
             });
         }
+
+        this.rootNodes.sort((a, b) => {
+            return (a as DetectorItem).detector.id.localeCompare((b as DetectorItem).detector.id);
+        });
     }
 
     filterDetections(detection: WakeDetection): boolean {
