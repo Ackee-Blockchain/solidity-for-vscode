@@ -1,14 +1,16 @@
 import * as vscode from 'vscode';
 import { BaseItem } from './BaseItem';
 import { WakeDetection } from './WakeDetection';
+import { DetectionRelatedInfoItem } from './DetectionRelatedInfoItem';
 
 
-export class DetectionItem extends BaseItem<any> {
+export class DetectionItem extends BaseItem<DetectionRelatedInfoItem> {
 
     detection: WakeDetection;
 
     constructor(detection: WakeDetection, context: vscode.ExtensionContext) {
-        super("L" + (detection.diagnostic.range.start.line + 1) + ": " + detection.diagnostic.message, undefined, context);
+        let id = "L" + (detection.diagnostic.range.start.line + 1) + ": " + detection.diagnostic.message;
+        super(id, id, detection.diagnostic.relatedInformation != undefined ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None, context);
         this.detection = detection;
         this.command = {
             title: "Open",
@@ -21,7 +23,11 @@ export class DetectionItem extends BaseItem<any> {
         } else {
             this.setIconBySeverity();
         }
-        this.tooltip = detection.diagnostic.data.sourceUnitName;
+        if (detection.diagnostic.relatedInformation != undefined){
+            detection.diagnostic.relatedInformation.forEach(it => {
+                this.addChild(new DetectionRelatedInfoItem(it, context));
+            })
+        }
     }
 
     setIconBySeverity() {

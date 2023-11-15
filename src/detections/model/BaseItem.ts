@@ -3,15 +3,17 @@ import { WakeDetection } from './WakeDetection';
 
 export abstract class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem {
     context: vscode.ExtensionContext
+    key: string;
     originalLabel: string;
     childs: T[] = [];
     parent: BaseItem<any> | undefined;
     childsMap: Map<string, T> = new Map<string, T>();
     leafsCount = 0;
 
-    constructor(label: string, collapsibleState: vscode.TreeItemCollapsibleState | undefined, context: vscode.ExtensionContext) {
+    constructor(key: string, label: string, collapsibleState: vscode.TreeItemCollapsibleState | undefined, context: vscode.ExtensionContext) {
         super(label, collapsibleState);
         this.context = context;
+        this.key = key;
         this.originalLabel = label;
     }
 
@@ -36,6 +38,7 @@ export abstract class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem 
         while (this.childs.length != 0) {
             this.childs.pop();
         }
+        this.leafsCount = 0;
     }
 
     addLeaf(leaf: WakeDetection, level?: number) {
@@ -51,6 +54,13 @@ export abstract class BaseItem<T extends BaseItem<any>> extends vscode.TreeItem 
             light: this.context.asAbsolutePath("resources/icons/" + name + ".png"),
             dark: this.context.asAbsolutePath("resources/icons/" + name + ".png"),
         };
+    }
+
+    updateLabel() {
+        if (this.parent == undefined) {
+            this.label = this.originalLabel + " (" + this.leafsCount + ")";
+        }
+        // super.updateChildLabels();
     }
 
     updateChildLabels() {

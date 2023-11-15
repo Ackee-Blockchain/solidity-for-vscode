@@ -1,16 +1,16 @@
 import * as vscode from "vscode";
-import { BaseRootItem } from './BaseRootItem';
+import { BaseItem } from './BaseItem';
 import { WakeDetection, Detector } from "./WakeDetection";
 import { PathItem } from "./PathItem";
 import { FileItem } from "./FileItem";
 import { DetectionItem } from "./DetectionItem";
 
-export class DetectorItem extends BaseRootItem {
+export class DetectorItem extends BaseItem<BaseItem<any>> {
 
     detector : Detector
 
     constructor(detector: Detector, context: vscode.ExtensionContext) {
-        super(detector.id, detector.id, context);
+        super(detector.id, detector.id, vscode.TreeItemCollapsibleState.Expanded, context);
         this.detector = detector;
         this.contextValue = 'DETECTOR';
     }
@@ -20,13 +20,13 @@ export class DetectorItem extends BaseRootItem {
         let childNode = this.childsMap.get(segments[0]);
         if (segments.length > 1) {
             if (childNode == undefined) {
-                childNode = new PathItem(segments[0], this.context);
+                childNode = new PathItem(segments[0], segments[0], this.context);
                 this.addChild(childNode);
             }
             childNode.addLeaf(leaf, 1)
         } else {
             if (childNode == undefined) {
-                childNode = new FileItem(leaf.uri, this.context);
+                childNode = new FileItem(leaf.uri, leaf.diagnostic.data.sourceUnitName, this.context);
                 this.addChild(childNode);
             }
             childNode.addChild(new DetectionItem(leaf, this.context));
