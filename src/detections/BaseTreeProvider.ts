@@ -1,16 +1,14 @@
 import * as vscode from 'vscode';
 import { BaseItem } from './model/BaseItem';
 import { WakeDetection } from './model/WakeDetection';
-import { BaseRootItem } from './model/BaseRootItem';
-
 
 export abstract class BaseTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
 
     context: vscode.ExtensionContext
 
     detectionsMap: Map<string, WakeDetection[]> = new Map<string, WakeDetection[]>();
-    rootNodesMap: Map<string, BaseRootItem> = new Map<string, BaseRootItem>();
-    rootNodes: BaseRootItem[] = [];
+    rootNodesMap: Map<string, BaseItem<any>> = new Map<string, BaseItem<any>>();
+    rootNodes: BaseItem<any>[] = [];
 
     _onDidChangeTreeData: vscode.EventEmitter<undefined> = new vscode.EventEmitter<undefined>();
     onDidChangeTreeData: vscode.Event<undefined> = this._onDidChangeTreeData.event;
@@ -21,7 +19,7 @@ export abstract class BaseTreeProvider implements vscode.TreeDataProvider<vscode
         this.context = context;
     }
 
-    addRoot(node: BaseRootItem) {
+    addRoot(node: BaseItem<any>) {
         this.rootNodesMap.set(node.key, node);
         this.rootNodes.push(node);
     }

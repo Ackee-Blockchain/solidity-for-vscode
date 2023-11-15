@@ -69,10 +69,10 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
                 let rootNode = this.rootNodesMap.get(segments[0]);
                 if (rootNode == undefined) {
                     if(segments.length > 1){
-                        rootNode = new PathItem(segments[0], this.context);
+                        rootNode = new PathItem(segments[0], segments[0], this.context);
                         this.addRoot(rootNode);
                     } else {
-                        rootNode = new FileItem(detection.uri, this.context);
+                        rootNode = new FileItem(detection.uri, detection.diagnostic.data.sourceUnitName, this.context);
                         this.addRoot(rootNode);
                     }
                 }
@@ -80,7 +80,7 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
             });
         }
 
-        this.rootNodes.sort((a: PathItem | FileItem, b: PathItem | FileItem) => {
+        this.rootNodes.sort((a, b) => {
             if (a instanceof PathItem && b instanceof FileItem) {
                 return -1;
             } else if (a instanceof FileItem && b instanceof PathItem) {

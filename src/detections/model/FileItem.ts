@@ -1,18 +1,18 @@
 import * as vscode from 'vscode';
 import { BaseItem } from './BaseItem';
 import { DetectionItem } from './DetectionItem';
-import { BaseRootItem } from './BaseRootItem';
 import { WakeDetection } from './WakeDetection';
 
 
-export class FileItem extends BaseRootItem {
+export class FileItem extends BaseItem<DetectionItem> {
     uri: vscode.Uri;
 
-    constructor(uri: vscode.Uri, context: vscode.ExtensionContext) {
+    constructor(uri: vscode.Uri, sourceUnitName: string, context: vscode.ExtensionContext) {
         let filename = uri.path.substring(uri.path.lastIndexOf("/") + 1)
-        super(filename, filename, context);
+        super(filename, filename, vscode.TreeItemCollapsibleState.Expanded, context);
         this.uri = uri;
         this.setIcon("solidity");
+        this.tooltip = sourceUnitName;
     }
 
     addChild(item: DetectionItem) {
