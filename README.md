@@ -1,26 +1,23 @@
-# [Ackee Blockchain](https://ackeeblockchain.com) Tools for Solidity
+# [Ackee Blockchain](https://ackeeblockchain.com) Tools for Solidity ([Wake](https://getwake.io))
 
 Tools for Solidity is an extension for Visual Studio Code that implements a language server for Solidity. It offers most of the language server features and displays results of vulnerability detectors (powered by [Wake](https://getwake.io)) along with compiler warnings and errors in custom UI. Different graph types can be generated to better vizualize the relations in the code.
 
-**This extension provides the following language server features:**
+**Features:**
 
-- Go to definition
-- Go to type definition
-- Go to implementation
+- Diagnostics & Detections
+- Go to definition, type definition, implementation
 - Find references
 - Type hierarchy
 - Document links
 - Hover
 - Code lens
 - Document symbols
-- Diagnostics & Detections UI
 - Rename
 
-**The following types of graphs can be generated:**
+**Supported graph types:**
 
 - Control flow graph of a function
-- Inheritance graph of a contract
-- Inheritance graph of a whole project
+- Inheritance graphs (contracts and whole project)
 - Linearized inheritance graph of a contract
 
 ## Dependencies
@@ -47,13 +44,15 @@ python3 -m pip install eth-wake
 
 ## Features
 
+### Detections
+
+Vulnerability detections from [Wake](https://getwake.io) are shown in our Detections UI with customizable grouping by path, impact, confidence or detector, and filtering by impact and confidence.
+
+![Detections preview](images/detections-ui.png)
+
 ### Go to definition
 
 ![Go to definition preview](images/go-to-definition.gif)
-
-### Go to type definition
-
-![Go to type definition preview](images/go-to-type-definition.gif)
 
 ### Go to implementation
 
@@ -115,12 +114,6 @@ Whitespace is ignored. For example:
 
 Compiler errors cannot be ignored. If no detectors or warning codes are specified, all diagnostics are ignored (or re-enabled in case of `// wake-enable`).
 
-### Detections UI
-
-Vulnerability detections from [Wake](https://getwake.io) are shown in our Detections UI with customizable grouping (by path/impact/confidence/detector) and filtering by impact and confidence.
-
-![Detections preview](images/detections-ui.png)
-
 ### Control flow graphs
 
 ![Control flow graph](images/control_flow_graph.png)
@@ -128,10 +121,6 @@ Vulnerability detections from [Wake](https://getwake.io) are shown in our Detect
 ### Inheritance graphs
 
 ![Inheritance graph](images/inheritance_graph.png)
-
-### Rename
-
-![Rename preview](images/rename.gif)
 
 ## Supported commands
 
