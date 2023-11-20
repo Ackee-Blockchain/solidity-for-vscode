@@ -1,24 +1,23 @@
 # [Ackee Blockchain](https://ackeeblockchain.com) Tools for Solidity ([Wake](https://getwake.io))
 
-Tools for Solidity is an extension for Visual Studio Code that implements a language server for Solidity. It offers most of the language server features and displays results of vulnerability detectors (powered by [Wake](https://getwake.io)) along with compiler warnings and errors in custom UI. Different graph types can be generated to better vizualize the relations in the code.
+Tools for Solidity is an extension for Visual Studio Code, powered by [Wake](https://getwake.io), that offers most of the language server features and displays real-time results of vulnerability detectors and compiler in custom UI. Different graph types can be generated to better visualize the relations in the code.
 
 **Features:**
 
-- Diagnostics & Detections
-- Go to definition, type definition, implementation
-- Find references
-- Type hierarchy
-- Document links
+- Diagnostics & Detections UI
+- Go to Definition, Type Definition, Implementation
+- Find References
+- Type Hierarchy
+- Document Links, Document Symbols
 - Hover
-- Code lens
-- Document symbols
+- Code Lens
 - Rename
 
 **Supported graph types:**
 
-- Control flow graph of a function
-- Inheritance graphs (contracts and whole project)
-- Linearized inheritance graph of a contract
+- Control Flow Graph
+- Inheritance Graph
+- Linearized Inheritance Graph
 
 ## Dependencies
 
@@ -26,11 +25,7 @@ The Tools for Solidity extension uses the PyPi package [eth-wake](https://pypi.o
 
 Rosetta is required to be enabled on Apple Silicon (M1, M2 & M3) Macs.
 
-To display the generated graphs, one of the supported Graphviz (DOT) extensions must be installed:
-
-- [Graphviz (dot) language support for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=joaompinto.vscode-graphviz) (recommended)
-- [Graphviz Preview](https://marketplace.visualstudio.com/items?itemName=EFanZh.graphviz-preview)
-- [Graphviz Interactive Preview](https://marketplace.visualstudio.com/items?itemName=tintinweb.graphviz-interactive-preview)
+To display the generated graphs, Graphviz (DOT) extension must be installed e.g. [Graphviz (dot) language support for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=joaompinto.vscode-graphviz).
 
 ## Installation
 
@@ -80,15 +75,23 @@ Also works for virtual functions.
 
 ![Document links preview](images/document-links.gif)
 
+### Document symbols
+
+![Document symbols preview](images/document-symbols.png)
+
 ### Hover
 
 Includes links to documentation for OpenZeppelin contracts.
 
 ![Hover preview](images/hover.gif)
 
-### Document symbols
+### Control flow graphs
 
-![Document symbols preview](images/document-symbols.png)
+![Control flow graph](images/control_flow_graph.png)
+
+### Inheritance graphs
+
+![Inheritance graph](images/inheritance_graph.png)
 
 ### Diagnostics
 
@@ -113,14 +116,6 @@ Whitespace is ignored. For example:
 ```
 
 Compiler errors cannot be ignored. If no detectors or warning codes are specified, all diagnostics are ignored (or re-enabled in case of `// wake-enable`).
-
-### Control flow graphs
-
-![Control flow graph](images/control_flow_graph.png)
-
-### Inheritance graphs
-
-![Inheritance graph](images/inheritance_graph.png)
 
 ## Supported commands
 
