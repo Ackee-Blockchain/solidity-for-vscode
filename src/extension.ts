@@ -424,6 +424,11 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
         wakeProvider?.clear();
         vscode.commands.executeCommand('wake.lsp.force_rerun_detectors');
     }));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.force_recompile", async () => {
+        solcProvider?.clear();
+        wakeProvider?.clear();
+        vscode.commands.executeCommand('wake.lsp.force_recompile');
+    }))
 
 }
 

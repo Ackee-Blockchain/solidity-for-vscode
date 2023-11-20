@@ -138,14 +138,14 @@ Vulnerability detections from [Wake](https://getwake.io) are shown in our Detect
 - **Tools for Solidity: Force Recompile Project**
 
 ```shell
-wake.lsp.force_recompile
+Tools-for-Solidity.detections.force_recompile
 ```
 Force recompile the opened project/files.
 
 - **Tools for Solidity: Force Rerun Detectors**
 
 ```shell
-wake.lsp.force_rerun_detectors
+Tools-for-Solidity.detections.force_rerun_detectors
 ```
 
 Force rerun Wake vulnerability and issue detectors on the opened project/files.
@@ -164,9 +164,16 @@ Tools-for-Solidity.generate.imports_graph
 ```
 Generate an imports graph for the whole project.
 
+- **Tools for Solidity: Import Foundry Remappings**
+
+```shell
+Tools-for-Solidity.foundry.import_remappings
+```
+Automatically configure the compiler remappings in a Foundry project.
+
 ## Known Issues
 
-- **Files created/modified/deleted outside of VS Code are not properly analysed**
+- **Files created/modified/deleted outside of VS Code are not properly analyzed**
 
 The extension currently does not handle changes external to VS Code. This especially means that files installed into `node_modules` are not detected. Please run the `Wake: Force Recompile Project` command after installing node packages as a workaround.
 
