@@ -38,7 +38,7 @@ let diagnosticCollection: vscode.DiagnosticCollection
 //export let log: Log
 
 const WAKE_TARGET_VERSION = "4.0.0";
-const WAKE_PRERELEASE = true;
+const WAKE_PRERELEASE = false;
 
 interface DiagnosticNotification{
     uri: string;
@@ -424,7 +424,7 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
         wakeProvider?.clear();
         vscode.commands.executeCommand('wake.lsp.force_rerun_detectors');
     }));
-   
+
 }
 
 function openFile(uri : vscode.Uri, range : vscode.Range){
