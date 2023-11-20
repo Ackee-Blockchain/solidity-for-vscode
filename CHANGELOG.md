@@ -2,6 +2,8 @@
 
 ## [1.11.0]
 - Wake Detections UI in Activity Bar
+- Ignore detections
+- Support auto-installation using pipx
 - Woke -> Wake migration
 
 ## [1.10.4]
