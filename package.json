@@ -373,16 +373,6 @@
         ],
         "commands": [
             {
-                "command": "wake.lsp.force_recompile",
-                "title": "Tools for Solidity: Force Recompile Project",
-                "icon": "$(refresh)"
-            },
-            {
-                "command": "wake.lsp.force_rerun_detectors",
-                "title": "Tools for Solidity: Force Rerun Detectors",
-                "icon": "$(refresh)"
-            },
-            {
                 "command": "Tools-for-Solidity.generate.imports_graph",
                 "title": "Tools for Solidity: Generate Imports Graph"
             },
@@ -421,6 +411,11 @@
             {
                 "command": "Tools-for-Solidity.detections.force_rerun_detectors",
                 "title": "Tools for Solidity: Force Rerun Detectors",
+                "icon": "$(refresh)"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.force_recompile",
+                "title": "Tools for Solidity: Force Recompile Project",
                 "icon": "$(refresh)"
             },
             {
@@ -516,7 +511,7 @@
                     "group": "navigation@2"
                 },
                 {
-                    "command": "wake.lsp.force_recompile",
+                    "command": "Tools-for-Solidity.detections.force_recompile",
                     "when": "view == solc-detections",
                     "group": "navigation@3"
                 }
