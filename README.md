@@ -13,7 +13,7 @@ Tools for Solidity is an extension for Visual Studio Code that implements a lang
 - Hover
 - Code lens
 - Document symbols
-- Diagnostics
+- Diagnostics & Detections UI
 - Rename
 
 **The following types of graphs can be generated:**
@@ -115,9 +115,11 @@ Whitespace is ignored. For example:
 
 Compiler errors cannot be ignored. If no detectors or warning codes are specified, all diagnostics are ignored (or re-enabled in case of `// wake-enable`).
 
-![Diagnostics preview](images/diagnostics-3.png)
+### Detections UI
 
-![Diagnostics preview](images/diagnostics-4.png)
+Vulnerability detections from [Wake](https://getwake.io) are shown in our Detections UI with customizable grouping (by path/impact/confidence/detector) and filtering by impact and confidence.
+
+![Detections preview](images/detections-ui.png)
 
 ### Control flow graphs
 
