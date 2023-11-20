@@ -1,7 +1,7 @@
 {
     "name": "tools-for-solidity",
     "displayName": "Tools for Solidity",
-    "version": "1.11.1",
+    "version": "1.11.0",
     "publisher": "ackeeblockchain",
     "description": "Advanced Solidity support and vulnerability detectors developed by Ackee Blockchain",
     "keywords": [
@@ -419,6 +419,11 @@
                 "title": "Tools for Solidity: New Global Printer"
             },
             {
+                "command": "Tools-for-Solidity.detections.force_rerun_detectors",
+                "title": "Tools for Solidity: Force Rerun Detectors",
+                "icon": "$(refresh)"
+            },
+            {
                 "command": "Tools-for-Solidity.detections.open_docs",
                 "title": "Open Documentation",
                 "icon": "$(book)"
@@ -496,7 +501,7 @@
         "menus": {
             "view/title": [
                 {
-                    "command": "wake.lsp.force_rerun_detectors",
+                    "command": "Tools-for-Solidity.detections.force_rerun_detectors",
                     "when": "view == wake-detections",
                     "group": "navigation@3"
                 },
@@ -610,7 +615,8 @@
         "ts-loader": "^9.4.1",
         "typescript": "^4.7.4",
         "webpack": "^5.88.2",
-        "webpack-cli": "^4.10.0"
+        "webpack-cli": "^4.10.0",
+        "@vscode/vsce": "^2.22.0"
     },
     "dependencies": {
         "@renovatebot/pep440": "^2.0.0",

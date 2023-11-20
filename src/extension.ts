@@ -10,6 +10,7 @@ import {
     StreamInfo,
     integer,
     Diagnostic,
+    ProgressType,
 } from 'vscode-languageclient/node';
 
 import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler, newDetector, newPrinter } from './commands';
@@ -27,6 +28,7 @@ import { WakeTreeDataProvider } from './detections/WakeTreeDataProvider';
 import { Detector, WakeDetection } from './detections/model/WakeDetection';
 import { convertDiagnostics } from './detections/util'
 import { DetectorItem } from './detections/model/DetectorItem';
+import { ClientMiddleware } from './ClientMiddleware';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ChildProcess | undefined = undefined;
@@ -35,7 +37,7 @@ let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
 //export let log: Log
 
-const WAKE_TARGET_VERSION = "4.0.0a6";
+const WAKE_TARGET_VERSION = "4.0.0";
 const WAKE_PRERELEASE = true;
 
 interface DiagnosticNotification{
@@ -348,6 +350,8 @@ export async function activate(context: vscode.ExtensionContext) {
         };
         return result;
     };
+    wakeProvider = new WakeTreeDataProvider(context);
+    solcProvider = new SolcTreeDataProvider(context);
 
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'solidity' }],
@@ -355,10 +359,13 @@ export async function activate(context: vscode.ExtensionContext) {
         outputChannel: outputChannel,
         initializationOptions: {
             toolsForSolidityVersion: context.extension.packageJSON.version
-        }
+        },
+        middleware: new ClientMiddleware(outputChannel)
     };
 
     client = new LanguageClient("Tools-for-Solidity", "Tools for Solidity", serverOptions, clientOptions);
+
+    client.onProgress
     diagnosticCollection = vscode.languages.createDiagnosticCollection('Wake')
 
     client.onNotification("textDocument/publishDiagnostics", (params) => {
@@ -367,8 +374,7 @@ export async function activate(context: vscode.ExtensionContext) {
         onNotification(outputChannel, diag);
     });
 
-    wakeProvider = new WakeTreeDataProvider(context);
-    solcProvider = new SolcTreeDataProvider(context);
+
     vscode.window.registerTreeDataProvider('wake-detections', wakeProvider);
     vscode.window.registerTreeDataProvider('solc-detections', solcProvider);
 
@@ -413,6 +419,12 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.confidence.high", async () => wakeProvider?.setFilterConfidence(Confidence.HIGH)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.confidence.medium", async () => wakeProvider?.setFilterConfidence(Confidence.MEDIUM)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.confidence.low", async () => wakeProvider?.setFilterConfidence(Confidence.LOW)));
+
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.force_rerun_detectors", async () => {
+        wakeProvider?.clear();
+        vscode.commands.executeCommand('wake.lsp.force_rerun_detectors');
+    }));
+   
 }
 
 function openFile(uri : vscode.Uri, range : vscode.Range){

@@ -1,6 +1,6 @@
 # [Ackee Blockchain](https://ackeeblockchain.com) Tools for Solidity
 
-Tools for Solidity is an extension for Visual Studio Code that implements a language server for Solidity. It offers most of the language server features and displays results of vulnerability detectors along with compiler warnings and errors. Different graph types can be generated to better vizualize the relations in the code.
+Tools for Solidity is an extension for Visual Studio Code that implements a language server for Solidity. It offers most of the language server features and displays results of vulnerability detectors (powered by [Wake](https://getwake.io)) along with compiler warnings and errors in custom UI. Different graph types can be generated to better vizualize the relations in the code.
 
 **This extension provides the following language server features:**
 
@@ -27,7 +27,7 @@ Tools for Solidity is an extension for Visual Studio Code that implements a lang
 
 The Tools for Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.7 or higher. Python 3.12 is experimentally supported.
 
-Rosetta is required to be enabled on Apple Silicon (M1 & M2) Macs.
+Rosetta is required to be enabled on Apple Silicon (M1, M2 & M3) Macs.
 
 To display the generated graphs, one of the supported Graphviz (DOT) extensions must be installed:
 
@@ -47,14 +47,6 @@ python3 -m pip install eth-wake
 
 ## Features
 
-### Control flow graphs
-
-![Control flow graph](images/control_flow_graph.png)
-
-### Inheritance graphs
-
-![Inheritance graph](images/inheritance_graph.png)
-
 ### Go to definition
 
 ![Go to definition preview](images/go-to-definition.gif)
@@ -73,13 +65,17 @@ Find implementations of an unimplemented function or modifier.
 
 ![Find references preview](images/find-references.gif)
 
-### Type hierarchy
+### Code lens
 
-![Contract type hierarchy preview](images/contract-type-hierarchy.gif)
+Number of references is shown above each declaration.
+
+![Code lens preview](images/code-lens.png)
+
+### Type hierarchy
 
 Also works for virtual functions.
 
-![Function type hierarchy preview](images/function-type-hierarchy.gif)
+![Contract type hierarchy preview](images/contract-type-hierarchy.gif)
 
 ### Document links
 
@@ -91,12 +87,6 @@ Includes links to documentation for OpenZeppelin contracts.
 
 ![Hover preview](images/hover.gif)
 
-### Code lens
-
-Number of references is shown above each declaration.
-
-![Code lens preview](images/code-lens.png)
-
 ### Document symbols
 
 ![Document symbols preview](images/document-symbols.png)
@@ -107,7 +97,7 @@ Number of references is shown above each declaration.
 
 ![Diagnostics preview](images/diagnostics-2.png)
 
-Together with compiler errors, diagnostics also include results from Wake vulnerability detectors.
+Together with compiler errors, diagnostics also include results from [Wake](https://getwake.io) vulnerability detectors.
 
 Detections and compiler warnings may be ignored by adding a comment in one of the following formats:
 
@@ -128,6 +118,14 @@ Compiler errors cannot be ignored. If no detectors or warning codes are specifie
 ![Diagnostics preview](images/diagnostics-3.png)
 
 ![Diagnostics preview](images/diagnostics-4.png)
+
+### Control flow graphs
+
+![Control flow graph](images/control_flow_graph.png)
+
+### Inheritance graphs
+
+![Inheritance graph](images/inheritance_graph.png)
 
 ### Rename
 
