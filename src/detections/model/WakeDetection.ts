@@ -41,7 +41,11 @@ export class WakeDiagnostic extends vscode.Diagnostic {
     }
 
     private _isCodeObject(obj: any): obj is Code {
-        return (typeof obj.value === 'string' || typeof obj.value === 'number' && typeof obj.target === 'object');
+        try {
+            return (typeof obj.value === 'string' || typeof obj.value === 'number' && typeof obj.target === 'object');
+        } catch (e) {
+            return false;
+        }
     }
 }
 
