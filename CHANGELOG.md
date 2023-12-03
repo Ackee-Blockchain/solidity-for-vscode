@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.11.1]
+- `solc` binaries are automatically re-installed if corrupted
+- Fixed language server crashes on Windows caused by unicode characters in printed messages
+- Fixed `wake` path detection when using `pipx`
+
 ## [1.11.0]
 - Wake Detections UI in Activity Bar
 - Ignore detections
