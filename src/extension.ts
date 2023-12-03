@@ -37,7 +37,7 @@ let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
 //export let log: Log
 
-const WAKE_TARGET_VERSION = "4.1.0";
+const WAKE_TARGET_VERSION = "4.1.2";
 const WAKE_PRERELEASE = false;
 
 interface DiagnosticNotification{
