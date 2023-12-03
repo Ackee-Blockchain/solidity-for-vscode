@@ -249,7 +249,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     }
 
                     for (const appPath of pipxList.venvs["eth-wake"].metadata.main_package.app_paths) {
-                        if (appPath.__Path__.endsWith("eth-wake")) {
+                        if (appPath.__Path__.endsWith("wake")) {
                             pathToExecutable = appPath.__Path__;
                             break;
                         }
