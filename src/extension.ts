@@ -314,11 +314,11 @@ export async function activate(context: vscode.ExtensionContext) {
             wakePath = path.join(cwd, "wake");
         }
 
-        outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}'`);
+        outputChannel.appendLine(`Running '${wakePath} --silent lsp --port ${wakePort}'`);
         if (cwd === undefined) {
-            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort)], {stdio: 'ignore'});
+            wakeProcess = spawn(wakePath, ["--silent", "lsp", "--port", String(wakePort)], {stdio: 'ignore'});
         } else {
-            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort)], {cwd, stdio: 'ignore'});
+            wakeProcess = spawn(wakePath, ["--silent", "lsp", "--port", String(wakePort)], {cwd, stdio: 'ignore'});
         }
         wakeProcess.on('error', (error) => {
             if (error) {
