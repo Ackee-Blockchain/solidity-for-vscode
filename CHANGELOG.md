@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.11.2]
+- Fixed issue caused by dependent extension for Graphviz preview being removed from the marketplace
+
 ## [1.11.1]
 - `solc` binaries are automatically re-installed if corrupted
 - Fixed language server crashes on Windows caused by unicode characters in printed messages
