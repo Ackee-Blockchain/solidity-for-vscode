@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.11.3]
+- Fixed language server crashes caused by `distutils` not being available in Python 3.12
+
 ## [1.11.2]
 - Fixed issue caused by dependent extension for Graphviz preview being removed from the marketplace
 
