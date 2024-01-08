@@ -45,19 +45,19 @@
                     "wake.configuration.use_toml_if_present": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Use the configuration TOML file if present instead of the VS Code settings"
+                        "description": "Use the configuration TOML file if present instead of the VS Code settings."
                     },
                     "wake.configuration.toml_path": {
                         "type": "string",
                         "default": "wake.toml",
-                        "description": "Path to the TOML configuration file relative to the workspace root"
+                        "description": "Path to the TOML configuration file relative to the workspace root."
                     }
                 }
             },
             {
                 "title": "Tools for Solidity",
                 "order": -1,
-                "properties": {
+                "properties": {                
                     "Tools-for-Solidity.trace.server": {
                         "scope": "window",
                         "type": "string",
@@ -72,20 +72,24 @@
                     "Tools-for-Solidity.Wake.autoInstall": {
                         "type": "boolean",
                         "default": "true",
-                        "description": "Automatically install 'wake-eth' PyPi package needed by Tools for Solidity"
+                        "description": "Automatically install 'wake-eth' PyPi package needed by Tools for Solidity."
                     },
                     "Tools-for-Solidity.Wake.usePipx": {
                         "type": "boolean",
                         "default": "true",
-                        "description": "Use pipx (if available) to install 'wake-eth' PyPi package if auto-install is enabled"
+                        "description": "Use pipx (if available) to install 'wake-eth' PyPi package if auto-install is enabled."
                     },
                     "Tools-for-Solidity.Wake.pathToExecutable": {
                         "type": "string",
-                        "description": "Path to Wake executable, overrides Tools-for-Solidity.Wake.autoInstall"
+                        "description": "Path to Wake executable, overrides Tools-for-Solidity.Wake.autoInstall."
                     },
                     "Tools-for-Solidity.Wake.port": {
                         "type": "integer",
                         "description": "Port on which Wake is listening. Overrides both Tools-for-Solidity.Wake.autoInstall and Tools-for-Solidity.Wake.pathToExecutable."
+                    },
+                    "Tools-for-Solidity.uuid": {
+                        "type": "string",
+                        "description": "Random genereated installation UUID, do not change."
                     }
                 }
             },
@@ -99,7 +103,7 @@
                             "type": "string"
                         },
                         "default": [],
-                        "description": "Allow paths passed directly to the solc compiler"
+                        "description": "Allow paths passed directly to the solc compiler."
                     },
                     "wake.compiler.solc.evm_version": {
                         "type": "string",
@@ -117,7 +121,7 @@
                             ""
                         ],
                         "default": "",
-                        "description": "EVM version passed to the solc compiler"
+                        "description": "EVM version passed to the solc compiler."
                     },
                     "wake.compiler.solc.exclude_paths": {
                         "type": "array",
@@ -131,7 +135,7 @@
                             "script",
                             "test"
                         ],
-                        "description": "Files in these paths are excluded from LSP analysis unless imported from other non-excluded files"
+                        "description": "Files in these paths are excluded from LSP analysis unless imported from other non-excluded files."
                     },
                     "wake.compiler.solc.include_paths": {
                         "type": "array",
@@ -141,7 +145,7 @@
                         "default": [
                             "node_modules"
                         ],
-                        "description": "Include paths used to search for non-relative import paths"
+                        "description": "Include paths used to search for non-relative import paths."
                     },
                     "wake.compiler.solc.remappings": {
                         "type": "array",
@@ -149,12 +153,12 @@
                             "type": "string"
                         },
                         "default": [],
-                        "markdownDescription": "Compiler remappings (see [Solidity docs](https://docs.soliditylang.org/en/latest/using-the-compiler.html#base-path-and-import-remapping))"
+                        "markdownDescription": "Compiler remappings (see [Solidity docs](https://docs.soliditylang.org/en/latest/using-the-compiler.html#base-path-and-import-remapping))."
                     },
                     "wake.compiler.solc.target_version": {
                         "type": "string",
                         "default": "",
-                        "description": "The version of the solc compiler used to compile all project files"
+                        "description": "The version of the solc compiler used to compile all project files."
                     },
                     "wake.compiler.solc.via_IR": {
                         "type": [
@@ -199,7 +203,7 @@
                             "type": "string"
                         },
                         "default": [],
-                        "description": "List of detectors (identified by their string or integer IDs) to exclude from the analysis"
+                        "description": "List of detectors (identified by their string or integer IDs) to exclude from the analysis."
                     },
                     "wake.detectors.only": {
                         "type": "array",
@@ -207,7 +211,7 @@
                             "type": "string"
                         },
                         "default": [],
-                        "description": "List of detectors (identified by their string or integer IDs) to only use in the analysis"
+                        "description": "List of detectors (identified by their string or integer IDs) to only use in the analysis."
                     },
                     "wake.detectors.ignore_paths": {
                         "type": "array",
@@ -246,12 +250,12 @@
                             "RL"
                         ],
                         "default": "TB",
-                        "markdownDescription": "The direction of the generated control flow graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                        "markdownDescription": "The direction of the generated control flow graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))."
                     },
                     "wake.generator.control_flow_graph.vscode_urls": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Generate vscode:// URLs in the generated control flow graph"
+                        "description": "Generate vscode:// URLs in the generated control flow graph."
                     },
                     "wake.generator.imports_graph.direction": {
                         "type": "string",
@@ -262,7 +266,7 @@
                             "RL"
                         ],
                         "default": "TB",
-                        "markdownDescription": "The direction of the generated imports graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                        "markdownDescription": "The direction of the generated imports graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))."
                     },
                     "wake.generator.imports_graph.imports_direction": {
                         "type": "string",
@@ -271,12 +275,12 @@
                             "importing-to-imported"
                         ],
                         "default": "imported-to-importing",
-                        "markdownDescription": "The direction of arrows in the generated imports graph"
+                        "markdownDescription": "The direction of arrows in the generated imports graph."
                     },
                     "wake.generator.imports_graph.vscode_urls": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Generate vscode:// URLs in the generated imports graph"
+                        "description": "Generate vscode:// URLs in the generated imports graph."
                     },
                     "wake.generator.inheritance_graph.direction": {
                         "type": "string",
@@ -287,12 +291,12 @@
                             "RL"
                         ],
                         "default": "BT",
-                        "markdownDescription": "The direction of the generated inheritance graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                        "markdownDescription": "The direction of the generated inheritance graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))."
                     },
                     "wake.generator.inheritance_graph.vscode_urls": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Generate vscode:// URLs in the generated inheritance graph"
+                        "description": "Generate vscode:// URLs in the generated inheritance graph."
                     },
                     "wake.generator.inheritance_graph_full.direction": {
                         "type": "string",
@@ -303,12 +307,12 @@
                             "RL"
                         ],
                         "default": "BT",
-                        "markdownDescription": "The direction of the inheritance graph generated for the whole project (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))"
+                        "markdownDescription": "The direction of the inheritance graph generated for the whole project (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))."
                     },
                     "wake.generator.inheritance_graph_full.vscode_urls": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Generate vscode:// URLs in the inheritance graph generated for the whole project"
+                        "description": "Generate vscode:// URLs in the inheritance graph generated for the whole project."
                     }
                 }
             },
@@ -319,22 +323,22 @@
                     "wake.lsp.compilation_delay": {
                         "type": "number",
                         "default": 0,
-                        "description": "Delay in seconds before the project is compiled after a keystroke"
+                        "description": "Delay in seconds before the project is compiled after a keystroke."
                     },
                     "wake.lsp.code_lens.enable": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Enable code lens with number of references"
+                        "description": "Enable code lens with number of references."
                     },
                     "wake.lsp.detectors.enable": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Enable Wake vulnerability detectors"
+                        "description": "Enable Wake vulnerability detectors."
                     },
                     "wake.lsp.find_references.include_declarations": {
                         "type": "boolean",
                         "default": false,
-                        "description": "Also include declarations in 'Go to references' results"
+                        "description": "Also include declarations in 'Go to references' results."
                     }
                 }
             }
@@ -604,18 +608,20 @@
         "@typescript-eslint/eslint-plugin": "^5.30.0",
         "@typescript-eslint/parser": "^5.30.0",
         "@vscode/test-electron": "^2.1.5",
+        "@vscode/vsce": "^2.22.0",
         "eslint": "^8.18.0",
         "glob": "^8.0.3",
         "mocha": "^10.0.0",
         "ts-loader": "^9.4.1",
         "typescript": "^4.7.4",
         "webpack": "^5.88.2",
-        "webpack-cli": "^4.10.0",
-        "@vscode/vsce": "^2.22.0"
+        "webpack-cli": "^4.10.0"
     },
     "dependencies": {
         "@renovatebot/pep440": "^2.0.0",
+        "firebase": "^10.7.1",
         "get-port": "<6.0.0",
+        "node-fetch": "^3.3.2",
         "vscode-languageclient": "^8.0.1",
         "wait-port": "^0.3.0"
     },
