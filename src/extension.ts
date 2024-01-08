@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as net from 'net';
+import fetch from 'node-fetch';
+import * as env from './env';
 
 import {
     LanguageClient,
@@ -29,12 +31,14 @@ import { Detector, WakeDetection } from './detections/model/WakeDetection';
 import { convertDiagnostics } from './detections/util'
 import { DetectorItem } from './detections/model/DetectorItem';
 import { ClientMiddleware } from './ClientMiddleware';
+import { randomUUID } from 'crypto';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ChildProcess | undefined = undefined;
 let wakeProvider: WakeTreeDataProvider | undefined = undefined;
 let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
+let session_id = randomUUID()
 //export let log: Log
 
 const WAKE_TARGET_VERSION = "4.3.0";
@@ -383,6 +387,7 @@ export async function activate(context: vscode.ExtensionContext) {
     initCoverage(outputChannel);
 
     client.start();
+    logEvent("activate");
 }
 
 function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext){
@@ -509,8 +514,6 @@ function migrateConfig(){
         migrateConfigKey(wokeCfg, wakeCfg, "lsp.code_lens.enable");
         migrateConfigKey(wokeCfg, wakeCfg, "lsp.detectors.enable");
         migrateConfigKey(wokeCfg, wakeCfg, "lsp.find_references.include_declarations");
-
-        vscode.workspace.getConfiguration()
     }
 }
 
@@ -525,6 +528,34 @@ function migrateConfigKey(from: vscode.WorkspaceConfiguration, to: vscode.Worksp
         to.update(key, value?.workspaceValue, vscode.ConfigurationTarget.Workspace);
         from.update(fromKey, undefined, vscode.ConfigurationTarget.Workspace);
     }
+}
+
+function getUuid() : string{
+    let config = vscode.workspace.getConfiguration("Tools-for-Solidity")
+    let value = config.inspect("uuid");
+    if (value?.globalValue == undefined) {
+        let uuid = randomUUID()
+        config.update("uuid", uuid, vscode.ConfigurationTarget.Global);
+        return uuid;
+    } else {
+        return value.globalValue as string;
+    }
+}
+
+function logEvent(name : string){
+    fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${env.GA_MEASUREMENT_ID}&api_secret=${env.GA_API_KEY}`, {
+        method: "POST",
+        body: JSON.stringify({
+            client_id: getUuid(),
+            events: [{
+                name: name,
+                params: {
+                    session_id: session_id,
+                    engagement_time_msec: 1
+                },
+            }]
+        })
+    });
 }
 
 export class Log{
