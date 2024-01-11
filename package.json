@@ -89,7 +89,7 @@
                     },
                     "Tools-for-Solidity.uuid": {
                         "type": "string",
-                        "description": "Random genereated installation UUID, do not change."
+                        "description": "Installation UUID (Random generated locally, used only for anonymous active installations tracking)."
                     }
                 }
             },
