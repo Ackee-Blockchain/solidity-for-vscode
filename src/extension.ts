@@ -2,8 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as net from 'net';
-import fetch from 'node-fetch';
-import * as env from './env';
+import {Analytics} from './analytics'
 
 import {
     LanguageClient,
@@ -31,14 +30,13 @@ import { Detector, WakeDetection } from './detections/model/WakeDetection';
 import { convertDiagnostics } from './detections/util'
 import { DetectorItem } from './detections/model/DetectorItem';
 import { ClientMiddleware } from './ClientMiddleware';
-import { randomUUID } from 'crypto';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ChildProcess | undefined = undefined;
 let wakeProvider: WakeTreeDataProvider | undefined = undefined;
 let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
-let session_id = randomUUID()
+let analytics: Analytics; 
 //export let log: Log
 
 const WAKE_TARGET_VERSION = "4.3.0";
@@ -220,6 +218,7 @@ async function pipxUpgrade(outputChannel: vscode.OutputChannel): Promise<void> {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
+    analytics = new Analytics();
     const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
     outputChannel.show(true);
 
@@ -387,7 +386,7 @@ export async function activate(context: vscode.ExtensionContext) {
     initCoverage(outputChannel);
 
     client.start();
-    logEvent("activate");
+    analytics.logActivate();
 }
 
 function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext){
@@ -472,6 +471,7 @@ export function deactivate() {
 function migrateConfig(){
 
     if (vscode.workspace.getConfiguration("Tools-for-Solidity").has("Woke")){
+        analytics.logMigrate();
         let cfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
         migrateConfigKey(cfg, cfg, "Woke.trace.server", "Wake.trace.server");
         migrateConfigKey(cfg, cfg, "Woke.autoInstall", "Wake.autoInstall");
@@ -528,34 +528,6 @@ function migrateConfigKey(from: vscode.WorkspaceConfiguration, to: vscode.Worksp
         to.update(key, value?.workspaceValue, vscode.ConfigurationTarget.Workspace);
         from.update(fromKey, undefined, vscode.ConfigurationTarget.Workspace);
     }
-}
-
-function getUuid() : string{
-    let config = vscode.workspace.getConfiguration("Tools-for-Solidity")
-    let value = config.inspect("uuid");
-    if (value?.globalValue == undefined) {
-        let uuid = randomUUID()
-        config.update("uuid", uuid, vscode.ConfigurationTarget.Global);
-        return uuid;
-    } else {
-        return value.globalValue as string;
-    }
-}
-
-function logEvent(name : string){
-    fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${env.GA_MEASUREMENT_ID}&api_secret=${env.GA_API_KEY}`, {
-        method: "POST",
-        body: JSON.stringify({
-            client_id: getUuid(),
-            events: [{
-                name: name,
-                params: {
-                    session_id: session_id,
-                    engagement_time_msec: 1
-                },
-            }]
-        })
-    });
 }
 
 export class Log{
