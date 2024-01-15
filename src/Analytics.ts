@@ -2,16 +2,10 @@ import * as env from './env';
 import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 import { randomUUID } from 'crypto';
-import { WakeDetection } from './detections/model/WakeDetection';
 
 export class Analytics{
 
     session_id : string = randomUUID();
-    extension: vscode.Extension<any>;
-
-    constructor(extension: vscode.Extension<any>){
-        this.extension = extension;
-    }
 
     getUuid(): string {
         let config = vscode.workspace.getConfiguration("Tools-for-Solidity")
@@ -31,12 +25,6 @@ export class Analytics{
 
     logMigrate() {
         this.logEvent(EventType.MIGRATE)
-    }
-
-    logDetection(detections: WakeDetection[]){
-        if(detections.length > 0){
-            this.logEvent(EventType.DETECTION)
-        }
     }
 
     logEvent(name: string) {
