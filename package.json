@@ -619,7 +619,6 @@
     },
     "dependencies": {
         "@renovatebot/pep440": "^2.0.0",
-        "firebase": "^10.7.1",
         "get-port": "<6.0.0",
         "node-fetch": "^3.3.2",
         "vscode-languageclient": "^8.0.1",

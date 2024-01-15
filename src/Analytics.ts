@@ -46,6 +46,5 @@ export class Analytics{
 
 export enum EventType{
     ACTIVATE = "activate",
-    MIGRATE = "migrate",
-    DETECTION = "detection"
+    MIGRATE = "migrate"
 }
