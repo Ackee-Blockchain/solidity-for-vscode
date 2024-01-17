@@ -57,7 +57,7 @@
             {
                 "title": "Tools for Solidity",
                 "order": -1,
-                "properties": {                
+                "properties": {
                     "Tools-for-Solidity.trace.server": {
                         "scope": "window",
                         "type": "string",
