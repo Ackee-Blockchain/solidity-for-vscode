@@ -36,11 +36,13 @@ let wakeProcess: ChildProcess | undefined = undefined;
 let wakeProvider: WakeTreeDataProvider | undefined = undefined;
 let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
-let analytics: Analytics; 
+let analytics: Analytics;
+let crashlog: string[] = [];
 //export let log: Log
 
 const WAKE_TARGET_VERSION = "4.3.0";
 const WAKE_PRERELEASE = false;
+const CRASHLOG_LIMIT = 1000;
 
 interface DiagnosticNotification{
     uri: string;
@@ -317,19 +319,28 @@ export async function activate(context: vscode.ExtensionContext) {
             wakePath = path.join(cwd, "wake");
         }
 
-        outputChannel.appendLine(`Running '${wakePath} --silent lsp --port ${wakePort}'`);
+        outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}'`);
         if (cwd === undefined) {
-            wakeProcess = spawn(wakePath, ["--silent", "lsp", "--port", String(wakePort)], {stdio: 'ignore'});
+            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort),], { shell: true, env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
         } else {
-            wakeProcess = spawn(wakePath, ["--silent", "lsp", "--port", String(wakePort)], {cwd, stdio: 'ignore'});
+            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort)], { cwd, shell: true, env: { ...process.env, PYTHONIOENCODING: 'utf8' }});
         }
+        wakeProcess.stdout?.on('data', (chunk) => {
+            crashlog.push(chunk);
+            if (crashlog.length > CRASHLOG_LIMIT){
+                crashlog.shift();
+            }
+        });
         wakeProcess.on('error', (error) => {
             if (error) {
                 outputChannel.appendLine(error.message);
                 throw error;
             }
         });
-        wakeProcess.on('exit', () => wakeProcess = undefined);
+        wakeProcess.on('exit', () => {
+            printCrashlog(outputChannel);
+            wakeProcess = undefined;
+        });
     } else {
         outputChannel.appendLine(`Connecting to running 'wake' server on port ${wakePort}`);
     }
@@ -528,6 +539,19 @@ function migrateConfigKey(from: vscode.WorkspaceConfiguration, to: vscode.Worksp
         to.update(key, value?.workspaceValue, vscode.ConfigurationTarget.Workspace);
         from.update(fromKey, undefined, vscode.ConfigurationTarget.Workspace);
     }
+}
+
+function printCrashlog(outputChannel : vscode.OutputChannel){
+    outputChannel.appendLine("\n≡W≡W≡W≡[ Wake LSP Crashlog ]≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡\n")
+    crashlog.forEach(line => {
+        outputChannel.appendLine(line);
+    });
+    outputChannel.appendLine("\n≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡")
+    outputChannel.appendLine("|                                                                                                                 |");
+    outputChannel.appendLine("|   Ooops! Wake LSP crashed, please report the issue to our GitHub:                                               |");
+    outputChannel.appendLine("|   https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/issues                                          |");
+    outputChannel.appendLine("|                                                                                                                 |");
+    outputChannel.appendLine("≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡")
 }
 
 export class Log{
