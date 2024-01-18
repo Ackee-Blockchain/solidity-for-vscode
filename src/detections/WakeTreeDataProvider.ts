@@ -5,6 +5,7 @@ import { ConfidenceItem } from './model/ConfidenceItem';
 import { PathItem } from './model/PathItem';
 import { BaseTreeProvider } from './BaseTreeProvider';
 import { FileItem } from './model/FileItem';
+import * as vscode from 'vscode';
 
 export class WakeTreeDataProvider extends BaseTreeProvider {
 
@@ -12,12 +13,23 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
     filterImpact: Impact = Impact.INFO;
     filterConfidence: Confidence = Confidence.LOW;
 
+    private loadConfig(){
+        let groupByConfig = vscode.workspace.getConfiguration("Tools-for-Solidity").get("detections.groupBy")
+        let filterImpactConfig = vscode.workspace.getConfiguration("Tools-for-Solidity").get("detections.filterImpact")
+        let filterConfidenceConfig = vscode.workspace.getConfiguration("Tools-for-Solidity").get("detections.filterConfidence")
+
+        if (groupByConfig !== undefined) this.groupBy = GroupBy[groupByConfig as keyof typeof GroupBy];
+        if (filterImpactConfig !== undefined) this.filterImpact = Impact[filterImpactConfig as keyof typeof Impact];
+        if (filterConfidenceConfig !== undefined) this.filterConfidence = Confidence[filterConfidenceConfig as keyof typeof Confidence];
+    }
+
     getRoot(diagnostic: WakeDiagnostic): string {
         return diagnostic.data.impact;
     }
 
     refresh(): void {
         this.clear();
+        this.loadConfig()
 
         switch (this.groupBy) {
             case GroupBy.IMPACT:
@@ -169,17 +181,17 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
 
     setGroupBy(groupBy: GroupBy) {
         this.groupBy = groupBy;
-        this.refresh();
+        vscode.workspace.getConfiguration("Tools-for-Solidity").update("detections.groupBy", GroupBy[groupBy]).then(() => this.refresh());
     }
 
     setFilterImpact(minImpact: Impact) {
         this.filterImpact = minImpact;
-        this.refresh();
+        vscode.workspace.getConfiguration("Tools-for-Solidity").update("detections.filterImpact", Impact[minImpact]).then(() => this.refresh());
     }
 
     setFilterConfidence(minConfidence: Confidence) {
         this.filterConfidence = minConfidence;
-        this.refresh();
+        vscode.workspace.getConfiguration("Tools-for-Solidity").update("detections.filterConfidence", Confidence[minConfidence]).then(() => this.refresh());
     }
 }
 
