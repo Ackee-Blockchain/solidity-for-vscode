@@ -190,45 +190,9 @@
                 }
             },
             {
-                "title": "Detections",
+                "title": "Detectors",
                 "order": 1,
                 "properties": {
-                    "Tools-for-Solidity.detections.groupBy": {
-                        "type": "string",
-                        "enum": [
-                            "IMPACT",
-                            "FILE",
-                            "CONFIDENCE",
-                            "DETECTOR"
-                        ],
-                        "default": "IMPACT",
-                        "order": -3,
-                        "markdownDescription": "Grouping criteria of detections in Wake Detections UI."
-                    },
-                    "Tools-for-Solidity.detections.filterImpact": {
-                        "type": "string",
-                        "enum": [
-                            "HIGH",
-                            "MEDIUM",
-                            "LOW",
-                            "WARNING",
-                            "INFO"
-                        ],
-                        "order": -2,
-                        "default": "INFO",
-                        "markdownDescription": "Minimum impact of detections shown in Wake Detections UI."
-                    },
-                    "Tools-for-Solidity.detections.filterConfidence": {
-                        "type": "string",
-                        "enum": [
-                            "HIGH",
-                            "MEDIUM",
-                            "LOW"
-                        ],
-                        "default": "LOW",
-                        "order": -1,
-                        "markdownDescription": "Minimum confidence of detections shown in Wake Detections UI."
-                    },
                     "wake.detectors.exclude": {
                         "type": "array",
                         "items": {

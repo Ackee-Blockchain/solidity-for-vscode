@@ -14,9 +14,9 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
     filterConfidence: Confidence = Confidence.LOW;
 
     private loadConfig(){
-        let groupByConfig = vscode.workspace.getConfiguration("Tools-for-Solidity").get("detections.groupBy")
-        let filterImpactConfig = vscode.workspace.getConfiguration("Tools-for-Solidity").get("detections.filterImpact")
-        let filterConfidenceConfig = vscode.workspace.getConfiguration("Tools-for-Solidity").get("detections.filterConfidence")
+        let groupByConfig = this.context.workspaceState.get("detections.groupBy")
+        let filterImpactConfig = this.context.workspaceState.get("detections.filterImpact")
+        let filterConfidenceConfig = this.context.workspaceState.get("detections.filterConfidence")
 
         if (groupByConfig !== undefined) this.groupBy = GroupBy[groupByConfig as keyof typeof GroupBy];
         if (filterImpactConfig !== undefined) this.filterImpact = Impact[filterImpactConfig as keyof typeof Impact];
@@ -181,17 +181,18 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
 
     setGroupBy(groupBy: GroupBy) {
         this.groupBy = groupBy;
+        this.context.workspaceState.update("detections.groupBy", GroupBy[groupBy]).then(() => this.refresh());
         vscode.workspace.getConfiguration("Tools-for-Solidity").update("detections.groupBy", GroupBy[groupBy]).then(() => this.refresh());
     }
 
     setFilterImpact(minImpact: Impact) {
         this.filterImpact = minImpact;
-        vscode.workspace.getConfiguration("Tools-for-Solidity").update("detections.filterImpact", Impact[minImpact]).then(() => this.refresh());
+        this.context.workspaceState.update("detections.filterImpact", Impact[minImpact]).then(() => this.refresh());
     }
 
     setFilterConfidence(minConfidence: Confidence) {
         this.filterConfidence = minConfidence;
-        vscode.workspace.getConfiguration("Tools-for-Solidity").update("detections.filterConfidence", Confidence[minConfidence]).then(() => this.refresh());
+        this.context.workspaceState.update("detections.filterConfidence", Confidence[minConfidence]).then(() => this.refresh());
     }
 }
 
