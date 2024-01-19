@@ -86,10 +86,6 @@
                     "Tools-for-Solidity.Wake.port": {
                         "type": "integer",
                         "description": "Port on which Wake is listening. Overrides both Tools-for-Solidity.Wake.autoInstall and Tools-for-Solidity.Wake.pathToExecutable."
-                    },
-                    "Tools-for-Solidity.uuid": {
-                        "type": "string",
-                        "description": "Installation UUID (Random generated locally, used only for anonymous active installations tracking)."
                     }
                 }
             },
