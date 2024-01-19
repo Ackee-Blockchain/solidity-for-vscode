@@ -13,6 +13,11 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
     filterImpact: Impact = Impact.INFO;
     filterConfidence: Confidence = Confidence.LOW;
 
+    constructor(context : vscode.ExtensionContext){
+        super(context);
+        this.loadConfig();
+    }
+
     private loadConfig(){
         let groupByConfig = this.context.workspaceState.get("detections.groupBy")
         let filterImpactConfig = this.context.workspaceState.get("detections.filterImpact")
@@ -21,6 +26,10 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
         if (groupByConfig !== undefined) this.groupBy = GroupBy[groupByConfig as keyof typeof GroupBy];
         if (filterImpactConfig !== undefined) this.filterImpact = Impact[filterImpactConfig as keyof typeof Impact];
         if (filterConfidenceConfig !== undefined) this.filterConfidence = Confidence[filterConfidenceConfig as keyof typeof Confidence];
+
+        vscode.commands.executeCommand('setContext', 'detections.group', GroupBy[this.groupBy]);
+        vscode.commands.executeCommand('setContext', 'detections.filterImpact', Impact[this.filterImpact]);
+        vscode.commands.executeCommand('setContext', 'detections.filterConfidence', Confidence[this.filterConfidence]);
     }
 
     getRoot(diagnostic: WakeDiagnostic): string {
@@ -29,7 +38,6 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
 
     refresh(): void {
         this.clear();
-        this.loadConfig()
 
         switch (this.groupBy) {
             case GroupBy.IMPACT:
@@ -182,17 +190,19 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
     setGroupBy(groupBy: GroupBy) {
         this.groupBy = groupBy;
         this.context.workspaceState.update("detections.groupBy", GroupBy[groupBy]).then(() => this.refresh());
-        vscode.workspace.getConfiguration("Tools-for-Solidity").update("detections.groupBy", GroupBy[groupBy]).then(() => this.refresh());
+        vscode.commands.executeCommand('setContext', 'detections.group', GroupBy[groupBy]);
     }
 
     setFilterImpact(minImpact: Impact) {
         this.filterImpact = minImpact;
         this.context.workspaceState.update("detections.filterImpact", Impact[minImpact]).then(() => this.refresh());
+        vscode.commands.executeCommand('setContext', 'detections.filterImpact', Impact[minImpact]);
     }
 
     setFilterConfidence(minConfidence: Confidence) {
         this.filterConfidence = minConfidence;
         this.context.workspaceState.update("detections.filterConfidence", Confidence[minConfidence]).then(() => this.refresh());
+        vscode.commands.executeCommand('setContext', 'detections.filterConfidence', Confidence[minConfidence]);
     }
 }
 
