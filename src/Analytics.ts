@@ -5,17 +5,21 @@ import { randomUUID } from 'crypto';
 
 export class Analytics{
 
+    context : vscode.ExtensionContext
     session_id : string = randomUUID();
 
+    constructor(context: vscode.ExtensionContext){
+        this.context = context;
+    }
+
     getUuid(): string {
-        let config = vscode.workspace.getConfiguration("Tools-for-Solidity")
-        let value = config.inspect("uuid");
-        if (value?.globalValue == undefined) {
+        let value = this.context.globalState.get("uuid");
+        if (value == undefined) {
             let uuid = randomUUID()
-            config.update("uuid", uuid, vscode.ConfigurationTarget.Global);
+            this.context.globalState.update("uuid", uuid);
             return uuid;
         } else {
-            return value.globalValue as string;
+            return value as string;
         }
     }
 

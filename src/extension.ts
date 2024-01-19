@@ -220,7 +220,7 @@ async function pipxUpgrade(outputChannel: vscode.OutputChannel): Promise<void> {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-    analytics = new Analytics();
+    analytics = new Analytics(context);
     const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
     outputChannel.show(true);
 
