@@ -425,19 +425,19 @@
             },
             {
                 "command": "Tools-for-Solidity.detections.group.impact",
-                "title": "◎ Group by Impact"
+                "title": "◯ Group by Impact"
             },
             {
                 "command": "Tools-for-Solidity.detections.group.file",
-                "title": "◎ Group by File"
+                "title": "◯ Group by File"
             },
             {
                 "command": "Tools-for-Solidity.detections.group.confidence",
-                "title": "◎ Group by Confidence"
+                "title": "◯ Group by Confidence"
             },
             {
                 "command": "Tools-for-Solidity.detections.group.detector",
-                "title": "◎ Group by Detector"
+                "title": "◯ Group by Detector"
             },
             {
                 "command": "Tools-for-Solidity.detections.group.impact_selected",
@@ -457,23 +457,23 @@
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.high",
-                "title": "◎ Impact: High"
+                "title": "◯ Impact: High"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.medium",
-                "title": "◎ Impact: High/Medium"
+                "title": "◯ Impact: High/Medium"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.low",
-                "title": "◎ Impact: High/Medium/Low"
+                "title": "◯ Impact: High/Medium/Low"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.warning",
-                "title": "◎ Impact: High/Medium/Low/Warning"
+                "title": "◯ Impact: High/Medium/Low/Warning"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.info",
-                "title": "◎ Impact: All"
+                "title": "◯ Impact: All"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.high_selected",
@@ -497,15 +497,15 @@
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.confidence.high",
-                "title": "◎ Confidence: High"
+                "title": "◯ Confidence: High"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.confidence.medium",
-                "title": "◎ Confidence: High/Medium"
+                "title": "◯ Confidence: High/Medium"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.confidence.low",
-                "title": "◎ Confidence: All"
+                "title": "◯ Confidence: All"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.confidence.high_selected",
