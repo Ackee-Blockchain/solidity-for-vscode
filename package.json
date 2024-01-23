@@ -425,52 +425,101 @@
             },
             {
                 "command": "Tools-for-Solidity.detections.group.impact",
-                "title": "Group by Impact"
+                "title": "◯ Group by Impact"
             },
             {
                 "command": "Tools-for-Solidity.detections.group.file",
-                "title": "Group by File"
+                "title": "◯ Group by File"
             },
             {
                 "command": "Tools-for-Solidity.detections.group.confidence",
-                "title": "Group by Confidence"
+                "title": "◯ Group by Confidence"
             },
             {
                 "command": "Tools-for-Solidity.detections.group.detector",
-                "title": "Group by Detector"
+                "title": "◯ Group by Detector"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.group.impact_selected",
+                "title": "◉ Group by Impact"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.group.file_selected",
+                "title": "◉ Group by File"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.group.confidence_selected",
+                "title": "◉ Group by Confidence"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.group.detector_selected",
+                "title": "◉ Group by Detector"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.high",
-                "title": "Impact: High"
+                "title": "◯ Impact: High"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.medium",
-                "title": "Impact: High/Medium"
+                "title": "◯ Impact: High/Medium"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.low",
-                "title": "Impact: High/Medium/Low"
+                "title": "◯ Impact: High/Medium/Low"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.warning",
-                "title": "Impact: High/Medium/Low/Warning"
+                "title": "◯ Impact: High/Medium/Low/Warning"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.impact.info",
-                "title": "Impact: All"
+                "title": "◯ Impact: All"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.impact.high_selected",
+                "title": "◉ Impact: High"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.impact.medium_selected",
+                "title": "◉ Impact: High/Medium"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.impact.low_selected",
+                "title": "◉ Impact: High/Medium/Low"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.impact.warning_selected",
+                "title": "◉ Impact: High/Medium/Low/Warning"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.impact.info_selected",
+                "title": "◉ Impact: All"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.confidence.high",
-                "title": "Confidence: High"
+                "title": "◯ Confidence: High"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.confidence.medium",
-                "title": "Confidence: High/Medium"
+                "title": "◯ Confidence: High/Medium"
             },
             {
                 "command": "Tools-for-Solidity.detections.filter.confidence.low",
-                "title": "Confidence: All"
+                "title": "◯ Confidence: All"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.confidence.high_selected",
+                "title": "◉ Confidence: High"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.confidence.medium_selected",
+                "title": "◉ Confidence: High/Medium"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.filter.confidence.low_selected",
+                "title": "◉ Confidence: All"
             }
+
         ],
         "viewsContainers": {
             "activitybar": [
@@ -526,53 +575,125 @@
             "tools-for-solidity.detections.filter": [
                 {
                     "command": "Tools-for-Solidity.detections.filter.impact.high",
-                    "group": "1_impact@2"
+                    "group": "1_impact@2",
+                    "when": "detections.filterImpact != 'HIGH'"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.filter.impact.medium",
-                    "group": "1_impact@3"
+                    "group": "1_impact@3",
+                    "when": "detections.filterImpact != 'MEDIUM'"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.filter.impact.low",
-                    "group": "1_impact@4"
+                    "group": "1_impact@4",
+                    "when": "detections.filterImpact != 'LOW'"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.filter.impact.warning",
-                    "group": "1_impact@5"
+                    "group": "1_impact@5",
+                    "when": "detections.filterImpact != 'WARNING'"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.filter.impact.info",
-                    "group": "1_impact@1"
+                    "group": "1_impact@1",
+                    "when": "detections.filterImpact != 'INFO'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.high_selected",
+                    "group": "1_impact@2",
+                    "when": "detections.filterImpact == 'HIGH'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.medium_selected",
+                    "group": "1_impact@3",
+                    "when": "detections.filterImpact == 'MEDIUM'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.low_selected",
+                    "group": "1_impact@4",
+                    "when": "detections.filterImpact == 'LOW'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.warning_selected",
+                    "group": "1_impact@5",
+                    "when": "detections.filterImpact == 'WARNING'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.info_selected",
+                    "group": "1_impact@1",
+                    "when": "detections.filterImpact == 'INFO'"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.filter.confidence.high",
-                    "group": "2_confidence@2"
+                    "group": "2_confidence@2",
+                    "when": "detections.filterConfidence != 'HIGH'"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.filter.confidence.medium",
-                    "group": "2_confidence@3"
+                    "group": "2_confidence@3",
+                    "when": "detections.filterConfidence != 'MEDIUM'"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.filter.confidence.low",
-                    "group": "2_confidence@1"
+                    "group": "2_confidence@1",
+                    "when": "detections.filterConfidence != 'LOW'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.high_selected",
+                    "group": "2_confidence@2",
+                    "when": "detections.filterConfidence == 'HIGH'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.medium_selected",
+                    "group": "2_confidence@3",
+                    "when": "detections.filterConfidence == 'MEDIUM'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.low_selected",
+                    "group": "2_confidence@1",
+                    "when": "detections.filterConfidence == 'LOW'"
                 }
             ],
             "tools-for-solidity.detections.group": [
                 {
                     "command": "Tools-for-Solidity.detections.group.file",
-                    "group": "group@1"
+                    "group": "group@1",
+                    "when": "detections.group != 'FILE'"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.group.impact",
-                    "group": "group@2"
+                    "group": "group@2",
+                    "when": "detections.group != 'IMPACT'"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.group.confidence",
-                    "group": "group@3"
+                    "group": "group@3",
+                    "when": "detections.group != 'CONFIDENCE'"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.group.detector",
-                    "group": "group@4"
+                    "group": "group@4",
+                    "when": "detections.group != 'DETECTOR'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.file_selected",
+                    "group": "group@1",
+                    "when": "detections.group == 'FILE'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.impact_selected",
+                    "group": "group@2",
+                    "when": "detections.group == 'IMPACT'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.confidence_selected",
+                    "group": "group@3",
+                    "when": "detections.group == 'CONFIDENCE'"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.detector_selected",
+                    "group": "group@4",
+                    "when": "detections.group == 'DETECTOR'"
                 }
             ]
         },
