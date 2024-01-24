@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as net from 'net';
-import {Analytics} from './analytics'
+import {Analytics} from './Analytics'
 
 import {
     LanguageClient,
@@ -40,7 +40,7 @@ let analytics: Analytics;
 let crashlog: string[] = [];
 //export let log: Log
 
-const WAKE_TARGET_VERSION = "4.3.0";
+const WAKE_TARGET_VERSION = "4.3.2";
 const WAKE_PRERELEASE = false;
 const CRASHLOG_LIMIT = 1000;
 
@@ -325,7 +325,7 @@ export async function activate(context: vscode.ExtensionContext) {
         } else {
             wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort)], { cwd, shell: true, env: { ...process.env, PYTHONIOENCODING: 'utf8' }});
         }
-        wakeProcess.stdout?.on('data', (chunk) => {
+        wakeProcess.stderr?.on('data', (chunk) => {
             crashlog.push(chunk);
             if (crashlog.length > CRASHLOG_LIMIT){
                 crashlog.shift();
@@ -542,16 +542,16 @@ function migrateConfigKey(from: vscode.WorkspaceConfiguration, to: vscode.Worksp
 }
 
 function printCrashlog(outputChannel : vscode.OutputChannel){
-    outputChannel.appendLine("\n≡W≡W≡W≡[ Wake LSP Crashlog ]≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡\n")
+    outputChannel.appendLine("\n≡W≡W≡W≡[ Wake LSP Crashlog ]≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡\n")
     crashlog.forEach(line => {
         outputChannel.appendLine(line);
     });
-    outputChannel.appendLine("\n≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡")
-    outputChannel.appendLine("|                                                                                                                 |");
-    outputChannel.appendLine("|   Ooops! Wake LSP crashed, please report the issue to our GitHub:                                               |");
-    outputChannel.appendLine("|   https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/issues                                          |");
-    outputChannel.appendLine("|                                                                                                                 |");
-    outputChannel.appendLine("≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡")
+    outputChannel.appendLine("\n≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡")
+    outputChannel.appendLine("|                                                                           |");
+    outputChannel.appendLine("|   Ooops! Wake LSP crashed, please report the issue to our GitHub:         |");
+    outputChannel.appendLine("|   https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/issues    |");
+    outputChannel.appendLine("|                                                                           |");
+    outputChannel.appendLine("≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡")
 }
 
 export class Log{
