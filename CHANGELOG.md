@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.11.4]
+- Detections UI - Sorting/filtering indicators, state persistence (workspace scoped)
+- Wake LSP crashlog
+
 ## [1.11.3]
 - Fixed language server crashes caused by `distutils` not being available in Python 3.12
 
