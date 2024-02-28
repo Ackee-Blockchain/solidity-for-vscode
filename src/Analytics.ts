@@ -40,8 +40,10 @@ export class Analytics{
                     name: name,
                     params: {
                         session_id: this.session_id,
+                        version: this.context.extension.packageJSON.version as string,
+                        platform: process.platform.toString(),
                         engagement_time_msec: 1
-                    },
+                    }
                 }]
             })
         });
@@ -50,5 +52,10 @@ export class Analytics{
 
 export enum EventType{
     ACTIVATE = "activate",
-    MIGRATE = "migrate"
+    MIGRATE = "migrate",
+    ERROR_WAKE_INSTALL_PIPX = "error_wake_install_pipx",
+    ERROR_WAKE_INSTALL_PIP = "error_wake_install_pip",
+    ERROR_WAKE_VERSION = "error_wake_version",
+    ERROR_WAKE_CRASH = "error_wake_crash",
+    ERROR_WAKE_RESTART_CONNECTION = "error_wake_restart_connection"
 }
