@@ -321,9 +321,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
         outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}'`);
         if (cwd === undefined) {
-            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort),], { shell: true, env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
+            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort),], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
         } else {
-            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort)], { cwd, shell: true, env: { ...process.env, PYTHONIOENCODING: 'utf8' }});
+            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort)], { cwd, shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' }});
         }
         wakeProcess.stderr?.on('data', (chunk) => {
             crashlog.push(chunk);
