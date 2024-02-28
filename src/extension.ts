@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as net from 'net';
-import {Analytics} from './Analytics'
+import { Analytics, EventType } from './Analytics'
 
 import {
     LanguageClient,
@@ -99,6 +99,7 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
             return true;
         } catch(err) {
             if (err instanceof Error) {
+                analytics.logEvent(EventType.ERROR_WAKE_INSTALL_PIP);
                 outputChannel.appendLine("Failed to install PyPi package 'eth-wake':");
                 outputChannel.appendLine(err.toString());
             }
@@ -265,6 +266,7 @@ export async function activate(context: vscode.ExtensionContext) {
                         await pipxUpgrade(outputChannel);
                     }
                 } catch(err) {
+                    analytics.logEvent(EventType.ERROR_WAKE_INSTALL_PIPX);
                     if (err instanceof Error) {
                         outputChannel.appendLine(err.toString());
                     }
@@ -305,6 +307,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 return;
             }
         } catch(err) {
+            analytics.logEvent(EventType.ERROR_WAKE_VERSION);
             if (err instanceof Error) {
                 outputChannel.appendLine(err.toString());
             }
@@ -338,6 +341,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         });
         wakeProcess.on('exit', () => {
+            analytics.logEvent(EventType.ERROR_WAKE_CRASH);
             printCrashlog(outputChannel);
             wakeProcess = undefined;
         });
@@ -379,7 +383,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     client = new LanguageClient("Tools-for-Solidity", "Tools for Solidity", serverOptions, clientOptions);
 
-    client.onProgress
     diagnosticCollection = vscode.languages.createDiagnosticCollection('Wake')
 
     client.onNotification("textDocument/publishDiagnostics", (params) => {
@@ -387,7 +390,6 @@ export async function activate(context: vscode.ExtensionContext) {
         let diag = params as DiagnosticNotification;
         onNotification(outputChannel, diag);
     });
-
 
     vscode.window.registerTreeDataProvider('wake-detections', wakeProvider);
     vscode.window.registerTreeDataProvider('solc-detections', solcProvider);
