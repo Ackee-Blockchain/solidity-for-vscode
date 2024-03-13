@@ -43,7 +43,7 @@ let errorHandler: ClientErrorHandler;
 let crashlog: string[] = [];
 //export let log: Log
 
-const WAKE_TARGET_VERSION = "4.3.2";
+const WAKE_TARGET_VERSION = "4.6.0";
 const WAKE_PRERELEASE = false;
 const CRASHLOG_LIMIT = 1000;
 
@@ -304,11 +304,12 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     if (!wakePort) {
+        let wakeVersion: string
         try {
-            const version: string = getWakeVersion(pathToExecutable, cwd);
-            if (compare(version, WAKE_TARGET_VERSION) < 0) {
+            wakeVersion = getWakeVersion(pathToExecutable, cwd);
+            if (compare(wakeVersion, WAKE_TARGET_VERSION) < 0) {
                 analytics.logEvent(EventType.ERROR_WAKE_VERSION);
-                outputChannel.appendLine(`PyPi package 'eth-wake' in version ${version} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`);
+                outputChannel.appendLine(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`);
                 return;
             }
         } catch(err) {
@@ -327,7 +328,7 @@ export async function activate(context: vscode.ExtensionContext) {
             wakePath = path.join(cwd, "wake");
         }
 
-        outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}'`);
+        outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (${wakeVersion})`);
         if (cwd === undefined) {
             wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort),], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
         } else {
