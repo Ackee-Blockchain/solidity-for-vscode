@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.11.5]
+- Improved error handling
+- Fixed Wake stdout buffer overflow
+
 ## [1.11.4]
 - Detections UI - Sorting/filtering indicators, state persistence (workspace scoped)
 - Wake LSP crashlog
