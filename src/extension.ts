@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as net from 'net';
-import {Analytics} from './Analytics'
+import { Analytics, EventType } from './Analytics'
 
 import {
     LanguageClient,
@@ -12,6 +12,7 @@ import {
     integer,
     Diagnostic,
     ProgressType,
+    ErrorHandler,
 } from 'vscode-languageclient/node';
 
 import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler, newDetector, newPrinter } from './commands';
@@ -30,6 +31,7 @@ import { Detector, WakeDetection } from './detections/model/WakeDetection';
 import { convertDiagnostics } from './detections/util'
 import { DetectorItem } from './detections/model/DetectorItem';
 import { ClientMiddleware } from './ClientMiddleware';
+import { ClientErrorHandler } from './ClientErrorHandler';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ChildProcess | undefined = undefined;
@@ -37,10 +39,11 @@ let wakeProvider: WakeTreeDataProvider | undefined = undefined;
 let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
 let analytics: Analytics;
+let errorHandler: ClientErrorHandler;
 let crashlog: string[] = [];
 //export let log: Log
 
-const WAKE_TARGET_VERSION = "4.3.2";
+const WAKE_TARGET_VERSION = "4.6.0";
 const WAKE_PRERELEASE = false;
 const CRASHLOG_LIMIT = 1000;
 
@@ -99,6 +102,7 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
             return true;
         } catch(err) {
             if (err instanceof Error) {
+                analytics.logEvent(EventType.ERROR_WAKE_INSTALL_PIP);
                 outputChannel.appendLine("Failed to install PyPi package 'eth-wake':");
                 outputChannel.appendLine(err.toString());
             }
@@ -223,6 +227,7 @@ export async function activate(context: vscode.ExtensionContext) {
     analytics = new Analytics(context);
     const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
     outputChannel.show(true);
+    errorHandler = new ClientErrorHandler(outputChannel, analytics);
 
     migrateConfig();
 
@@ -265,6 +270,7 @@ export async function activate(context: vscode.ExtensionContext) {
                         await pipxUpgrade(outputChannel);
                     }
                 } catch(err) {
+                    analytics.logEvent(EventType.ERROR_WAKE_INSTALL_PIPX);
                     if (err instanceof Error) {
                         outputChannel.appendLine(err.toString());
                     }
@@ -298,13 +304,16 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     if (!wakePort) {
+        let wakeVersion: string
         try {
-            const version: string = getWakeVersion(pathToExecutable, cwd);
-            if (compare(version, WAKE_TARGET_VERSION) < 0) {
-                outputChannel.appendLine(`PyPi package 'eth-wake' in version ${version} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`);
+            wakeVersion = getWakeVersion(pathToExecutable, cwd);
+            if (compare(wakeVersion, WAKE_TARGET_VERSION) < 0) {
+                analytics.logEvent(EventType.ERROR_WAKE_VERSION);
+                outputChannel.appendLine(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`);
                 return;
             }
         } catch(err) {
+            analytics.logEvent(EventType.ERROR_WAKE_VERSION_UNKNOWN);
             if (err instanceof Error) {
                 outputChannel.appendLine(err.toString());
             }
@@ -319,7 +328,7 @@ export async function activate(context: vscode.ExtensionContext) {
             wakePath = path.join(cwd, "wake");
         }
 
-        outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}'`);
+        outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (${wakeVersion})`);
         if (cwd === undefined) {
             wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort),], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
         } else {
@@ -338,6 +347,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         });
         wakeProcess.on('exit', () => {
+            analytics.logEvent(EventType.ERROR_WAKE_CRASH);
             printCrashlog(outputChannel);
             wakeProcess = undefined;
         });
@@ -374,12 +384,13 @@ export async function activate(context: vscode.ExtensionContext) {
         initializationOptions: {
             toolsForSolidityVersion: context.extension.packageJSON.version
         },
-        middleware: new ClientMiddleware(outputChannel)
+        middleware: new ClientMiddleware(outputChannel),
+        errorHandler: errorHandler
     };
 
     client = new LanguageClient("Tools-for-Solidity", "Tools for Solidity", serverOptions, clientOptions);
+    errorHandler.setClient(client);
 
-    client.onProgress
     diagnosticCollection = vscode.languages.createDiagnosticCollection('Wake')
 
     client.onNotification("textDocument/publishDiagnostics", (params) => {
@@ -387,7 +398,6 @@ export async function activate(context: vscode.ExtensionContext) {
         let diag = params as DiagnosticNotification;
         onNotification(outputChannel, diag);
     });
-
 
     vscode.window.registerTreeDataProvider('wake-detections', wakeProvider);
     vscode.window.registerTreeDataProvider('solc-detections', solcProvider);
