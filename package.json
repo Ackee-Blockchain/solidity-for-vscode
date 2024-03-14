@@ -519,7 +519,6 @@
                 "command": "Tools-for-Solidity.detections.filter.confidence.low_selected",
                 "title": "◉ Confidence: All"
             }
-
         ],
         "viewsContainers": {
             "activitybar": [
@@ -736,6 +735,7 @@
     },
     "dependencies": {
         "@renovatebot/pep440": "^2.0.0",
+        "execa": "^8.0.1",
         "get-port": "<6.0.0",
         "node-fetch": "^3.3.2",
         "vscode-languageclient": "^8.0.1",
