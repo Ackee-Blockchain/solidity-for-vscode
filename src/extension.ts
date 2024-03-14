@@ -23,7 +23,6 @@ const path = require('node:path');
 import getPort = require('get-port');
 import waitPort = require('wait-port');
 import { compare } from '@renovatebot/pep440';
-import { ChildProcess, execFileSync, spawn } from 'child_process';
 import { GroupBy, Impact, Confidence } from "./detections/WakeTreeDataProvider";
 import { SolcTreeDataProvider } from './detections/SolcTreeDataProvider';
 import { WakeTreeDataProvider } from './detections/WakeTreeDataProvider';
@@ -32,9 +31,10 @@ import { convertDiagnostics } from './detections/util'
 import { DetectorItem } from './detections/model/DetectorItem';
 import { ClientMiddleware } from './ClientMiddleware';
 import { ClientErrorHandler } from './ClientErrorHandler';
+import { ExecaChildProcess, execa, execaSync } from 'execa';
 
 let client: LanguageClient | undefined = undefined;
-let wakeProcess: ChildProcess | undefined = undefined;
+let wakeProcess: ExecaChildProcess | undefined = undefined;
 let wakeProvider: WakeTreeDataProvider | undefined = undefined;
 let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection
@@ -76,10 +76,10 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
         let out;
         if (WAKE_PRERELEASE) {
             outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --pre'`);
-            out = execFileSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre"]).toString("utf8");
+            out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre"]).stdout;
         } else {
             outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U'`);
-            out = execFileSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U"]).toString("utf8");
+            out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U"]).stdout;
         }
         outputChannel.appendLine(out);
         return true;
@@ -93,10 +93,10 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
             let out;
             if (WAKE_PRERELEASE) {
                 outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --pre --user'`);
-                out = execFileSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre", "--user"]).toString("utf8");
+                out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre", "--user"]).stdout;
             } else {
                 outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --user'`);
-                out = execFileSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--user"]).toString("utf8");
+                out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--user"]).stdout;
             }
             outputChannel.appendLine(out);
             return true;
@@ -113,13 +113,13 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
 
 function getWakeVersion(pathToExecutable: string|null, cwd?: string): string {
     if (pathToExecutable) {
-        return execFileSync(pathToExecutable, ["--version"]).toString("utf8").trim();
+        return execaSync(pathToExecutable, ["--version"]).stdout.trim();
     }
     if (cwd === undefined) {
-        return execFileSync("wake", ["--version"]).toString("utf8").trim();
+        return execaSync("wake", ["--version"]).stdout.trim();
     }
     else {
-        return execFileSync("./wake", ["--version"], {"cwd": cwd}).toString("utf8").trim();
+        return execaSync("./wake", ["--version"], {"cwd": cwd}).stdout.trim();
     }
 }
 
@@ -146,7 +146,7 @@ async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable
     let cwd: string|undefined = undefined;
 
     if (!installed) {
-        const globalPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).toString("utf8").trim();
+        const globalPackages = execaSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).stdout.trim();
         installed = await checkWakeInstalled(outputChannel, globalPackages);
         if (installed) {
             outputChannel.appendLine(`Consider adding '${globalPackages}' to your PATH environment variable.`);
@@ -154,7 +154,7 @@ async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable
         }
     }
     if (!installed) {
-        const userPackages = execFileSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).toString("utf8").trim();
+        const userPackages = execaSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).stdout.trim();
         installed = await checkWakeInstalled(outputChannel, userPackages);
         if (installed) {
             outputChannel.appendLine(`Consider adding '${userPackages}' to your PATH environment variable.`);
@@ -170,7 +170,7 @@ async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable
 
 function findPython(outputChannel: vscode.OutputChannel): string {
     try {
-        const pythonVersion = execFileSync("python3", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).toString("utf8").trim();
+        const pythonVersion = execaSync("python3", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).stdout.trim();
 
         if (compare(pythonVersion, "3.7.0") < 0) {
             outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
@@ -179,7 +179,7 @@ function findPython(outputChannel: vscode.OutputChannel): string {
         return "python3";
     } catch(err) {
         try {
-            const pythonVersion = execFileSync("python", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).toString("utf8").trim();
+            const pythonVersion = execaSync("python", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).stdout.trim();
 
             if (compare(pythonVersion, "3.7.0") < 0) {
                 outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
@@ -197,10 +197,10 @@ async function pipxInstall(outputChannel: vscode.OutputChannel): Promise<void> {
     let out: string = "";
     if (WAKE_PRERELEASE) {
         outputChannel.appendLine(`Running 'pipx install --pip-args=--pre eth-wake'`);
-        out = execFileSync("pipx", ["install", "--pip-args=--pre", "eth-wake"]).toString("utf8");
+        out = execaSync("pipx", ["install", "--pip-args=--pre", "eth-wake"]).stdout;
     } else {
         outputChannel.appendLine(`Running 'pipx install eth-wake'`);
-        out = execFileSync("pipx", ["install", "eth-wake"]).toString("utf8");
+        out = execaSync("pipx", ["install", "eth-wake"]).stdout;
     }
     if (out.trim().length > 0) {
         outputChannel.appendLine(out);
@@ -211,10 +211,10 @@ async function pipxUpgrade(outputChannel: vscode.OutputChannel): Promise<void> {
     let out: string = "";
     if (WAKE_PRERELEASE) {
         outputChannel.appendLine(`Running 'pipx upgrade --pip-args=--pre eth-wake'`);
-        out = execFileSync("pipx", ["upgrade", "--pip-args=--pre", "eth-wake"]).toString("utf8");
+        out = execaSync("pipx", ["upgrade", "--pip-args=--pre", "eth-wake"]).stdout;
     } else {
         outputChannel.appendLine(`Running 'pipx upgrade eth-wake'`);
-        out = execFileSync("pipx", ["upgrade", "eth-wake"]).toString("utf8");
+        out = execaSync("pipx", ["upgrade", "eth-wake"]).stdout;
     }
     if (out.trim().length > 0) {
         outputChannel.appendLine(out);
@@ -246,7 +246,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (usePipx) {
             let pipxList;
             try {
-                pipxList = JSON.parse(execFileSync("pipx", ["list", "--json"]).toString("utf8").trim());
+                pipxList = JSON.parse(execaSync("pipx", ["list", "--json"]).stdout.trim());
             } catch(err) {
                 usePipx = false;
             }
@@ -255,11 +255,11 @@ export async function activate(context: vscode.ExtensionContext) {
                 try {
                     if (!("eth-wake" in pipxList.venvs)) {
                         await pipxInstall(outputChannel);
-                        pipxList = JSON.parse(execFileSync("pipx", ["list", "--json"]).toString("utf8").trim());
+                        pipxList = JSON.parse(execaSync("pipx", ["list", "--json"]).stdout.trim());
                     }
 
                     for (const appPath of pipxList.venvs["eth-wake"].metadata.main_package.app_paths) {
-                        if (appPath.__Path__.endsWith("wake")) {
+                        if (path.parse(appPath.__Path__).name === "wake") {
                             pathToExecutable = appPath.__Path__;
                             break;
                         }
@@ -323,16 +323,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
         wakePort = await getPort();
 
-        let wakePath: string = pathToExecutable ?? "wake";
-        if (!pathToExecutable && cwd !== undefined) {
-            wakePath = path.join(cwd, "wake");
+        if (pathToExecutable !== null) {
+            cwd = path.dirname(pathToExecutable);
         }
+
+        const wakePath: string = cwd ? path.join(cwd, "wake") : "wake";
 
         outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (${wakeVersion})`);
         if (cwd === undefined) {
-            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort),], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
+            wakeProcess = execa('wake', ["lsp", "--port", String(wakePort)], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
         } else {
-            wakeProcess = spawn(wakePath, ["lsp", "--port", String(wakePort)], { cwd, shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' }});
+            const cmd = process.platform === "win32" ? "wake" : "./wake";
+            wakeProcess = execa(cmd, ["lsp", "--port", String(wakePort)], { cwd, shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' }});
         }
         wakeProcess.stderr?.on('data', (chunk) => {
             crashlog.push(chunk);
