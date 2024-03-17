@@ -333,7 +333,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (cwd === undefined) {
             wakeProcess = execa('wake', ["lsp", "--port", String(wakePort)], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
         } else {
-            const cmd = process.platform === "win32" ? "wake" : "./wake";
+            const cmd = process.platform === "win32" ? ".\\wake" : "./wake";
             wakeProcess = execa(cmd, ["lsp", "--port", String(wakePort)], { cwd, shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' }});
         }
         wakeProcess.stderr?.on('data', (chunk) => {
