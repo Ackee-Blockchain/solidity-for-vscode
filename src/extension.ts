@@ -19,6 +19,7 @@ import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, ge
 import { hideCoverageCallback, initCoverage, showCoverageCallback } from './coverage';
 
 const path = require('node:path');
+const fs = require('fs');
 
 import getPort = require('get-port');
 import waitPort = require('wait-port');
@@ -41,6 +42,9 @@ let diagnosticCollection: vscode.DiagnosticCollection
 let analytics: Analytics;
 let errorHandler: ClientErrorHandler;
 let crashlog: string[] = [];
+let venvPath: string;
+let venvActivateCommand: string;
+
 //export let log: Log
 
 const WAKE_TARGET_VERSION = "4.6.0";
@@ -102,18 +106,46 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
             return true;
         } catch(err) {
             if (err instanceof Error) {
-                analytics.logEvent(EventType.ERROR_WAKE_INSTALL_PIP);
                 outputChannel.appendLine("Failed to install PyPi package 'eth-wake':");
                 outputChannel.appendLine(err.toString());
             }
-            return false;
+
+            try {
+                if (!fs.existsSync(venvPath)) {
+                    outputChannel.appendLine(`Running '${pythonExecutable} -m venv ${venvPath}'`);
+                    execaSync(pythonExecutable, ["-m", "venv", venvPath]);
+                }
+
+                let out;
+                if (WAKE_PRERELEASE) {
+                    outputChannel.appendLine(`Running '${venvActivateCommand} && pip install eth-wake -U --pre'`);
+                    out = execaSync(`${venvActivateCommand} && pip install eth-wake -U --pre`, { shell: true }).stdout;
+                } else {
+                    outputChannel.appendLine(`Running '${venvActivateCommand} && pip install eth-wake -U'`);
+                    out = execaSync(`${venvActivateCommand} && pip install eth-wake -U`, { shell: true }).stdout;
+                }
+                outputChannel.appendLine(out);
+                return true;
+            } catch(err) {
+                analytics.logEvent(EventType.ERROR_WAKE_INSTALL_PIP);
+
+                if (err instanceof Error) {
+                    outputChannel.appendLine("Failed to install PyPi package 'eth-wake' into venv:");
+                    outputChannel.appendLine(err.toString());
+                }
+
+                return false;
+            }
         }
     }
 }
 
-function getWakeVersion(pathToExecutable: string|null, cwd?: string): string {
+function getWakeVersion(pathToExecutable: string|null, venv: boolean, cwd?: string): string {
     if (pathToExecutable) {
         return execaSync(pathToExecutable, ["--version"]).stdout.trim();
+    }
+    if (venv) {
+        return execaSync(`${venvActivateCommand} && wake --version`, { shell: true }).stdout.trim();
     }
     if (cwd === undefined) {
         return execaSync("wake", ["--version"]).stdout.trim();
@@ -123,9 +155,9 @@ function getWakeVersion(pathToExecutable: string|null, cwd?: string): string {
     }
 }
 
-async function checkWakeInstalled(outputChannel: vscode.OutputChannel, cwd?: string): Promise<boolean> {
+async function checkWakeInstalled(outputChannel: vscode.OutputChannel, venv: boolean, cwd?: string): Promise<boolean> {
     try {
-        const version: string = getWakeVersion(null, cwd);
+        const version: string = getWakeVersion(null, venv, cwd);
 
         if (compare(version, WAKE_TARGET_VERSION) < 0) {
             if (cwd === undefined) {
@@ -141,13 +173,14 @@ async function checkWakeInstalled(outputChannel: vscode.OutputChannel, cwd?: str
     }
 }
 
-async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<string|boolean|undefined> {
-    let installed: boolean = await checkWakeInstalled(outputChannel);
+async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<[boolean, boolean, string|undefined]> {
+    let installed: boolean = await checkWakeInstalled(outputChannel, false);
+    let venv: boolean = false;
     let cwd: string|undefined = undefined;
 
     if (!installed) {
         const globalPackages = execaSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).stdout.trim();
-        installed = await checkWakeInstalled(outputChannel, globalPackages);
+        installed = await checkWakeInstalled(outputChannel, false, globalPackages);
         if (installed) {
             outputChannel.appendLine(`Consider adding '${globalPackages}' to your PATH environment variable.`);
             cwd = globalPackages;
@@ -155,17 +188,20 @@ async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable
     }
     if (!installed) {
         const userPackages = execaSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).stdout.trim();
-        installed = await checkWakeInstalled(outputChannel, userPackages);
+        installed = await checkWakeInstalled(outputChannel, false, userPackages);
         if (installed) {
             outputChannel.appendLine(`Consider adding '${userPackages}' to your PATH environment variable.`);
             cwd = userPackages;
         }
     }
-    if (!installed) {
-        return false;
+    if (!installed && fs.existsSync(venvPath)) {
+        installed = await checkWakeInstalled(outputChannel, true);
+        if (installed) {
+            venv = true;
+        }
     }
 
-    return cwd;
+    return [installed, venv, cwd];
 }
 
 function findPython(outputChannel: vscode.OutputChannel): string {
@@ -228,6 +264,12 @@ export async function activate(context: vscode.ExtensionContext) {
     const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
     outputChannel.show(true);
     errorHandler = new ClientErrorHandler(outputChannel, analytics);
+    venvPath = path.join(context.globalStorageUri.fsPath, "venv");
+    if (process.platform === "win32") {
+        venvActivateCommand = path.join(venvPath, "Scripts", "activate.bat");
+    } else {
+        venvActivateCommand = "source " + path.join(venvPath, "bin", "activate");
+    }
 
     migrateConfig();
 
@@ -240,6 +282,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
     let wakePort: number|undefined = extensionConfig.get('Wake.port', undefined);
     let installed: boolean = false;
+    let venv: boolean = false;
     let cwd: string|undefined = undefined;
 
     if (autoInstall && !pathToExecutable && !wakePort) {
@@ -264,7 +307,7 @@ export async function activate(context: vscode.ExtensionContext) {
                             break;
                         }
                     }
-                    const version: string = getWakeVersion(pathToExecutable, cwd);
+                    const version: string = getWakeVersion(pathToExecutable, false, cwd);
                     if (compare(version, WAKE_TARGET_VERSION) < 0) {
                         outputChannel.appendLine(`Found 'eth-wake' in version ${version} in ${pathToExecutable} but the target minimal version is ${WAKE_TARGET_VERSION}.`);
                         await pipxUpgrade(outputChannel);
@@ -282,23 +325,18 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!usePipx) {
             const pythonExecutable = findPython(outputChannel);
 
-            let result: string|boolean|undefined = await findWakeDir(outputChannel, pythonExecutable);
-            if (result === false || result === true) {
+            [installed, venv, cwd] = await findWakeDir(outputChannel, pythonExecutable);
+            if (!installed) {
                 outputChannel.appendLine("Installing PyPi package 'eth-wake'.");
                 installed = await installWake(outputChannel, pythonExecutable);
 
                 if (installed) {
-                    result = await findWakeDir(outputChannel, pythonExecutable);
+                    [installed, venv, cwd] = await findWakeDir(outputChannel, pythonExecutable);
 
-                    if (result === false || result === true) {
+                    if (!installed) {
                         outputChannel.appendLine("'eth-wake' installed but cannot be found in PATH or pip site-packages.");
                     }
-                    else {
-                        cwd = result;
-                    }
                 }
-            } else {
-                cwd = result;
             }
         }
     }
@@ -306,7 +344,7 @@ export async function activate(context: vscode.ExtensionContext) {
     if (!wakePort) {
         let wakeVersion: string
         try {
-            wakeVersion = getWakeVersion(pathToExecutable, cwd);
+            wakeVersion = getWakeVersion(pathToExecutable, venv, cwd);
             if (compare(wakeVersion, WAKE_TARGET_VERSION) < 0) {
                 analytics.logEvent(EventType.ERROR_WAKE_VERSION);
                 outputChannel.appendLine(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`);
@@ -329,10 +367,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
         const wakePath: string = cwd ? path.join(cwd, "wake") : "wake";
 
-        outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (${wakeVersion})`);
-        if (cwd === undefined) {
+        if (venv) {
+            outputChannel.appendLine(`Running '${venvActivateCommand} && wake lsp --port ${wakePort}' (v${wakeVersion})`);
+            wakeProcess = execa(`${venvActivateCommand} && wake lsp --port ${wakePort}`, { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
+        }
+        else if (cwd === undefined) {
+            outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (v${wakeVersion})`);
             wakeProcess = execa('wake', ["lsp", "--port", String(wakePort)], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
         } else {
+            outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (v${wakeVersion})`);
             const cmd = process.platform === "win32" ? ".\\wake" : "./wake";
             wakeProcess = execa(cmd, ["lsp", "--port", String(wakePort)], { cwd, shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' }});
         }
