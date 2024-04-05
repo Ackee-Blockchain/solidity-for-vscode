@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.12.0]
+- Implemented the initial set of LSP callback features
+- Implemented new `eth-wake` installation method (installation into venv) as a fallback
+- Fixed language server crashes caused by Wake config changes
+
 ## [1.11.5]
 - Improved error handling
 - Fixed Wake stdout buffer overflow
