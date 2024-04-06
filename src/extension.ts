@@ -232,6 +232,8 @@ export async function activate(context: vscode.ExtensionContext) {
     let installed: boolean = false;
     let cwd: string|undefined = undefined;
 
+    let solcIgnoredWarnings = extensionConfig.get<Array<integer|string>>('Wake.compiler.solc.ignoredWarnings', []);
+
     if (autoInstall && !pathToExecutable && !wakePort) {
         if (usePipx) {
             let pipxList;
@@ -371,6 +373,18 @@ export async function activate(context: vscode.ExtensionContext) {
     client.onNotification("textDocument/publishDiagnostics", (params) => {
         //outputChannel.appendLine(JSON.stringify(params));
         let diag = params as DiagnosticNotification;
+
+        // Do not show ignored warnings
+        diag.diagnostics = diag.diagnostics.filter((item) => {
+            if (
+                item.code &&
+                item.source === "Wake(solc)" &&
+                solcIgnoredWarnings.includes(Number.parseInt(item.code as string))
+            ) {
+                return false;
+            }
+            return true;
+        });
         onNotification(outputChannel, diag);
     });
 
