@@ -86,6 +86,14 @@
                     "Tools-for-Solidity.Wake.port": {
                         "type": "integer",
                         "description": "Port on which Wake is listening. Overrides both Tools-for-Solidity.Wake.autoInstall and Tools-for-Solidity.Wake.pathToExecutable."
+                    },
+                    "Tools-for-Solidity.Wake.compiler.solc.ignoredWarnings": {
+                        "type": "array",
+                        "items": {
+                            "type": ["integer", "string"]
+                        },
+                        "default": [],
+                        "description": "Ignore warnings with these codes from the solc compiler"
                     }
                 }
             },
