@@ -1,4 +1,4 @@
-import * as env from './env';
+import * as env from './env.example';
 import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 import { randomUUID } from 'crypto';
@@ -47,6 +47,17 @@ export class Analytics{
                 }]
             })
         });
+    }
+
+    logCrash(event: EventType, error: any) {
+        vscode.window.showInformationMessage("Thank you for your feedback!");
+    }
+
+    async askCrashReport(event: EventType, error: any) {
+        const allowedFeedback = await vscode.window.showErrorMessage("Wake has crashed. Would you like to provide feedback?", "Yes", "No");
+        if (allowedFeedback === "Yes") {
+            this.logCrash(event, error);
+        }
     }
 }
 

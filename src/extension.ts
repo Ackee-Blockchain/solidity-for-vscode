@@ -131,10 +131,12 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
                 return true;
             } catch(err) {
                 analytics.logEvent(EventType.ERROR_WAKE_INSTALL_PIP);
+                analytics.askCrashReport(EventType.ERROR_WAKE_INSTALL_PIP, err);
 
                 if (err instanceof Error) {
                     outputChannel.appendLine("Failed to install PyPi package 'eth-wake' into venv:");
                     outputChannel.appendLine(err.toString());
+                    outputChannel.show(true);
                 }
 
                 return false;
@@ -274,6 +276,8 @@ export async function activate(context: vscode.ExtensionContext) {
         venvActivateCommand = "source " + path.join(venvPath, "bin", "activate");
     }
 
+    
+
     migrateConfig();
 
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
@@ -289,6 +293,15 @@ export async function activate(context: vscode.ExtensionContext) {
     let cwd: string|undefined = undefined;
 
     let solcIgnoredWarnings = extensionConfig.get<Array<integer|string>>('Wake.compiler.solc.ignoredWarnings', []);
+
+    // sample error
+    // try {
+    //     throw new Error("Sample error");
+    // } catch(err) {
+    //     outputChannel.appendLine("Sample error");
+    //     outputChannel.show(true);
+    //     analytics.askCrashReport(EventType.ERROR_WAKE_CRASH, err);
+    // }
 
     if (autoInstall && !pathToExecutable && !wakePort) {
         if (usePipx) {
@@ -319,8 +332,11 @@ export async function activate(context: vscode.ExtensionContext) {
                     }
                 } catch(err) {
                     analytics.logEvent(EventType.ERROR_WAKE_INSTALL_PIPX);
+                    analytics.askCrashReport(EventType.ERROR_WAKE_INSTALL_PIPX, err);
+                    vscode.window
                     if (err instanceof Error) {
                         outputChannel.appendLine(err.toString());
+                        outputChannel.show(true);
                     }
                     return;
                 }
@@ -352,13 +368,20 @@ export async function activate(context: vscode.ExtensionContext) {
             wakeVersion = getWakeVersion(pathToExecutable, venv, cwd);
             if (compare(wakeVersion, WAKE_TARGET_VERSION) < 0) {
                 analytics.logEvent(EventType.ERROR_WAKE_VERSION);
+                analytics.askCrashReport(
+                    EventType.ERROR_WAKE_VERSION, 
+                    new Error(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}.`)
+                );
                 outputChannel.appendLine(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`);
+                outputChannel.show(true);
                 return;
             }
         } catch(err) {
             analytics.logEvent(EventType.ERROR_WAKE_VERSION_UNKNOWN);
+            analytics.askCrashReport(EventType.ERROR_WAKE_VERSION_UNKNOWN, err);
             if (err instanceof Error) {
                 outputChannel.appendLine(err.toString());
+                outputChannel.show(true);
             }
             outputChannel.appendLine(`Unable to determine the version of 'eth-wake' PyPi package.`);
             return;
@@ -398,6 +421,7 @@ export async function activate(context: vscode.ExtensionContext) {
         });
         wakeProcess.on('exit', () => {
             analytics.logEvent(EventType.ERROR_WAKE_CRASH);
+            analytics.askCrashReport(EventType.ERROR_WAKE_CRASH, new Error("Wake LSP crashed"));
             printCrashlog(outputChannel);
             wakeProcess = undefined;
         });
@@ -628,6 +652,15 @@ function printCrashlog(outputChannel : vscode.OutputChannel){
     outputChannel.appendLine("|                                                                           |");
     outputChannel.appendLine("≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡")
 }
+
+// Log a crash event and ask the user to report it
+// function logCrash(error: Error, message: string, event: EventType, outputChannel: vscode.OutputChannel) {
+//     outputChannel.appendLine(message);
+//     outputChannel.show(true);
+
+//     analytics.logEvent(event);
+//     analytics.askCrashReport(event, error);
+// }
 
 export class Log{
 
