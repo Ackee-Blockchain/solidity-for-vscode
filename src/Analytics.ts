@@ -3,6 +3,9 @@ import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 import { randomUUID } from 'crypto';
 
+
+const didAllowFeedbackKey = "didAllowFeedback";
+
 export class Analytics{
 
     context : vscode.ExtensionContext
@@ -50,15 +53,39 @@ export class Analytics{
     }
 
     logCrash(event: EventType, error: any) {
-        vscode.window.showInformationMessage("Thank you for your feedback!");
+        // should not show a message to the user
+        // just a testing placeholder
+        // vscode.window.showInformationMessage("Thank you for your feedback!");
     }
 
     async askCrashReport(event: EventType, error: any) {
-        const allowedFeedback = await vscode.window.showErrorMessage("Wake has crashed. Would you like to provide feedback?", "Yes", "No");
-        if (allowedFeedback === "Yes") {
+        const didAllowFeedback = await this.context.globalState.get(didAllowFeedbackKey);
+        if (didAllowFeedback === UserAnalyticsPreference.NEVER) {
+            return;
+        }
+
+        if (didAllowFeedback === UserAnalyticsPreference.ALWAYS) {
+            this.logCrash(event, error);
+            return;
+        }
+
+        const allowedFeedback = await vscode.window.showErrorMessage("Wake has crashed. Would you like to provide feedback?", 
+            UserAnalyticsPreference.YES, UserAnalyticsPreference.ALWAYS, UserAnalyticsPreference.NEVER); 
+
+        if (allowedFeedback === UserAnalyticsPreference.ALWAYS || allowedFeedback === UserAnalyticsPreference.NEVER) {
+            this.context.globalState.update(didAllowFeedbackKey, allowedFeedback);
+        }
+
+        if (allowedFeedback === UserAnalyticsPreference.YES || allowedFeedback === UserAnalyticsPreference.ALWAYS) {
             this.logCrash(event, error);
         }
     }
+}
+
+enum UserAnalyticsPreference {
+    YES = "Yes",
+    ALWAYS = "Always",
+    NEVER = "Never"
 }
 
 export enum EventType{
