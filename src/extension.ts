@@ -368,10 +368,11 @@ export async function activate(context: vscode.ExtensionContext) {
             wakeVersion = getWakeVersion(pathToExecutable, venv, cwd);
             if (compare(wakeVersion, WAKE_TARGET_VERSION) < 0) {
                 analytics.logEvent(EventType.ERROR_WAKE_VERSION);
-                analytics.askCrashReport(
-                    EventType.ERROR_WAKE_VERSION, 
-                    new Error(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}.`)
-                );
+                // TODO: remove?
+                // analytics.askCrashReport(
+                //     EventType.ERROR_WAKE_VERSION, 
+                //     new Error(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}.`)
+                // );
                 outputChannel.appendLine(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`);
                 outputChannel.show(true);
                 return;
