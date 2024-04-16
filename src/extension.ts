@@ -3,6 +3,9 @@
 import * as vscode from 'vscode';
 import * as net from 'net';
 import { Analytics, EventType } from './Analytics'
+import TelemetryReporter from '@vscode/extension-telemetry';
+
+const telemetryKey = '2c1373f6-b323-4cdb-9b41-3e5251c1f57d';
 
 import {
     LanguageClient,
@@ -131,7 +134,7 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
                 return true;
             } catch(err) {
                 analytics.logEvent(EventType.ERROR_WAKE_INSTALL_PIP);
-                analytics.askCrashReport(EventType.ERROR_WAKE_INSTALL_PIP, err);
+                analytics.logCrash(EventType.ERROR_WAKE_INSTALL_PIP, err);
 
                 if (err instanceof Error) {
                     outputChannel.appendLine("Failed to install PyPi package 'eth-wake' into venv:");
@@ -270,6 +273,7 @@ export async function activate(context: vscode.ExtensionContext) {
     outputChannel.show(true);
     errorHandler = new ClientErrorHandler(outputChannel, analytics);
     venvPath = path.join(context.globalStorageUri.fsPath, "venv");
+    
     if (process.platform === "win32") {
         venvActivateCommand = path.join(venvPath, "Scripts", "activate.bat");
     } else {
@@ -300,7 +304,7 @@ export async function activate(context: vscode.ExtensionContext) {
     } catch(err) {
         outputChannel.appendLine("Sample error");
         outputChannel.show(true);
-        analytics.askCrashReport(EventType.ERROR_WAKE_CRASH, err);
+        analytics.logCrash(EventType.ERROR_WAKE_CRASH, err);
     }
 
     if (autoInstall && !pathToExecutable && !wakePort) {
@@ -332,7 +336,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     }
                 } catch(err) {
                     analytics.logEvent(EventType.ERROR_WAKE_INSTALL_PIPX);
-                    analytics.askCrashReport(EventType.ERROR_WAKE_INSTALL_PIPX, err);
+                    analytics.logCrash(EventType.ERROR_WAKE_INSTALL_PIPX, err);
                     vscode.window
                     if (err instanceof Error) {
                         outputChannel.appendLine(err.toString());
@@ -369,7 +373,7 @@ export async function activate(context: vscode.ExtensionContext) {
             if (compare(wakeVersion, WAKE_TARGET_VERSION) < 0) {
                 analytics.logEvent(EventType.ERROR_WAKE_VERSION);
                 // TODO: remove?
-                // analytics.askCrashReport(
+                // analytics.logCrash(
                 //     EventType.ERROR_WAKE_VERSION, 
                 //     new Error(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}.`)
                 // );
@@ -379,7 +383,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         } catch(err) {
             analytics.logEvent(EventType.ERROR_WAKE_VERSION_UNKNOWN);
-            analytics.askCrashReport(EventType.ERROR_WAKE_VERSION_UNKNOWN, err);
+            analytics.logCrash(EventType.ERROR_WAKE_VERSION_UNKNOWN, err);
             if (err instanceof Error) {
                 outputChannel.appendLine(err.toString());
                 outputChannel.show(true);
@@ -422,7 +426,7 @@ export async function activate(context: vscode.ExtensionContext) {
         });
         wakeProcess.on('exit', () => {
             analytics.logEvent(EventType.ERROR_WAKE_CRASH);
-            analytics.askCrashReport(EventType.ERROR_WAKE_CRASH, new Error("Wake LSP crashed"));
+            analytics.logCrash(EventType.ERROR_WAKE_CRASH, new Error("Wake LSP crashed"));
             printCrashlog(outputChannel);
             wakeProcess = undefined;
         });
@@ -653,15 +657,6 @@ function printCrashlog(outputChannel : vscode.OutputChannel){
     outputChannel.appendLine("|                                                                           |");
     outputChannel.appendLine("≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡")
 }
-
-// Log a crash event and ask the user to report it
-// function logCrash(error: Error, message: string, event: EventType, outputChannel: vscode.OutputChannel) {
-//     outputChannel.appendLine(message);
-//     outputChannel.show(true);
-
-//     analytics.logEvent(event);
-//     analytics.askCrashReport(event, error);
-// }
 
 export class Log{
 

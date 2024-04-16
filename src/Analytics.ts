@@ -2,17 +2,19 @@ import * as env from './env.example';
 import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 import { randomUUID } from 'crypto';
-
-
-const didAllowFeedbackKey = "didAllowFeedback";
+import TelemetryReporter from '@vscode/extension-telemetry';
 
 export class Analytics{
 
-    context : vscode.ExtensionContext
+    context : vscode.ExtensionContext;
+    reporter : TelemetryReporter;
     session_id : string = randomUUID();
 
     constructor(context: vscode.ExtensionContext){
         this.context = context;
+
+        this.reporter = new TelemetryReporter(env.TELEMETRY_KEY);
+        context.subscriptions.push(this.reporter);
     }
 
     getUuid(): string {
@@ -27,65 +29,39 @@ export class Analytics{
     }
 
     logActivate(){
-        this.logEvent(EventType.ACTIVATE)
+        this.logEvent(EventType.ACTIVATE);
     }
 
     logMigrate() {
-        this.logEvent(EventType.MIGRATE)
+        this.logEvent(EventType.MIGRATE);
     }
 
     logEvent(name: string) {
-        fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${env.GA_MEASUREMENT_ID}&api_secret=${env.GA_API_KEY}`, {
-            method: "POST",
-            body: JSON.stringify({
-                client_id: this.getUuid(),
-                events: [{
-                    name: name,
-                    params: {
-                        session_id: this.session_id,
-                        version: this.context.extension.packageJSON.version as string,
-                        platform: process.platform.toString(),
-                        engagement_time_msec: 1
-                    }
-                }]
-            })
-        });
+        this.reporter.sendTelemetryEvent(
+            name, 
+            {
+                'common.extname': this.context.extension.packageJSON.name as string,
+                'common.extversion': this.context.extension.packageJSON.version as string,
+                'common.platform': process.platform.toString(),
+                'common.vscodeversion': vscode.version,
+                'common.vscodesessionid': this.session_id
+            }
+        );
     }
 
     logCrash(event: EventType, error: any) {
-        // should not show a message to the user
-        // just a testing placeholder
-        // vscode.window.showInformationMessage("Thank you for your feedback!");
+        this.reporter.sendTelemetryErrorEvent(
+            event, 
+            {
+                'common.extname': this.context.extension.packageJSON.name as string,
+                'common.extversion': this.context.extension.packageJSON.version as string,
+                'common.platform': process.platform.toString(),
+                'common.vscodeversion': vscode.version,
+                'common.vscodesessionid': this.session_id,
+                'error': error.toString(),
+            }
+        );
     }
-
-    async askCrashReport(event: EventType, error: any) {
-        const didAllowFeedback = await this.context.globalState.get(didAllowFeedbackKey);
-        if (didAllowFeedback === UserAnalyticsPreference.NEVER) {
-            return;
-        }
-
-        if (didAllowFeedback === UserAnalyticsPreference.ALWAYS) {
-            this.logCrash(event, error);
-            return;
-        }
-
-        const allowedFeedback = await vscode.window.showErrorMessage("Wake has crashed. Would you like to provide feedback?", 
-            UserAnalyticsPreference.YES, UserAnalyticsPreference.ALWAYS, UserAnalyticsPreference.NEVER); 
-
-        if (allowedFeedback === UserAnalyticsPreference.ALWAYS || allowedFeedback === UserAnalyticsPreference.NEVER) {
-            this.context.globalState.update(didAllowFeedbackKey, allowedFeedback);
-        }
-
-        if (allowedFeedback === UserAnalyticsPreference.YES || allowedFeedback === UserAnalyticsPreference.ALWAYS) {
-            this.logCrash(event, error);
-        }
-    }
-}
-
-enum UserAnalyticsPreference {
-    YES = "Yes",
-    ALWAYS = "Always",
-    NEVER = "Never"
 }
 
 export enum EventType{
