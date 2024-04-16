@@ -23,7 +23,8 @@ const config = {
   },
   resolve: {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-    mainFields: ['browser', 'module', 'main'], // look for `browser` entry point in imported node modules
+    // mainFields: ['browser', 'module', 'main'], // look for `browser` entry point in imported node modules
+    mainFields: ['module', 'main'], // look for `module` entry point in imported node modules
     extensions: ['.ts', '.js'],
     alias: {
       // provides alternate implementation for node module and source files
