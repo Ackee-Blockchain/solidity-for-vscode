@@ -90,7 +90,10 @@
                     "Tools-for-Solidity.Wake.compiler.solc.ignoredWarnings": {
                         "type": "array",
                         "items": {
-                            "type": ["integer", "string"]
+                            "type": [
+                                "integer",
+                                "string"
+                            ]
                         },
                         "default": [],
                         "description": "Ignore warnings with these codes from the solc compiler"
@@ -745,6 +748,7 @@
     },
     "dependencies": {
         "@renovatebot/pep440": "^2.0.0",
+        "@vscode/extension-telemetry": "^0.7.7",
         "execa": "^8.0.1",
         "get-port": "<6.0.0",
         "node-fetch": "^3.3.2",
