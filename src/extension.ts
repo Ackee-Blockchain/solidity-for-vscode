@@ -298,14 +298,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let solcIgnoredWarnings = extensionConfig.get<Array<integer|string>>('Wake.compiler.solc.ignoredWarnings', []);
 
-    // sample error
-    try {
-        throw new Error("Sample error");
-    } catch(err) {
-        outputChannel.appendLine("Sample error");
-        outputChannel.show(true);
-        analytics.logCrash(EventType.ERROR_WAKE_CRASH, err);
-    }
+    // // sample error
+    // try {
+    //     throw new Error("Sample error");
+    // } catch(err) {
+    //     outputChannel.appendLine("Sample error");
+    //     outputChannel.show(true);
+    //     analytics.logCrash(EventType.ERROR_WAKE_CRASH, err);
+    // }
 
     if (autoInstall && !pathToExecutable && !wakePort) {
         if (usePipx) {
