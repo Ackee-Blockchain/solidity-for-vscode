@@ -14,7 +14,7 @@
         "compiler",
         "solidity security"
     ],
-    "homepage": "https://ackeeblockchain.com/blog/introducing-tools-for-solidity/",
+    "homepage": "https://ackee.xyz/blog/introducing-tools-for-solidity/",
     "bugs": {
         "url": "https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/issues"
     },
