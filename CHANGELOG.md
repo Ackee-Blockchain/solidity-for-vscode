@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.13.0]
+- Added option to disable certain compiler warnings (thanks to @DrakeEvans)
+- Improved crash logs
+- Fixed language server & detector crashes
+
 ## [1.12.0]
 - Implemented the initial set of LSP callback features
 - Implemented new `eth-wake` installation method (installation into venv) as a fallback
