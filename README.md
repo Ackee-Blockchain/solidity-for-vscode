@@ -1,4 +1,4 @@
-# [Ackee Blockchain](https://ackeeblockchain.com) Tools for Solidity ([Wake](https://getwake.io))
+# [Ackee Blockchain](https://ackee.xyz) Tools for Solidity ([Wake](https://getwake.io))
 
 Tools for Solidity is an extension for Visual Studio Code, powered by [Wake](https://getwake.io), that offers most of the language server features and displays real-time results of vulnerability detectors and compiler in custom UI. Different graph types can be generated to better visualize the relations in the code.
 
