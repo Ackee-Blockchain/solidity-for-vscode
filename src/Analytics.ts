@@ -1,5 +1,4 @@
-import * as env from './env.example';
-import fetch from 'node-fetch';
+import * as env from './env';
 import * as vscode from 'vscode';
 import { randomUUID } from 'crypto';
 import TelemetryReporter from '@vscode/extension-telemetry';
@@ -38,7 +37,7 @@ export class Analytics{
 
     logEvent(name: string) {
         this.reporter.sendTelemetryEvent(
-            name, 
+            name,
             {
                 'common.extname': this.context.extension.packageJSON.name as string,
                 'common.extversion': this.context.extension.packageJSON.version as string,
@@ -51,14 +50,14 @@ export class Analytics{
 
     logCrash(event: EventType, error: any) {
         this.reporter.sendTelemetryErrorEvent(
-            event, 
+            event,
             {
                 'common.extname': this.context.extension.packageJSON.name as string,
                 'common.extversion': this.context.extension.packageJSON.version as string,
                 'common.platform': process.platform.toString(),
                 'common.vscodeversion': vscode.version,
                 'common.vscodesessionid': this.session_id,
-                'error': error.toString(),
+                'error': error.toString().slice(-8100)
             }
         );
     }
