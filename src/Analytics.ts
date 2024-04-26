@@ -1,30 +1,17 @@
 import * as env from './env';
 import * as vscode from 'vscode';
-import { randomUUID } from 'crypto';
 import TelemetryReporter from '@vscode/extension-telemetry';
 
 export class Analytics{
 
     context : vscode.ExtensionContext;
     reporter : TelemetryReporter;
-    session_id : string = randomUUID();
 
     constructor(context: vscode.ExtensionContext){
         this.context = context;
 
         this.reporter = new TelemetryReporter(env.TELEMETRY_KEY);
         context.subscriptions.push(this.reporter);
-    }
-
-    getUuid(): string {
-        let value = this.context.globalState.get("uuid");
-        if (value == undefined) {
-            let uuid = randomUUID()
-            this.context.globalState.update("uuid", uuid);
-            return uuid;
-        } else {
-            return value as string;
-        }
     }
 
     logActivate(){
@@ -41,9 +28,11 @@ export class Analytics{
             {
                 'common.extname': this.context.extension.packageJSON.name as string,
                 'common.extversion': this.context.extension.packageJSON.version as string,
-                'common.platform': process.platform.toString(),
+                'common.vscodemachineid': vscode.env.machineId,
+                'common.vscodeseesionid': vscode.env.sessionId,
                 'common.vscodeversion': vscode.version,
-                'common.vscodesessionid': this.session_id
+                'common.os': process.platform.toString(),
+                'common.nodeArch': process.arch,
             }
         );
     }
@@ -54,9 +43,11 @@ export class Analytics{
             {
                 'common.extname': this.context.extension.packageJSON.name as string,
                 'common.extversion': this.context.extension.packageJSON.version as string,
-                'common.platform': process.platform.toString(),
+                'common.vscodemachineid': vscode.env.machineId,
+                'common.vscodeseesionid': vscode.env.sessionId,
                 'common.vscodeversion': vscode.version,
-                'common.vscodesessionid': this.session_id,
+                'common.os': process.platform.toString(),
+                'common.nodeArch': process.arch,
                 'error': error.toString().slice(-8100)
             }
         );
@@ -66,6 +57,7 @@ export class Analytics{
 export enum EventType{
     ACTIVATE = "activate",
     MIGRATE = "migrate",
+    ERROR_PIP_INSTALL = "error_pip_install",
     ERROR_WAKE_INSTALL_PIPX = "error_wake_install_pipx",
     ERROR_WAKE_INSTALL_PIP = "error_wake_install_pip",
     ERROR_WAKE_VERSION = "error_wake_version",
