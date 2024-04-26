@@ -79,6 +79,35 @@ function onNotification(outputChannel: vscode.OutputChannel, detection: Diagnost
 }
 
 async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<boolean> {
+    // check if pip is available and install it if not
+    try {
+        execaSync(pythonExecutable, ["-m", "pip", "--version"]);
+    } catch(err) {
+        try {
+            outputChannel.appendLine(`Running '${pythonExecutable} -m ensurepip'`);
+            execaSync(pythonExecutable, ["-m", "ensurepip"]);
+        } catch(err) {
+            if (err instanceof Error) {
+                outputChannel.appendLine("Failed to install pip:");
+                outputChannel.appendLine(err.toString());
+            }
+            try {
+                outputChannel.appendLine(`Running '${pythonExecutable} -m ensurepip --user'`);
+                execaSync(pythonExecutable, ["-m", "ensurepip", "--user"]);
+            } catch(err) {
+                analytics.logCrash(EventType.ERROR_PIP_INSTALL, err);
+
+                if (err instanceof Error) {
+                    outputChannel.appendLine("Failed to install pip into user site-packages:");
+                    outputChannel.appendLine(err.toString());
+                    outputChannel.show(true);
+                }
+
+                return false;
+            }
+        }
+    }
+
     try {
         let out;
         if (WAKE_PRERELEASE) {
@@ -271,9 +300,9 @@ export async function activate(context: vscode.ExtensionContext) {
     venvPath = path.join(context.globalStorageUri.fsPath, "venv");
 
     if (process.platform === "win32") {
-        venvActivateCommand = path.join(venvPath, "Scripts", "activate.bat");
+        venvActivateCommand = '"' + path.join(venvPath, "Scripts", "activate.bat") + '"';
     } else {
-        venvActivateCommand = "source " + path.join(venvPath, "bin", "activate");
+        venvActivateCommand = '. "' + path.join(venvPath, "bin", "activate") + '"';
     }
 
     migrateConfig();
