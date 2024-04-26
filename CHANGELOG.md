@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.13.1]
+- Fixed possible `eth-wake` installation issues
+
 ## [1.13.0]
 - Added option to disable certain compiler warnings (thanks to @DrakeEvans)
 - Improved crash logs
