@@ -562,12 +562,19 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.sake.compile_current_file", async () => {
         const editor = vscode.window.activeTextEditor;
         if (editor?.document?.languageId !== 'solidity') {
+            outputChannel.appendLine("Failed to compile, no Solidity file opened");
             return;
         }
 
-        outputChannel.appendLine(`Running 'wake sake compile, opened file is ${editor.document.uri.fsPath}'`);
+        if (client === undefined) {
+            outputChannel.appendLine("Failed to compile due to missing language client");
+        }
 
-        vscode.commands.executeCommand('wake/sake/compile');
+        const out = await client?.sendRequest("wake/sake/compile");
+
+        outputChannel.appendLine(`Client response: ${out}`);
+        console.log(out);
+        // outputChannel.appendLine(`Running 'wake sake compile, opened file is ${editor.document.uri.fsPath}'`);
     }));
 
 }
