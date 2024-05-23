@@ -531,6 +531,10 @@
             {
                 "command": "Tools-for-Solidity.detections.filter.confidence.low_selected",
                 "title": "◉ Confidence: All"
+            },
+            {
+                "command": "Tools-for-Solidity.sake.compile_current_file",
+                "title": "Sake: Compile Current File"
             }
         ],
         "viewsContainers": {

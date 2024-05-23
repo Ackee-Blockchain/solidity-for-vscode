@@ -234,6 +234,8 @@ async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable
         }
     }
 
+    outputChannel.appendLine(`Found 'eth-wake' ${installed} ${venv} ${cwd}`);
+
     return [installed, venv, cwd];
 }
 
@@ -245,6 +247,8 @@ function findPython(outputChannel: vscode.OutputChannel): string {
             outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
             throw new Error("Python version too old");
         }
+        outputChannel.appendLine(`Found Python in version ${pythonVersion}. Returning 'python3'.`);
+        outputChannel.appendLine(`Running 'which python3' returned ${execaSync("which", ["python3"]).stdout.trim()}`);
         return "python3";
     } catch(err) {
         try {
@@ -254,6 +258,8 @@ function findPython(outputChannel: vscode.OutputChannel): string {
                 outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
                 throw new Error("Python version too old");
             }
+            outputChannel.appendLine(`Found Python in version ${pythonVersion}. Returning 'python'.`);
+            outputChannel.appendLine(`Running 'which python' returned ${execaSync("which", ["python"]).stdout.trim()}`);
             return "python";
         } catch(err) {
             outputChannel.appendLine("Python >=3.7 must be installed.");
@@ -553,6 +559,16 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     }))
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.wake_callback", async (documentUri: vscode.Uri, callbackType: string, callbackId: string) => await vscode.commands.executeCommand('wake.callback', documentUri, callbackType, callbackId)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.sake.compile_current_file", async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (editor?.document?.languageId !== 'solidity') {
+            return;
+        }
+
+        outputChannel.appendLine(`Running 'wake sake compile, opened file is ${editor.document.uri.fsPath}'`);
+
+        vscode.commands.executeCommand('wake/sake/compile');
+    }));
 
 }
 
