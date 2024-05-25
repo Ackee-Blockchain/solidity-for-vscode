@@ -241,8 +241,8 @@ function findPython(outputChannel: vscode.OutputChannel): string {
     try {
         const pythonVersion = execaSync("python3", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).stdout.trim();
 
-        if (compare(pythonVersion, "3.7.0") < 0) {
-            outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
+        if (compare(pythonVersion, "3.8.0") < 0) {
+            outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.8 must be installed.`);
             throw new Error("Python version too old");
         }
         return "python3";
@@ -250,13 +250,13 @@ function findPython(outputChannel: vscode.OutputChannel): string {
         try {
             const pythonVersion = execaSync("python", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).stdout.trim();
 
-            if (compare(pythonVersion, "3.7.0") < 0) {
-                outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
+            if (compare(pythonVersion, "3.8.0") < 0) {
+                outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.8 must be installed.`);
                 throw new Error("Python version too old");
             }
             return "python";
         } catch(err) {
-            outputChannel.appendLine("Python >=3.7 must be installed.");
+            outputChannel.appendLine("Python >=3.8 must be installed.");
             throw new Error("Python not found");
         }
     }
