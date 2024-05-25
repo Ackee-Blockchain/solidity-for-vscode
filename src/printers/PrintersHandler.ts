@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient/node';
-import { PrinterNotification, PeekLocationsCommand, GoToLocationsCommand, OpenCommand, CopyToClipboardCommand } from './PrinterNotification';
+import { PrinterNotification, PeekLocationsCommand, GoToLocationsCommand, OpenCommand, CopyToClipboardCommand, ShowMessageCommand } from './PrinterNotification';
 
 export class PrintersHandler {
 
@@ -66,6 +66,18 @@ export class PrintersHandler {
                 const copyParams = command as CopyToClipboardCommand;
 
                 await vscode.env.clipboard.writeText(copyParams.text);
+            } else if (command.command == "showMessage") {
+                const messageParams = command as ShowMessageCommand;
+
+                if (messageParams.kind === "info") {
+                    await vscode.window.showInformationMessage(messageParams.message);
+                } else if (messageParams.kind === "warning") {
+                    await vscode.window.showWarningMessage(messageParams.message);
+                } else if (messageParams.kind === "error") {
+                    await vscode.window.showErrorMessage(messageParams.message);
+                } else {
+                    throw new Error(`Unknown message kind: ${messageParams.kind}`);
+                }
             }
         }
     }

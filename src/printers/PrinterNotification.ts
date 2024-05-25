@@ -30,3 +30,8 @@ export interface OpenCommand extends PrinterCommand {
 export interface CopyToClipboardCommand extends PrinterCommand {
     text: string;
 }
+
+export interface ShowMessageCommand extends PrinterCommand {
+    message: string;
+    kind: "info" | "warning" | "error";
+}
