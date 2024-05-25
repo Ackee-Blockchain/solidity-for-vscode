@@ -1,17 +1,48 @@
 import * as env from './env';
 import * as vscode from 'vscode';
-import TelemetryReporter from '@vscode/extension-telemetry';
+
+let appInsights = require('applicationinsights');
+
+
+class TelemetrySender implements vscode.TelemetrySender {
+    sendEventData(eventName: string, data?: Record<string, any> | undefined): void {
+        appInsights.defaultClient.trackEvent({
+            name: eventName,
+            properties: data
+        });
+    }
+
+    sendErrorData(error: Error, data?: Record<string, any> | undefined): void {
+        appInsights.defaultClient.trackException({
+            exception: error,
+            properties: data
+        });
+    }
+}
+
 
 export class Analytics{
-
     context : vscode.ExtensionContext;
-    reporter : TelemetryReporter;
+    telemetryLogger: vscode.TelemetryLogger;
 
     constructor(context: vscode.ExtensionContext){
-        this.context = context;
+        appInsights.setup(env.TELEMETRY_KEY)
+            .setAutoCollectRequests(false)
+            .setAutoCollectPerformance(false)
+            .setAutoCollectExceptions(false)
+            .setAutoCollectDependencies(false)
+            .setAutoDependencyCorrelation(false)
+            .setAutoCollectConsole(false)
+            .setUseDiskRetryCaching(true)
+            .start();
+        const { userId, sessionId } = appInsights.defaultClient.context.keys;
+        appInsights.defaultClient.context.tags[userId] = vscode.env.machineId;
+        appInsights.defaultClient.context.tags[sessionId] = vscode.env.sessionId;
 
-        this.reporter = new TelemetryReporter(env.TELEMETRY_KEY);
-        context.subscriptions.push(this.reporter);
+        this.context = context;
+        this.telemetryLogger = vscode.env.createTelemetryLogger(new TelemetrySender());
+
+        context.subscriptions.push(this.telemetryLogger);
     }
 
     logActivate(){
@@ -23,7 +54,7 @@ export class Analytics{
     }
 
     logEvent(name: string) {
-        this.reporter.sendTelemetryEvent(
+        this.telemetryLogger.logUsage(
             name,
             {
                 'common.extname': this.context.extension.packageJSON.name as string,
@@ -38,7 +69,7 @@ export class Analytics{
     }
 
     logCrash(event: EventType, error: any) {
-        this.reporter.sendTelemetryErrorEvent(
+        this.telemetryLogger.logError(
             event,
             {
                 'common.extname': this.context.extension.packageJSON.name as string,

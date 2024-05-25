@@ -24,7 +24,7 @@
     },
     "icon": "images/icon.png",
     "engines": {
-        "vscode": "^1.67.0"
+        "vscode": "^1.75.0"
     },
     "categories": [
         "Linters",
@@ -732,8 +732,8 @@
     "devDependencies": {
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.1",
-        "@types/node": "16.x",
-        "@types/vscode": "^1.67.0",
+        "@types/node": "^16.18.97",
+        "@types/vscode": "^1.75.0",
         "@typescript-eslint/eslint-plugin": "^5.30.0",
         "@typescript-eslint/parser": "^5.30.0",
         "@vscode/test-electron": "^2.1.5",
@@ -748,7 +748,7 @@
     },
     "dependencies": {
         "@renovatebot/pep440": "^2.0.0",
-        "@vscode/extension-telemetry": "^0.9.6",
+        "applicationinsights": "^2.9.0",
         "execa": "^8.0.1",
         "get-port": "<6.0.0",
         "node-fetch": "^3.3.2",
