@@ -21,7 +21,13 @@ try {
 }
 
 function initializeScale(initialScale, initialFitToWidthMode, initialFitToHeightMode, initialLayout) {
-    var svgEls = document.getElementsByTagName("svg");
+    var svgTargetContainer = document.getElementById("svg-target-container");
+    if (!svgTargetContainer) {
+        console.error("An error occurred while trying to find the target 'svg' element");
+        return;
+    }
+
+    var svgEls = svgTargetContainer.getElementsByTagName("svg");
     if (svgEls.length < 1) {
         console.error("Cannot find any 'svg' element in the document.");
         return;
