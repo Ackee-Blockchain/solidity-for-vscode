@@ -35,3 +35,8 @@ export interface ShowMessageCommand extends PrinterCommand {
     message: string;
     kind: "info" | "warning" | "error";
 }
+
+export interface ShowDotCommand extends PrinterCommand {
+    title: string;
+    dot: string;
+}
