@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient/node';
-import { PrinterNotification, PeekLocationsCommand, GoToLocationsCommand, OpenCommand, CopyToClipboardCommand, ShowMessageCommand } from './PrinterNotification';
+import { PrinterNotification, PeekLocationsCommand, GoToLocationsCommand, OpenCommand, CopyToClipboardCommand, ShowMessageCommand, ShowDotCommand } from './PrinterNotification';
+import { GraphvizPreviewGenerator } from '../graphviz/GraphvizPreviewGenerator';
 
 export class PrintersHandler {
 
     context: vscode.ExtensionContext
     outputChannel: vscode.OutputChannel
 
-    constructor(client: LanguageClient, context: vscode.ExtensionContext, outputChannel: vscode.OutputChannel) {
+    constructor(client: LanguageClient, context: vscode.ExtensionContext, private graphvizGenerator: GraphvizPreviewGenerator, outputChannel: vscode.OutputChannel) {
         this.context = context;
         this.outputChannel = outputChannel;
 
@@ -78,6 +79,11 @@ export class PrintersHandler {
                 } else {
                     throw new Error(`Unknown message kind: ${messageParams.kind}`);
                 }
+            } else if (command.command == "showDot") {
+                const dotParams = command as ShowDotCommand;
+
+                const preview = this.graphvizGenerator.createPreviewPanel(dotParams.dot, dotParams.title, vscode.ViewColumn.Beside);
+                await this.graphvizGenerator.updateContent(preview);
             }
         }
     }

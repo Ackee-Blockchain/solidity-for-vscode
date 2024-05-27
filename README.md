@@ -25,8 +25,6 @@ The Tools for Solidity extension uses the PyPi package [eth-wake](https://pypi.o
 
 Rosetta is required to be enabled on Apple Silicon (M1, M2 & M3) Macs.
 
-To display the generated graphs, Graphviz (DOT) extension must be installed e.g. [Graphviz Preview](https://marketplace.visualstudio.com/items?itemName=EFanZh.graphviz-preview).
-
 ## Installation
 
 The package [eth-wake](https://pypi.org/project/eth-wake/) is installed `automatically` when this extension is activated.
@@ -171,4 +169,5 @@ The extension relies on the `solc` compiler. For this reason, files containing c
 
 ## Acknowledgements
 
-We used [juanfranblanco/vscode-solidity](https://github.com/juanfranblanco/vscode-solidity/blob/master/syntaxes/solidity.json) as a base of our Solidity grammar.
+- [juanfranblanco/vscode-solidity](https://github.com/juanfranblanco/vscode-solidity/blob/master/syntaxes/solidity.json): a base of our Solidity grammar
+- [joaompinto/vscode-graphviz](https://github.com/joaompinto/vscode-graphviz): a base of our Graphviz integration

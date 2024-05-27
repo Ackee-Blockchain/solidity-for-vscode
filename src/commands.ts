@@ -1,59 +1,37 @@
-import { execFile, execFileSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import * as vscode from 'vscode';
 import { URI, Position } from 'vscode-languageclient/node';
 import * as os from 'os';
+import { GraphvizPreviewGenerator } from './graphviz/GraphvizPreviewGenerator';
 const fs = require("fs");
 
-async function showDot(content: string, out?: vscode.OutputChannel) {
-    const activeEditor = vscode.window.activeTextEditor;
-    const activeColumn = activeEditor?.viewColumn;
-    const activeTextDocument = activeEditor?.document;
 
-    vscode.workspace.openTextDocument({language: 'dot', content: content}).then(async doc => {
-        await vscode.window.showTextDocument(doc);
-
-        try {
-            await vscode.commands.executeCommand('graphviz.previewToSide', doc.uri);
-        } catch (e) {
-            try {
-                await vscode.commands.executeCommand('graphviz.showPreviewToSide');
-            } catch (e) {
-                try {
-                    await vscode.commands.executeCommand('graphviz-interactive-preview.preview.beside', {uri: doc.uri});
-                } catch (e) {
-                    await vscode.window.showErrorMessage("Failed to show graphviz preview. Please install one of supported Graphviz (DOT) preview extensions.");
-                    return;
-                }
-            }
-        }
-
-        if (activeEditor !== undefined && activeColumn !== undefined && activeTextDocument !== undefined) {
-            await vscode.window.showTextDocument(activeTextDocument, activeColumn);
-        }
-    });
+async function showDot(content: string, title: string, graphviz: GraphvizPreviewGenerator) {
+    const panel = graphviz.createPreviewPanel(content, title, vscode.ViewColumn.Beside);
+    await graphviz.updateContent(panel);
 }
 
-export async function generateCfgHandler(out: vscode.OutputChannel, documentUri: URI, canonicalName: string) {
+export async function generateCfgHandler(out: vscode.OutputChannel, documentUri: URI, canonicalName: string, graphviz: GraphvizPreviewGenerator) {
     const cfg: string = await vscode.commands.executeCommand('wake.generate.control_flow_graph', documentUri, canonicalName);
 
-    await showDot(cfg, out);
+    await showDot(cfg, `${canonicalName} control flow graph`, graphviz);
 }
 
-export async function generateInheritanceGraphHandler({ documentUri, canonicalName, out }: {documentUri: URI, canonicalName: string, out: vscode.OutputChannel}) {
+export async function generateInheritanceGraphHandler({ documentUri, canonicalName, out, graphviz }: {documentUri: URI, canonicalName: string, out: vscode.OutputChannel, graphviz: GraphvizPreviewGenerator}) {
     let graph: string;
     if (documentUri === undefined || canonicalName === undefined || out === undefined) {
         graph = await vscode.commands.executeCommand('wake.generate.inheritance_graph_full');
-        await showDot(graph);
+        await showDot(graph, "Inheritance graph", graphviz);
     }
     else {
         graph = await vscode.commands.executeCommand('wake.generate.inheritance_graph', documentUri, canonicalName);
-        await showDot(graph, out);
+        await showDot(graph, `${canonicalName} inheritance graph`, graphviz);
     }
 }
 
-export async function generateLinearizedInheritanceGraphHandler(out: vscode.OutputChannel, documentUri: URI, canonicalName: string) {
+export async function generateLinearizedInheritanceGraphHandler(out: vscode.OutputChannel, documentUri: URI, canonicalName: string, graphviz: GraphvizPreviewGenerator) {
     const graph: string = await vscode.commands.executeCommand('wake.generate.linearized_inheritance_graph', documentUri, canonicalName);
-    await showDot(graph, out);
+    await showDot(graph, `${canonicalName} linearized inheritance graph`, graphviz);
 }
 
 export async function copyToClipboardHandler(text: string) {
@@ -95,9 +73,9 @@ export async function importFoundryRemappings(out: vscode.OutputChannel) {
     vscode.window.showInformationMessage(`Imported ${remappings.length} remappings.`);
 }
 
-export async function generateImportsGraphHandler(out: vscode.OutputChannel) {
+export async function generateImportsGraphHandler(out: vscode.OutputChannel, graphviz: GraphvizPreviewGenerator) {
     const graph: string = await vscode.commands.executeCommand('wake.generate.imports_graph');
-    await showDot(graph);
+    await showDot(graph, "Imports graph", graphviz);
 }
 
 export async function executeReferencesHandler(out: vscode.OutputChannel, documentUri: URI, position: Position, declarationPositions: Array<Position>) {

@@ -733,6 +733,7 @@
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.1",
         "@types/node": "^16.18.97",
+        "@types/tmp": "^0.2.6",
         "@types/vscode": "^1.75.0",
         "@typescript-eslint/eslint-plugin": "^5.30.0",
         "@typescript-eslint/parser": "^5.30.0",
@@ -747,15 +748,15 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
+        "@hpcc-js/wasm": "^2.1.0",
         "@renovatebot/pep440": "^2.0.0",
         "applicationinsights": "^2.9.0",
         "execa": "^8.0.1",
         "get-port": "<6.0.0",
         "node-fetch": "^3.3.2",
+        "open": "^10.1.0",
+        "tmp": "^0.2.3",
         "vscode-languageclient": "^8.0.1",
         "wait-port": "^0.3.0"
-    },
-    "extensionDependencies": [
-        "EFanZh.graphviz-preview"
-    ]
+    }
 }

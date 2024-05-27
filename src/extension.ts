@@ -14,6 +14,7 @@ import {
     ProgressType,
     ErrorHandler,
 } from 'vscode-languageclient/node';
+import { Graphviz } from "@hpcc-js/wasm";
 
 import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler, newDetector, newPrinter } from './commands';
 import { hideCoverageCallback, initCoverage, showCoverageCallback } from './coverage';
@@ -34,6 +35,7 @@ import { ClientMiddleware } from './ClientMiddleware';
 import { ClientErrorHandler } from './ClientErrorHandler';
 import { ExecaChildProcess, execa, execaSync } from 'execa';
 import { PrintersHandler } from './printers/PrintersHandler'
+import { GraphvizPreviewGenerator } from './graphviz/GraphvizPreviewGenerator';
 
 
 let client: LanguageClient | undefined = undefined;
@@ -47,6 +49,7 @@ let printers: PrintersHandler;
 let crashlog: string[] = [];
 let venvPath: string;
 let venvActivateCommand: string;
+let graphvizGenerator: GraphvizPreviewGenerator;
 
 //export let log: Log
 
@@ -474,7 +477,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     client = new LanguageClient("Tools-for-Solidity", "Tools for Solidity", serverOptions, clientOptions);
     errorHandler.setClient(client);
-    printers = new PrintersHandler(client, context, outputChannel);
+
+    const graphviz = await Graphviz.load();
+    graphvizGenerator = new GraphvizPreviewGenerator(context, graphviz);
+    printers = new PrintersHandler(client, context, graphvizGenerator, outputChannel);
 
     diagnosticCollection = vscode.languages.createDiagnosticCollection('Wake')
 
@@ -508,12 +514,12 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext){
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.control_flow_graph", async (documentUri, canonicalName) => await generateCfgHandler(outputChannel, documentUri, canonicalName)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.inheritance_graph", async (documentUri, canonicalName) => await generateInheritanceGraphHandler({ documentUri, canonicalName, out: outputChannel })));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.linearized_inheritance_graph", async (documentUri, canonicalName) => await generateLinearizedInheritanceGraphHandler(outputChannel, documentUri, canonicalName)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.control_flow_graph", async (documentUri, canonicalName) => await generateCfgHandler(outputChannel, documentUri, canonicalName, graphvizGenerator)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.inheritance_graph", async (documentUri, canonicalName) => await generateInheritanceGraphHandler({ documentUri, canonicalName, out: outputChannel, graphviz: graphvizGenerator})));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.linearized_inheritance_graph", async (documentUri, canonicalName) => await generateLinearizedInheritanceGraphHandler(outputChannel, documentUri, canonicalName, graphvizGenerator)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.copy_to_clipboard", async (text) => await copyToClipboardHandler(text)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.foundry.import_remappings", async () => await importFoundryRemappings(outputChannel)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.imports_graph", async () => await generateImportsGraphHandler(outputChannel)));
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.imports_graph", async () => await generateImportsGraphHandler(outputChannel, graphvizGenerator)));
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.execute.references", async (documentUri, position, declarationPositions) => await executeReferencesHandler(outputChannel, documentUri, position, declarationPositions)));
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.coverage.show", showCoverageCallback));
