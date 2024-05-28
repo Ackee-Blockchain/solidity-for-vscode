@@ -97,5 +97,7 @@ export enum EventType{
     ERROR_WAKE_CONNECTION_ERROR_CONTINUE = "error_wake_connection_error_continue",
     ERROR_WAKE_CONNECTION_ERROR_SHUTDOWN = "error_wake_connection_error_shutdown",
     ERROR_WAKE_CONNECTION_CLOSE_RESTART = "error_wake_connection_close_restart",
-    ERROR_WAKE_CONNECTION_CLOSE_DO_NOT_RESTART = "error_wake_connection_close_do_not_restart"
+    ERROR_WAKE_CONNECTION_CLOSE_DO_NOT_RESTART = "error_wake_connection_close_do_not_restart",
+    ERROR_WAKE_SERVER_SHOW_MESSAGE_ERROR = "error_wake_server_show_message_error",
+    ERROR_WAKE_SERVER_LOG_MESSAGE_ERROR = "error_wake_server_log_message_error"
 }

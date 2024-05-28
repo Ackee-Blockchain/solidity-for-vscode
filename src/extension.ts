@@ -13,6 +13,9 @@ import {
     Diagnostic,
     ProgressType,
     ErrorHandler,
+    ShowMessageNotification,
+    MessageType,
+    LogMessageNotification,
 } from 'vscode-languageclient/node';
 import { Graphviz } from "@hpcc-js/wasm";
 
@@ -500,6 +503,38 @@ export async function activate(context: vscode.ExtensionContext) {
             return true;
         });
         onNotification(outputChannel, diag);
+    });
+    client.onNotification(ShowMessageNotification.type, (message) => {
+        switch (message.type) {
+            case MessageType.Error:
+                analytics.logCrash(EventType.ERROR_WAKE_SERVER_SHOW_MESSAGE_ERROR, new Error(message.message));
+                vscode.window.showErrorMessage(message.message);
+                break;
+            case MessageType.Warning:
+                vscode.window.showWarningMessage(message.message);
+                break;
+            case MessageType.Info:
+                vscode.window.showInformationMessage(message.message);
+                break;
+            default:
+                vscode.window.showInformationMessage(message.message);
+        }
+    });
+    client.onNotification(LogMessageNotification.type, (message) => {
+        switch (message.type) {
+            case MessageType.Error:
+                analytics.logCrash(EventType.ERROR_WAKE_SERVER_LOG_MESSAGE_ERROR, new Error(message.message));
+                client?.error(message.message, undefined, false);
+                break;
+            case MessageType.Warning:
+                client?.warn(message.message, undefined, false);
+                break;
+            case MessageType.Info:
+                client?.info(message.message, undefined, false);
+                break;
+            default:
+                client?.outputChannel.appendLine(message.message);
+        }
     });
 
     vscode.window.registerTreeDataProvider('wake-detections', wakeProvider);
