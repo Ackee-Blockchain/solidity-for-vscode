@@ -1,4 +1,8 @@
 {
+    "exclude":[
+        "src/sake/webview/node_modules/**/*",
+        "src/sake/webview/src/**/*",
+    ],
     "compilerOptions": {
         "module": "commonjs",
         "target": "ES2020",
@@ -8,6 +12,13 @@
         ],
         "sourceMap": true,
         "rootDir": "src",
+
+        // FOR SOME REASON WEBPACK IGNORES THIS?
+        // "paths": {
+        //     "@sake/*": ["./src/sake/*"],
+        //     "@shared/*": ["./src/sake/webview/shared/*"],
+        // },
+
         "strict": true   /* enable all strict type-checking options */
         /* Additional Checks */
         // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */

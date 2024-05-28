@@ -34,6 +34,7 @@ import { ClientMiddleware } from './ClientMiddleware';
 import { ClientErrorHandler } from './ClientErrorHandler';
 import { ExecaChildProcess, execa, execaSync } from 'execa';
 import { PrintersHandler } from './printers/PrintersHandler'
+import { activateSake, deactivateSake } from './sake/sake';
 
 
 let client: LanguageClient | undefined = undefined;
@@ -511,6 +512,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     client.start();
     analytics.logActivate();
+
+    // activate Sake
+    activateSake(context);
 }
 
 function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext){
@@ -609,6 +613,7 @@ export function deactivate() {
             wakeProcess.kill("SIGKILL");
         }
     }
+    deactivateSake();
 }
 
 function migrateConfig(){
