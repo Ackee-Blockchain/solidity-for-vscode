@@ -8,7 +8,6 @@ import { Contract } from './webview/shared/types';
 export function activateSake(context: vscode.ExtensionContext) {
     const sidebarCompilerProvider = new CompilerWebviewProvider(context.extensionUri);
 
-    console.log("registering sake compile", context)
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
         "sake-compile",

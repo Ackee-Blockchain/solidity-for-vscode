@@ -513,6 +513,8 @@ export async function activate(context: vscode.ExtensionContext) {
     client.start();
     analytics.logActivate();
 
+    console.log("in extension", vscode.window.registerTreeDataProvider, vscode.window.showErrorMessage);
+
     // activate Sake
     activateSake(context);
 }
@@ -563,7 +565,7 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     }))
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.wake_callback", async (documentUri: vscode.Uri, callbackType: string, callbackId: string) => await vscode.commands.executeCommand('wake.callback', documentUri, callbackType, callbackId)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.sake.compile_current_file", async () => {
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.sake.compile_all", async () => {
         const editor = vscode.window.activeTextEditor;
         if (editor?.document?.languageId !== 'solidity') {
             outputChannel.appendLine("Failed to compile, no Solidity file opened");
@@ -578,6 +580,8 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
 
         outputChannel.appendLine(`Client response: ${out}`);
         console.log(out);
+
+        return out;
         // outputChannel.appendLine(`Running 'wake sake compile, opened file is ${editor.document.uri.fsPath}'`);
     }));
 

@@ -2,75 +2,28 @@
     import {
         provideVSCodeDesignSystem,
         vsCodeButton,
-        vsCodeDropdown,
-        vsCodeOption,
-        vsCodeDivider,
-        vsCodeCheckbox
     } from "@vscode/webview-ui-toolkit";
-    import Divider from "../../components/Divider.svelte";
-    import Spacer from "../../components/Spacer.svelte";
-
+    import { messageHandler } from '@estruyf/vscode/dist/client'
+    import { WebviewMessage } from "../../../shared/types";
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
-        vsCodeDropdown(),
-        vsCodeOption(),
-        vsCodeDivider(),
-        vsCodeCheckbox()
     );
 
-    window.addEventListener("message", (event) => {
-        if (!event.data.command) return;
+    let compiling = false;
 
-        const { command, payload } = event.data;
-
-        switch (command) {
-            case "onChangeActiveFile":
-                if (payload === undefined) {
-                    selectedFile = undefined;
-                    return;
-                }
-
-                const fileName = payload.document.fileName.split('/').pop();
-                selectedFile = fileName;
-                break;
-        }
-    });
-
-    let selectedFile: string | undefined;
+    const compile = async () => {
+        compiling = true;
+        await messageHandler.send(WebviewMessage.onInfo, "mnm");
+        await messageHandler.send(WebviewMessage.onCompileAll);
+        compiling = false;
+    }
 </script>
 
 <main>
-    <section>
-        <p class="mb-2">Compiler version</p>
-        <vscode-dropdown position="below" class="w-full">
-          <vscode-option>0.8.25</vscode-option>
-          <vscode-option>0.8.24</vscode-option>
-          <vscode-option>0.8.23</vscode-option>
-        </vscode-dropdown>
-    </section>
-    <vscode-checkbox checked>Auto-compile</vscode-checkbox>
-    <!-- <Divider />
-    <section>
-        <p class="mb-2">Compile file</p>
-        <vscode-dropdown position="below" class="w-full">
-          <vscode-option>0.8.25</vscode-option>
-          <vscode-option>0.8.24</vscode-option>
-          <vscode-option>0.8.23</vscode-option>
-        </vscode-dropdown>
-    </section> -->
-
-    <Spacer />
-
-    {#if selectedFile}
-        <vscode-button class="w-full">Compile {selectedFile}</vscode-button>
-    {:else}
-        <vscode-button class="w-full" disabled>Open a file to compile</vscode-button>
-    {/if}
-
-    <Spacer />
-
-    <vscode-button class="w-full" appearance="secondary">Compile all</vscode-button>
+    <vscode-button class="w-full" on:click={compile}>
+        {compiling ? "Compiling..." : "Compile contracts"}
+    </vscode-button>
 </main>
 
 <style global>

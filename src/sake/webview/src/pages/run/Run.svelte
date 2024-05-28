@@ -12,7 +12,7 @@
     import Contract from "../../components/Contract.svelte";
     import Divider from "../../components/Divider.svelte";
     import CallSetup from "../../components/CallSetup.svelte";
-    import { StateId, Message } from "../../../shared/types";
+    import { StateId } from "../../../shared/types";
     // import '../../../shared/types'; // Importing types to avoid TS error
 
     provideVSCodeDesignSystem().register(
@@ -44,7 +44,7 @@
         const { command, payload, stateId } = event.data;
 
         switch (command) {
-            case Message.onDeployContract:
+            case "onDeployedContract":
                 if (payload === undefined) {
                     return;
                 }

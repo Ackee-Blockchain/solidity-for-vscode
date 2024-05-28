@@ -9,11 +9,6 @@ export interface Account {
     balance: number;
 }
 
-export interface Contract extends Account {
-    name: string;
-    abi: Array<ContractFunction>;
-}
-
 export interface ContractFunction {
     // required
     inputs: Array<ContractFunctionInput>;
@@ -23,6 +18,13 @@ export interface ContractFunction {
     // optional
     outputs: Array<any> | undefined; // TODO
     name: string | undefined;
+}
+
+export type ContractAbi = Array<ContractFunction>;
+
+export interface Contract extends Account {
+    name: string;
+    abi: ContractAbi;
 }
 
 export interface ContractFunctionInput {
@@ -41,7 +43,7 @@ export interface ContractFunctionInput {
 *
 */
 
-export interface WebviewMessage {
+export interface WebviewMessageData {
     command: string;
     payload: any;
     requestId?: string;
@@ -51,12 +53,13 @@ export interface WebviewMessage {
 // TODO resolve how svelte can import enums
 // TODO should be STATE_ID but me no likey for some reason
 // TODO add messages as enums
-export enum Message {
+export enum WebviewMessage {
     onInfo = "onInfo",
     onError = "onError",
     getTextFromInputBox = "getTextFromInputBox",
     setState = "setState",
     getState = "getState",
+    onCompileAll = "onCompileAll",
     onContractFunctionCall = "onContractFunctionCall",
     onDeployContract = "onDeployContract",
     onUndeployContract = "onUndeployContract", // TODO rename
@@ -67,6 +70,12 @@ export enum Message {
 * Payloads
 *
 */
+
+export interface CompilationPayload {
+    contracts: Array<ContractAbi>;
+    success: boolean;
+    // TODO add error message
+}
 
 export interface FunctionCallPayload {
     contract: Contract;
@@ -87,3 +96,4 @@ export enum StateId {
 interface ContractFunctionOutput {
     // TODO
 }
+

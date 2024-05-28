@@ -11,7 +11,7 @@
   import { buildTree, InputHandler } from "../helpers/FunctionInputsHandler";
   import IconSpacer from "./icons/IconSpacer.svelte";
   import { messageHandler } from '@estruyf/vscode/dist/client'
-  import type { ContractFunction, Contract, FunctionCallPayload } from "../../../shared/types";
+  import type { ContractFunction, Contract, FunctionCallPayload } from "../../shared/types";
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),

@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { BaseWebviewProvider } from "./BaseWebviewProvider";
 import { loadSampleAbi } from "../commands";
 import { MessageHandlerData } from "@estruyf/vscode";
-import { WebviewMessage } from "../webview/shared/types";
+import { WebviewMessageData } from "../webview/shared/types";
 
 export class CompilerWebviewProvider extends BaseWebviewProvider {
     constructor(_extensionUri: vscode.Uri) {
@@ -15,7 +15,7 @@ export class DeployWebviewProvider extends BaseWebviewProvider {
         super(_extensionUri, "deploy");
     }
 
-    protected override async _onDidReceiveMessage(message: WebviewMessage) {
+    protected override async _onDidReceiveMessage(message: WebviewMessageData) {
         const { command, requestId, stateId, payload } = message;
 
         switch (command) {

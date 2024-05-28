@@ -5,7 +5,7 @@ import { MessageHandlerData } from '@estruyf/vscode';
 import { BaseState } from "../state/BaseState";
 import { DeployedContractsState } from "../state/DeployedContractsState";
 import { loadSampleAbi } from "../commands";
-import { StateId, WebviewMessage } from "../webview/shared/types";
+import { StateId, WebviewMessageData, WebviewMessage, CompilationPayload } from "../webview/shared/types";
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -83,7 +83,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         );
     }
 
-    public postMessageToWebview(message: WebviewMessage) {
+    public postMessageToWebview(message: WebviewMessageData) {
         this._view?.webview.postMessage(message);
     }
 
@@ -109,15 +109,16 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         return this._getStateObject(StateId.DeployedContracts);
     }
 
-    private async _handleMessage(message: WebviewMessage, webviewView: vscode.WebviewView) {
+    private async _handleMessage(message: WebviewMessageData, webviewView: vscode.WebviewView) {
         const { command, requestId, stateId, payload } = message;
-
-        console.log("handling message", message);
 
         // convert stateId string to enum
         const _stateId = stateId as StateId;
 
+        console.log("handling message", message);
+
         switch (command) {
+            // TODO: change strings to enums
             case "onInfo": {
                 if (!payload) {
                     return;
@@ -203,6 +204,25 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 console.log("contract call was executed", payload);
             }
 
+            case WebviewMessage.onCompileAll: {
+                const compilation = await vscode.commands.executeCommand<CompilationPayload>("Tools-for-Solidity.sake.compile_all");
+                console.log("compilation", compilation);
+
+                console.log(vscode.window);
+
+                if (!compilation.success) {
+                    console.log("compilation failed");
+
+                    await vscode.window.showErrorMessage("Compilation failed");
+                    return;
+                }
+
+                console.log("compilation successful", vscode.window.showInformationMessage, vscode.window);
+                const infores = await vscode.window.showInformationMessage("Compilation successful", "ok", "no");
+                console.log("infores", infores);
+                break;
+            }
+
             default: {
                 // Pass the message to the inheriting class
                 this._onDidReceiveMessage(message);
@@ -212,5 +232,5 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
     /*
     * This method is called when the webview receives a message from the extension
     */
-    protected async _onDidReceiveMessage(message: WebviewMessage) {}
+    protected async _onDidReceiveMessage(message: WebviewMessageData) {}
 }
