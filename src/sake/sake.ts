@@ -4,10 +4,11 @@ import { StatusBarEnvironmentProvider } from './providers/StatusBarEnvironmentPr
 import { copyToClipboardHandler, loadSampleAbi, getTextFromInputBox } from './commands';
 import { DeploymentState } from './state/DeploymentState';
 import { CompilationState } from './state/CompilationState';
-import { CompilationPayload, Contract } from './webview/shared/types';
+import { WakeCompilationResult, Contract } from './webview/shared/types';
 import {
     LanguageClient,
 } from 'vscode-languageclient/node';
+import { parseCompilationResult } from './utils/compilation';
 
 export function activateSake(context: vscode.ExtensionContext, outputChannel: vscode.OutputChannel, client: LanguageClient | undefined) {
     const sidebarCompilerProvider = new CompilerWebviewProvider(context.extensionUri);
@@ -97,17 +98,43 @@ export function activateSake(context: vscode.ExtensionContext, outputChannel: vs
             return;
         }
 
-        const compilation = await client?.sendRequest<CompilationPayload>("wake/sake/compile");
+        const compilationResult = await client?.sendRequest<WakeCompilationResult>("wake/sake/compile");
 
-        if (compilation == null || !compilation.success) {
+        console.log("compilation result", compilationResult)
+
+        if (compilationResult == null || !compilationResult.success) {
             vscode.window.showErrorMessage("Compilation failed!");
             return false;
         }
 
         vscode.window.showInformationMessage("Compilation was successful!");
-        compilationState.setCompilation(compilation.contracts);
+        const _parsedCompilationResult = parseCompilationResult(compilationResult.contracts);
+        compilationState.setCompilation(_parsedCompilationResult);
 
-        return compilation.success;
+        return compilationResult.success;
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.sake.deploy", async () => {
+        if (client === undefined) {
+            outputChannel.appendLine("Failed to deploy due to missing language client");
+            return;
+        }
+
+        // const deploymentResult = await client?.sendRequest<WakeDeployResult>("wake/sake/deploy");
+        const deploymentResult = await client?.sendRequest<any>("wake/sake/deploy");
+
+        console.log("deployment result", deploymentResult)
+
+        if (deploymentResult == null || !deploymentResult.success) {
+            vscode.window.showErrorMessage("Compilation failed!");
+            return false;
+        }
+
+        // vscode.window.showInformationMessage("Compilation was successful!");
+        // const _parsedCompilationResult = parseCompilationResult(compilation.contracts);
+        // compilationState.setCompilation(_parsedCompilationResult);
+
+        return deploymentResult.success;
     }));
 
     vscode.workspace.onDidChangeTextDocument((e) => {

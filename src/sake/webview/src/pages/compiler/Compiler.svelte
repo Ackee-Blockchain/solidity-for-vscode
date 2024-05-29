@@ -33,9 +33,7 @@
 
         switch (command) {
             case WebviewMessage.stateChanged:
-                console.log("==", stateId, StateId.CompiledContracts, stateId == StateId.CompiledContracts)
                 if (stateId == StateId.CompiledContracts) {
-                    console.log("setting dirtyCompilation to", (payload as CompilationStateData).dirty);
                     dirtyCompilation = (payload as CompilationStateData).dirty;
                 }
                 break;

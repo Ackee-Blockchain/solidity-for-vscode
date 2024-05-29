@@ -61,10 +61,12 @@ export enum WebviewMessage {
     getState = "getState",
     stateChanged = "stateChanged",
     onCompile = "onCompile",
+    onDeploy = "onDeploy",
     onContractFunctionCall = "onContractFunctionCall",
-    onDeployContract = "onDeployContract",
     onUndeployContract = "onUndeployContract", // TODO rename
 }
+
+// TODO create pairs of WebviewMessage and WebviewInput and WebviewOutput
 
 /*
 *
@@ -72,10 +74,24 @@ export enum WebviewMessage {
 *
 */
 
-export interface CompilationPayload {
-    contracts: Array<ContractAbi>;
+export interface WakeCompiledContract {
+    [key: string]: any[];
+}
+
+export interface CompiledContract {
+    fqn: string;
+    name: string;
+    abi: ContractAbi;
+    // TODO join this type with contract
+}
+
+export interface WakeCompilationResult {
+    contracts: WakeCompiledContract;
     success: boolean;
     // TODO add error message
+}
+
+export interface WakeDeploymentResult {
 }
 
 export interface FunctionCallPayload {
@@ -98,7 +114,7 @@ export interface DeploymentStateData {
 }
 
 export interface CompilationStateData {
-    contracts: Array<ContractAbi>;
+    contracts: Array<CompiledContract>;
     dirty: boolean;
     // TODO add isDirty
 }

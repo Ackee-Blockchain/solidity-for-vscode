@@ -5,7 +5,7 @@ import { MessageHandlerData } from '@estruyf/vscode';
 import { BaseState } from "../state/BaseState";
 import { DeploymentState } from "../state/DeploymentState";
 import { loadSampleAbi } from "../commands";
-import { StateId, WebviewMessageData, WebviewMessage, CompilationPayload } from "../webview/shared/types";
+import { StateId, WebviewMessageData, WebviewMessage } from "../webview/shared/types";
 import { CompilationState } from "../state/CompilationState";
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
@@ -176,16 +176,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case "deployContract": {
-                if (!payload) {
-                    return;
-                }
-
-                this._getDeployedContracts().deploy(payload);
-
-                break;
-            }
-
             case "undeployContract": {
                 if (!payload) {
                     return;
@@ -206,6 +196,14 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
             case WebviewMessage.onCompile: {
                 const success = await vscode.commands.executeCommand<boolean>("Tools-for-Solidity.sake.compile");
+
+                webviewView.webview.postMessage({ command, requestId, payload: success } as MessageHandlerData<boolean>);
+
+                break;
+            }
+
+            case WebviewMessage.onDeploy: {
+                const success = await vscode.commands.executeCommand<boolean>("Tools-for-Solidity.sake.deploy");
 
                 webviewView.webview.postMessage({ command, requestId, payload: success } as MessageHandlerData<boolean>);
 

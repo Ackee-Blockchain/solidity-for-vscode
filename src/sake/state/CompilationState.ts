@@ -1,4 +1,4 @@
-import { CompilationStateData, ContractAbi, StateId } from "../webview/shared/types";
+import { CompilationStateData, CompiledContract, ContractAbi, StateId } from "../webview/shared/types";
 import { BaseState } from "./BaseState";
 
 export class CompilationState extends BaseState<CompilationStateData> {
@@ -27,7 +27,7 @@ export class CompilationState extends BaseState<CompilationStateData> {
         };
     }
 
-    public setCompilation(contracts: Array<ContractAbi>): void {
+    public setCompilation(contracts: Array<CompiledContract>): void {
         this.state = {
             contracts: contracts,
             dirty: false,
