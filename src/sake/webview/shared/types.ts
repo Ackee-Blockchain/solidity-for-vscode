@@ -59,7 +59,8 @@ export enum WebviewMessage {
     getTextFromInputBox = "getTextFromInputBox",
     setState = "setState",
     getState = "getState",
-    onCompileAll = "onCompileAll",
+    stateChanged = "stateChanged",
+    onCompile = "onCompile",
     onContractFunctionCall = "onContractFunctionCall",
     onDeployContract = "onDeployContract",
     onUndeployContract = "onUndeployContract", // TODO rename
@@ -83,17 +84,26 @@ export interface FunctionCallPayload {
     arguments: string;
 }
 
-export interface DeployedContractState {
+/*
+*
+* State
+*
+*/
+
+// TODO remove this
+export interface DeploymentStateData {
     name: string;
     address: string;
     abi: any;
 }
 
+export interface CompilationStateData {
+    contracts: Array<ContractAbi>;
+    dirty: boolean;
+    // TODO add isDirty
+}
+
 export enum StateId {
     DeployedContracts = "deployedContracts",
+    CompiledContracts = "compiledContracts",
 }
-
-interface ContractFunctionOutput {
-    // TODO
-}
-

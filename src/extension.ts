@@ -513,10 +513,8 @@ export async function activate(context: vscode.ExtensionContext) {
     client.start();
     analytics.logActivate();
 
-    console.log("in extension", vscode.window.registerTreeDataProvider, vscode.window.showErrorMessage);
-
     // activate Sake
-    activateSake(context);
+    activateSake(context, outputChannel, client);
 }
 
 function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext){
@@ -565,26 +563,6 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     }))
 
     context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.wake_callback", async (documentUri: vscode.Uri, callbackType: string, callbackId: string) => await vscode.commands.executeCommand('wake.callback', documentUri, callbackType, callbackId)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.sake.compile_all", async () => {
-        const editor = vscode.window.activeTextEditor;
-        if (editor?.document?.languageId !== 'solidity') {
-            outputChannel.appendLine("Failed to compile, no Solidity file opened");
-            return;
-        }
-
-        if (client === undefined) {
-            outputChannel.appendLine("Failed to compile due to missing language client");
-        }
-
-        const out = await client?.sendRequest("wake/sake/compile");
-
-        outputChannel.appendLine(`Client response: ${out}`);
-        console.log(out);
-
-        return out;
-        // outputChannel.appendLine(`Running 'wake sake compile, opened file is ${editor.document.uri.fsPath}'`);
-    }));
-
 }
 
 function openFile(uri : vscode.Uri, range : vscode.Range){

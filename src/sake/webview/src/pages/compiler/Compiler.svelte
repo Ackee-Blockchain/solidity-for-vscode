@@ -4,26 +4,52 @@
         vsCodeButton,
     } from "@vscode/webview-ui-toolkit";
     import { messageHandler } from '@estruyf/vscode/dist/client'
-    import { WebviewMessage } from "../../../shared/types";
+    import { StateId, WebviewMessage, type CompilationStateData } from "../../../shared/types";
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
     );
 
     let compiling = false;
+    let dirtyCompilation = false;
 
     const compile = async () => {
         compiling = true;
-        await messageHandler.send(WebviewMessage.onInfo, "mnm");
-        await messageHandler.send(WebviewMessage.onCompileAll);
+
+        const success = await messageHandler.request<boolean>(WebviewMessage.onCompile);
+        if (success) {
+            dirtyCompilation = false;
+        }
+
         compiling = false;
     }
+
+    window.addEventListener("message", (event) => {
+        if (!event.data.command) return;
+
+        const { command, payload, stateId } = event.data;
+
+        console.log("received message in compiler.svelte", event.data);
+
+        switch (command) {
+            case WebviewMessage.stateChanged:
+                console.log("==", stateId, StateId.CompiledContracts, stateId == StateId.CompiledContracts)
+                if (stateId == StateId.CompiledContracts) {
+                    console.log("setting dirtyCompilation to", (payload as CompilationStateData).dirty);
+                    dirtyCompilation = (payload as CompilationStateData).dirty;
+                }
+                break;
+        }
+    });
 </script>
 
 <main>
-    <vscode-button class="w-full" on:click={compile}>
-        {compiling ? "Compiling..." : "Compile contracts"}
+    <vscode-button class="w-full" on:click={compile} appearence={dirtyCompilation ? "primary" : "secondary"} disabled={compiling}>
+        {compiling ? "Compiling..." : "Compile all"}
     </vscode-button>
+    {#if dirtyCompilation}
+        <div class="text-sm px-2 py-1 bg-gray-800 rounded relative top-[-2px]">Some files were changed, recompilation might be needed</div>
+    {/if}
 </main>
 
 <style global>

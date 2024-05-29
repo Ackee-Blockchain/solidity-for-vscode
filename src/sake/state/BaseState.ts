@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
-import { StateId } from '../webview/shared/types';
+import { StateId, WebviewMessage } from '../webview/shared/types';
 
 export abstract class BaseState<T> {
     subscriptions: BaseWebviewProvider[] = [];
@@ -28,9 +28,10 @@ export abstract class BaseState<T> {
     }
 
     private _sendUpdateMessage() {
+        console.log("state in " + this._stateId + " changed, calling subscribers", this.state)
         this.subscriptions.forEach((provider) => {
             provider.postMessageToWebview({
-                command: "stateUpdated",
+                command: WebviewMessage.stateChanged,
                 payload: this._state,
                 stateId: this._stateId
             });

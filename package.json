@@ -535,6 +535,10 @@
             {
                 "command": "Tools-for-Solidity.sake.compile",
                 "title": "Sake: Compile"
+            },
+            {
+                "command": "Tools-for-Solidity.sake.test",
+                "title": "Sake: Test"
             }
         ],
         "viewsContainers": {
@@ -766,6 +770,7 @@
         "@types/mocha": "^9.1.1",
         "@types/node": "16.x",
         "@types/vscode": "^1.67.0",
+        "@types/vscode-webview": "^1.57.5",
         "@typescript-eslint/eslint-plugin": "^5.30.0",
         "@typescript-eslint/parser": "^5.30.0",
         "@vscode/test-electron": "^2.1.5",

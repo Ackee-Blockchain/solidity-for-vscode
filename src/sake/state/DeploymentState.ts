@@ -1,27 +1,27 @@
-import { DeployedContractState, StateId } from "../webview/shared/types";
+import { DeploymentStateData, StateId } from "../webview/shared/types";
 import { BaseState } from "./BaseState";
 
-export class DeployedContractsState extends BaseState<DeployedContractState[]> {
-    private static _instance: DeployedContractsState;
+export class DeploymentState extends BaseState<DeploymentStateData[]> {
+    private static _instance: DeploymentState;
 
     private constructor() {
         super(StateId.DeployedContracts, []);
     }
 
-    public static getInstance(): DeployedContractsState {
+    public static getInstance(): DeploymentState {
         if (!this._instance) {
-            this._instance = new DeployedContractsState();
+            this._instance = new DeploymentState();
         }
         return this._instance;
     }
 
-    public deploy(contract: DeployedContractState) {
+    public deploy(contract: DeploymentStateData) {
         // TODO validate payload
         const _state = [...this.state, contract];
         this.state = _state;
     }
 
-    public undeploy(contract: DeployedContractState) {
+    public undeploy(contract: DeploymentStateData) {
         const _state = this.state.filter((c) => c.address !== contract.address);
         this.state = _state;
     }

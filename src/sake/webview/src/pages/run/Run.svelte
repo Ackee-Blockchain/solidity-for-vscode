@@ -52,7 +52,7 @@
                 deployedContracts = [...deployedContracts, payload];
                 break;
 
-            case "stateUpdated": {
+            case "stateChanged": {
                 if (stateId === StateId.DeployedContracts) {
                     deployedContracts = payload;
                 }

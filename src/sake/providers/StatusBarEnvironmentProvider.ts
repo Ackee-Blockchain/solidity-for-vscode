@@ -10,8 +10,8 @@ export class StatusBarEnvironmentProvider {
         this._statusBarEnvironment.command = this.getCommandId();
 
         this._envs = [
-            "Shanghai", 
-            "Merge", 
+            "Shanghai",
+            "Merge",
             "London",
             "Berlin"
         ];
@@ -37,6 +37,8 @@ export class StatusBarEnvironmentProvider {
                     this._setStatusBarText();
                 }
             });
+
+            vscode.window.showInformationMessage("Set environment");
         };
     }
 

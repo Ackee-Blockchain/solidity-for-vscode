@@ -2,10 +2,14 @@ import * as vscode from 'vscode';
 import { DeployWebviewProvider, CompilerWebviewProvider, RunWebviewProvider } from './providers/WebviewProviders';
 import { StatusBarEnvironmentProvider } from './providers/StatusBarEnvironmentProvider';
 import { copyToClipboardHandler, loadSampleAbi, getTextFromInputBox } from './commands';
-import { DeployedContractsState } from './state/DeployedContractsState';
-import { Contract } from './webview/shared/types';
+import { DeploymentState } from './state/DeploymentState';
+import { CompilationState } from './state/CompilationState';
+import { CompilationPayload, Contract } from './webview/shared/types';
+import {
+    LanguageClient,
+} from 'vscode-languageclient/node';
 
-export function activateSake(context: vscode.ExtensionContext) {
+export function activateSake(context: vscode.ExtensionContext, outputChannel: vscode.OutputChannel, client: LanguageClient | undefined) {
     const sidebarCompilerProvider = new CompilerWebviewProvider(context.extensionUri);
 
     context.subscriptions.push(
@@ -31,9 +35,8 @@ export function activateSake(context: vscode.ExtensionContext) {
         )
     );
 
-    const deployedContractsState = DeployedContractsState.getInstance();
-    deployedContractsState.subscribe(sidebarRunProvider);
-    deployedContractsState.subscribe(sidebarDeployProvider);
+    const deploymentState = DeploymentState.getInstance();
+    const compilationState = CompilationState.getInstance();
 
     context.subscriptions.push(
         vscode.commands.registerCommand('sake.refresh', async () => {
@@ -52,7 +55,13 @@ export function activateSake(context: vscode.ExtensionContext) {
                 address: "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",
                 abi: sampleContractAbi
             };
-            deployedContractsState.deploy(sampleContract);
+            deploymentState.deploy(sampleContract);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('sake.test', async () => {
+            vscode.window.showInformationMessage("Hello World from Sake!");
         })
     );
 
@@ -82,26 +91,33 @@ export function activateSake(context: vscode.ExtensionContext) {
     }
     ));
 
-    // vscode.workspace.onDidChangeConfiguration((e) => {
-    //     console.log("changed config", e);
-    // });
+    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.sake.compile", async () => {
+        if (client === undefined) {
+            outputChannel.appendLine("Failed to compile due to missing language client");
+            return;
+        }
 
-    // vscode.workspace.onDidChangeTextDocument((e) => {
-    //     console.log("changed text", e);
-    // });
+        const compilation = await client?.sendRequest<CompilationPayload>("wake/sake/compile");
 
-    // vscode.workspace.onDidOpenTextDocument((e) => {
-    //     console.log("opened text", e);
-    // });
+        if (compilation == null || !compilation.success) {
+            vscode.window.showErrorMessage("Compilation failed!");
+            return false;
+        }
 
-    vscode.window.onDidChangeActiveTextEditor((e: vscode.TextEditor | undefined) => {
-        sidebarCompilerProvider.postMessageToWebview({
-            command: "onChangeActiveFile",
-            payload: e
-        });
+        vscode.window.showInformationMessage("Compilation was successful!");
+        compilationState.setCompilation(compilation.contracts);
+
+        return compilation.success;
+    }));
+
+    vscode.workspace.onDidChangeTextDocument((e) => {
+        if (e.document.languageId == "solidity" && !e.document.isDirty) {
+            console.log(".sol file changed, set compilation state dirty");
+            compilationState.makeDirty();
+        }
+        // TODO might need to rework using vscode.workspace.createFileSystemWatcher
     });
-
-
 }
+
 
 export function deactivateSake() {}

@@ -3,9 +3,10 @@ import { getNonce } from "../utils/getNonce";
 import { getBasePage } from "../utils/getBasePage";
 import { MessageHandlerData } from '@estruyf/vscode';
 import { BaseState } from "../state/BaseState";
-import { DeployedContractsState } from "../state/DeployedContractsState";
+import { DeploymentState } from "../state/DeploymentState";
 import { loadSampleAbi } from "../commands";
 import { StateId, WebviewMessageData, WebviewMessage, CompilationPayload } from "../webview/shared/types";
+import { CompilationState } from "../state/CompilationState";
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -27,7 +28,8 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
         // Subscribe to states
-        DeployedContractsState.getInstance().subscribe(this);
+        DeploymentState.getInstance().subscribe(this);
+        CompilationState.getInstance().subscribe(this);
 
         // Handle messages from the webview
         webviewView.webview.onDidReceiveMessage(async (message) => {
@@ -105,7 +107,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         return this._stateSubscriptions.get(stateId);
     }
 
-    protected _getDeployedContracts(): DeployedContractsState {
+    protected _getDeployedContracts(): DeploymentState {
         return this._getStateObject(StateId.DeployedContracts);
     }
 
@@ -115,15 +117,13 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         // convert stateId string to enum
         const _stateId = stateId as StateId;
 
-        console.log("handling message", message);
-
         switch (command) {
             // TODO: change strings to enums
             case "onInfo": {
                 if (!payload) {
                     return;
                 }
-                vscode.window.showInformationMessage(payload);
+                vscode.window.showWarningMessage(payload);
                 break;
             }
 
@@ -204,22 +204,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 console.log("contract call was executed", payload);
             }
 
-            case WebviewMessage.onCompileAll: {
-                const compilation = await vscode.commands.executeCommand<CompilationPayload>("Tools-for-Solidity.sake.compile_all");
-                console.log("compilation", compilation);
+            case WebviewMessage.onCompile: {
+                const success = await vscode.commands.executeCommand<boolean>("Tools-for-Solidity.sake.compile");
 
-                console.log(vscode.window);
+                webviewView.webview.postMessage({ command, requestId, payload: success } as MessageHandlerData<boolean>);
 
-                if (!compilation.success) {
-                    console.log("compilation failed");
-
-                    await vscode.window.showErrorMessage("Compilation failed");
-                    return;
-                }
-
-                console.log("compilation successful", vscode.window.showInformationMessage, vscode.window);
-                const infores = await vscode.window.showInformationMessage("Compilation successful", "ok", "no");
-                console.log("infores", infores);
                 break;
             }
 
