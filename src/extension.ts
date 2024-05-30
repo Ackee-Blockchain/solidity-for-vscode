@@ -22,8 +22,10 @@ import { Graphviz } from "@hpcc-js/wasm";
 import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler, newDetector, newPrinter } from './commands';
 import { hideCoverageCallback, initCoverage, showCoverageCallback } from './coverage';
 
-const path = require('node:path');
-const fs = require('fs');
+import * as https from 'https';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as tmp from 'tmp';
 
 import getPort = require('get-port');
 import waitPort = require('wait-port');
@@ -85,6 +87,53 @@ function onNotification(outputChannel: vscode.OutputChannel, detection: Diagnost
     }
 }
 
+async function installPip(outputChannel: vscode.OutputChannel, pythonExecutable: string) {
+    var tempFile = tmp.fileSync({ mode: 0o644 });
+    const url = "https://bootstrap.pypa.io/get-pip.py";
+
+    outputChannel.appendLine(`Downloading ${url} to ${tempFile.name}`);
+
+    await new Promise<void>((resolve, reject) => {
+        https.get(url, (response) => {
+            if (response.statusCode !== 200) {
+                reject(new Error(`Failed to download ${url}: ${response.statusCode}`));
+                return;
+            }
+
+            const file = fs.createWriteStream(tempFile.name);
+            response.pipe(file);
+
+            file.on('finish', () => {
+                file.close((err) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    outputChannel.appendLine(`Running '${pythonExecutable} ${tempFile.name} --user'`);
+
+                    try {
+                        const result = execaSync(pythonExecutable, [tempFile.name, "--user"]);
+                        if (result.exitCode !== 0) {
+                            reject(new Error(`Failed to install pip: ${result.stderr}`));
+                            return;
+                        }
+                    } catch(err) {
+                        reject(err);
+                        return;
+                    }
+
+                    resolve();
+                });
+            }).on('error', (err) => {
+                reject(err);
+            });
+        }).on('error', (err) => {
+            reject(err);
+        });
+    });
+}
+
 async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<boolean> {
     // check if pip is available and install it if not
     try {
@@ -102,15 +151,23 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
                 outputChannel.appendLine(`Running '${pythonExecutable} -m ensurepip --user'`);
                 execaSync(pythonExecutable, ["-m", "ensurepip", "--user"]);
             } catch(err) {
-                analytics.logCrash(EventType.ERROR_PIP_INSTALL, err);
-
                 if (err instanceof Error) {
                     outputChannel.appendLine("Failed to install pip into user site-packages:");
                     outputChannel.appendLine(err.toString());
-                    outputChannel.show(true);
                 }
+                try {
+                    await installPip(outputChannel, pythonExecutable);
+                } catch(err) {
+                    analytics.logCrash(EventType.ERROR_PIP_INSTALL, err);
 
-                return false;
+                    if (err instanceof Error) {
+                        outputChannel.appendLine("Failed to install pip:");
+                        outputChannel.appendLine(err.toString());
+                        outputChannel.show(true);
+                    }
+
+                    return false;
+                }
             }
         }
     }
