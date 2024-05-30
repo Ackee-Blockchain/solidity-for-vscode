@@ -755,6 +755,7 @@
         "get-port": "<6.0.0",
         "node-fetch": "^3.3.2",
         "open": "^10.1.0",
+        "pidtree": "^0.6.0",
         "tmp": "^0.2.3",
         "vscode-languageclient": "^8.0.1",
         "wait-port": "^0.3.0"
