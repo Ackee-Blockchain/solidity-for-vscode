@@ -39,6 +39,7 @@ import { ClientErrorHandler } from './ClientErrorHandler';
 import { ExecaChildProcess, execa, execaSync } from 'execa';
 import { PrintersHandler } from './printers/PrintersHandler'
 import { GraphvizPreviewGenerator } from './graphviz/GraphvizPreviewGenerator';
+import pidtree = require('pidtree');
 
 
 let client: LanguageClient | undefined = undefined;
@@ -618,14 +619,32 @@ function openWeb(detector : Detector){
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
+export async function deactivate() {
     if (client !== undefined) {
         client.stop();
     }
-    if (wakeProcess !== undefined) {
-        if (!wakeProcess.kill()) {
-            wakeProcess.kill("SIGKILL");
-        }
+    if (wakeProcess?.pid !== undefined) {
+        const pids = await pidtree(wakeProcess.pid);
+        pids.forEach((pid: number) => {
+            try {
+                process.kill(pid, "SIGTERM");
+            } catch (err) {
+                console.error(err);
+            }
+        });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        pids.forEach((pid: number) => {
+            try {
+                if (process.platform === "win32") {
+                    execaSync("taskkill", ["/pid", pid.toString(), "/f", "/t"]);
+                } else {
+                    process.kill(pid, "SIGKILL");
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
     }
 }
 
