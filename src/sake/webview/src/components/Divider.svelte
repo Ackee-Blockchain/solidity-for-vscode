@@ -1,4 +1,4 @@
-<hr class="my-4" />
+<hr class="my-6" />
 
 <style>
     hr {

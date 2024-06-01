@@ -66,10 +66,10 @@
 
 </script>
 
-<main>fn
+<main>
     <CallSetup />
 
-    <vscode-divider class="my-4"></vscode-divider>
+    <Divider />
 
     <section>
         <p class="mb-2">Deployed Contracts</p>

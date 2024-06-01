@@ -5,8 +5,9 @@ import { MessageHandlerData } from '@estruyf/vscode';
 import { BaseState } from "../state/BaseState";
 import { DeploymentState } from "../state/DeploymentState";
 import { loadSampleAbi } from "../commands";
-import { StateId, WebviewMessageData, WebviewMessage } from "../webview/shared/types";
+import { StateId, WebviewMessageData, WebviewMessage, WakeDeploymentRequestParams } from "../webview/shared/types";
 import { CompilationState } from "../state/CompilationState";
+import { AccountState } from "../state/AccountState";
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -30,6 +31,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         // Subscribe to states
         DeploymentState.getInstance().subscribe(this);
         CompilationState.getInstance().subscribe(this);
+        AccountState.getInstance().subscribe(this);
 
         // Handle messages from the webview
         webviewView.webview.onDidReceiveMessage(async (message) => {
@@ -203,7 +205,20 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessage.onDeploy: {
-                const success = await vscode.commands.executeCommand<boolean>("Tools-for-Solidity.sake.deploy");
+                if (!payload) {
+                    console.error("No deployment params provided");
+                    return;
+                }
+
+                const success = await vscode.commands.executeCommand<boolean>("Tools-for-Solidity.sake.deploy", payload);
+
+                webviewView.webview.postMessage({ command, requestId, payload: success } as MessageHandlerData<boolean>);
+
+                break;
+            }
+
+            case WebviewMessage.onGetAccounts: {
+                const success = await vscode.commands.executeCommand<boolean>("Tools-for-Solidity.sake.getAccounts");
 
                 webviewView.webview.postMessage({ command, requestId, payload: success } as MessageHandlerData<boolean>);
 

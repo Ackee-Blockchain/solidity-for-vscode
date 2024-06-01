@@ -64,6 +64,7 @@ export enum WebviewMessage {
     onDeploy = "onDeploy",
     onContractFunctionCall = "onContractFunctionCall",
     onUndeployContract = "onUndeployContract", // TODO rename
+    onGetAccounts = "onGetAccounts",
 }
 
 // TODO create pairs of WebviewMessage and WebviewInput and WebviewOutput
@@ -74,30 +75,18 @@ export enum WebviewMessage {
 *
 */
 
-export interface WakeCompiledContract {
-    [key: string]: any[];
+export interface FunctionCallPayload {
+    contract: Contract;
+    function: string;
+    arguments: string;
 }
+
 
 export interface CompiledContract {
     fqn: string;
     name: string;
     abi: ContractAbi;
     // TODO join this type with contract
-}
-
-export interface WakeCompilationResult {
-    contracts: WakeCompiledContract;
-    success: boolean;
-    // TODO add error message
-}
-
-export interface WakeDeploymentResult {
-}
-
-export interface FunctionCallPayload {
-    contract: Contract;
-    function: string;
-    arguments: string;
 }
 
 /*
@@ -119,7 +108,38 @@ export interface CompilationStateData {
     // TODO add isDirty
 }
 
+export type AccountStateData = Array<string>; // TODO
+
 export enum StateId {
     DeployedContracts = "deployedContracts",
     CompiledContracts = "compiledContracts",
+    Accounts = "accounts",
 }
+
+/*
+*
+* API to Wake
+*
+*/
+
+export interface WakeCompiledContract {
+    [key: string]: ContractAbi
+};
+
+export interface WakeCompilationResponse {
+    contracts: WakeCompiledContract;
+    success: boolean;
+    // TODO add error message
+}
+
+export interface WakeDeploymentResponse {
+}
+
+export interface WakeDeploymentRequestParams {
+    contract_fqn: string;
+    sender: string;
+    calldata: string;
+    value: number;
+}
+
+export type WakeGetAccountsResponse = AccountStateData;

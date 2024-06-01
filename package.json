@@ -535,10 +535,6 @@
             {
                 "command": "Tools-for-Solidity.sake.compile",
                 "title": "Sake: Compile"
-            },
-            {
-                "command": "Tools-for-Solidity.sake.test",
-                "title": "Sake: Test"
             }
         ],
         "viewsContainers": {
@@ -569,14 +565,10 @@
             "sake": [
                 {
                     "type": "webview",
-                    "id": "sake-compile",
-                    "name": "Compiler"
+                    "id": "sake-compile-deploy",
+                    "name": "Compile & Deploy"
                 },
-                {
-                    "type": "webview",
-                    "id": "sake-deploy",
-                    "name": "Deploy"
-                },
+
                 {
                     "type": "webview",
                     "id": "sake-run",

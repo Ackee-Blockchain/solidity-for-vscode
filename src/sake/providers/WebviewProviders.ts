@@ -24,26 +24,6 @@ export class DeployWebviewProvider extends BaseWebviewProvider {
                 this._view?.webview.postMessage({ command, requestId, payload: sampleContractAbi } as MessageHandlerData<string>);
                 break;
             }
-
-            case "deployContract": {
-                if (!payload) {
-                    return;
-                }
-
-                this._getDeployedContracts().deploy(payload);
-
-                break;
-            }
-
-            case "undeployContract": {
-                if (!payload) {
-                    return;
-                }
-
-                this._getDeployedContracts().undeploy(payload);
-
-                break;
-            }
         }
 
     }
