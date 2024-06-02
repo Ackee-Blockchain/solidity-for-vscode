@@ -33,4 +33,11 @@ export class CompilationState extends BaseState<CompilationStateData> {
             dirty: false,
         };
     }
+
+    public getDict() {
+        return this.state.contracts.reduce((dict, contract) => {
+            dict[contract.fqn] = contract;
+            return dict;
+        }, {} as Record<string, CompiledContract>);
+    }
 }

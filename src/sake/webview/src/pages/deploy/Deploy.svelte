@@ -14,6 +14,7 @@
     import CallSetup from "../../components/CallSetup.svelte";
     import { messageHandler } from '@estruyf/vscode/dist/client'
     import { StateId, WebviewMessage, type CompilationStateData, type CompiledContract, type WakeDeploymentRequestParams } from "../../../shared/types";
+    import { onMount } from "svelte";
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -31,6 +32,18 @@
     let dirtyCompilation = false;
     let callSetup: CallSetup;
 
+    onMount(() => {
+        messageHandler.send(WebviewMessage.getState, StateId.CompiledContracts);
+    });
+
+    const setCompilationState = (payload: CompilationStateData) => {
+        compiledContracts = payload.contracts;
+        if (selectedContractId == null || selectedContractId >= compiledContracts.length) {
+            selectedContractId = 0;
+        }
+        dirtyCompilation = payload.dirty;
+    }
+
     const compile = async () => {
         compiling = true;
 
@@ -47,18 +60,14 @@
 
         const { command, payload, stateId } = event.data;
 
-        console.log("received message in deploy.svelte", event.data);
-
         switch (command) {
             case WebviewMessage.stateChanged:
+            case WebviewMessage.getState:
                 if (stateId == StateId.CompiledContracts) {
-                    const _payload = payload as CompilationStateData;
-                    console.log("received compiled contracts", payload);
-                    compiledContracts = _payload.contracts;
-                    if (selectedContractId == null || selectedContractId >= compiledContracts.length) {
-                        selectedContractId = 0;
+                    if (payload === undefined) {
+                        return;
                     }
-                    dirtyCompilation = _payload.dirty;
+                    setCompilationState(payload as CompilationStateData);
                     return;
                 }
 

@@ -132,8 +132,25 @@ export interface WakeCompilationResponse {
     // TODO add error message
 }
 
-export interface WakeDeploymentResponse {
+export interface WakeDeployedContract {
+    type: string;
+    status: string;
+    cumulativeGasUsed: string;
+    logs: any[];
+    logsBloom: string;
+    transactionHash: string;
+    transactionIndex: string;
+    blockHash: string;
+    blockNumber: string;
+    gasUsed: string;
+    effectiveGasPrice: string;
+    from: string;
+    to: string | null;
+    contractAddress: string;
+    root: string;
 }
+
+export type WakeDeploymentResponse = WakeDeployedContract;
 
 export interface WakeDeploymentRequestParams {
     contract_fqn: string;

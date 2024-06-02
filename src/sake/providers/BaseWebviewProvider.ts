@@ -114,10 +114,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
     }
 
     private async _handleMessage(message: WebviewMessageData, webviewView: vscode.WebviewView) {
-        const { command, requestId, stateId, payload } = message;
-
-        // convert stateId string to enum
-        const _stateId = stateId as StateId;
+        const { command, requestId, payload } = message;
 
         switch (command) {
             // TODO: change strings to enums
@@ -144,7 +141,8 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case "setState": {
-                if (!stateId || !this._stateSubscriptions.has(_stateId)) {
+                const _stateId = payload as StateId;
+                if (_stateId === undefined || !this._stateSubscriptions.has(_stateId)) {
                     // console.error(`A provider ${this._targetPath} tried to set state which it does not subscribe to: ${stateId}`);
                     // Send a response to the webview that the state was not set
                     webviewView.webview.postMessage({ command, requestId, payload: false } as MessageHandlerData<boolean>);
@@ -155,20 +153,20 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 state && (state.state = payload);
 
                 // Send a response to the webview that the state was set
-                webviewView.webview.postMessage({ command, requestId, payload: true } as MessageHandlerData<boolean>);
+                webviewView.webview.postMessage({ command, requestId, stateId: _stateId, payload: true } as MessageHandlerData<boolean>);
 
                 break;
             }
 
-            case "getState": {
-                if (!stateId || !this._stateSubscriptions.has(_stateId)) {
-                    // console.error(`A provider ${this._targetPath} tried to get state which it does not subscribe to: ${stateId}`);
+            case WebviewMessage.getState: {
+                const _stateId = payload as StateId;
+                if (_stateId === undefined || !this._stateSubscriptions.has(_stateId)) {
                     webviewView.webview.postMessage({ command, requestId, payload: undefined } as MessageHandlerData<any>);
                     break;
                 }
 
-                const state = this._stateSubscriptions.get(_stateId)
-                webviewView.webview.postMessage({ command, requestId, payload: state?.state } as MessageHandlerData<any>);
+                const state = this._stateSubscriptions.get(_stateId);
+                webviewView.webview.postMessage({ command, requestId, stateId: _stateId, payload: state?.state } as MessageHandlerData<any>);
                 break;
             }
 

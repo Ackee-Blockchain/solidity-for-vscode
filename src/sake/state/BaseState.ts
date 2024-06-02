@@ -23,6 +23,7 @@ export abstract class BaseState<T> {
     }
 
     public set state(_state: T) {
+        // TODO check if state is the same, only update if it differs
         this._state = _state;
         this._sendUpdateMessage();
     }

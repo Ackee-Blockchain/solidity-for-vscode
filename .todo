@@ -1,0 +1,62 @@
+
+Frontend:
+    Inputs:
+        ☐ setting [2,3,4] to uint256[] throw an error at root
+        ☐ be able to set a new input length
+        ☐ be able to set ListInput to []
+        ☐ be able to set value undefined
+        ☐ be able to delete contracts as well
+        ☐ state mutability payable @critical @started(24-05-08 18:16)
+        ☐ enums @critical
+
+    Other:
+        ☐ history of txs
+        ☐ maybe add option to save a function call (with params)
+
+    Compile:
+        ☐ ui should show all solidity files in current workspace @next
+            - listen to changes, when a new file is created etc. show it in the ui
+            - when something is deleted, hide it
+
+    Ideas:
+        ☐ Button for opening a contract abi in a bigger window (with additional functionality)?
+        ☐ network could be chosen via top box, and the current network could be displayed in the bottom row maybe.
+           i dont think the network should be inside the sidebar
+        ☐ add a config where this is specified? like sake.toml or something
+        ☐ accs could have colors?
+
+Backend:
+    ✔ refactor the state stuff, prob should be a separate class for each state with its own functions @done(24-05-07 11:51)
+
+General:
+    ☐ preserve state between webview switching @critical
+        ☐ on webview reset, load data from state @critical
+    ✔ join types and interfaces (now extension and webview have them separate) @done(24-05-08 17:55)
+        ☐ resolve the enum issue
+    ☐ i jsut need to add the enums to shared @warning
+        ☐ also add enums for message names
+        ☐ rename deployContract to onDeploy, everything which is an event should start with on
+
+Non-Critical:
+    ✔ Single parent class for sidebar providers @done(24-05-07 09:36)
+
+Brainstorming:
+    ☐ Convert TX history to Wake code/Run current wake code on the network
+    [] the card element oculd be similar to code block in ai chat
+    ✔ text input for function call when card is collased @done(24-05-20 10:52)
+        - just could write the function, again similar as in chat... could be quick
+    ☐ lsp hint above function to call it?
+    ☐ how to simplify ui
+        - instead of listing all the deployed contracts, maybe use a dropdown?
+    ☐ output channel idea
+        - something liek the terminal, split horizontally into 2 parts, the right little part would be the history of txs,
+        - the left would just output the given selected tx
+
+
+TfS Integration:
+    how it will work
+        will use lsp protocol
+            notifikace or message/requests   resposne bude json
+        see printersHandler.ts
+    ☐ define messages and types whcih will be sent to lsp wake side
+    ☐ validation at frontend

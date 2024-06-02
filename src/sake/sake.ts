@@ -97,17 +97,17 @@ export function activateSake(context: vscode.ExtensionContext, outputChannel: vs
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.compile",
-        () => compile(client, outputChannel, compilationState))
+        () => compile(client, outputChannel))
     );
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.deploy",
-        (deploymentParams: WakeDeploymentRequestParams) => deploy(deploymentParams, client, outputChannel, deploymentState))
+        (deploymentParams: WakeDeploymentRequestParams) => deploy(deploymentParams, client, outputChannel))
     );
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.getAccounts",
-        () => getAccounts(client, outputChannel, accountState))
+        () => getAccounts(client, outputChannel))
     );
 
 

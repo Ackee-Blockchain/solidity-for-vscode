@@ -45,6 +45,12 @@
                     const _payload = payload as AccountStateData;
                     console.log("received accounts", payload);
                     accounts = _payload;
+                    if (selectedAccountIndex == null || selectedAccountIndex >= accounts.length) {
+                        selectedAccountIndex = 0;
+                    }
+                    else if (accounts.length === 0) {
+                        selectedAccountIndex = undefined;
+                    }
                     return;
                 }
 

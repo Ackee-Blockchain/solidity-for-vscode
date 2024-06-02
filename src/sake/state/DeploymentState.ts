@@ -25,4 +25,11 @@ export class DeploymentState extends BaseState<DeploymentStateData[]> {
         const _state = this.state.filter((c) => c.address !== contract.address);
         this.state = _state;
     }
+
+    public getDict() {
+        return this.state.reduce((acc, contract) => {
+            acc[contract.address] = contract;
+            return acc;
+        }, {} as Record<string, DeploymentStateData>);
+    }
 }
