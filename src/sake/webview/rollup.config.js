@@ -41,16 +41,6 @@ const _defaultConfig = {
 
 export default [
     {
-        input: 'src/pages/compiler/compiler.ts',
-        output: {
-            sourcemap: true,
-            format: 'iife',
-            name: 'app',
-            file: 'dist/compiler/webview.js'
-        },
-        ..._defaultConfig,
-    },
-    {
         input: 'src/pages/run/run.ts',
         output: {
             sourcemap: true,
@@ -61,12 +51,12 @@ export default [
         ..._defaultConfig,
     },
     {
-        input: 'src/pages/deploy/deploy.ts',
+        input: 'src/pages/compile-deploy/compile-deploy.ts',
         output: {
             sourcemap: true,
             format: 'cjs',
             name: 'app',
-            file: 'dist/deploy/webview.js'
+            file: 'dist/compile-deploy/webview.js'
         },
         ..._defaultConfig,
     }

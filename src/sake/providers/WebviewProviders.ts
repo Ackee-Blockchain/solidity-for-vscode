@@ -12,7 +12,7 @@ export class CompilerWebviewProvider extends BaseWebviewProvider {
 
 export class DeployWebviewProvider extends BaseWebviewProvider {
     constructor(_extensionUri: vscode.Uri) {
-        super(_extensionUri, "deploy");
+        super(_extensionUri, "compile-deploy");
     }
 
     protected override async _onDidReceiveMessage(message: WebviewMessageData) {
