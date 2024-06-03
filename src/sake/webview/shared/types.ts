@@ -59,7 +59,6 @@ export enum WebviewMessage {
     getTextFromInputBox = "getTextFromInputBox",
     setState = "setState",
     getState = "getState",
-    stateChanged = "stateChanged",
     onCompile = "onCompile",
     onDeploy = "onDeploy",
     onContractFunctionCall = "onContractFunctionCall",

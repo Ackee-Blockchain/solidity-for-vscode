@@ -8,11 +8,12 @@
         vsCodeCheckbox,
         vsCodeTextField,
     } from "@vscode/webview-ui-toolkit";
-    import Spacer from "../../components/Spacer.svelte";
     import Contract from "../../components/Contract.svelte";
     import Divider from "../../components/Divider.svelte";
     import CallSetup from "../../components/CallSetup.svelte";
-    import { StateId } from "../../../shared/types";
+    import { StateId, WebviewMessage } from "../../../shared/types";
+    import { onMount } from "svelte";
+    import { messageHandler } from "@estruyf/vscode/dist/client";
     // import '../../../shared/types'; // Importing types to avoid TS error
 
     provideVSCodeDesignSystem().register(
@@ -24,19 +25,11 @@
         vsCodeTextField(),
     );
 
-    let deployedContracts: Array<any> = [
-        // {
-        //     name: "MagicCoin",
-        //     address: "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",
-        //     abi: sampleContractAbi
-        // },
-        // {
-        //     name: "NotMagicCoin",
-        //     address: "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2",
-        //     abi: sampleContractAbi
+    let deployedContracts: Array<any> = [];
 
-        // }
-    ];
+    onMount(() => {
+        messageHandler.send(WebviewMessage.getState, StateId.DeployedContracts);
+    });
 
     window.addEventListener("message", (event) => {
         if (!event.data.command) return;
@@ -44,20 +37,11 @@
         const { command, payload, stateId } = event.data;
 
         switch (command) {
-            case "onDeployedContract":
-                if (payload === undefined) {
-                    return;
-                }
-
-                deployedContracts = [...deployedContracts, payload];
-                break;
-
-            case "stateChanged": {
+            case WebviewMessage.getState: {
                 if (stateId === StateId.DeployedContracts) {
                     deployedContracts = payload;
                 }
 
-                // deployedContracts = payload;
                 break;
             }
         }

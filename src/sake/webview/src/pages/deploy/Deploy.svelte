@@ -61,7 +61,6 @@
         const { command, payload, stateId } = event.data;
 
         switch (command) {
-            case WebviewMessage.stateChanged:
             case WebviewMessage.getState:
                 if (stateId == StateId.CompiledContracts) {
                     if (payload === undefined) {

@@ -42,7 +42,7 @@
         const { command, payload, stateId } = event.data;
 
         switch (command) {
-            case WebviewMessage.stateChanged:
+            case WebviewMessage.getState:
                 if (stateId == StateId.Accounts) {
                     const _payload = payload as AccountStateData;
                     accounts = _payload;

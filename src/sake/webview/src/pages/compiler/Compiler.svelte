@@ -30,7 +30,7 @@
         const { command, payload, stateId } = event.data;
 
         switch (command) {
-            case WebviewMessage.stateChanged:
+            case WebviewMessage.getState:
                 if (stateId == StateId.CompiledContracts) {
                     dirtyCompilation = (payload as CompilationStateData).dirty;
                 }
