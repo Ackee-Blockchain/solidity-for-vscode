@@ -22,6 +22,10 @@
         return accounts[selectedAccountIndex];
     }
 
+    export const getValue = () => {
+        return value;
+    }
+
     let accounts: AccountStateData = [
         // { address: "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", balance: 100 },
         // { address: "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", balance: 50 },
@@ -37,13 +41,10 @@
 
         const { command, payload, stateId } = event.data;
 
-        console.log("received message in callsetup.svelte", event.data);
-
         switch (command) {
             case WebviewMessage.stateChanged:
                 if (stateId == StateId.Accounts) {
                     const _payload = payload as AccountStateData;
-                    console.log("received accounts", payload);
                     accounts = _payload;
                     if (selectedAccountIndex == null || selectedAccountIndex >= accounts.length) {
                         selectedAccountIndex = 0;
@@ -59,9 +60,19 @@
     });
 
     let selectedAccountIndex: number | undefined = undefined
+    let value: number | undefined = undefined
 
     function handleAccountChange(event: any) {
         selectedAccountIndex = event.detail.value;
+    }
+
+    function handleValueChange(event: any) {
+        const _value = parseInt(event.target.value);
+        if (isNaN(_value)) {
+            value = undefined;
+            return;
+        }
+        value = _value
     }
 </script>
 
@@ -95,13 +106,13 @@
     {/if}
 
     <div class="w-full flex flex-row gap-3 ">
-        <div>
+        <!-- <div>
             <p class="ml-1 text-sm">Gas limit</p>
             <vscode-text-field placeholder="Gas limit" class="w-full"></vscode-text-field>
-        </div>
+        </div> -->
         <div>
             <p class="ml-1 text-sm">Value</p>
-            <vscode-text-field placeholder="Value" class="w-full"></vscode-text-field>
+            <vscode-text-field placeholder="Value" class="w-full" value={value} on:change={handleValueChange}></vscode-text-field>
         </div>
         <!-- <p>Value</p>
         <vscode-text-field placeholder="Value" class="w-full"></vscode-text-field> -->

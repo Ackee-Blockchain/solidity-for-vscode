@@ -22,6 +22,7 @@ export async function getAccounts(
 
     console.log("accounts result", accountsResult);
 
+    // eslint-disable-next-line eqeqeq
     if (accountsResult == null || accountsResult.length === 0) {
         vscode.window.showErrorMessage("Failed to get accounts!");
         return false;
@@ -67,13 +68,20 @@ export async function deploy(
         return;
     }
 
+    console.log("deployment params", deploymentParams);
+
     // const deploymentResult = await client?.sendRequest<WakeDeployResult>("wake/sake/deploy");
     const deploymentResult = await client?.sendRequest<WakeDeploymentResponse>("wake/sake/deploy", deploymentParams);
 
     console.log("deployment result", deploymentResult);
 
     if (deploymentResult == null) { // TODO more checks
-        vscode.window.showErrorMessage("Deployment failed!");
+        vscode.window.showErrorMessage("Deployment failed, no result returned");
+        return false;
+    }
+
+    if (deploymentResult.status === "0x0") {
+        vscode.window.showErrorMessage("Deployment failed, status 0x0");
         return false;
     }
 
@@ -85,7 +93,8 @@ export async function deploy(
         name: _contractCompilationData.name,
         address: deploymentResult.contractAddress,
         abi: _contractCompilationData.abi,
-    }
+    };
+
     deploymentState.deploy(_deploymentData);
 
     // Show output

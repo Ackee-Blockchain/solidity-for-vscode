@@ -29,8 +29,6 @@
 
         const { command, payload, stateId } = event.data;
 
-        console.log("received message in compiler.svelte", event.data);
-
         switch (command) {
             case WebviewMessage.stateChanged:
                 if (stateId == StateId.CompiledContracts) {
@@ -42,6 +40,7 @@
 </script>
 
 <main>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <vscode-button class="w-full" on:click={compile} appearence={dirtyCompilation ? "primary" : "secondary"} disabled={compiling}>
         {compiling ? "Compiling..." : "Compile all"}
     </vscode-button>

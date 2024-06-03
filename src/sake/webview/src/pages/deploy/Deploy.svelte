@@ -15,6 +15,7 @@
     import { messageHandler } from '@estruyf/vscode/dist/client'
     import { StateId, WebviewMessage, type CompilationStateData, type CompiledContract, type WakeDeploymentRequestParams } from "../../../shared/types";
     import { onMount } from "svelte";
+  import Constructor from "../../components/Constructor.svelte";
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -26,8 +27,7 @@
     );
 
     let compiledContracts: Array<CompiledContract> = [];
-    let selectedContractId: number | null = null;
-    let isValidSelection = selectedContractId !== null && selectedContractId >= 0 && selectedContractId < compiledContracts.length;
+    let selectedContract: CompiledContract | undefined = undefined;
     let compiling = false;
     let dirtyCompilation = false;
     let callSetup: CallSetup;
@@ -38,8 +38,8 @@
 
     const setCompilationState = (payload: CompilationStateData) => {
         compiledContracts = payload.contracts;
-        if (selectedContractId == null || selectedContractId >= compiledContracts.length) {
-            selectedContractId = 0;
+        if (selectedContract === undefined && compiledContracts.length > 0) {
+            selectedContract = compiledContracts[0];
         }
         dirtyCompilation = payload.dirty;
     }
@@ -79,35 +79,41 @@
         return "0x" + Math.random().toString(16).slice(2)
     }
 
-    const deploy = async function() {
-        if (selectedContractId === null || selectedContractId >= compiledContracts.length) {
-            console.error("invalid contract id", selectedContractId)
-            messageHandler.send(WebviewMessage.onError, "An issue occurred while deploying the contract");
+    const deploy = async function(calldata: string) {
+        if (selectedContract === undefined) {
+            messageHandler.send(WebviewMessage.onError, "Failed deployment, no contract seleced");
             return;
         }
 
-        const _sender = callSetup.getSelectedAccount();
+        const _sender: string | undefined = callSetup.getSelectedAccount();
         if (_sender === undefined) {
-            console.error("invalid sender", _sender)
-            messageHandler.send(WebviewMessage.onError, "An issue occurred while deploying the contract");
+            messageHandler.send(WebviewMessage.onError, "Failed deployment, undefined sender");
             return;
         }
 
-        console.log("selected contract", compiledContracts[selectedContractId]);
+        const _value: number | undefined = callSetup.getValue();
 
-        const _selectedContract = compiledContracts[selectedContractId];
         const payload: WakeDeploymentRequestParams = {
-            contract_fqn: _selectedContract.fqn,
+            contract_fqn: selectedContract.fqn,
             sender: _sender,
-            calldata: "",
-            value: 0
+            calldata: calldata,
+            value: _value ?? 0
         }
 
         await messageHandler.send(WebviewMessage.onDeploy, payload)
     }
 
-    const selectContract = (e: CustomEvent) => {
-        selectedContractId = e.detail.value;
+    const selectContract = function(e: CustomEvent) {
+        // console.log("selected contract id", e.detail.value);
+
+        const _selectedContractId = e.detail.value;
+        if (_selectedContractId == null || _selectedContractId >= compiledContracts.length) {
+            selectedContract = undefined;
+        } else {
+            selectedContract = compiledContracts[_selectedContractId];
+        }
+
+        // console.log("selected contract", selectedContract);
     }
 
 </script>
@@ -118,14 +124,13 @@
         <vscode-option>Auto-compile</vscode-option>
     </vscode-dropdown>
 
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <vscode-button class="w-full" on:click={compile} appearence={dirtyCompilation ? "primary" : "secondary"} disabled={compiling}>
         {compiling ? "Compiling..." : "Compile all"}
     </vscode-button>
     {#if dirtyCompilation}
         <div class="text-sm px-2 py-1 bg-gray-800 rounded relative top--2 text-center pt-2 pb-1" style="z-index:0;">Some files were changed since last compilation</div>
     {/if}
-
-
 
     <Divider />
 
@@ -140,7 +145,12 @@
         </vscode-dropdown>
         <div class="my-4"></div>
 
-        <vscode-button class="w-full" on:click={deploy} disabled={selectedContractId == null}>Deploy</vscode-button>
+        {#if selectedContract !== undefined}
+            <Constructor abi={selectedContract.abi} onDeploy={deploy}/>
+        {/if}
+
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+
     </section>
 
 </main>

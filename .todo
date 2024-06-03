@@ -52,11 +52,27 @@ Brainstorming:
         - something liek the terminal, split horizontally into 2 parts, the right little part would be the history of txs,
         - the left would just output the given selected tx
 
+    ☐ maybe add a button to the sidebar to open the output channel
+
+    IDEA TO MAKE THE RUN CONTRACT INTERFACE MORE READABLE @critical
+        - for each function, the function button would be full width, and if there would be any input, this would be below
+        - the "input below" could be expandable, basicaly how it works now
+
+    - could i use os-native dropdowns? would improve space
+
 
 TfS Integration:
     how it will work
         will use lsp protocol
             notifikace or message/requests   resposne bude json
         see printersHandler.ts
-    ☐ define messages and types whcih will be sent to lsp wake side
+    ✔ define messages and types whcih will be sent to lsp wake side @done(24-06-03 15:53)
     ☐ validation at frontend
+
+Worklog:
+    ✔ wake compilation fix @done(24-06-03 15:33)
+    ✔ compilation and deployment api @done(24-06-03 15:33)
+    ✔ constructor frontend @done(24-06-03 15:53)
+        ☐ kinda
+    ☐ calldata computation wiwht ethjs
+    ☐ hide deploy window until compilation has happened

@@ -63,7 +63,7 @@
         <div class="flex flex-col gap-1">
             {#each contract.abi as func}
                 {#if func.type == "function"}
-                    <ContractFunction {func} {contract}/>
+                    <ContractFunction {func} onFunctionCall={()=>{}}/>
                 {/if}
             {/each}
         </div>

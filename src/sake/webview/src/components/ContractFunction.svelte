@@ -19,26 +19,35 @@
     );
 
     export let func: ContractFunction;
-    export let contract: Contract;
-    let expanded: boolean = false;
+    export let onFunctionCall: (calldata: string) => void;
+    let expanded: boolean;
     let hasInputs: boolean;
     let input: InputHandler;
+    $: funcChanged(func)
 
-    onMount(() => {
+    const funcChanged = (func: ContractFunction) => {
         hasInputs = func.inputs && func.inputs.length > 0;
         input = buildTree(func.inputs);
-    });
+        expanded = false;
+    }
+
+    // onMount(() => {
+    //     hasInputs = func.inputs && func.inputs.length > 0;
+    //     input = buildTree(func.inputs);
+    // });
 
     async function submit() {
-        console.log("submitting function call");
-        console.log('input', input.get());
-        console.log('input', input);
-        const payload: FunctionCallPayload = {
-            contract: contract,
-            function: func.name!,
-            arguments: input.get()!
-        }
-        await messageHandler.send("onContractFunctionCall", payload);
+        // console.log("submitting function call");
+        // console.log('input', input.get());
+        // console.log('input', input);
+        // const payload: FunctionCallPayload = {
+        //     contract: contract,
+        //     function: func.name!,
+        //     arguments: input.get()!
+        // }
+        // await messageHandler.send("onContractFunctionCall", payload);
+        // onFunctionCall(input.get());
+        onFunctionCall("")
     }
 
     // TODO rename

@@ -4,7 +4,7 @@ export function parseCompilationResult(compilationResult: WakeCompiledContract):
     // Wake returns an object with a key "fqn:contractName" and value contractAbi
     // this needs to be converted to an array of CompiledContract
 
-    const contracts: Array<CompiledContract> = [];
+    let contracts: Array<CompiledContract> = [];
 
     let key: keyof WakeCompiledContract;
     for (const key in compilationResult) {
@@ -20,6 +20,9 @@ export function parseCompilationResult(compilationResult: WakeCompiledContract):
 
         contracts.push(contract);
     }
+
+    // filter out contracts with no abi -> libraries
+    contracts = contracts.filter(contract => contract.abi.length > 0);
 
     return contracts;
 }
