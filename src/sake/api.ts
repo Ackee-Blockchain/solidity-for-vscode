@@ -20,19 +20,13 @@ export async function getAccounts(
 
     const accountsResult = await client?.sendRequest<AccountStateData>("wake/sake/getAccounts");
 
-    console.log("accounts result", accountsResult);
-
     // eslint-disable-next-line eqeqeq
     if (accountsResult == null || accountsResult.length === 0) {
         vscode.window.showErrorMessage("Failed to get accounts!");
         return false;
     }
 
-    console.log("saving acc state", accountsResult, accountState);
-
     accountState.setAccounts(accountsResult);
-
-    console.log("saved acc state", accountState);
 
     return true;
 }

@@ -53,5 +53,10 @@
 </script>
 
 {#if constructor}
-    <ContractFunction bind:this={deployFunction} func={constructor} onFunctionCall={onDeploy}/>
+    <ContractFunction
+        bind:this={deployFunction}
+        func={constructor}
+        onFunctionCall={onDeploy}
+        isConstructor={true}
+    />
 {/if}

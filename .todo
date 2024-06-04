@@ -75,8 +75,12 @@ Worklog:
     ✔ constructor frontend @done(24-06-03 15:53)
         ☐ kinda
     ✔ simplified updateState @done(24-06-03 20:09)
+    ✔ join compile + deploy, refactor @done(24-06-03 20:13)
     ☐ calldata computation wiwht ethjs
     ☐ hide deploy window until compilation has happened
     - if function (and value also) is not payable, dont allow value
         - should i raise an error/info if value is set? or set value to 0 for simplicity
         - does calling a not payable function with a value revert?
+        - prob doesn ot matter
+    ☐ handling of errors during api, if wake results in err, compiling buttons stays disabled
+    ☐ migrate to types from web3

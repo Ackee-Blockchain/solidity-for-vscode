@@ -8,7 +8,7 @@
   import { onMount } from 'svelte';
   import ExpandButton from "./icons/ExpandButton.svelte";
   import KebabButton from "./icons/KebabButton.svelte";
-  import { buildTree, InputHandler } from "../helpers/FunctionInputsHandler";
+  import { buildTree, RootInputHandler } from "../helpers/FunctionInputsHandler";
   import IconSpacer from "./icons/IconSpacer.svelte";
   import { messageHandler } from '@estruyf/vscode/dist/client'
   import type { ContractFunction, Contract, FunctionCallPayload } from "../../shared/types";
@@ -20,15 +20,17 @@
 
     export let func: ContractFunction;
     export let onFunctionCall: (calldata: string) => void;
+    export let isConstructor: boolean = false;
     let expanded: boolean;
     let hasInputs: boolean;
-    let input: InputHandler;
+    let input: RootInputHandler;
     $: funcChanged(func)
 
     const funcChanged = (func: ContractFunction) => {
-        hasInputs = func.inputs && func.inputs.length > 0;
-        input = buildTree(func.inputs);
+        hasInputs = func.inputs ? func.inputs.length > 0 : false;
+        input = buildTree(func);
         expanded = false;
+        console.log(func.name, func);
     }
 
     // onMount(() => {
@@ -47,13 +49,21 @@
         // }
         // await messageHandler.send("onContractFunctionCall", payload);
         // onFunctionCall(input.get());
-        onFunctionCall("")
+        const _encodedInput: string = isConstructor ? input.encodedParameters() : input.calldata();
+        console.log("encoded input", isConstructor, _encodedInput);
+        onFunctionCall(_encodedInput)
     }
 
     // TODO rename
     const openFullTextInputEditor = async function() {
         const newValue = await messageHandler.request<any>("getTextFromInputBox", input.get());
         newValue && input.set(newValue);
+        input = input;
+    }
+
+    const handleInput = (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        input.set(target.value);
         input = input;
     }
 
@@ -83,10 +93,7 @@
         <ExpandButton bind:expanded={expanded} />
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <vscode-button class="flex-1" on:click={submit}>{func.name}</vscode-button>
-        <vscode-text-field class="flex-1" placeholder={input.description()} value={input.get()} on:change={e => {
-            input.set(e.target.value);
-            input = input;
-            }} />
+        <vscode-text-field class="flex-1" placeholder={input.description()} value={input.get()} on:change={handleInput} />
     {:else}
         <IconSpacer />
         <!-- svelte-ignore a11y-click-events-have-key-events -->

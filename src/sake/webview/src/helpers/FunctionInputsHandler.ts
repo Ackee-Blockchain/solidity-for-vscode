@@ -1,8 +1,10 @@
 
 import type { ContractFunctionInput } from '../../shared/types';
+import type { AbiFunctionFragment } from 'web3-types';
+import { encodeFunctionCall, encodeParameters } from 'web3-eth-abi';
 
-export function buildTree(inputs: Array<ContractFunctionInput>): RootInputHandler {
-    const root = new RootInputHandler(inputs);
+export function buildTree(abi: AbiFunctionFragment): RootInputHandler {
+    const root = new RootInputHandler(abi);
     return root;
 }
 
@@ -36,6 +38,15 @@ function createInput(input: ContractFunctionInput) {
     }
 
     // Else, normal input
+
+    // is number
+    // const _numberTypes = ['uint8', 'uint16', 'uint32', 'uint64', 'uint128', 'uint256', 'int8', 'int16', 'int32', 'int64', 'int128', 'int256', 'uint', 'int'];
+    // if (_numberTypes.includes(input.type)) {
+    //     return new IntegerLeafInputHandler({
+    //         ...input
+    //     });
+    // }
+
     return new LeafInputHandler({
         ...input
     });
@@ -47,10 +58,10 @@ export abstract class InputHandler {
     public type: string | undefined;
     public children: Array<InputHandler>;
     public parent: InputHandler | undefined;
-    protected _abi: any;
+    protected _abiParameter: any;
 
     constructor(data: any) {
-        this._abi = data;
+        this._abiParameter = data;
 
         this.name = data?.name;
         this.type = data?.type;
@@ -72,6 +83,8 @@ export abstract class InputHandler {
 
     public abstract get(): string | undefined;
 
+    public abstract getValues(): any;
+
     public abstract set(value: string): void;
 
     protected abstract _buildTree(): void;
@@ -80,7 +93,7 @@ export abstract class InputHandler {
 }
 
 class LeafInputHandler extends InputHandler {
-    private _value: string | undefined;
+    protected _value: string | undefined;
 
     constructor(data: any) {
         super(data);
@@ -90,6 +103,10 @@ class LeafInputHandler extends InputHandler {
 
     public get() {
         // TODO: should return based on type
+        return this._value;
+    }
+
+    public getValues(): any {
         return this._value;
     }
 
@@ -107,10 +124,12 @@ class LeafInputHandler extends InputHandler {
     }
 }
 
-class RootInputHandler extends InputHandler {
-    constructor(data: any) {
-        super(data);
+export class RootInputHandler extends InputHandler {
+    private _abi: AbiFunctionFragment;
 
+    constructor(abi: AbiFunctionFragment) {
+        super(abi.inputs);
+        this._abi = abi;
         this.internalType = InputTypesInternal.ROOT;
     }
 
@@ -120,6 +139,10 @@ class RootInputHandler extends InputHandler {
         }
 
         return `${this.children.map((child: InputHandler) => child.get()).join(',')}`;
+    }
+
+    public getValues() {
+        return this.children.map((child: InputHandler) => child.getValues());
     }
 
     public set(value: string) {
@@ -141,12 +164,41 @@ class RootInputHandler extends InputHandler {
         });
     }
 
+    /*
+    * Encodes the input values
+    * Includes function selector
+    *
+    * @returns {string} - Encoded calldata
+    */
+    public calldata(): string {
+        const _calldata = encodeFunctionCall(
+            this._abi,
+            this.getValues(),
+        );
+        return _calldata.slice(2); // remove 0x
+    }
+
+    /*
+    * Encodes the input values into
+    * Does not include function selector (used in constructor)
+    *
+    * @returns {string} - Encoded parameters
+    */
+    public encodedParameters(): string {
+        const _encodedParams = encodeParameters(
+            this._abi.inputs?.map((input: any) => input.type) || [],
+            this.getValues(),
+        );
+        return _encodedParams.slice(2); // remove 0x
+    }
+
+
     protected _buildTree() {
-        if (!this._abi || !Array.isArray(this._abi)) {
+        if (!this._abiParameter || !Array.isArray(this._abiParameter)) {
             throw new FunctionInputBuildError('RootInput: ABI is not defined or empty');
         }
 
-        this._abi.forEach((input: any) => {
+        this._abiParameter.forEach((input: any) => {
             this.addChild(createInput(input));
         });
     }
@@ -169,6 +221,10 @@ class ComponentInputHandler extends InputHandler {
         }
 
         return `(${this.children.map((child: InputHandler) => child.get()).join(',')})`;
+    }
+
+    public getValues() {
+        return this.children.map((child: InputHandler) => child.getValues());
     }
 
     public set(value: string) {
@@ -195,11 +251,11 @@ class ComponentInputHandler extends InputHandler {
     }
 
     protected _buildTree() {
-        if (!this._abi || !this._abi.components) {
+        if (!this._abiParameter || !this._abiParameter.components) {
             throw new FunctionInputBuildError('ComponentInput: ABI is not defined or empty');
         }
 
-        this._abi.components.forEach((input: any) => {
+        this._abiParameter.components.forEach((input: any) => {
             this.addChild(createInput(input));
         });
     }
@@ -229,6 +285,10 @@ class StaticListInputHandler extends InputHandler {
         }
 
         return `[${this.children.map((child: InputHandler) => child.get()).join(',')}]`;
+    }
+
+    public getValues() {
+        return this.children.map((child: InputHandler) => child.getValues());
     }
 
     public set(value: string) {
@@ -294,6 +354,10 @@ export class DynamicListInputHandler extends InputHandler {
         }
 
         return `[${this.children.map((child: InputHandler) => child.get()).join(',')}]`;
+    }
+
+    public getValues() {
+        return this.children.map((child: InputHandler) => child.getValues());
     }
 
     public set(value: string) {

@@ -9,6 +9,7 @@ export interface Account {
     balance: number;
 }
 
+// inherited from Fragment
 export interface ContractFunction {
     // required
     inputs: Array<ContractFunctionInput>;
@@ -17,7 +18,8 @@ export interface ContractFunction {
 
     // optional
     outputs: Array<any> | undefined; // TODO
-    name: string | undefined;
+    name: string;
+    // displayName: string | undefined;
 }
 
 export type ContractAbi = Array<ContractFunction>;
@@ -27,6 +29,7 @@ export interface Contract extends Account {
     abi: ContractAbi;
 }
 
+// TODO rename to json interface (AbiFunctionFragment from web-eth-abi)
 export interface ContractFunctionInput {
     // required
     internalType: string;

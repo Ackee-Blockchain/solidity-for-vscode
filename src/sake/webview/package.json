@@ -33,6 +33,8 @@
   "dependencies": {
     "@estruyf/vscode": "^1.1.0",
     "@vscode/codicons": "^0.0.35",
-    "@vscode/webview-ui-toolkit": "^1.4.0"
+    "@vscode/webview-ui-toolkit": "^1.4.0",
+    "web3-eth-abi": "^4.2.2",
+    "web3-types": "^1.6.0"
   }
 }
