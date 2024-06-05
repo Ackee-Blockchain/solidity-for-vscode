@@ -9,7 +9,7 @@
     import ExpandButton from "./icons/ExpandButton.svelte";
     import DeleteButton from "./icons/DeleteButton.svelte";
     import CopyButton from "./icons/CopyButton.svelte";
-    import type { Contract } from "../../shared/types";
+    import { WebviewMessage, type Contract, type WakeFunctionCallRequestParams } from "../../shared/types";
   import { messageHandler } from "@estruyf/vscode/dist/client";
 
     provideVSCodeDesignSystem().register(
@@ -18,12 +18,16 @@
     );
 
     export let contract: Contract;
+    export let onFunctionCall: (calldata: string, contract_address: string) => void;
     let expanded = false;
 
     const undeploy = async function() {
-        messageHandler.send("undeployContract", contract)
+        messageHandler.send("undeployContract", contract) // TODO rename
     }
 
+    const _onFunctionCall = (calldata: string) => {
+        onFunctionCall(calldata, contract.address);
+    }
 </script>
 
 {#if !expanded}
@@ -63,7 +67,7 @@
         <div class="flex flex-col gap-1">
             {#each contract.abi as func}
                 {#if func.type == "function"}
-                    <ContractFunction {func} onFunctionCall={()=>{}}/>
+                    <ContractFunction {func} onFunctionCall={_onFunctionCall}/>
                 {/if}
             {/each}
         </div>

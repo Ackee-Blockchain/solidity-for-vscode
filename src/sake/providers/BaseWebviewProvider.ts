@@ -186,14 +186,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case "onContractFunctionCall": {
-                if (!payload) {
-                    return;
-                }
-
-                console.log("contract call was executed", payload);
-            }
-
             case WebviewMessage.onCompile: {
                 const success = await vscode.commands.executeCommand<boolean>("Tools-for-Solidity.sake.compile");
 
@@ -217,6 +209,19 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
             case WebviewMessage.onGetAccounts: {
                 const success = await vscode.commands.executeCommand<boolean>("Tools-for-Solidity.sake.getAccounts");
+
+                webviewView.webview.postMessage({ command, requestId, payload: success } as MessageHandlerData<boolean>);
+
+                break;
+            }
+
+            case WebviewMessage.onContractFunctionCall: {
+                if (!payload) {
+                    console.error("No deployment params provided");
+                    return;
+                }
+
+                const success = await vscode.commands.executeCommand<boolean>("Tools-for-Solidity.sake.call", payload);
 
                 webviewView.webview.postMessage({ command, requestId, payload: success } as MessageHandlerData<boolean>);
 

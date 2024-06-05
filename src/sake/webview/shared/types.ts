@@ -162,3 +162,10 @@ export interface WakeDeploymentRequestParams {
 }
 
 export type WakeGetAccountsResponse = AccountStateData;
+
+export interface WakeFunctionCallRequestParams {
+    contract_address: string
+    sender: string
+    calldata: string
+    value: number
+}

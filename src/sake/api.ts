@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { AccountStateData, DeploymentStateData, WakeDeploymentRequestParams, WakeDeploymentResponse } from "./webview/shared/types";
+import { AccountStateData, DeploymentStateData, WakeDeploymentRequestParams, WakeDeploymentResponse, WakeFunctionCallRequestParams } from "./webview/shared/types";
 import { LanguageClient } from 'vscode-languageclient/node';
 import { CompilationState } from './state/CompilationState';
 import { parseCompilationResult } from './utils/compilation';
@@ -97,4 +97,26 @@ export async function deploy(
     outputChannel.show();
 
     return true;
+}
+
+export async function call(
+    callParams: WakeFunctionCallRequestParams,
+    client: LanguageClient | undefined,
+    outputChannel: vscode.OutputChannel) {
+    if (client === undefined) {
+        outputChannel.appendLine("Failed to call function due to missing language client");
+        return;
+    }
+
+    console.log("call params", callParams);
+
+    const callResult = await client?.sendRequest<any>("wake/sake/call", callParams);
+
+    console.log("call result", callResult);
+
+    if (callResult == null) { // TODO more checks
+        vscode.window.showErrorMessage("Function call failed, no result returned");
+        return false;
+    }
+    // TODO
 }

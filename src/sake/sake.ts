@@ -4,12 +4,12 @@ import { StatusBarEnvironmentProvider } from './providers/StatusBarEnvironmentPr
 import { copyToClipboardHandler, loadSampleAbi, getTextFromInputBox } from './commands';
 import { DeploymentState } from './state/DeploymentState';
 import { CompilationState } from './state/CompilationState';
-import { WakeCompilationResponse, Contract, WakeDeploymentRequestParams } from './webview/shared/types';
+import { WakeCompilationResponse, Contract, WakeDeploymentRequestParams, WakeFunctionCallRequestParams } from './webview/shared/types';
 import {
     LanguageClient,
 } from 'vscode-languageclient/node';
 import { parseCompilationResult } from './utils/compilation';
-import { compile, deploy, getAccounts } from './api';
+import { call, compile, deploy, getAccounts } from './api';
 import { AccountState } from './state/AccountState';
 
 export function activateSake(context: vscode.ExtensionContext, outputChannel: vscode.OutputChannel, client: LanguageClient | undefined) {
@@ -108,6 +108,11 @@ export function activateSake(context: vscode.ExtensionContext, outputChannel: vs
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.getAccounts",
         () => getAccounts(client, outputChannel))
+    );
+
+    context.subscriptions.push(vscode.commands.registerCommand(
+        "Tools-for-Solidity.sake.call",
+        (callParams: WakeFunctionCallRequestParams) => call(callParams, client, outputChannel))
     );
 
 
