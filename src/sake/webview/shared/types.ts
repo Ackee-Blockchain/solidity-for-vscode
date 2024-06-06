@@ -128,6 +128,10 @@ export interface WakeCompiledContract {
     [key: string]: ContractAbi
 };
 
+export interface TxReceipt {
+    [key: string]: any
+}
+
 export interface WakeCompilationResponse {
     contracts: WakeCompiledContract;
     success: boolean;
@@ -152,7 +156,13 @@ export interface WakeDeployedContract {
     root: string;
 }
 
-export type WakeDeploymentResponse = WakeDeployedContract;
+// export type WakeDeploymentResponse = WakeDeployedContract;
+export interface WakeDeploymentResponse {
+    success: boolean,
+    contract_address: string | null,
+    tx_receipt: TxReceipt,
+    call_trace: string
+}
 
 export interface WakeDeploymentRequestParams {
     contract_fqn: string;
@@ -168,4 +178,11 @@ export interface WakeFunctionCallRequestParams {
     sender: string
     calldata: string
     value: number
+}
+
+export interface WakeFunctionCallResponse {
+    success: boolean,
+    return_value: string // might need to change to hex string
+    tx_receipt: TxReceipt
+    call_trace: string
 }

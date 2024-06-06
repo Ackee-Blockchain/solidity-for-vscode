@@ -74,7 +74,7 @@ export async function deploy(
         return false;
     }
 
-    if (deploymentResult.status === "0x0") {
+    if (deploymentResult.tx_receipt.status === "0x0") {
         vscode.window.showErrorMessage("Deployment failed, status 0x0");
         return false;
     }
@@ -85,7 +85,7 @@ export async function deploy(
     const _contractCompilationData = compilationState.getDict()[deploymentParams.contract_fqn];
     const _deploymentData: DeploymentStateData = {
         name: _contractCompilationData.name,
-        address: deploymentResult.contractAddress,
+        address: deploymentResult.contract_address!,
         abi: _contractCompilationData.abi,
     };
 
