@@ -247,25 +247,31 @@
                 }
             },
             {
-                "title": "Graphs",
+                "title": "Printers",
                 "order": 2,
                 "properties": {
-                    "wake.generator.control_flow_graph.direction": {
-                        "type": "string",
-                        "enum": [
-                            "TB",
-                            "BT",
-                            "LR",
-                            "RL"
-                        ],
-                        "default": "TB",
-                        "markdownDescription": "The direction of the generated control flow graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))."
+                    "wake.printers.exclude": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "List of printers (identified by their string name) not to run in the LSP server."
                     },
-                    "wake.generator.control_flow_graph.vscode_urls": {
-                        "type": "boolean",
-                        "default": true,
-                        "description": "Generate vscode:// URLs in the generated control flow graph."
-                    },
+                    "wake.printers.only": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "List of printers (identified by their string name) to only run in the LSP server."
+                    }
+                }
+            },
+            {
+                "title": "Graphs",
+                "order": 3,
+                "properties": {
                     "wake.generator.imports_graph.direction": {
                         "type": "string",
                         "enum": [
@@ -291,22 +297,6 @@
                         "default": true,
                         "description": "Generate vscode:// URLs in the generated imports graph."
                     },
-                    "wake.generator.inheritance_graph.direction": {
-                        "type": "string",
-                        "enum": [
-                            "TB",
-                            "BT",
-                            "LR",
-                            "RL"
-                        ],
-                        "default": "BT",
-                        "markdownDescription": "The direction of the generated inheritance graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))."
-                    },
-                    "wake.generator.inheritance_graph.vscode_urls": {
-                        "type": "boolean",
-                        "default": true,
-                        "description": "Generate vscode:// URLs in the generated inheritance graph."
-                    },
                     "wake.generator.inheritance_graph_full.direction": {
                         "type": "string",
                         "enum": [
@@ -327,7 +317,7 @@
             },
             {
                 "title": "LSP",
-                "order": 3,
+                "order": 4,
                 "properties": {
                     "wake.lsp.compilation_delay": {
                         "type": "number",
@@ -337,7 +327,33 @@
                     "wake.lsp.code_lens.enable": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Enable code lens with number of references."
+                        "description": "Enable code lens."
+                    },
+                    "wake.lsp.code_lens.sort_tag_priority": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [
+                            "lsp-references",
+                            "lsp-selectors",
+                            "lsp-inheritance-graph",
+                            "lsp-linearized-inheritance-graph"
+                        ],
+                        "description": "Order of code lens with the same start and end position based on sort tags used in detectors/printers. Sort tags default to the printer/detector name."
+                    },
+                    "wake.lsp.inlay_hints.enable": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Enable inlay hints."
+                    },
+                    "wake.lsp.inlay_hints.sort_tag_priority": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Order of inlay hints with the same position based on sort tags used in detectors/printers. Sort tags default to the printer/detector name."
                     },
                     "wake.lsp.detectors.enable": {
                         "type": "boolean",
