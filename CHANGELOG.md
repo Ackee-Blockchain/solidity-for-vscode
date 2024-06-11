@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.14.0]
+- Added workspace symbols feature
+- Detectors & printers now run in subprocesses, making the language server more responsive
+- Re-implemented code lens af LSP printers, making them more configurable (incl. on/off switch via `only` and `exclude` config options)
+- Dropped support for Python 3.7
+- Bugfixes & stability improvements
+
 ## [1.13.1]
 - Fixed possible `eth-wake` installation issues
 
