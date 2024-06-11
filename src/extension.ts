@@ -59,7 +59,7 @@ let graphvizGenerator: GraphvizPreviewGenerator;
 
 //export let log: Log
 
-const WAKE_TARGET_VERSION = "4.9.0";
+const WAKE_TARGET_VERSION = "4.10.1";
 const WAKE_PRERELEASE = false;
 const CRASHLOG_LIMIT = 1000;
 
