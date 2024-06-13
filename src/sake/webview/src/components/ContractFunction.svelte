@@ -11,22 +11,22 @@
   import { buildTree, RootInputHandler } from "../helpers/FunctionInputsHandler";
   import IconSpacer from "./icons/IconSpacer.svelte";
   import { messageHandler } from '@estruyf/vscode/dist/client'
-  import type { ContractFunction, Contract, FunctionCallPayload } from "../../shared/types";
+  import type { ContractFunction as ContractFunctionType, Contract, FunctionCallPayload } from "../../shared/types";
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
         vsCodeTextField(),
     );
 
-    export let func: ContractFunction;
-    export let onFunctionCall: (calldata: string) => void;
+    export let func: ContractFunctionType;
+    export let onFunctionCall: (calldata: string, func: ContractFunctionType) => void;
     export let isConstructor: boolean = false;
     let expanded: boolean;
     let hasInputs: boolean;
     let input: RootInputHandler;
     $: funcChanged(func)
 
-    const funcChanged = (func: ContractFunction) => {
+    const funcChanged = (func: ContractFunctionType) => {
         hasInputs = func.inputs ? func.inputs.length > 0 : false;
         input = buildTree(func);
         expanded = false;
@@ -51,7 +51,7 @@
         // onFunctionCall(input.get());
         const _encodedInput: string = isConstructor ? input.encodedParameters() : input.calldata();
         console.log("encoded input", isConstructor, _encodedInput);
-        onFunctionCall(_encodedInput)
+        onFunctionCall(_encodedInput, func)
     }
 
     // TODO rename

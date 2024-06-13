@@ -11,7 +11,7 @@
     import Contract from "../../components/Contract.svelte";
     import Divider from "../../components/Divider.svelte";
     import CallSetup from "../../components/CallSetup.svelte";
-    import { StateId, WebviewMessage, type WakeFunctionCallRequestParams } from "../../../shared/types";
+    import { StateId, WebviewMessage, type FunctionCallPayload, type WakeFunctionCallRequestParams, type ContractFunction as ContractFunctionType } from "../../../shared/types";
     import { onMount } from "svelte";
     import { messageHandler } from "@estruyf/vscode/dist/client";
     // import '../../../shared/types'; // Importing types to avoid TS error
@@ -49,7 +49,7 @@
 
     });
 
-    const call = async function(calldata: string, contract_address: string) {
+    const call = async function(calldata: string, contract_address: string, func: ContractFunctionType) {
 
         const _sender: string | undefined = callSetup.getSelectedAccount();
         if (_sender === undefined) {
@@ -59,11 +59,16 @@
 
         const _value: number | undefined = callSetup.getValue();
 
-        const payload: WakeFunctionCallRequestParams = {
+        const requestParams: WakeFunctionCallRequestParams = {
             contract_address: contract_address,
             sender: _sender,
             calldata: calldata,
             value: _value ?? 0
+        }
+
+        const payload: FunctionCallPayload = {
+            func: func,
+            requestParams: requestParams
         }
 
         await messageHandler.send(WebviewMessage.onContractFunctionCall, payload)

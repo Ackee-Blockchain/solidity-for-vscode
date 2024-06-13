@@ -9,7 +9,7 @@
     import ExpandButton from "./icons/ExpandButton.svelte";
     import DeleteButton from "./icons/DeleteButton.svelte";
     import CopyButton from "./icons/CopyButton.svelte";
-    import { WebviewMessage, type Contract, type WakeFunctionCallRequestParams } from "../../shared/types";
+    import { WebviewMessage, type Contract, type WakeFunctionCallRequestParams, type ContractFunction as ContractFunctionType} from "../../shared/types";
   import { messageHandler } from "@estruyf/vscode/dist/client";
 
     provideVSCodeDesignSystem().register(
@@ -18,15 +18,15 @@
     );
 
     export let contract: Contract;
-    export let onFunctionCall: (calldata: string, contract_address: string) => void;
+    export let onFunctionCall: (calldata: string, contract_address: string, func: ContractFunctionType) => void;
     let expanded = false;
 
     const undeploy = async function() {
         messageHandler.send("undeployContract", contract) // TODO rename
     }
 
-    const _onFunctionCall = (calldata: string) => {
-        onFunctionCall(calldata, contract.address);
+    const _onFunctionCall = (calldata: string, func: ContractFunctionType) => {
+        onFunctionCall(calldata, contract.address, func);
     }
 </script>
 

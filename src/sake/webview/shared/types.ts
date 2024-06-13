@@ -77,18 +77,16 @@ export enum WebviewMessage {
 *
 */
 
-export interface FunctionCallPayload {
-    contract: Contract;
-    function: string;
-    arguments: string;
-}
-
-
 export interface CompiledContract {
     fqn: string;
     name: string;
     abi: ContractAbi;
     // TODO join this type with contract
+}
+
+export interface FunctionCallPayload {
+    func: ContractFunction;
+    requestParams: WakeFunctionCallRequestParams;
 }
 
 /*
@@ -159,9 +157,9 @@ export interface WakeDeployedContract {
 // export type WakeDeploymentResponse = WakeDeployedContract;
 export interface WakeDeploymentResponse {
     success: boolean,
-    contract_address: string | null,
-    tx_receipt: TxReceipt,
-    call_trace: string
+    contractAddress: string | null,
+    txReceipt: TxReceipt,
+    // call_trace: string
 }
 
 export interface WakeDeploymentRequestParams {
@@ -184,5 +182,5 @@ export interface WakeFunctionCallResponse {
     success: boolean,
     return_value: string // might need to change to hex string
     tx_receipt: TxReceipt
-    call_trace: string
+    // call_trace: string
 }

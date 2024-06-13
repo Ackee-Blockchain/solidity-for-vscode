@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
-import { AccountStateData, DeploymentStateData, WakeDeploymentRequestParams, WakeDeploymentResponse, WakeFunctionCallRequestParams } from "./webview/shared/types";
+import { AccountStateData, DeploymentStateData, FunctionCallPayload, WakeDeploymentRequestParams, WakeDeploymentResponse, WakeFunctionCallRequestParams } from "./webview/shared/types";
 import { LanguageClient } from 'vscode-languageclient/node';
 import { CompilationState } from './state/CompilationState';
 import { parseCompilationResult } from './utils/compilation';
 import { DeploymentState } from './state/DeploymentState';
 import { AccountState } from './state/AccountState';
+import { decodeCallReturnValue } from './utils/call';
 
 const accountState = AccountState.getInstance();
 const deploymentState = DeploymentState.getInstance();
@@ -13,110 +14,136 @@ const compilationState = CompilationState.getInstance();
 export async function getAccounts(
     client: LanguageClient | undefined,
     outputChannel: vscode.OutputChannel) {
-    if (client === undefined) {
-        outputChannel.appendLine("Failed to get accounts due to missing language client");
-        return;
-    }
+    try {
+        if (client === undefined) { throw new Error("Missing language client"); }
 
-    const accountsResult = await client?.sendRequest<AccountStateData>("wake/sake/getAccounts");
+        const accountsResult = await client?.sendRequest<AccountStateData>("wake/sake/getAccounts");
 
-    // eslint-disable-next-line eqeqeq
-    if (accountsResult == null || accountsResult.length === 0) {
-        vscode.window.showErrorMessage("Failed to get accounts!");
+        if (accountsResult == null) { throw new Error("No result returned"); }
+        if (accountsResult.length === 0) { throw new Error("No accounts returned"); }
+
+        accountState.setAccounts(accountsResult);
+
+        return true;
+    } catch (e) {
+        const message = typeof e === "string" ? e : (e as Error).message;
+        vscode.window.showErrorMessage("Failed to get accounts: " + message);
         return false;
     }
-
-    accountState.setAccounts(accountsResult);
-
-    return true;
 }
 
 export async function compile(
     client: LanguageClient | undefined,
     outputChannel: vscode.OutputChannel) {
-    if (client === undefined) {
-        outputChannel.appendLine("Failed to compile due to missing language client");
-        return;
-    }
+    try {
+        if (client === undefined) { throw new Error("Missing language client"); }
 
-    const compilationResult = await client?.sendRequest<any>("wake/sake/compile");
+        const compilationResult = await client?.sendRequest<any>("wake/sake/compile");
 
-    if (compilationResult == null || !compilationResult.success) {
-        vscode.window.showErrorMessage("Compilation failed!");
+        if (compilationResult == null) { throw new Error("No result returned"); }
+        if (!compilationResult.success) { throw new Error("Compilation was unsuccessful"); }
+
+        vscode.window.showInformationMessage("Compilation was successful!");
+        const _parsedCompilationResult = parseCompilationResult(compilationResult.contracts);
+        compilationState.setCompilation(_parsedCompilationResult);
+
+        return compilationResult.success;
+    } catch (e) {
+        const message = typeof e === "string" ? e : (e as Error).message;
+        vscode.window.showErrorMessage("Compilation failed with error: " + message);
         return false;
     }
-
-    vscode.window.showInformationMessage("Compilation was successful!");
-    const _parsedCompilationResult = parseCompilationResult(compilationResult.contracts);
-    compilationState.setCompilation(_parsedCompilationResult);
-
-    return compilationResult.success;
 }
 
 export async function deploy(
     deploymentParams: WakeDeploymentRequestParams,
     client: LanguageClient | undefined,
     outputChannel: vscode.OutputChannel) {
-    if (client === undefined) {
-        outputChannel.appendLine("Failed to deploy due to missing language client");
-        return;
-    }
+    try {
+        if (client === undefined) { throw new Error("Missing language client"); }
 
-    console.log("deployment params", deploymentParams);
+        console.log("deployment params", deploymentParams);
 
-    // const deploymentResult = await client?.sendRequest<WakeDeployResult>("wake/sake/deploy");
-    const deploymentResult = await client?.sendRequest<WakeDeploymentResponse>("wake/sake/deploy", deploymentParams);
+        const deploymentResult = await client?.sendRequest<WakeDeploymentResponse>("wake/sake/deploy", deploymentParams);
 
-    console.log("deployment result", deploymentResult);
+        if (deploymentResult == null) { throw new Error("No result returned"); }
+        if (!deploymentResult.success) { throw new Error("Deployment was unsuccessful"); }
 
-    if (deploymentResult == null) { // TODO more checks
-        vscode.window.showErrorMessage("Deployment failed, no result returned");
+        // Add deployment to state
+        const _contractCompilationData = compilationState.getDict()[deploymentParams.contract_fqn];
+        const _deploymentData: DeploymentStateData = {
+            name: _contractCompilationData.name,
+            address: deploymentResult.contractAddress!,
+            abi: _contractCompilationData.abi,
+        };
+
+        console.log("deployment data", _deploymentData, deploymentResult)
+
+        deploymentState.deploy(_deploymentData);
+
+        // Show output
+        outputChannel.appendLine("Deployed contract: " + _contractCompilationData.name);
+        outputChannel.append(JSON.stringify(deploymentResult.txReceipt));
+        outputChannel.show();
+        vscode.window.showInformationMessage("Deployment was successful!");
+
+        return true;
+    } catch (e) {
+        const message = typeof e === "string" ? e : (e as Error).message;
+        vscode.window.showErrorMessage("Deployment failed with error: " + message);
         return false;
     }
-
-    if (deploymentResult.tx_receipt.status === "0x0") {
-        vscode.window.showErrorMessage("Deployment failed, status 0x0");
-        return false;
-    }
-
-    vscode.window.showInformationMessage("Deployment was successful!");
-
-    // Add deployment to state
-    const _contractCompilationData = compilationState.getDict()[deploymentParams.contract_fqn];
-    const _deploymentData: DeploymentStateData = {
-        name: _contractCompilationData.name,
-        address: deploymentResult.contract_address!,
-        abi: _contractCompilationData.abi,
-    };
-
-    deploymentState.deploy(_deploymentData);
-
-    // Show output
-    outputChannel.appendLine("Deployed contract: " + _contractCompilationData.name);
-    outputChannel.append(JSON.stringify(deploymentResult));
-    outputChannel.show();
-
-    return true;
 }
 
 export async function call(
-    callParams: WakeFunctionCallRequestParams,
+    callPayload: FunctionCallPayload,
     client: LanguageClient | undefined,
     outputChannel: vscode.OutputChannel) {
-    if (client === undefined) {
-        outputChannel.appendLine("Failed to call function due to missing language client");
-        return;
-    }
+    // if (client === undefined) {
+    //     outputChannel.appendLine("Failed to call function due to missing language client");
+    //     return;
+    // }
 
-    console.log("call params", callParams);
+    // console.log("call params", callParams);
 
-    const callResult = await client?.sendRequest<any>("wake/sake/call", callParams);
+    // const callResult = await client?.sendRequest<any>("wake/sake/call", callParams);
 
-    console.log("call result", callResult);
+    // console.log("call result", callResult);
 
-    if (callResult == null) { // TODO more checks
-        vscode.window.showErrorMessage("Function call failed, no result returned");
+
+
+    // if (callResult == null) { // TODO more checks
+    //     vscode.window.showErrorMessage("Function call failed, no result returned");
+    //     return false;
+    // }
+    // // TODO
+
+    const { requestParams, func } = callPayload;
+
+    try {
+        if (client === undefined) { throw new Error("Missing language client"); }
+
+        console.log("call params", requestParams);
+
+        const callResult = await client?.sendRequest<any>("wake/sake/call", requestParams);
+
+        if (callResult == null) { throw new Error("No result returned"); }
+        if (!callResult.success) { throw new Error("Function call was unsuccessful"); }
+
+        // parse
+        const decocedReturnValue = decodeCallReturnValue(callResult.returnValue, func);
+        console.log("decoded return value", decocedReturnValue);
+
+        // Show output
+        outputChannel.appendLine("Function call was successful!");
+        outputChannel.append(JSON.stringify(callResult.txReceipt));
+        outputChannel.show();
+        vscode.window.showInformationMessage("Function call was successful!");
+
+        return true;
+    } catch (e) {
+        const message = typeof e === "string" ? e : (e as Error).message;
+        vscode.window.showErrorMessage("Function call failed with error: " + message);
         return false;
     }
-    // TODO
 }
