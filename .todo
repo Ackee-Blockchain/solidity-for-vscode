@@ -109,8 +109,15 @@ Worklog:
     ☐ add view progress during api calls
         - see https://code.visualstudio.com/api/ux-guidelines/views#views-with-progress
 
-Output:
-    add icons
-    show output from deployment in output tree
-    add state for history
-    add button in output tree to show history
+    ☐ remove the compilation loading button maybe, and move the loading indicator to the bottom blue row in vscode
+
+    Output:
+        ☐ add icons
+        ☐ show output from deployment in output tree
+        ☐ add state for history
+        ☐ add button in output tree to show history
+        ☐ instead of TxOutput use TxDeploymentOutput and TxCallOutput
+        ☐ txoutput success will show true even on revert
+
+Questions for User Testing:
+    ☐ in history, what data is important to you to see at first glance

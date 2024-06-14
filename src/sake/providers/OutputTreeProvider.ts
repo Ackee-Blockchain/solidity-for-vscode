@@ -44,9 +44,9 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
 
 function jsonToTree(nodes: any): SakeOutputItem[] {
     const rootNodes: SakeOutputItem[] = [];
-    console.log("nodes", nodes);
+    // console.log("nodes", nodes);
     Object.entries(nodes).forEach(([key, value]) => {
-        console.log("value-key", value, key);
+        // console.log("value-key", value, key);
         const node = new SakeOutputItem(key, vscode.TreeItemCollapsibleState.Collapsed);
         if (isObject(value)) {
             const children = jsonToTree(value);

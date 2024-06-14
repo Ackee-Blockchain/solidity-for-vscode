@@ -12,6 +12,8 @@ import { parseCompilationResult } from './utils/compilation';
 import { call, compile, deploy, getAccounts } from './api';
 import { AccountState } from './state/AccountState';
 import { SakeOutputTreeProvider } from './providers/OutputTreeProvider';
+import { TxHistoryState } from './state/TxHistoryState';
+import { showTxFromHistory } from './utils/output';
 
 export function activateSake(context: vscode.ExtensionContext, client: LanguageClient | undefined) {
     // const sidebarCompilerProvider = new CompilerWebviewProvider(context.extensionUri);
@@ -23,15 +25,11 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     //     )
     // );
 
-    const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
+    // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
     const sakeOutputProvider = new SakeOutputTreeProvider(context);
     context.subscriptions.push(
         vscode.window.registerTreeDataProvider('sake-output', sakeOutputProvider)
     );
-
-    vscode.window
-
-    sakeOutputProvider
 
     const sidebarDeployProvider = new DeployWebviewProvider(context.extensionUri);
     context.subscriptions.push(
@@ -52,6 +50,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     const deploymentState = DeploymentState.getInstance();
     const compilationState = CompilationState.getInstance();
     const accountState = AccountState.getInstance();
+    const txHistoryState = TxHistoryState.getInstance();
 
     context.subscriptions.push(
         vscode.commands.registerCommand('sake.refresh', async () => {
@@ -108,24 +107,28 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.compile",
-        () => compile(client, sakeOutputChannel))
+        () => compile(client))
     );
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.deploy",
-        (deploymentParams: WakeDeploymentRequestParams) => deploy(deploymentParams, client, sakeOutputChannel))
+        (deploymentParams: WakeDeploymentRequestParams) => deploy(deploymentParams, client, sakeOutputProvider))
     );
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.getAccounts",
-        () => getAccounts(client, sakeOutputChannel))
+        () => getAccounts(client))
     );
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.call",
-        (callParams: FunctionCallPayload) => call(callParams, client, sakeOutputChannel, sakeOutputProvider))
+        (callParams: FunctionCallPayload) => call(callParams, client, sakeOutputProvider))
     );
 
+    context.subscriptions.push(vscode.commands.registerCommand(
+        "Tools-for-Solidity.sake.show_history",
+        () => showTxFromHistory(sakeOutputProvider))
+    );
 
     vscode.workspace.onDidChangeTextDocument((e) => {
         if (e.document.languageId == "solidity" && !e.document.isDirty) {

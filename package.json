@@ -535,6 +535,11 @@
             {
                 "command": "Tools-for-Solidity.sake.compile",
                 "title": "Sake: Compile"
+            },
+            {
+                "command": "Tools-for-Solidity.sake.show_history",
+                "title": "Sake: Show Transaction History",
+                "icon": "$(history)"
             }
         ],
         "viewsContainers": {
@@ -610,6 +615,11 @@
                     "command": "Tools-for-Solidity.detections.force_recompile",
                     "when": "view == solc-detections",
                     "group": "navigation@3"
+                },
+                {
+                    "command": "Tools-for-Solidity.sake.show_history",
+                    "when": "view == sake-output",
+                    "group": "navigation"
                 }
             ],
             "view/item/context": [

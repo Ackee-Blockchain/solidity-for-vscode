@@ -91,6 +91,40 @@ export interface FunctionCallPayload {
 
 /*
 *
+* Tx Outputs
+*
+*/
+
+export enum TxType {
+    Deployment = "Deployment",
+    FunctionCall = "Function Call"
+}
+
+export interface TxOutput {
+    type: TxType;
+    success: boolean;
+    from: string;
+    // to: string;
+    // returnValue: string;
+    receipt: TxReceipt;
+    callTrace: string;
+    // TODO remove to and returnValue and use TxDeploymentOutput and TxFunctionCallOutput
+    // also add input data and function name for ease of use in history
+}
+
+export interface TxDeploymentOutput extends TxOutput {
+    contractName: string;
+    contractAddress: string;
+}
+
+export interface TxFunctionCallOutput extends TxOutput {
+    to: string;
+    functionName: string;
+    returnValue: any; // TOTO create a type for this
+}
+
+/*
+*
 * State
 *
 */
@@ -110,10 +144,13 @@ export interface CompilationStateData {
 
 export type AccountStateData = Array<string>; // TODO
 
+export type TxHistoryStateData = TxDeploymentOutput | TxFunctionCallOutput;
+
 export enum StateId {
     DeployedContracts = "deployedContracts",
     CompiledContracts = "compiledContracts",
     Accounts = "accounts",
+    TxHistory = "txHistory",
 }
 
 /*
@@ -160,7 +197,7 @@ export interface WakeDeploymentResponse {
     success: boolean,
     contractAddress: string | null,
     txReceipt: TxReceipt,
-    // call_trace: string
+    callTrace: string
 }
 
 export interface WakeDeploymentRequestParams {

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { AccountStateData, DeploymentStateData, FunctionCallPayload, WakeDeploymentRequestParams, WakeDeploymentResponse, WakeFunctionCallRequestParams } from "./webview/shared/types";
+import { AccountStateData, DeploymentStateData, FunctionCallPayload, TxDeploymentOutput, TxFunctionCallOutput, TxOutput, TxType, WakeDeploymentRequestParams, WakeDeploymentResponse, WakeFunctionCallRequestParams, WakeFunctionCallResponse } from "./webview/shared/types";
 import { LanguageClient } from 'vscode-languageclient/node';
 import { CompilationState } from './state/CompilationState';
 import { parseCompilationResult } from './utils/compilation';
@@ -7,14 +7,15 @@ import { DeploymentState } from './state/DeploymentState';
 import { AccountState } from './state/AccountState';
 import { decodeCallReturnValue } from './utils/call';
 import { SakeOutputTreeProvider } from './providers/OutputTreeProvider';
+import { TxHistoryState } from './state/TxHistoryState';
 
 const accountState = AccountState.getInstance();
 const deploymentState = DeploymentState.getInstance();
 const compilationState = CompilationState.getInstance();
+const txHistoryState = TxHistoryState.getInstance();
 
 export async function getAccounts(
-    client: LanguageClient | undefined,
-    outputChannel: vscode.OutputChannel) {
+    client: LanguageClient | undefined) {
     try {
         if (client === undefined) { throw new Error("Missing language client"); }
 
@@ -34,8 +35,7 @@ export async function getAccounts(
 }
 
 export async function compile(
-    client: LanguageClient | undefined,
-    outputChannel: vscode.OutputChannel) {
+    client: LanguageClient | undefined) {
     try {
         if (client === undefined) { throw new Error("Missing language client"); }
 
@@ -57,35 +57,46 @@ export async function compile(
 }
 
 export async function deploy(
-    deploymentParams: WakeDeploymentRequestParams,
+    requestParams: WakeDeploymentRequestParams,
     client: LanguageClient | undefined,
-    outputChannel: vscode.OutputChannel) {
+    outputTreeProvider: SakeOutputTreeProvider) {
     try {
         if (client === undefined) { throw new Error("Missing language client"); }
 
-        console.log("deployment params", deploymentParams);
+        console.log("deployment params", requestParams);
 
-        const deploymentResult = await client?.sendRequest<WakeDeploymentResponse>("wake/sake/deploy", deploymentParams);
+        const result = await client?.sendRequest<WakeDeploymentResponse>("wake/sake/deploy", requestParams);
 
-        if (deploymentResult == null) { throw new Error("No result returned"); }
-        if (!deploymentResult.success) { throw new Error("Deployment was unsuccessful"); }
+        console.log("deployment result", result);
+
+        if (result == null) { throw new Error("No result returned"); }
+        if (!result.success) { throw new Error("Deployment was unsuccessful"); }
 
         // Add deployment to state
-        const _contractCompilationData = compilationState.getDict()[deploymentParams.contract_fqn];
+        const _contractCompilationData = compilationState.getDict()[requestParams.contract_fqn];
         const _deploymentData: DeploymentStateData = {
             name: _contractCompilationData.name,
-            address: deploymentResult.contractAddress!,
+            address: result.contractAddress!,
             abi: _contractCompilationData.abi,
         };
 
-        console.log("deployment data", _deploymentData, deploymentResult)
-
         deploymentState.deploy(_deploymentData);
 
-        // Show output
-        outputChannel.appendLine("Deployed contract: " + _contractCompilationData.name);
-        outputChannel.append(JSON.stringify(deploymentResult.txReceipt));
-        outputChannel.show();
+        // Add to tx history
+        const txOutput: TxDeploymentOutput = {
+            type: TxType.Deployment,
+            success: true,  // TODO success will show true even on revert
+            from: requestParams.sender,
+            contractAddress: result.contractAddress!,
+            contractName: _contractCompilationData.name,
+            receipt: result.txReceipt,
+            callTrace: result.callTrace
+        };
+
+        txHistoryState.addTx(txOutput);
+        outputTreeProvider.set(txOutput);
+        vscode.commands.executeCommand("sake-output.focus");
+
         vscode.window.showInformationMessage("Deployment was successful!");
 
         return true;
@@ -99,7 +110,6 @@ export async function deploy(
 export async function call(
     callPayload: FunctionCallPayload,
     client: LanguageClient | undefined,
-    outputChannel: vscode.OutputChannel,
     outputTreeProvider: SakeOutputTreeProvider
 ) {
     const { requestParams, func } = callPayload;
@@ -109,23 +119,32 @@ export async function call(
 
         console.log("call params", requestParams);
 
-        const callResult = await client?.sendRequest<any>("wake/sake/call", requestParams);
+        const result = await client?.sendRequest<WakeFunctionCallResponse>("wake/sake/call", requestParams);
 
-        console.log("call result", callResult);
+        console.log("call result", result);
 
-        if (callResult == null) { throw new Error("No result returned"); }
-        if (!callResult.success) { throw new Error("Function call was unsuccessful"); }
+        if (result == null) { throw new Error("No result returned"); }
+        if (!result.success) { throw new Error("Function call was unsuccessful"); }
 
         // parse
-        const decocedReturnValue = decodeCallReturnValue(callResult.returnValue, func);
+        const decocedReturnValue = decodeCallReturnValue(result.returnValue, func);
         console.log("decoded return value", decocedReturnValue);
 
-        // Show output
-        // outputChannel.appendLine("Function call was successful!");
-        // outputChannel.append(JSON.stringify(callResult.txReceipt));
-        // outputChannel.show();
-        outputTreeProvider.set(callResult);
+        const txOutput: TxFunctionCallOutput = {
+            type: TxType.FunctionCall,
+            success: true, // TODO success will show true even on revert
+            from: requestParams.sender,
+            to: requestParams.contract_address,
+            functionName: func.name,
+            returnValue: decocedReturnValue,
+            receipt: result.txReceipt,
+            callTrace: result.callTrace
+        };
+
+        txHistoryState.addTx(txOutput);
+        outputTreeProvider.set(txOutput);
         vscode.commands.executeCommand("sake-output.focus");
+
         vscode.window.showInformationMessage("Function call was successful!");
 
         return true;
