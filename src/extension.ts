@@ -514,7 +514,7 @@ export async function activate(context: vscode.ExtensionContext) {
     analytics.logActivate();
 
     // activate Sake
-    activateSake(context, outputChannel, client);
+    activateSake(context, client);
 }
 
 function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext){

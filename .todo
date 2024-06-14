@@ -82,8 +82,9 @@ Worklog:
         ☐ test for dynamic types, arrays, structs
     ☐ call api
         ✔ well it works, but usually does not return anything @done(24-06-05 23:52)
-        ☐ fix this
-        ☐ return tx
+        ✔ fix this @done(24-06-14 09:41)
+        ✔ return tx @done(24-06-14 09:42)
+        ✔ calltrace working with newest wake @done(24-06-14 09:42)
     ☐ hide deploy window until compilation has happened
     - if function (and value also) is not payable, dont allow value
         - should i raise an error/info if value is set? or set value to 0 for simplicity
@@ -92,3 +93,6 @@ Worklog:
     ☐ handling of errors during api, if wake results in err, compiling buttons stays disabled
     ☐ handling of errors due to bad input
     ☐ migrate to types from web3
+    ☐ output
+        ☐ separate from tfs
+        ☐ better displaying of jsons

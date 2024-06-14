@@ -12,7 +12,7 @@ import { parseCompilationResult } from './utils/compilation';
 import { call, compile, deploy, getAccounts } from './api';
 import { AccountState } from './state/AccountState';
 
-export function activateSake(context: vscode.ExtensionContext, outputChannel: vscode.OutputChannel, client: LanguageClient | undefined) {
+export function activateSake(context: vscode.ExtensionContext, client: LanguageClient | undefined) {
     // const sidebarCompilerProvider = new CompilerWebviewProvider(context.extensionUri);
 
     // context.subscriptions.push(
@@ -21,6 +21,8 @@ export function activateSake(context: vscode.ExtensionContext, outputChannel: vs
     //     sidebarCompilerProvider
     //     )
     // );
+
+    const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
 
     const sidebarDeployProvider = new DeployWebviewProvider(context.extensionUri);
     context.subscriptions.push(
@@ -97,22 +99,22 @@ export function activateSake(context: vscode.ExtensionContext, outputChannel: vs
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.compile",
-        () => compile(client, outputChannel))
+        () => compile(client, sakeOutputChannel))
     );
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.deploy",
-        (deploymentParams: WakeDeploymentRequestParams) => deploy(deploymentParams, client, outputChannel))
+        (deploymentParams: WakeDeploymentRequestParams) => deploy(deploymentParams, client, sakeOutputChannel))
     );
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.getAccounts",
-        () => getAccounts(client, outputChannel))
+        () => getAccounts(client, sakeOutputChannel))
     );
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.call",
-        (callParams: FunctionCallPayload) => call(callParams, client, outputChannel))
+        (callParams: FunctionCallPayload) => call(callParams, client, sakeOutputChannel))
     );
 
 

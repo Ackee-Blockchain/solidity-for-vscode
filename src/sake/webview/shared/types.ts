@@ -180,7 +180,7 @@ export interface WakeFunctionCallRequestParams {
 
 export interface WakeFunctionCallResponse {
     success: boolean,
-    return_value: string // might need to change to hex string
-    tx_receipt: TxReceipt
-    // call_trace: string
+    returnValue: string // might need to change to hex string
+    txReceipt: TxReceipt
+    callTrace: string
 }

@@ -99,25 +99,6 @@ export async function call(
     callPayload: FunctionCallPayload,
     client: LanguageClient | undefined,
     outputChannel: vscode.OutputChannel) {
-    // if (client === undefined) {
-    //     outputChannel.appendLine("Failed to call function due to missing language client");
-    //     return;
-    // }
-
-    // console.log("call params", callParams);
-
-    // const callResult = await client?.sendRequest<any>("wake/sake/call", callParams);
-
-    // console.log("call result", callResult);
-
-
-
-    // if (callResult == null) { // TODO more checks
-    //     vscode.window.showErrorMessage("Function call failed, no result returned");
-    //     return false;
-    // }
-    // // TODO
-
     const { requestParams, func } = callPayload;
 
     try {
@@ -126,6 +107,8 @@ export async function call(
         console.log("call params", requestParams);
 
         const callResult = await client?.sendRequest<any>("wake/sake/call", requestParams);
+
+        console.log("call result", callResult);
 
         if (callResult == null) { throw new Error("No result returned"); }
         if (!callResult.success) { throw new Error("Function call was unsuccessful"); }
