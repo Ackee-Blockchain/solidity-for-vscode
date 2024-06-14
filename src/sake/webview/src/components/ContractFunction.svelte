@@ -11,7 +11,7 @@
   import { buildTree, RootInputHandler } from "../helpers/FunctionInputsHandler";
   import IconSpacer from "./icons/IconSpacer.svelte";
   import { messageHandler } from '@estruyf/vscode/dist/client'
-  import type { ContractFunction as ContractFunctionType, Contract, FunctionCallPayload } from "../../shared/types";
+  import { type ContractFunction as ContractFunctionType, type Contract, type FunctionCallPayload, WebviewMessage } from "../../shared/types";
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -49,7 +49,16 @@
         // }
         // await messageHandler.send("onContractFunctionCall", payload);
         // onFunctionCall(input.get());
-        const _encodedInput: string = isConstructor ? input.encodedParameters() : input.calldata();
+        let _encodedInput: string;
+        try {
+            _encodedInput = isConstructor ? input.encodedParameters() : input.calldata();
+        } catch (e) {
+            const errorMessage = typeof e === "string" ? e : (e as Error).message;
+            const message = `Failed to encode input with error: ${errorMessage}`;
+            messageHandler.send(WebviewMessage.onError, message)
+            return;
+        }
+
         console.log("encoded input", isConstructor, _encodedInput);
         onFunctionCall(_encodedInput, func)
     }

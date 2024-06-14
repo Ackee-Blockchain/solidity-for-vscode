@@ -126,7 +126,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case "onError": {
+            case WebviewMessage.onError: {
                 if (!payload) {
                     return;
                 }

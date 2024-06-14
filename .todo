@@ -93,6 +93,18 @@ Worklog:
     ☐ handling of errors during api, if wake results in err, compiling buttons stays disabled
     ☐ handling of errors due to bad input
     ☐ migrate to types from web3
+
+    ✔ handle error when abi cannot encode calldata @done(24-06-14 11:32)
+    ☐ get func selector (right click on function or something)
+    ☐ outputChannel to TreeView
+    ☐ option to send raw calldata to contract
     ☐ output
         ☐ separate from tfs
         ☐ better displaying of jsons
+    ☐ getBalances, setBalances
+        ☐ api
+        ☐ frontend
+    ☐ fix theming
+    ☐ rename WebviewMessage to WebviewMessageId
+    ☐ add view progress during api calls
+        - see https://code.visualstudio.com/api/ux-guidelines/views#views-with-progress
