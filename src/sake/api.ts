@@ -6,6 +6,7 @@ import { parseCompilationResult } from './utils/compilation';
 import { DeploymentState } from './state/DeploymentState';
 import { AccountState } from './state/AccountState';
 import { decodeCallReturnValue } from './utils/call';
+import { SakeOutputTreeProvider } from './providers/OutputTreeProvider';
 
 const accountState = AccountState.getInstance();
 const deploymentState = DeploymentState.getInstance();
@@ -98,7 +99,9 @@ export async function deploy(
 export async function call(
     callPayload: FunctionCallPayload,
     client: LanguageClient | undefined,
-    outputChannel: vscode.OutputChannel) {
+    outputChannel: vscode.OutputChannel,
+    outputTreeProvider: SakeOutputTreeProvider
+) {
     const { requestParams, func } = callPayload;
 
     try {
@@ -118,9 +121,11 @@ export async function call(
         console.log("decoded return value", decocedReturnValue);
 
         // Show output
-        outputChannel.appendLine("Function call was successful!");
-        outputChannel.append(JSON.stringify(callResult.txReceipt));
-        outputChannel.show();
+        // outputChannel.appendLine("Function call was successful!");
+        // outputChannel.append(JSON.stringify(callResult.txReceipt));
+        // outputChannel.show();
+        outputTreeProvider.set(callResult);
+        vscode.commands.executeCommand("sake-output.focus");
         vscode.window.showInformationMessage("Function call was successful!");
 
         return true;

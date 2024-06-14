@@ -108,3 +108,9 @@ Worklog:
     ☐ rename WebviewMessage to WebviewMessageId
     ☐ add view progress during api calls
         - see https://code.visualstudio.com/api/ux-guidelines/views#views-with-progress
+
+Output:
+    add icons
+    show output from deployment in output tree
+    add state for history
+    add button in output tree to show history

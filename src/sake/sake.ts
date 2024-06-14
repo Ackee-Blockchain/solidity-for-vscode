@@ -11,6 +11,7 @@ import {
 import { parseCompilationResult } from './utils/compilation';
 import { call, compile, deploy, getAccounts } from './api';
 import { AccountState } from './state/AccountState';
+import { SakeOutputTreeProvider } from './providers/OutputTreeProvider';
 
 export function activateSake(context: vscode.ExtensionContext, client: LanguageClient | undefined) {
     // const sidebarCompilerProvider = new CompilerWebviewProvider(context.extensionUri);
@@ -23,6 +24,14 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     // );
 
     const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
+    const sakeOutputProvider = new SakeOutputTreeProvider(context);
+    context.subscriptions.push(
+        vscode.window.registerTreeDataProvider('sake-output', sakeOutputProvider)
+    );
+
+    vscode.window
+
+    sakeOutputProvider
 
     const sidebarDeployProvider = new DeployWebviewProvider(context.extensionUri);
     context.subscriptions.push(
@@ -114,7 +123,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     context.subscriptions.push(vscode.commands.registerCommand(
         "Tools-for-Solidity.sake.call",
-        (callParams: FunctionCallPayload) => call(callParams, client, sakeOutputChannel))
+        (callParams: FunctionCallPayload) => call(callParams, client, sakeOutputChannel, sakeOutputProvider))
     );
 
 

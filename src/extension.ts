@@ -503,8 +503,12 @@ export async function activate(context: vscode.ExtensionContext) {
         onNotification(outputChannel, diag);
     });
 
-    vscode.window.registerTreeDataProvider('wake-detections', wakeProvider);
-    vscode.window.registerTreeDataProvider('solc-detections', solcProvider);
+    context.subscriptions.push(
+        vscode.window.registerTreeDataProvider('wake-detections', wakeProvider)
+    );
+    context.subscriptions.push(
+        vscode.window.registerTreeDataProvider('solc-detections', solcProvider)
+    );
 
     registerCommands(outputChannel, context);
 

@@ -130,6 +130,7 @@ export interface TxReceipt {
     [key: string]: any
 }
 
+
 export interface WakeCompilationResponse {
     contracts: WakeCompiledContract;
     success: boolean;
