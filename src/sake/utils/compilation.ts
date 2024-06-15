@@ -26,3 +26,7 @@ export function parseCompilationResult(compilationResult: WakeCompiledContract):
 
     return contracts;
 }
+
+export function getNameFromContractFqn(fqn: string): string {
+    return fqn.split(":")[1];
+}

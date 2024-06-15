@@ -114,13 +114,13 @@ export interface TxOutput {
 
 export interface TxDeploymentOutput extends TxOutput {
     contractName: string;
-    contractAddress: string;
+    contractAddress: string | null;
 }
 
 export interface TxFunctionCallOutput extends TxOutput {
     to: string;
     functionName: string;
-    returnValue: any; // TOTO create a type for this
+    returnValue: any | undefined; // TOTO create a type for this
 }
 
 /*

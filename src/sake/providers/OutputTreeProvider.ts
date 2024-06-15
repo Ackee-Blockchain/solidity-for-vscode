@@ -2,9 +2,55 @@ import * as vscode from 'vscode';
 
 class SakeOutputItem extends vscode.TreeItem {
     children: SakeOutputItem[] = [];
+    key: string;
+    value: string | undefined;
+
+    constructor(key: string, value: string | undefined, collapsibleState: vscode.TreeItemCollapsibleState | undefined) {
+        const _label = value === undefined ? key : key + ": " + value;
+        super(_label, collapsibleState);
+
+        this.key = key;
+        this.value = value;
+
+        this._setIcon();
+    }
+
+    private _setIcon() {
+        switch (this.key) {
+            case 'type':
+                this.iconPath = new vscode.ThemeIcon('squirrel');
+                break;
+            case 'success':
+                this.iconPath = this.value === "true" ? new vscode.ThemeIcon('pass') : new vscode.ThemeIcon('stop-circle');
+                break;
+            case 'to':
+                this.iconPath = new vscode.ThemeIcon('arrow-small-right');
+                break;
+            case 'from':
+                this.iconPath = new vscode.ThemeIcon('arrow-small-left');
+                break;
+            case 'contractAddress':
+                this.iconPath = new vscode.ThemeIcon('rocket');
+                break;
+            case 'contractName':
+                this.iconPath = new vscode.ThemeIcon('symbol-key');
+                break;
+            case 'receipt':
+                this.iconPath = new vscode.ThemeIcon('book');
+                break;
+            case 'callTrace':
+                this.iconPath = new vscode.ThemeIcon('list-tree');
+                break;
+            default:
+                this.iconPath = undefined;
+                break;
+        }
+    }
+
 
     setChildren(children: SakeOutputItem[]): void {
         this.children = children;
+
     }
 }
 
@@ -47,13 +93,13 @@ function jsonToTree(nodes: any): SakeOutputItem[] {
     // console.log("nodes", nodes);
     Object.entries(nodes).forEach(([key, value]) => {
         // console.log("value-key", value, key);
-        const node = new SakeOutputItem(key, vscode.TreeItemCollapsibleState.Collapsed);
+        const node = new SakeOutputItem(key, undefined, vscode.TreeItemCollapsibleState.Collapsed);
         if (isObject(value)) {
             const children = jsonToTree(value);
             node.setChildren(children);
         } else if (Array.isArray(value)) {
             const children = value.map((item: any) => {
-                return new SakeOutputItem(item, vscode.TreeItemCollapsibleState.None);
+                return new SakeOutputItem(item, undefined, vscode.TreeItemCollapsibleState.None);
             });
             node.setChildren(children);
         } else {
