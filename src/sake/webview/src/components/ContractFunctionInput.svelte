@@ -2,35 +2,57 @@
     import {
         provideVSCodeDesignSystem,
         vsCodeButton,
-        vsCodeTextField,
-    } from "@vscode/webview-ui-toolkit";
+        vsCodeTextField
+    } from '@vscode/webview-ui-toolkit';
     import { onMount } from 'svelte';
-    import ExpandButton from "./icons/ExpandButton.svelte";
-  import PlusButton from "./icons/PlusButton.svelte";
-  import MinusButton from "./icons/MinusButton.svelte";
-  import IconSpacer from "./icons/IconSpacer.svelte";
-  import KebabButton from "./icons/KebabButton.svelte";
-  import { messageHandler } from '@estruyf/vscode/dist/client'
-  import { DynamicListInputHandler, InputHandler, InputTypesInternal } from "../helpers/FunctionInputsHandler";
+    import ExpandButton from './icons/ExpandButton.svelte';
+    import PlusButton from './icons/PlusButton.svelte';
+    import MinusButton from './icons/MinusButton.svelte';
+    import IconSpacer from './icons/IconSpacer.svelte';
+    import KebabButton from './icons/KebabButton.svelte';
+    import { messageHandler } from '@estruyf/vscode/dist/client';
+    import {
+        DynamicListInputHandler,
+        InputHandler,
+        InputTypesInternal
+    } from '../helpers/FunctionInputsHandler';
 
-    provideVSCodeDesignSystem().register(
-        vsCodeButton(),
-        vsCodeTextField(),
-    );
+    provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
     export let input: InputHandler;
     let expanded = false;
 
-    const openFullTextInputEditor = async function() {
-        const newValue = await messageHandler.request<any>("getTextFromInputBox", input.get());
+    const openFullTextInputEditor = async function () {
+        const newValue = await messageHandler.request<any>(
+            'getTextFromInputBox',
+            input.getString()
+        );
         newValue && input.set(newValue);
         input = input;
-    }
+    };
 
     // silence warning
     const inputAsDynamicList = () => {
         return input as DynamicListInputHandler;
-    }
+    };
+
+    const handleInput = (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        try {
+            input.set(target.value);
+            const _string = input.getString();
+            if (_string !== undefined) {
+                target.value = _string;
+            }
+        } catch (e) {
+            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
+            const message = `Failed to set input with error: ${errorMessage}`;
+            // messageHandler.send(WebviewMessage.onError, message);
+            console.error(message);
+            return;
+        }
+        input = input;
+    };
 </script>
 
 <div class="flex flex-row items-start gap-1">
@@ -38,38 +60,44 @@
     {#if input.internalType === InputTypesInternal.LEAF}
         <IconSpacer />
     {:else}
-        <ExpandButton bind:expanded={expanded} />
+        <ExpandButton bind:expanded />
     {/if}
 
     <!-- Input box -->
     {#if expanded}
         <div class="flex flex-col flex-1 gap-1">
             <div class="h-[28px] flex items-center">
-                <p class="text-md flex-1">{input.description()}</p>
+                <p class="text-md flex-1">{input.description}</p>
                 {#if input.internalType == InputTypesInternal.DYNAMIC_LIST}
-                    <PlusButton callback={() => {
-                        inputAsDynamicList().addElement();
-                        input = input;
-                    }}/>
-                    <MinusButton callback={() => {
-                        inputAsDynamicList().removeElement();
-                        input = input;
-                    }}/>
+                    <PlusButton
+                        callback={() => {
+                            inputAsDynamicList().addElement();
+                            input = input;
+                        }}
+                    />
+                    <MinusButton
+                        callback={() => {
+                            inputAsDynamicList().removeElement();
+                            input = input;
+                        }}
+                    />
                 {/if}
             </div>
             <!-- Static or dynamic list -->
             {#key input.children}
                 {#each input.children as child}
-                    <svelte:self input={child}/>
+                    <svelte:self input={child} />
                 {/each}
             {/key}
         </div>
     {:else}
-        <vscode-text-field class="flex-1" placeholder={input.description()} value={input.get()} on:change={e => {
-            input.set(e.target.value);
-            input = input;
-            }} />
-        <KebabButton callback={() => { openFullTextInputEditor(); }} />
+        <vscode-text-field
+            class="flex-1"
+            placeholder={input.description}
+            value={input.getString()}
+            on:change={handleInput}
+        />
+        <KebabButton callback={openFullTextInputEditor} />
     {/if}
     <!-- Kebab at the end for additional functionality (i.e. input edit in InputBox) -->
 </div>

@@ -8,9 +8,16 @@ Frontend:
         ☐ be able to delete contracts as well
         ☐ state mutability payable @critical @started(24-05-08 18:16)
         ☐ enums @critical
+        ☐ fix pressing +/- closes expanded state
+        ✔ bar fails with set [(123,[1,2,3],[(mimimi),(mamama)])] @done(24-06-17 17:27)
+        [] strings in tuples (and maybe also lists) dont have ""
+            - what do i do about this. this should only be the case when the value is unexpanded.
+            - if the stirng is being added at leaf, no "" should be there i guess
+        ✔ remove trailing whiteline, in that case input fails to be encoded @done(24-06-15 17:03)
+        [] save inputs into some state (so they dont get lost when run tab is closed)
 
     Other:
-        ☐ history of txs
+        ✔ history of txs @done(24-06-15 16:41)
         ☐ maybe add option to save a function call (with params)
 
     Compile:
@@ -118,6 +125,9 @@ Worklog:
         ☐ add button in output tree to show history
         ☐ instead of TxOutput use TxDeploymentOutput and TxCallOutput
         ☐ txoutput success will show true even on revert
+
+
+    - what happens when a deployed contract gets updated and recompiled. this should be somehow visible on the ui
 
 Questions for User Testing:
     ☐ in history, what data is important to you to see at first glance
