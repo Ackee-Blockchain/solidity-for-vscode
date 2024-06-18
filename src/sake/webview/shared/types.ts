@@ -1,8 +1,10 @@
 /*
-*
-* Account and Contract Interfaces
-*
-*/
+ *
+ * Account and Contract Interfaces
+ *
+ */
+
+export type Address = string;
 
 export interface Account {
     address: string;
@@ -41,10 +43,10 @@ export interface ContractFunctionInput {
 }
 
 /*
-*
-* Messaging
-*
-*/
+ *
+ * Messaging
+ *
+ */
 
 export interface WebviewMessageData {
     command: string;
@@ -57,25 +59,25 @@ export interface WebviewMessageData {
 // TODO should be STATE_ID but me no likey for some reason
 // TODO add messages as enums
 export enum WebviewMessage {
-    onInfo = "onInfo",
-    onError = "onError",
-    getTextFromInputBox = "getTextFromInputBox",
-    setState = "setState",
-    getState = "getState",
-    onCompile = "onCompile",
-    onDeploy = "onDeploy",
-    onContractFunctionCall = "onContractFunctionCall",
-    onUndeployContract = "onUndeployContract", // TODO rename
-    onGetAccounts = "onGetAccounts",
+    onInfo = 'onInfo',
+    onError = 'onError',
+    getTextFromInputBox = 'getTextFromInputBox',
+    setState = 'setState',
+    getState = 'getState',
+    onCompile = 'onCompile',
+    onDeploy = 'onDeploy',
+    onContractFunctionCall = 'onContractFunctionCall',
+    onUndeployContract = 'onUndeployContract', // TODO rename
+    onGetAccounts = 'onGetAccounts'
 }
 
 // TODO create pairs of WebviewMessage and WebviewInput and WebviewOutput
 
 /*
-*
-* Payloads
-*
-*/
+ *
+ * Payloads
+ *
+ */
 
 export interface CompiledContract {
     fqn: string;
@@ -90,14 +92,14 @@ export interface FunctionCallPayload {
 }
 
 /*
-*
-* Tx Outputs
-*
-*/
+ *
+ * Tx Outputs
+ *
+ */
 
 export enum TxType {
-    Deployment = "Deployment",
-    FunctionCall = "Function Call"
+    Deployment = 'Deployment',
+    FunctionCall = 'Function Call'
 }
 
 export interface TxOutput {
@@ -124,10 +126,10 @@ export interface TxFunctionCallOutput extends TxOutput {
 }
 
 /*
-*
-* State
-*
-*/
+ *
+ * State
+ *
+ */
 
 // TODO remove this
 export interface DeploymentStateData {
@@ -142,31 +144,33 @@ export interface CompilationStateData {
     // TODO add isDirty
 }
 
-export type AccountStateData = Array<string>; // TODO
+export type AccountStateData = {
+    address: string;
+    balance: number | undefined;
+};
 
 export type TxHistoryStateData = TxDeploymentOutput | TxFunctionCallOutput;
 
 export enum StateId {
-    DeployedContracts = "deployedContracts",
-    CompiledContracts = "compiledContracts",
-    Accounts = "accounts",
-    TxHistory = "txHistory",
+    DeployedContracts = 'deployedContracts',
+    CompiledContracts = 'compiledContracts',
+    Accounts = 'accounts',
+    TxHistory = 'txHistory'
 }
 
 /*
-*
-* API to Wake
-*
-*/
+ *
+ * API to Wake
+ *
+ */
 
 export interface WakeCompiledContract {
-    [key: string]: ContractAbi
-};
-
-export interface TxReceipt {
-    [key: string]: any
+    [key: string]: ContractAbi;
 }
 
+export interface TxReceipt {
+    [key: string]: any;
+}
 
 export interface WakeCompilationResponse {
     contracts: WakeCompiledContract;
@@ -194,10 +198,10 @@ export interface WakeDeployedContract {
 
 // export type WakeDeploymentResponse = WakeDeployedContract;
 export interface WakeDeploymentResponse {
-    success: boolean,
-    contractAddress: string | null,
-    txReceipt: TxReceipt,
-    callTrace: string
+    success: boolean;
+    contractAddress: string | null;
+    txReceipt: TxReceipt;
+    callTrace: string;
 }
 
 export interface WakeDeploymentRequestParams {
@@ -210,15 +214,24 @@ export interface WakeDeploymentRequestParams {
 export type WakeGetAccountsResponse = AccountStateData;
 
 export interface WakeFunctionCallRequestParams {
-    contract_address: string
-    sender: string
-    calldata: string
-    value: number
+    contract_address: string;
+    sender: string;
+    calldata: string;
+    value: number;
 }
 
 export interface WakeFunctionCallResponse {
-    success: boolean,
-    returnValue: string // might need to change to hex string
-    txReceipt: TxReceipt
-    callTrace: string
+    success: boolean;
+    returnValue: string; // might need to change to hex string
+    txReceipt: TxReceipt;
+    callTrace: string;
+}
+
+export interface WakeGetBalancesRequestParams {
+    addresses: string[];
+}
+
+export interface WakeGetBalancesResponse {
+    success: boolean;
+    balances: { [key: string]: number };
 }

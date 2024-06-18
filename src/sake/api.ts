@@ -1,5 +1,20 @@
 import * as vscode from 'vscode';
-import { AccountStateData, DeploymentStateData, FunctionCallPayload, TxDeploymentOutput, TxFunctionCallOutput, TxOutput, TxType, WakeDeploymentRequestParams, WakeDeploymentResponse, WakeFunctionCallRequestParams, WakeFunctionCallResponse } from "./webview/shared/types";
+import {
+    AccountStateData,
+    Address,
+    DeploymentStateData,
+    FunctionCallPayload,
+    TxDeploymentOutput,
+    TxFunctionCallOutput,
+    TxOutput,
+    TxType,
+    WakeDeploymentRequestParams,
+    WakeDeploymentResponse,
+    WakeFunctionCallRequestParams,
+    WakeFunctionCallResponse,
+    WakeGetBalancesRequestParams,
+    WakeGetBalancesResponse
+} from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { CompilationState } from './state/CompilationState';
 import { getNameFromContractFqn, parseCompilationResult } from './utils/compilation';
@@ -14,44 +29,102 @@ const deploymentState = DeploymentState.getInstance();
 const compilationState = CompilationState.getInstance();
 const txHistoryState = TxHistoryState.getInstance();
 
-export async function getAccounts(
-    client: LanguageClient | undefined) {
+export async function getAccounts(client: LanguageClient | undefined) {
     try {
-        if (client === undefined) { throw new Error("Missing language client"); }
+        if (client === undefined) {
+            throw new Error('Missing language client');
+        }
 
-        const accountsResult = await client?.sendRequest<AccountStateData>("wake/sake/getAccounts");
+        const result = await client?.sendRequest<Address[]>('wake/sake/getAccounts');
 
-        if (accountsResult == null) { throw new Error("No result returned"); }
-        if (accountsResult.length === 0) { throw new Error("No accounts returned"); }
+        if (result == null) {
+            throw new Error('No result returned');
+        }
+        if (result.length === 0) {
+            throw new Error('No accounts returned');
+        }
 
-        accountState.setAccounts(accountsResult);
+        // @dev don't set the state here, as it will be set in balances
+
+        // const _accountStateData = result.map((address) => {
+        //     return {
+        //         address: address,
+        //         balance: undefined
+        //     };
+        // });
+        // accountState.setAccounts(_accountStateData);
+
+        getBalances(client, { addresses: result });
 
         return true;
     } catch (e) {
-        const message = typeof e === "string" ? e : (e as Error).message;
-        vscode.window.showErrorMessage("Failed to get accounts: " + message);
+        const message = typeof e === 'string' ? e : (e as Error).message;
+        vscode.window.showErrorMessage('Failed to get accounts: ' + message);
         return false;
     }
 }
 
-export async function compile(
-    client: LanguageClient | undefined) {
+export async function getBalances(
+    client: LanguageClient | undefined,
+    requestParams: WakeGetBalancesRequestParams
+) {
     try {
-        if (client === undefined) { throw new Error("Missing language client"); }
+        if (client === undefined) {
+            throw new Error('Missing language client');
+        }
 
-        const compilationResult = await client?.sendRequest<any>("wake/sake/compile");
+        const result = await client?.sendRequest<WakeGetBalancesResponse>(
+            'wake/sake/getBalances',
+            requestParams
+        );
 
-        if (compilationResult == null) { throw new Error("No result returned"); }
-        if (!compilationResult.success) { throw new Error("Compilation was unsuccessful"); }
+        if (result == null) {
+            throw new Error('No result returned');
+        }
+        if (!result.success) {
+            throw new Error('Failed to get balances');
+        }
 
-        vscode.window.showInformationMessage("Compilation was successful!");
-        const _parsedCompilationResult = parseCompilationResult(compilationResult.contracts);
-        compilationState.setCompilation(_parsedCompilationResult);
+        const _accountStateData = requestParams.addresses.map((address) => {
+            return {
+                address: address,
+                balance: result.balances[address]
+            };
+        });
 
-        return compilationResult.success;
+        accountState.setAccounts(_accountStateData);
+
+        return result;
     } catch (e) {
-        const message = typeof e === "string" ? e : (e as Error).message;
-        vscode.window.showErrorMessage("Compilation failed with error: " + message);
+        const message = typeof e === 'string' ? e : (e as Error).message;
+        vscode.window.showErrorMessage('Failed to get addresses: ' + message);
+        return [];
+    }
+}
+
+export async function compile(client: LanguageClient | undefined) {
+    try {
+        if (client === undefined) {
+            throw new Error('Missing language client');
+        }
+
+        const result = await client?.sendRequest<any>('wake/sake/compile');
+
+        if (result == null) {
+            throw new Error('No result returned');
+        }
+        if (!result.success) {
+            throw new Error('Compilation was unsuccessful');
+        }
+
+        vscode.window.showInformationMessage('Compilation was successful!');
+        const _parsedresult = parseCompilationResult(result.contracts);
+        compilationState.setCompilation(_parsedresult);
+
+        return result.success;
+    } catch (e) {
+        const message = typeof e === 'string' ? e : (e as Error).message;
+        vscode.window.showErrorMessage('Compilation failed with error: ' + message);
         return false;
     }
 }
@@ -59,17 +132,25 @@ export async function compile(
 export async function deploy(
     requestParams: WakeDeploymentRequestParams,
     client: LanguageClient | undefined,
-    outputTreeProvider: SakeOutputTreeProvider) {
+    outputTreeProvider: SakeOutputTreeProvider
+) {
     try {
-        if (client === undefined) { throw new Error("Missing language client"); }
+        if (client === undefined) {
+            throw new Error('Missing language client');
+        }
 
-        console.log("deployment params", requestParams);
+        console.log('deployment params', requestParams);
 
-        const result = await client?.sendRequest<WakeDeploymentResponse>("wake/sake/deploy", requestParams);
+        const result = await client?.sendRequest<WakeDeploymentResponse>(
+            'wake/sake/deploy',
+            requestParams
+        );
 
-        console.log("deployment result", result);
+        console.log('deployment result', result);
 
-        if (result == null) { throw new Error("No result returned"); }
+        if (result == null) {
+            throw new Error('No result returned');
+        }
         // if (!result.success) { throw new Error("Deployment was unsuccessful"); }
 
         let _contractCompilationData;
@@ -78,7 +159,7 @@ export async function deploy(
             const _deploymentData: DeploymentStateData = {
                 name: _contractCompilationData.name,
                 address: result.contractAddress!,
-                abi: _contractCompilationData.abi,
+                abi: _contractCompilationData.abi
             };
 
             deploymentState.deploy(_deploymentData);
@@ -86,11 +167,10 @@ export async function deploy(
 
         // Add deployment to state
 
-
         // Add to tx history
         const txOutput: TxDeploymentOutput = {
             type: TxType.Deployment,
-            success: true,  // TODO success will show true even on revert
+            success: true, // TODO success will show true even on revert
             from: requestParams.sender,
             contractAddress: result.contractAddress,
             contractName: getNameFromContractFqn(requestParams.contract_fqn),
@@ -100,14 +180,14 @@ export async function deploy(
 
         txHistoryState.addTx(txOutput);
         outputTreeProvider.set(txOutput);
-        vscode.commands.executeCommand("sake-output.focus");
+        vscode.commands.executeCommand('sake-output.focus');
 
-        vscode.window.showInformationMessage("Deployment was successful!");
+        vscode.window.showInformationMessage('Deployment was successful!');
 
         return true;
     } catch (e) {
-        const message = typeof e === "string" ? e : (e as Error).message;
-        vscode.window.showErrorMessage("Deployment failed with error: " + message);
+        const message = typeof e === 'string' ? e : (e as Error).message;
+        vscode.window.showErrorMessage('Deployment failed with error: ' + message);
         return false;
     }
 }
@@ -120,22 +200,29 @@ export async function call(
     const { requestParams, func } = callPayload;
 
     try {
-        if (client === undefined) { throw new Error("Missing language client"); }
+        if (client === undefined) {
+            throw new Error('Missing language client');
+        }
 
-        console.log("call params", requestParams);
+        console.log('call params', requestParams);
 
-        const result = await client?.sendRequest<WakeFunctionCallResponse>("wake/sake/call", requestParams);
+        const result = await client?.sendRequest<WakeFunctionCallResponse>(
+            'wake/sake/call',
+            requestParams
+        );
 
-        console.log("call result", result);
+        console.log('call result', result);
 
-        if (result == null) { throw new Error("No result returned"); }
+        if (result == null) {
+            throw new Error('No result returned');
+        }
         // if (!result.success) { throw new Error("Function call was unsuccessful"); }
 
         let decodedReturnValue;
         if (result.success) {
             // parse result
             decodedReturnValue = decodeCallReturnValue(result.returnValue, func);
-            console.log("decoded return value", decodedReturnValue);
+            console.log('decoded return value', decodedReturnValue);
         }
 
         const txOutput: TxFunctionCallOutput = {
@@ -151,14 +238,14 @@ export async function call(
 
         txHistoryState.addTx(txOutput);
         outputTreeProvider.set(txOutput);
-        vscode.commands.executeCommand("sake-output.focus");
+        vscode.commands.executeCommand('sake-output.focus');
 
         // vscode.window.showInformationMessage("Function call was successful!");
 
         return true;
     } catch (e) {
-        const message = typeof e === "string" ? e : (e as Error).message;
-        vscode.window.showErrorMessage("Function call failed with error: " + message);
+        const message = typeof e === 'string' ? e : (e as Error).message;
+        vscode.window.showErrorMessage('Function call failed with error: ' + message);
         return false;
     }
 }

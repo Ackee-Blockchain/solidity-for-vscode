@@ -28,9 +28,9 @@
     let inputRoot: RootInputHandler;
     $: funcChanged(func);
 
-    const funcChanged = (func: ContractFunctionType) => {
-        hasInputs = func.inputs ? func.inputs.length > 0 : false;
-        inputRoot = buildTree(func);
+    const funcChanged = (_func: ContractFunctionType) => {
+        hasInputs = _func.inputs ? _func.inputs.length > 0 : false;
+        inputRoot = buildTree(_func);
         expanded = false;
         // console.log(func.name, func);
     };

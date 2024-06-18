@@ -91,7 +91,8 @@ TfS Integration:
             notifikace or message/requests   resposne bude json
         see printersHandler.ts
     ✔ define messages and types whcih will be sent to lsp wake side @done(24-06-03 15:53)
-    ☐ validation at frontend
+    ✔ validation at frontend @done(24-06-18 13:33)
+        yess
 
 Worklog:
     ✔ wake compilation fix @done(24-06-03 15:33)
@@ -104,7 +105,7 @@ Worklog:
         ✔ for simple types @done(24-06-05 23:46)
         ✔ for constructors @done(24-06-05 23:46)
         ☐ test for dynamic types, arrays, structs
-    ☐ call api
+    ✔ call api @done(24-06-18 13:45)
         ✔ well it works, but usually does not return anything @done(24-06-05 23:52)
         ✔ fix this @done(24-06-14 09:41)
         ✔ return tx @done(24-06-14 09:42)

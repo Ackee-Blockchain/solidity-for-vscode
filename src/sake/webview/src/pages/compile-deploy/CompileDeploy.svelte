@@ -6,16 +6,22 @@
         vsCodeOption,
         vsCodeDivider,
         vsCodeCheckbox,
-        vsCodeTextField,
-    } from "@vscode/webview-ui-toolkit";
-    import Spacer from "../../components/Spacer.svelte";
-    import Contract from "../../components/Contract.svelte";
-    import Divider from "../../components/Divider.svelte";
-    import CallSetup from "../../components/CallSetup.svelte";
-    import { messageHandler } from '@estruyf/vscode/dist/client'
-    import { StateId, WebviewMessage, type CompilationStateData, type CompiledContract, type WakeDeploymentRequestParams } from "../../../shared/types";
-    import { onMount } from "svelte";
-  import Constructor from "../../components/Constructor.svelte";
+        vsCodeTextField
+    } from '@vscode/webview-ui-toolkit';
+    import Spacer from '../../components/Spacer.svelte';
+    import Contract from '../../components/Contract.svelte';
+    import Divider from '../../components/Divider.svelte';
+    import CallSetup from '../../components/CallSetup.svelte';
+    import { messageHandler } from '@estruyf/vscode/dist/client';
+    import {
+        StateId,
+        WebviewMessage,
+        type CompilationStateData,
+        type CompiledContract,
+        type WakeDeploymentRequestParams
+    } from '../../../shared/types';
+    import { onMount } from 'svelte';
+    import Constructor from '../../components/Constructor.svelte';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -23,7 +29,7 @@
         vsCodeOption(),
         vsCodeDivider(),
         vsCodeCheckbox(),
-        vsCodeTextField(),
+        vsCodeTextField()
     );
 
     let compiledContracts: Array<CompiledContract> = [];
@@ -42,7 +48,7 @@
             selectedContract = compiledContracts[0];
         }
         dirtyCompilation = payload.dirty;
-    }
+    };
 
     const compile = async () => {
         compiling = true;
@@ -53,9 +59,9 @@
         }
 
         compiling = false;
-    }
+    };
 
-    window.addEventListener("message", (event) => {
+    window.addEventListener('message', (event) => {
         if (!event.data.command) return;
 
         const { command, payload, stateId } = event.data;
@@ -74,19 +80,19 @@
         }
     });
 
-    const createRandomAddress = function() {
-        return "0x" + Math.random().toString(16).slice(2)
-    }
+    const createRandomAddress = function () {
+        return '0x' + Math.random().toString(16).slice(2);
+    };
 
-    const deploy = async function(calldata: string) {
+    const deploy = async function (calldata: string) {
         if (selectedContract === undefined) {
-            messageHandler.send(WebviewMessage.onError, "Failed deployment, no contract seleced");
+            messageHandler.send(WebviewMessage.onError, 'Failed deployment, no contract seleced');
             return;
         }
 
-        const _sender: string | undefined = callSetup.getSelectedAccount();
+        const _sender: string | undefined = callSetup.getSelectedAccount()?.address;
         if (_sender === undefined) {
-            messageHandler.send(WebviewMessage.onError, "Failed deployment, undefined sender");
+            messageHandler.send(WebviewMessage.onError, 'Failed deployment, undefined sender');
             return;
         }
 
@@ -97,12 +103,12 @@
             sender: _sender,
             calldata: calldata,
             value: _value ?? 0
-        }
+        };
 
-        await messageHandler.send(WebviewMessage.onDeploy, payload)
-    }
+        await messageHandler.send(WebviewMessage.onDeploy, payload);
+    };
 
-    const selectContract = function(e: CustomEvent) {
+    const selectContract = function (e: CustomEvent) {
         // console.log("selected contract id", e.detail.value);
 
         const _selectedContractId = e.detail.value;
@@ -113,8 +119,7 @@
         }
 
         // console.log("selected contract", selectedContract);
-    }
-
+    };
 </script>
 
 <main>
@@ -124,16 +129,26 @@
     </vscode-dropdown>
 
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <vscode-button class="w-full" on:click={compile} appearence={dirtyCompilation ? "primary" : "secondary"} disabled={compiling}>
-        {compiling ? "Compiling..." : "Compile all"}
+    <vscode-button
+        class="w-full"
+        on:click={compile}
+        appearence={dirtyCompilation ? 'primary' : 'secondary'}
+        disabled={compiling}
+    >
+        {compiling ? 'Compiling...' : 'Compile all'}
     </vscode-button>
     {#if dirtyCompilation}
-        <div class="text-sm px-2 py-1 bg-gray-800 rounded relative top--2 text-center pt-2 pb-1" style="z-index:0;">Some files were changed since last compilation</div>
+        <div
+            class="text-sm px-2 py-1 bg-gray-800 rounded relative top--2 text-center pt-2 pb-1"
+            style="z-index:0;"
+        >
+            Some files were changed since last compilation
+        </div>
     {/if}
 
     <Divider />
 
-    <CallSetup bind:this={callSetup}/>
+    <CallSetup bind:this={callSetup} />
 
     <section>
         <p class="ml-1 text-sm">Contract</p>
@@ -145,13 +160,11 @@
         <div class="my-4"></div>
 
         {#if selectedContract !== undefined}
-            <Constructor abi={selectedContract.abi} onDeploy={deploy}/>
+            <Constructor abi={selectedContract.abi} onDeploy={deploy} />
         {/if}
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-
     </section>
-
 </main>
 
 <style global>

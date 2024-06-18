@@ -60,7 +60,7 @@
         contract_address: string,
         func: ContractFunctionType
     ) {
-        const _sender: string | undefined = callSetup.getSelectedAccount();
+        const _sender: string | undefined = callSetup.getSelectedAccount()?.address;
         if (_sender === undefined) {
             messageHandler.send(WebviewMessage.onError, 'Failed deployment, undefined sender');
             return;

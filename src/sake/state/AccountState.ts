@@ -1,7 +1,7 @@
-import { AccountStateData, StateId } from "../webview/shared/types";
-import { BaseState } from "./BaseState";
+import { AccountStateData, StateId } from '../webview/shared/types';
+import { BaseState } from './BaseState';
 
-export class AccountState extends BaseState<AccountStateData> {
+export class AccountState extends BaseState<AccountStateData[]> {
     private static _instance: AccountState;
 
     private constructor() {
@@ -15,7 +15,7 @@ export class AccountState extends BaseState<AccountStateData> {
         return this._instance;
     }
 
-    public setAccounts(accounts: AccountStateData) {
+    public setAccounts(accounts: AccountStateData[]) {
         // TODO validate payload
         this.state = accounts;
     }
