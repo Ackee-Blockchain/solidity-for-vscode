@@ -13,7 +13,8 @@ import {
     WakeFunctionCallRequestParams,
     WakeFunctionCallResponse,
     WakeGetBalancesRequestParams,
-    WakeGetBalancesResponse
+    WakeGetBalancesResponse,
+    WakeSetBalancesRequestParams
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { CompilationState } from './state/CompilationState';
@@ -54,7 +55,7 @@ export async function getAccounts(client: LanguageClient | undefined) {
         // });
         // accountState.setAccounts(_accountStateData);
 
-        getBalances(client, { addresses: result });
+        getBalances({ addresses: result }, client);
 
         return true;
     } catch (e) {
@@ -65,8 +66,8 @@ export async function getAccounts(client: LanguageClient | undefined) {
 }
 
 export async function getBalances(
-    client: LanguageClient | undefined,
-    requestParams: WakeGetBalancesRequestParams
+    requestParams: WakeGetBalancesRequestParams,
+    client: LanguageClient | undefined
 ) {
     try {
         if (client === undefined) {
@@ -99,6 +100,32 @@ export async function getBalances(
         const message = typeof e === 'string' ? e : (e as Error).message;
         vscode.window.showErrorMessage('Failed to get addresses: ' + message);
         return [];
+    }
+}
+
+export async function setBalances(
+    requestParams: WakeSetBalancesRequestParams,
+    client: LanguageClient | undefined
+) {
+    try {
+        if (client === undefined) {
+            throw new Error('Missing language client');
+        }
+
+        const result = await client?.sendRequest<boolean>('wake/sake/setBalances', requestParams);
+
+        if (result == null) {
+            throw new Error('No result returned');
+        }
+        if (!result) {
+            throw new Error('Failed to set balances');
+        }
+
+        return result;
+    } catch (e) {
+        const message = typeof e === 'string' ? e : (e as Error).message;
+        vscode.window.showErrorMessage('Failed to set balances: ' + message);
+        return false;
     }
 }
 

@@ -143,6 +143,10 @@ Worklog:
 
     ☐ be able to set name of contract
 
+    ☐ api calls
+        - i probably need to change the api calls to return the actual data instead of boolean
+        - if anything goes wrong, just throw...
+
     Output:
         ☐ add icons
         ☐ show output from deployment in output tree
@@ -156,6 +160,12 @@ Worklog:
         - what happens when a deployed contract gets updated and recompiled.
         - this should be somehow visible on the ui that the contract is outdated
 
+    [] if state data is already saved, you dont have to query wake always
+        - prob implement this in sake.ts
+
+    [] for validation look if web3js has some funcs
+
 
 Questions for User Testing:
     ☐ in history, what data is important to you to see at first glance
+    [] topUp or set acc balance?

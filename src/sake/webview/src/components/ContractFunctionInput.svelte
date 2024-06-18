@@ -16,6 +16,7 @@
         InputHandler,
         InputTypesInternal
     } from '../helpers/FunctionInputsHandler';
+    import { WebviewMessage } from '../../shared/types';
 
     provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
@@ -23,8 +24,8 @@
     let expanded = false;
 
     const openFullTextInputEditor = async function () {
-        const newValue = await messageHandler.request<any>(
-            'getTextFromInputBox',
+        const newValue = await messageHandler.request<string>(
+            WebviewMessage.getTextFromInputBox,
             input.getString()
         );
         newValue && input.set(newValue);

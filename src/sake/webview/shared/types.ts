@@ -68,7 +68,9 @@ export enum WebviewMessage {
     onDeploy = 'onDeploy',
     onContractFunctionCall = 'onContractFunctionCall',
     onUndeployContract = 'onUndeployContract', // TODO rename
-    onGetAccounts = 'onGetAccounts'
+    onGetAccounts = 'onGetAccounts',
+    onGetBalances = 'onGetBalances', // @ todo rename, probably dony use on everywhere
+    onSetBalances = 'onSetBalances'
 }
 
 // TODO create pairs of WebviewMessage and WebviewInput and WebviewOutput
@@ -233,5 +235,9 @@ export interface WakeGetBalancesRequestParams {
 
 export interface WakeGetBalancesResponse {
     success: boolean;
+    balances: { [key: string]: number };
+}
+
+export interface WakeSetBalancesRequestParams {
     balances: { [key: string]: number };
 }

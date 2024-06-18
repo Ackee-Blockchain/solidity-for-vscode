@@ -1,7 +1,7 @@
 import type { ContractFunctionInput } from '../../shared/types';
 import type { AbiFunctionFragment } from 'web3-types';
 import { encodeFunctionCall, encodeParameters } from 'web3-eth-abi';
-import { FunctionInputBuildError, FunctionInputParseError } from './errors';
+import { FunctionInputBuildError, FunctionInputParseError } from '../../shared/errors';
 import { validateAndParseType } from '../../shared/validate';
 
 export function buildTree(abi: AbiFunctionFragment): RootInputHandler {

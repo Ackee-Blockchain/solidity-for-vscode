@@ -12,9 +12,12 @@
         StateId,
         WebviewMessage,
         type Account,
-        type AccountStateData
+        type AccountStateData,
+        type WakeSetBalancesRequestParams
     } from '../../shared/types';
     import { messageHandler } from '@estruyf/vscode/dist/client';
+    import EtherValueInput from './EtherValueInput.svelte';
+    import CopyButton from './icons/CopyButton.svelte';
 
     provideVSCodeDesignSystem().register(vsCodeDropdown(), vsCodeOption(), vsCodeTextField());
 
@@ -87,6 +90,38 @@
         value = _value;
     }
 
+    async function topUp() {
+        if (selectedAccount === undefined) {
+            return;
+        }
+
+        const value = await messageHandler.request<string>(
+            WebviewMessage.getTextFromInputBox,
+            selectedAccount?.address
+        );
+
+        if (value === undefined) {
+            return;
+        }
+
+        console.log('top up value', value);
+
+        const _address = selectedAccount.address;
+
+        const _params: WakeSetBalancesRequestParams = {
+            balances: {
+                _address: parseInt(value)
+            }
+        };
+
+        const success = await messageHandler.send(WebviewMessage.onSetBalances, {
+            address: selectedAccount?.address,
+            value: value
+        });
+
+        console.log('top up success', success);
+    }
+
     export function getSelectedAccount(): AccountStateData | undefined {
         return selectedAccount;
     }
@@ -110,24 +145,7 @@
                 <div class="w-full flex flex-row gap-1 items-center h-[20px]">
                     <span class="flex-1 truncate text-sm">{selectedAccount.address}</span>
                     <!-- <span class="flex-1 truncate text-sm">{accounts[selectedAccountIndex].address}</span> -->
-                    <IconButton>
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 16 16"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                            ><path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M4 4l1-1h5.414L14 6.586V14l-1 1H5l-1-1V4zm9 3l-3-3H5v10h8V7z"
-                            /><path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M3 1L2 2v10l1 1V2h6.414l-1-1H3z"
-                            /></svg
-                        >
-                    </IconButton>
+                    <CopyButton callback={topUp} />
                 </div>
                 <div class="w-full flex flex-row gap-1 items-center h-[20px]">
                     <span class="text-sm flex-1">{selectedAccount.balance}</span>
@@ -149,6 +167,7 @@
                         {value}
                         on:change={handleValueChange}
                     ></vscode-text-field>
+                    <!-- <EtherValueInput /> -->
                 </div>
                 <!-- <p>Value</p>
             <vscode-text-field placeholder="Value" class="w-full"></vscode-text-field> -->

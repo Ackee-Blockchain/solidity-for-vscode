@@ -1,15 +1,25 @@
 import * as vscode from 'vscode';
-import { DeployWebviewProvider, CompilerWebviewProvider, RunWebviewProvider } from './providers/WebviewProviders';
+import {
+    DeployWebviewProvider,
+    CompilerWebviewProvider,
+    RunWebviewProvider
+} from './providers/WebviewProviders';
 import { StatusBarEnvironmentProvider } from './providers/StatusBarEnvironmentProvider';
 import { copyToClipboardHandler, loadSampleAbi, getTextFromInputBox } from './commands';
 import { DeploymentState } from './state/DeploymentState';
 import { CompilationState } from './state/CompilationState';
-import { WakeCompilationResponse, Contract, WakeDeploymentRequestParams, WakeFunctionCallRequestParams, FunctionCallPayload } from './webview/shared/types';
 import {
-    LanguageClient,
-} from 'vscode-languageclient/node';
+    WakeCompilationResponse,
+    Contract,
+    WakeDeploymentRequestParams,
+    WakeFunctionCallRequestParams,
+    FunctionCallPayload,
+    WakeGetBalancesRequestParams,
+    WakeSetBalancesRequestParams
+} from './webview/shared/types';
+import { LanguageClient } from 'vscode-languageclient/node';
 import { parseCompilationResult } from './utils/compilation';
-import { call, compile, deploy, getAccounts } from './api';
+import { call, compile, deploy, getAccounts, getBalances, setBalances } from './api';
 import { AccountState } from './state/AccountState';
 import { SakeOutputTreeProvider } from './providers/OutputTreeProvider';
 import { TxHistoryState } from './state/TxHistoryState';
@@ -33,18 +43,12 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     const sidebarDeployProvider = new DeployWebviewProvider(context.extensionUri);
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider(
-        "sake-compile-deploy",
-        sidebarDeployProvider
-        )
+        vscode.window.registerWebviewViewProvider('sake-compile-deploy', sidebarDeployProvider)
     );
 
     const sidebarRunProvider = new RunWebviewProvider(context.extensionUri);
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider(
-        "sake-run",
-        sidebarRunProvider
-        )
+        vscode.window.registerWebviewViewProvider('sake-run', sidebarRunProvider)
     );
 
     const deploymentState = DeploymentState.getInstance();
@@ -57,16 +61,16 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
             // TODO: change helloworld to sake
             // HelloWorldPanel.kill();
             // HelloWorldPanel.createOrShow(context.extensionUri);
-        }
-    ));
+        })
+    );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('sake.sampleDeploy', async () => {
             const sampleContractAbi = await loadSampleAbi();
             const sampleContract: Contract = {
-                name: "SampleContract",
+                name: 'SampleContract',
                 balance: 0, // had to add this
-                address: "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",
+                address: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
                 abi: sampleContractAbi
             };
             deploymentState.deploy(sampleContract);
@@ -75,10 +79,9 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     context.subscriptions.push(
         vscode.commands.registerCommand('sake.test', async () => {
-            vscode.window.showInformationMessage("Hello World from Sake!");
+            vscode.window.showInformationMessage('Hello World from Sake!');
         })
     );
-
 
     // register status bar
     const statusBarEnvironmentProvider = new StatusBarEnvironmentProvider();
@@ -86,58 +89,89 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     context.subscriptions.push(statusBarEnvironmentProvider.getStatusBarItem());
 
     // register commands
-    context.subscriptions.push(vscode.commands.registerCommand('sake.copyToClipboard', async (text: string) => await copyToClipboardHandler(text)));
-    context.subscriptions.push(vscode.commands.registerCommand('sake.getTextFromInputBox', async (initialValue: string) => await getTextFromInputBox(initialValue)));
-    context.subscriptions.push(vscode.commands.registerCommand('sake.getCurrentFile', async () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            await vscode.window.showErrorMessage("No active editor found.");
-            return;
-        }
-        const document = editor.document;
-        const selection = editor.selection;
-        const text = document.getText(selection);
-        await vscode.window.showInformationMessage(text);
-    }));
-    context.subscriptions.push(vscode.commands.registerCommand('sake.getSampleContract', async () => {
-        const sampleContractAbi = await loadSampleAbi();
-        return sampleContractAbi;
-    }
-    ));
-
-    context.subscriptions.push(vscode.commands.registerCommand(
-        "Tools-for-Solidity.sake.compile",
-        () => compile(client))
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'sake.copyToClipboard',
+            async (text: string) => await copyToClipboardHandler(text)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'sake.getTextFromInputBox',
+            async (initialValue: string) => await getTextFromInputBox(initialValue)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('sake.getCurrentFile', async () => {
+            const editor = vscode.window.activeTextEditor;
+            if (!editor) {
+                await vscode.window.showErrorMessage('No active editor found.');
+                return;
+            }
+            const document = editor.document;
+            const selection = editor.selection;
+            const text = document.getText(selection);
+            await vscode.window.showInformationMessage(text);
+        })
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('sake.getSampleContract', async () => {
+            const sampleContractAbi = await loadSampleAbi();
+            return sampleContractAbi;
+        })
     );
 
-    context.subscriptions.push(vscode.commands.registerCommand(
-        "Tools-for-Solidity.sake.deploy",
-        (deploymentParams: WakeDeploymentRequestParams) => deploy(deploymentParams, client, sakeOutputProvider))
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.compile', () => compile(client))
     );
 
-    context.subscriptions.push(vscode.commands.registerCommand(
-        "Tools-for-Solidity.sake.getAccounts",
-        () => getAccounts(client))
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.sake.deploy',
+            (params: WakeDeploymentRequestParams) => deploy(params, client, sakeOutputProvider)
+        )
     );
 
-    context.subscriptions.push(vscode.commands.registerCommand(
-        "Tools-for-Solidity.sake.call",
-        (callParams: FunctionCallPayload) => call(callParams, client, sakeOutputProvider))
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.getAccounts', () =>
+            getAccounts(client)
+        )
     );
 
-    context.subscriptions.push(vscode.commands.registerCommand(
-        "Tools-for-Solidity.sake.show_history",
-        () => showTxFromHistory(sakeOutputProvider))
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.sake.call',
+            (params: FunctionCallPayload) => call(params, client, sakeOutputProvider)
+        )
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.show_history', () =>
+            showTxFromHistory(sakeOutputProvider)
+        )
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.sake.setBalances',
+            (params: WakeSetBalancesRequestParams) => setBalances(params, client)
+        )
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.sake.getBalances',
+            (params: WakeGetBalancesRequestParams) => getBalances(params, client)
+        )
     );
 
     vscode.workspace.onDidChangeTextDocument((e) => {
-        if (e.document.languageId == "solidity" && !e.document.isDirty) {
-            console.log(".sol file changed, set compilation state dirty");
+        if (e.document.languageId == 'solidity' && !e.document.isDirty) {
+            console.log('.sol file changed, set compilation state dirty');
             compilationState.makeDirty();
         }
         // TODO might need to rework using vscode.workspace.createFileSystemWatcher
     });
 }
-
 
 export function deactivateSake() {}

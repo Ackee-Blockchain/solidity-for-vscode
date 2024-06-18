@@ -67,8 +67,8 @@
 
     // TODO rename
     const openFullTextInputEditor = async function () {
-        const newValue = await messageHandler.request<any>(
-            'getTextFromInputBox',
+        const newValue = await messageHandler.request<string>(
+            WebviewMessage.getTextFromInputBox,
             inputRoot.getString()
         );
         newValue && inputRoot.set(newValue);

@@ -1,5 +1,5 @@
 // import assert from 'assert';
-import { FunctionInputParseError } from '../src/helpers/errors';
+import { FunctionInputParseError } from './errors';
 
 export function validateAndParseType(value: string, type: string): string {
     value = value.trim();
