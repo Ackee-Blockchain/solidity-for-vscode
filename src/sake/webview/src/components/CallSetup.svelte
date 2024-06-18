@@ -37,6 +37,8 @@
         switch (command) {
             case WebviewMessage.getState:
                 if (stateId == StateId.Accounts) {
+                    console.log('callsetup got state', payload);
+
                     const _payload = payload as AccountStateData[];
                     accounts = _payload;
 
@@ -48,17 +50,21 @@
 
                     // check if selected account is still in the list, if not select the first account
                     if (
-                        selectedAccount !== undefined &&
-                        !accounts.some((account) => account.address === selectedAccount!.address)
+                        selectedAccount === undefined ||
+                        (selectedAccount !== undefined &&
+                            !accounts.some(
+                                (account) => account.address === selectedAccount!.address
+                            ))
                     ) {
                         selectedAccount = accounts[0];
+                        return;
                     }
 
-                    if (selectedAccount === undefined) {
-                        selectedAccount = accounts[0];
-                    }
-
-                    console.log('accounts', accounts);
+                    // if selectedAccount is in payload, update selectedAccount
+                    // @dev accounts.find should not return undefined, since checked above
+                    selectedAccount = accounts.find(
+                        (account) => account.address === selectedAccount!.address
+                    );
 
                     return;
                 }
@@ -66,6 +72,7 @@
                 break;
         }
     });
+
     function handleAccountChange(event: any) {
         const _selectedAccountIndex = event.detail.value;
 
@@ -104,20 +111,13 @@
             return;
         }
 
-        console.log('top up value', value);
-
-        const _address = selectedAccount.address;
-
         const _params: WakeSetBalancesRequestParams = {
             balances: {
-                _address: parseInt(value)
+                [selectedAccount.address]: parseInt(value)
             }
         };
 
-        const success = await messageHandler.send(WebviewMessage.onSetBalances, {
-            address: selectedAccount?.address,
-            value: value
-        });
+        const success = await messageHandler.request(WebviewMessage.onSetBalances, _params);
 
         console.log('top up success', success);
     }

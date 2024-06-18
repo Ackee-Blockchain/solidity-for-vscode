@@ -241,3 +241,7 @@ export interface WakeGetBalancesResponse {
 export interface WakeSetBalancesRequestParams {
     balances: { [key: string]: number };
 }
+
+export interface WakeSetBalancesResponse {
+    success: boolean;
+}

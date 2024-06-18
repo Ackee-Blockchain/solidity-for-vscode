@@ -14,7 +14,8 @@ import {
     WakeFunctionCallResponse,
     WakeGetBalancesRequestParams,
     WakeGetBalancesResponse,
-    WakeSetBalancesRequestParams
+    WakeSetBalancesRequestParams,
+    WakeSetBalancesResponse
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { CompilationState } from './state/CompilationState';
@@ -30,6 +31,12 @@ const deploymentState = DeploymentState.getInstance();
 const compilationState = CompilationState.getInstance();
 const txHistoryState = TxHistoryState.getInstance();
 
+/**
+ * Get accounts and balances and save to state
+ *
+ * @param client
+ * @returns boolean based on success
+ */
 export async function getAccounts(client: LanguageClient | undefined) {
     try {
         if (client === undefined) {
@@ -45,15 +52,15 @@ export async function getAccounts(client: LanguageClient | undefined) {
             throw new Error('No accounts returned');
         }
 
-        // @dev don't set the state here, as it will be set in balances
-
-        // const _accountStateData = result.map((address) => {
-        //     return {
-        //         address: address,
-        //         balance: undefined
-        //     };
-        // });
-        // accountState.setAccounts(_accountStateData);
+        // @dev set the state here also, even though it will be updated in getBalances
+        // this is because balances only update existing accounts state
+        const _accountStateData = result.map((address) => {
+            return {
+                address: address,
+                balance: undefined
+            };
+        });
+        accountState.setAccountsSilent(_accountStateData);
 
         getBalances({ addresses: result }, client);
 
@@ -65,6 +72,14 @@ export async function getAccounts(client: LanguageClient | undefined) {
     }
 }
 
+/**
+ * Get balances for a list of addresses and save to state
+ * @dev only updates existing accounts state
+ *
+ * @param requestParams - list of addresses
+ * @param client - language client
+ * @returns boolean based on success
+ */
 export async function getBalances(
     requestParams: WakeGetBalancesRequestParams,
     client: LanguageClient | undefined
@@ -86,20 +101,21 @@ export async function getBalances(
             throw new Error('Failed to get balances');
         }
 
-        const _accountStateData = requestParams.addresses.map((address) => {
-            return {
-                address: address,
-                balance: result.balances[address]
-            };
-        });
+        // const _accountStateData = requestParams.addresses.map((address) => {
+        //     return {
+        //         address: address,
+        //         balance: result.balances[address]
+        //     };
+        // });
+        // accountState.setAccounts(_accountStateData);
 
-        accountState.setAccounts(_accountStateData);
+        accountState.updateBalances(result.balances);
 
-        return result;
+        return true;
     } catch (e) {
         const message = typeof e === 'string' ? e : (e as Error).message;
         vscode.window.showErrorMessage('Failed to get addresses: ' + message);
-        return [];
+        return false;
     }
 }
 
@@ -107,21 +123,30 @@ export async function setBalances(
     requestParams: WakeSetBalancesRequestParams,
     client: LanguageClient | undefined
 ) {
+    console.log('API set balances', requestParams);
+
     try {
         if (client === undefined) {
             throw new Error('Missing language client');
         }
 
-        const result = await client?.sendRequest<boolean>('wake/sake/setBalances', requestParams);
+        const result = await client?.sendRequest<WakeSetBalancesResponse>(
+            'wake/sake/setBalances',
+            requestParams
+        );
+
+        console.log('API set balances result', result);
 
         if (result == null) {
             throw new Error('No result returned');
         }
-        if (!result) {
+        if (!result.success) {
             throw new Error('Failed to set balances');
         }
 
-        return result;
+        console.log('API set balances going to update');
+        // Update balances
+        accountState.updateBalances(requestParams.balances);
     } catch (e) {
         const message = typeof e === 'string' ? e : (e as Error).message;
         vscode.window.showErrorMessage('Failed to set balances: ' + message);
