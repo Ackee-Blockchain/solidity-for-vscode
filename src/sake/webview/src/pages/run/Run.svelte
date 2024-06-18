@@ -6,14 +6,20 @@
         vsCodeOption,
         vsCodeDivider,
         vsCodeCheckbox,
-        vsCodeTextField,
-    } from "@vscode/webview-ui-toolkit";
-    import Contract from "../../components/Contract.svelte";
-    import Divider from "../../components/Divider.svelte";
-    import CallSetup from "../../components/CallSetup.svelte";
-    import { StateId, WebviewMessage, type FunctionCallPayload, type WakeFunctionCallRequestParams, type ContractFunction as ContractFunctionType } from "../../../shared/types";
-    import { onMount } from "svelte";
-    import { messageHandler } from "@estruyf/vscode/dist/client";
+        vsCodeTextField
+    } from '@vscode/webview-ui-toolkit';
+    import Contract from '../../components/Contract.svelte';
+    import Divider from '../../components/Divider.svelte';
+    import CallSetup from '../../components/CallSetup.svelte';
+    import {
+        StateId,
+        WebviewMessage,
+        type FunctionCallPayload,
+        type WakeFunctionCallRequestParams,
+        type ContractFunction as ContractFunctionType
+    } from '../../../shared/types';
+    import { onMount } from 'svelte';
+    import { messageHandler } from '@estruyf/vscode/dist/client';
     // import '../../../shared/types'; // Importing types to avoid TS error
 
     provideVSCodeDesignSystem().register(
@@ -22,7 +28,7 @@
         vsCodeOption(),
         vsCodeDivider(),
         vsCodeCheckbox(),
-        vsCodeTextField(),
+        vsCodeTextField()
     );
 
     let deployedContracts: Array<any> = [];
@@ -32,7 +38,7 @@
         messageHandler.send(WebviewMessage.getState, StateId.DeployedContracts);
     });
 
-    window.addEventListener("message", (event) => {
+    window.addEventListener('message', (event) => {
         if (!event.data.command) return;
 
         const { command, payload, stateId } = event.data;
@@ -46,38 +52,41 @@
                 break;
             }
         }
-
     });
 
-    const call = async function(calldata: string, contract_address: string, func: ContractFunctionType) {
-
+    // @todo extract into a helper function
+    const call = async function (
+        calldata: string,
+        contract_address: string,
+        func: ContractFunctionType
+    ) {
         const _sender: string | undefined = callSetup.getSelectedAccount();
         if (_sender === undefined) {
-            messageHandler.send(WebviewMessage.onError, "Failed deployment, undefined sender");
+            messageHandler.send(WebviewMessage.onError, 'Failed deployment, undefined sender');
             return;
         }
 
-        const _value: number | undefined = callSetup.getValue();
+        const _value: number = callSetup.getValue() ?? 0;
 
         const requestParams: WakeFunctionCallRequestParams = {
             contract_address: contract_address,
             sender: _sender,
             calldata: calldata,
-            value: _value ?? 0
-        }
+            // @dev automatically set value to 0 if function is not payable
+            value: func.stateMutability === 'payable' ? _value : 0
+        };
 
         const payload: FunctionCallPayload = {
             func: func,
             requestParams: requestParams
-        }
+        };
 
-        await messageHandler.send(WebviewMessage.onContractFunctionCall, payload)
-    }
-
+        await messageHandler.send(WebviewMessage.onContractFunctionCall, payload);
+    };
 </script>
 
 <main>
-    <CallSetup bind:this={callSetup}/>
+    <CallSetup bind:this={callSetup} />
 
     <Divider />
 
@@ -87,10 +96,9 @@
             {#if i > 0}
                 <Divider />
             {/if}
-            <Contract {contract} onFunctionCall={call}/>
+            <Contract {contract} onFunctionCall={call} />
         {/each}
     </section>
-
 </main>
 
 <style global>

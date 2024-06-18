@@ -111,7 +111,7 @@ export class RootInputHandler {
 
     public getString() {
         // @dev return "" to not display "undefined"
-        return this._child?.getString() || '';
+        return this._child?.getString() ?? '';
     }
 
     public getValues() {
@@ -137,7 +137,7 @@ export class RootInputHandler {
      */
     public calldata(): string {
         // @todo add support for function type - it has to be changed from "function" to "bytes24"
-        const _calldata = encodeFunctionCall(this._abi, this.getValues() || []);
+        const _calldata = encodeFunctionCall(this._correctedAbi, this.getValues() ?? []);
 
         return _calldata.slice(2); // remove 0x
     }
@@ -151,11 +151,38 @@ export class RootInputHandler {
     public encodedParameters() {
         // @todo add support for function type - it has to be changed from "function" to "bytes24"
         const _encodedParams = encodeParameters(
-            this._abi.inputs?.map((input: any) => input.type) || [],
-            this.getValues() || []
+            this._correctedAbi.inputs?.map((input: any) => input.type) ?? [],
+            this.getValues() ?? []
         );
 
         return _encodedParams.slice(2); // remove 0x
+    }
+
+    /**
+     * Function which corrects some ABI properties so they can be used in encoding
+     * currently only used for function type
+     *
+     * @param abi - ABI of the function
+     * @returns {AbiFunctionFragment} - Corrected ABI
+     */
+    private get _correctedAbi() {
+        if (!this._abi.inputs) {
+            return this._abi;
+        }
+
+        return {
+            ...this._abi,
+            inputs: this._abi.inputs.map((input: any) => {
+                if (input.type === 'function') {
+                    return {
+                        ...input,
+                        type: 'bytes24'
+                    };
+                }
+
+                return input;
+            })
+        };
     }
 
     protected _buildTree() {
@@ -338,13 +365,6 @@ class ComponentInputHandler extends InputHandler {
         if (value === undefined || value === '') {
             this.children.forEach((child: InputHandler) => child.set(''));
             return;
-        }
-
-        // TODO: add more complex validation
-        // TODO why do i actually need this?
-        const match = value.match(/^\((.*)\)$/);
-        if (!match) {
-            throw new FunctionInputParseError('ComponentInput: Invalid input format');
         }
 
         const _values = splitNestedLists(value);

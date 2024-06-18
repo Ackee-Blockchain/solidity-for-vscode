@@ -2,33 +2,45 @@
 Frontend:
     Inputs:
         ✔ setting [2,3,4] to uint256[] throw an error at root @done(24-06-18 11:39)
-            - solved with multitype input
-        ☐ be able to set a new input length
-        ☐ be able to set ListInput to []
-            - [] gets replaced by undefined, but seems like the tx still goes thru
-            - so maybe add a check that the input cannot be undefined?
-            - or if it is undefined, dont encode any data? is that ok?
-            - if a list is empty, should the call data be just the func selector OR empty bytes?
-        ☐ be able to set value undefined
-        ☐ be able to delete contracts as well
+            solved with multitype input
+        ✘ be able to set a new input length @cancelled(24-06-18 13:20)
+            idk waht i meant which this
+        ✔ be able to set ListInput to [] @done(24-06-18 13:19)
+            "[]" gets replaced by undefined, but seems like the tx still goes thru
+            or maybe add a check that the input cannot be undefined?
+            or if it is undefined, dont encode any data? is that ok?
+            if a list is empty, should the call data be just the func selector OR empty bytes?
+                -> there will be bytes, because you have to define list length
+            ✔ [] gets transformed into '', which can be sent @done(24-06-18 13:10)
+        ✔ be able to set value undefined @done(24-06-18 13:10)
+            just remove any value
+        ✔ be able to delete contracts as well @done(24-06-18 13:19)
+            seems to be working
         ☐ state mutability payable @critical @started(24-05-08 18:16)
-        ☐ enums @critical
+            ✔ if a function is payable, the value is enabled. otherwise no @done(24-06-18 13:32)
+            ☐ but maybe add a different color? or maybe an icon which highlights that a function is payable
+        ✔ tuple with a single string does not get parsed if not expanded @done(24-06-18 12:53)
+        ✘ enums @cancelled(24-06-18 12:45)
+            cannot be done currently, as the enum is not in the abi
         ☐ fix pressing +/- closes expanded state
+            not a pressing issue
         ✔ bar fails with set [(123,[1,2,3],[(mimimi),(mamama)])] @done(24-06-17 17:27)
-        [] strings in tuples (and maybe also lists) dont have ""
-            - what do i do about this. this should only be the case when the value is unexpanded.
-            - if the stirng is being added at leaf, no "" should be there i guess
+        ✔ strings in tuples (and maybe also lists) dont have "" @done(24-06-18 13:09)
+            what do i do about this. this should only be the case when the value is unexpanded.
+            if the stirng is being added at leaf, no "" should be there i guess
+            ✔ done, strings have "" @done(24-06-18 13:09)
         ✔ remove trailing whiteline, in that case input fails to be encoded @done(24-06-15 17:03)
-        [] save inputs into some state (so they dont get lost when run tab is closed)
+        ☐ save inputs into some state (so they dont get lost when run tab is closed)
 
     Other:
         ✔ history of txs @done(24-06-15 16:41)
         ☐ maybe add option to save a function call (with params)
 
     Compile:
-        ☐ ui should show all solidity files in current workspace @next
-            - listen to changes, when a new file is created etc. show it in the ui
-            - when something is deleted, hide it
+        ✘ ui should show all solidity files in current workspace @next @cancelled(24-06-18 13:19)
+            listen to changes, when a new file is created etc. show it in the ui
+            when something is deleted, hide it
+            ✔ solved, compilation is done all in bulk so no file selection @done(24-06-18 13:19)
 
     Ideas:
         ☐ Button for opening a contract abi in a bigger window (with additional functionality)?
@@ -127,6 +139,8 @@ Worklog:
         ☐ this means input handlers would have a stringValue and an actualValue
         the string value would be the one inputted by the user and corrected - 10ether -> 10 ether
         the actual value would be the one used for computation - 10 ether -> 10000000000000000000
+
+    ☐ be able to set name of contract
 
     Output:
         ☐ add icons
