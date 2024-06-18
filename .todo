@@ -1,9 +1,14 @@
 
 Frontend:
     Inputs:
-        ☐ setting [2,3,4] to uint256[] throw an error at root
+        ✔ setting [2,3,4] to uint256[] throw an error at root @done(24-06-18 11:39)
+            - solved with multitype input
         ☐ be able to set a new input length
         ☐ be able to set ListInput to []
+            - [] gets replaced by undefined, but seems like the tx still goes thru
+            - so maybe add a check that the input cannot be undefined?
+            - or if it is undefined, dont encode any data? is that ok?
+            - if a list is empty, should the call data be just the func selector OR empty bytes?
         ☐ be able to set value undefined
         ☐ be able to delete contracts as well
         ☐ state mutability payable @critical @started(24-05-08 18:16)
@@ -117,6 +122,11 @@ Worklog:
         - see https://code.visualstudio.com/api/ux-guidelines/views#views-with-progress
 
     ☐ remove the compilation loading button maybe, and move the loading indicator to the bottom blue row in vscode
+    [] dont allow compilation when no solidity files are in the workspace
+    [] split input string correction/validation and parsing into 2 separate function
+        ☐ this means input handlers would have a stringValue and an actualValue
+        the string value would be the one inputted by the user and corrected - 10ether -> 10 ether
+        the actual value would be the one used for computation - 10 ether -> 10000000000000000000
 
     Output:
         ☐ add icons
@@ -127,7 +137,10 @@ Worklog:
         ☐ txoutput success will show true even on revert
 
 
-    - what happens when a deployed contract gets updated and recompiled. this should be somehow visible on the ui
+    ☐ add this visibility
+        - what happens when a deployed contract gets updated and recompiled.
+        - this should be somehow visible on the ui that the contract is outdated
+
 
 Questions for User Testing:
     ☐ in history, what data is important to you to see at first glance

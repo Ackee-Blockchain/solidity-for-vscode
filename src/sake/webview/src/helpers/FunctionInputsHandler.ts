@@ -1,6 +1,8 @@
 import type { ContractFunctionInput } from '../../shared/types';
 import type { AbiFunctionFragment } from 'web3-types';
 import { encodeFunctionCall, encodeParameters } from 'web3-eth-abi';
+import { FunctionInputBuildError, FunctionInputParseError } from './errors';
+import { validateAndParseType } from '../../shared/validate';
 
 export function buildTree(abi: AbiFunctionFragment): RootInputHandler {
     const root = new RootInputHandler(abi);
@@ -134,6 +136,7 @@ export class RootInputHandler {
      * @returns {string} - Encoded calldata
      */
     public calldata(): string {
+        // @todo add support for function type - it has to be changed from "function" to "bytes24"
         const _calldata = encodeFunctionCall(this._abi, this.getValues() || []);
 
         return _calldata.slice(2); // remove 0x
@@ -146,6 +149,7 @@ export class RootInputHandler {
      * @returns {string} - Encoded parameters
      */
     public encodedParameters() {
+        // @todo add support for function type - it has to be changed from "function" to "bytes24"
         const _encodedParams = encodeParameters(
             this._abi.inputs?.map((input: any) => input.type) || [],
             this.getValues() || []
@@ -290,8 +294,6 @@ class LeafInputHandler extends InputHandler {
     }
 
     public set(value: string) {
-        // TODO: validation based on type (strings should have "" etc.)
-        // remove trailing and leading whitespaces
         value = value?.trim();
 
         if (value === '') {
@@ -299,134 +301,17 @@ class LeafInputHandler extends InputHandler {
             return;
         }
 
-        value = this._validateType(value);
+        if (this.type === undefined) {
+            throw new FunctionInputParseError('LeafInput: Type is not defined');
+        }
 
-        // remove enclosing quotes
+        value = validateAndParseType(value, this.type);
 
         this._value = value;
+        console.log('leaf set', this._value);
     }
 
     protected _buildTree() {}
-
-    private _validateType(value: string): string {
-        switch (this.type) {
-            case 'string':
-                if (value === '""') {
-                    return '';
-                }
-
-                if (value.startsWith('"') && value.endsWith('"')) {
-                    value = value.slice(1, -1);
-                }
-
-                return value;
-
-            case 'bool':
-                value = value.toLowerCase();
-                if (value !== 'true' && value !== 'false') {
-                    throw new FunctionInputParseError('LeafInput: Invalid boolean value');
-                }
-                return value;
-
-            case 'address':
-                // check if it starts with 0x
-                if (!value.startsWith('0x')) {
-                    value = '0x' + value;
-                }
-
-                // regex to check if it is a valid address
-                const match = value.match(/^0x[0-9a-fA-F]{40}$/);
-                if (!match) {
-                    throw new FunctionInputParseError('LeafInput: Invalid address');
-                }
-
-                return value;
-
-            case 'bytes':
-            case 'bytes1':
-            case 'bytes2':
-            case 'bytes3':
-            case 'bytes4':
-            case 'bytes5':
-            case 'bytes6':
-            case 'bytes7':
-            case 'bytes8':
-            case 'bytes9':
-            case 'bytes10':
-            case 'bytes11':
-            case 'bytes12':
-            case 'bytes13':
-            case 'bytes14':
-            case 'bytes15':
-            case 'bytes16':
-            case 'bytes17':
-            case 'bytes18':
-            case 'bytes19':
-            case 'bytes20':
-            case 'bytes21':
-            case 'bytes22':
-            case 'bytes23':
-            case 'bytes24':
-            case 'bytes25':
-            case 'bytes26':
-            case 'bytes27':
-            case 'bytes28':
-            case 'bytes29':
-            case 'bytes30':
-            case 'bytes31':
-            case 'bytes32':
-                // check if it starts with 0x
-                if (!value.startsWith('0x')) {
-                    value = '0x' + value;
-                }
-
-                // regex to check if it is a valid bytes
-                const matchBytes = value.match(/^0x[0-9a-fA-F]*$/);
-                if (!matchBytes) {
-                    throw new FunctionInputParseError('LeafInput: Invalid bytes');
-                }
-
-                return value;
-
-            case 'uint':
-            case 'uint8':
-            case 'uint16':
-            case 'uint32':
-            case 'uint64':
-            case 'uint128':
-            case 'uint256':
-                // @todo validate uint
-                // check if it is a number
-                if (isNaN(parseInt(value))) {
-                    throw new FunctionInputParseError('LeafInput: Invalid uint');
-                }
-
-                // check if it is a positive number
-                if (parseInt(value) < 0) {
-                    throw new FunctionInputParseError('LeafInput: Uint should be positive');
-                }
-
-                return value;
-
-            case 'int':
-            case 'int8':
-            case 'int16':
-            case 'int32':
-            case 'int64':
-            case 'int128':
-            case 'int256':
-                // check if it is a number
-                if (isNaN(parseInt(value))) {
-                    throw new FunctionInputParseError('LeafInput: Invalid int');
-                }
-
-                return value;
-
-            default:
-                // @todo
-                return value;
-        }
-    }
 }
 
 class ComponentInputHandler extends InputHandler {
@@ -701,18 +586,4 @@ export enum InputTypesInternal {
     STATIC_LIST = 'STATIC_LIST',
     DYNAMIC_LIST = 'DYNAMIC_LIST',
     LEAF = 'LEAF'
-}
-
-class FunctionInputBuildError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'FunctionInputBuildError';
-    }
-}
-
-class FunctionInputParseError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'FunctionInputParseError';
-    }
 }
