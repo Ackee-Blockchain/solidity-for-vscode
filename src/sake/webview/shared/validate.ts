@@ -140,100 +140,100 @@ function _validateByteType(value: string, type: string): void {
             assert(value.length % 2 === 0, 'Invalid bytes length');
             break;
         case 'bytes1':
-            assert(value.length === 4, 'Invalid bytes length');
+            assert(value.length === 4, 'Invalid bytes1 length');
             break;
         case 'bytes2':
-            assert(value.length === 6, 'Invalid bytes length');
+            assert(value.length === 6, 'Invalid bytes2 length');
             break;
         case 'bytes3':
-            assert(value.length === 8, 'Invalid bytes length');
+            assert(value.length === 8, 'Invalid bytes3 length');
             break;
         case 'bytes4':
-            assert(value.length === 10, 'Invalid bytes length');
+            assert(value.length === 10, 'Invalid bytes4 length');
             break;
         case 'bytes5':
-            assert(value.length === 12, 'Invalid bytes length');
+            assert(value.length === 12, 'Invalid bytes5 length');
             break;
         case 'bytes6':
-            assert(value.length === 14, 'Invalid bytes length');
+            assert(value.length === 14, 'Invalid bytes6 length');
             break;
         case 'bytes7':
-            assert(value.length === 16, 'Invalid bytes length');
+            assert(value.length === 16, 'Invalid bytes7 length');
             break;
         case 'bytes8':
-            assert(value.length === 18, 'Invalid bytes length');
+            assert(value.length === 18, 'Invalid bytes8 length');
             break;
         case 'bytes9':
-            assert(value.length === 20, 'Invalid bytes length');
+            assert(value.length === 20, 'Invalid bytes9 length');
             break;
         case 'bytes10':
-            assert(value.length === 22, 'Invalid bytes length');
+            assert(value.length === 22, 'Invalid bytes10 length');
             break;
         case 'bytes11':
-            assert(value.length === 24, 'Invalid bytes length');
+            assert(value.length === 24, 'Invalid bytes11 length');
             break;
         case 'bytes12':
-            assert(value.length === 26, 'Invalid bytes length');
+            assert(value.length === 26, 'Invalid bytes12 length');
             break;
         case 'bytes13':
-            assert(value.length === 28, 'Invalid bytes length');
+            assert(value.length === 28, 'Invalid bytes13 length');
             break;
         case 'bytes14':
-            assert(value.length === 30, 'Invalid bytes length');
+            assert(value.length === 30, 'Invalid bytes14 length');
             break;
         case 'bytes15':
-            assert(value.length === 32, 'Invalid bytes length');
+            assert(value.length === 32, 'Invalid bytes15 length');
             break;
         case 'bytes16':
-            assert(value.length === 34, 'Invalid bytes length');
+            assert(value.length === 34, 'Invalid bytes16 length');
             break;
         case 'bytes17':
-            assert(value.length === 36, 'Invalid bytes length');
+            assert(value.length === 36, 'Invalid bytes17 length');
             break;
         case 'bytes18':
-            assert(value.length === 38, 'Invalid bytes length');
+            assert(value.length === 38, 'Invalid bytes18 length');
             break;
         case 'bytes19':
-            assert(value.length === 40, 'Invalid bytes length');
+            assert(value.length === 40, 'Invalid bytes19 length');
             break;
         case 'bytes20':
-            assert(value.length === 42, 'Invalid bytes length');
+            assert(value.length === 42, 'Invalid bytes20 length');
             break;
         case 'bytes21':
-            assert(value.length === 44, 'Invalid bytes length');
+            assert(value.length === 44, 'Invalid bytes21 length');
             break;
         case 'bytes22':
-            assert(value.length === 46, 'Invalid bytes length');
+            assert(value.length === 46, 'Invalid bytes22 length');
             break;
         case 'bytes23':
-            assert(value.length === 48, 'Invalid bytes length');
+            assert(value.length === 48, 'Invalid bytes23 length');
             break;
         case 'bytes24':
-            assert(value.length === 50, 'Invalid bytes length');
+            assert(value.length === 50, 'Invalid bytes24 length');
             break;
         case 'bytes25':
-            assert(value.length === 52, 'Invalid bytes length');
+            assert(value.length === 52, 'Invalid bytes25 length');
             break;
         case 'bytes26':
-            assert(value.length === 54, 'Invalid bytes length');
+            assert(value.length === 54, 'Invalid bytes26 length');
             break;
         case 'bytes27':
-            assert(value.length === 56, 'Invalid bytes length');
+            assert(value.length === 56, 'Invalid bytes27 length');
             break;
         case 'bytes28':
-            assert(value.length === 58, 'Invalid bytes length');
+            assert(value.length === 58, 'Invalid bytes28 length');
             break;
         case 'bytes29':
-            assert(value.length === 60, 'Invalid bytes length');
+            assert(value.length === 60, 'Invalid bytes29 length');
             break;
         case 'bytes30':
-            assert(value.length === 62, 'Invalid bytes length');
+            assert(value.length === 62, 'Invalid bytes30 length');
             break;
         case 'bytes31':
-            assert(value.length === 64, 'Invalid bytes length');
+            assert(value.length === 64, 'Invalid bytes31 length');
             break;
         case 'bytes32':
-            assert(value.length === 66, 'Invalid bytes length');
+            assert(value.length === 66, 'Invalid bytes32 length');
             break;
         default:
             throw new FunctionInputParseError('Unexpected bytes type');
@@ -246,23 +246,23 @@ function _validateUintType(value: number, type: string): void {
     }
     switch (type) {
         case 'uint8':
-            assert(value <= 2 ** 8 - 1, 'Invalid uint length');
+            assert(value <= 2 ** 8 - 1, 'Invalid uint8 length');
             break;
         case 'uint16':
-            assert(value <= 2 ** 16 - 1, 'Invalid uint length');
+            assert(value <= 2 ** 16 - 1, 'Invalid uint16 length');
             break;
         case 'uint32':
-            assert(value <= 2 ** 32 - 1, 'Invalid uint length');
+            assert(value <= 2 ** 32 - 1, 'Invalid uint32 length');
             break;
         case 'uint64':
-            assert(value <= 2 ** 64 - 1, 'Invalid uint length');
+            assert(value <= 2 ** 64 - 1, 'Invalid uint64 length');
             break;
         case 'uint128':
-            assert(value <= 2 ** 128 - 1, 'Invalid uint length');
+            assert(value <= 2 ** 128 - 1, 'Invalid uint128 length');
             break;
         case 'uint':
         case 'uint256':
-            assert(value <= 2 ** 256 - 1, 'Invalid uint length');
+            assert(value <= 2 ** 256 - 1, 'Invalid uint256 length');
             break;
         default:
             throw new FunctionInputParseError(`Unexpected uint type "${type}"`);

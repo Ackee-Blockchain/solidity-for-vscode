@@ -23,12 +23,13 @@
     export let func: ContractFunctionType;
     export let onFunctionCall: (calldata: string, func: ContractFunctionType) => void;
     export let isConstructor: boolean = false;
-    let expanded: boolean;
+    let expanded: boolean = false;
     let hasInputs: boolean;
     let inputRoot: RootInputHandler;
     $: funcChanged(func);
 
     const funcChanged = (_func: ContractFunctionType) => {
+        console.log('func changed', _func);
         hasInputs = _func.inputs ? _func.inputs.length > 0 : false;
         inputRoot = buildTree(_func);
         expanded = false;
@@ -104,10 +105,20 @@
                 <!-- TODO: add blank button spacer -->
                 {#each inputRoot.multiInputs as input}
                     <!-- <vscode-text-field placeholder={input.type} class="ml-[29px]"/> -->
-                    <ContractFunctionInput {input} />
+                    <ContractFunctionInput
+                        {input}
+                        onInputStateChange={() => {
+                            inputRoot = inputRoot;
+                        }}
+                    />
                 {/each}
             {:else}
-                <ContractFunctionInput input={inputRoot.singleInput} />
+                <ContractFunctionInput
+                    input={inputRoot.singleInput}
+                    onInputStateChange={() => {
+                        inputRoot = inputRoot;
+                    }}
+                />
             {/if}
         {/if}
     </div>

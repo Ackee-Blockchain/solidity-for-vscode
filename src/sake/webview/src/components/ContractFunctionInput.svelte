@@ -21,7 +21,7 @@
     provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
     export let input: InputHandler;
-    let expanded = false;
+    export let onInputStateChange: () => void;
 
     const openFullTextInputEditor = async function () {
         const newValue = await messageHandler.request<string>(
@@ -32,7 +32,7 @@
         input = input;
     };
 
-    // silence warning
+    // @dev silence warning
     const inputAsDynamicList = () => {
         return input as DynamicListInputHandler;
     };
@@ -40,15 +40,14 @@
     const handleInput = (e: Event) => {
         const target = e.target as HTMLInputElement;
         try {
+            const _stateBefore = input.state;
             input.set(target.value);
-            const _string = input.getString();
-            if (_string !== undefined) {
-                target.value = _string;
+            if (_stateBefore !== input.state) {
+                onInputStateChange();
             }
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
-            const message = `Failed to set input with error: ${errorMessage}`;
-            // messageHandler.send(WebviewMessage.onError, message);
+            const message = `Unexpected error setting input state: ${errorMessage}`;
             console.error(message);
             return;
         }
@@ -61,11 +60,11 @@
     {#if input.internalType === InputTypesInternal.LEAF}
         <IconSpacer />
     {:else}
-        <ExpandButton bind:expanded />
+        <ExpandButton bind:expanded={input.expanded} />
     {/if}
 
     <!-- Input box -->
-    {#if expanded}
+    {#if input.expanded}
         <div class="flex flex-col flex-1 gap-1">
             <div class="h-[28px] flex items-center">
                 <p class="text-md flex-1">{input.description}</p>
@@ -87,7 +86,7 @@
             <!-- Static or dynamic list -->
             {#key input.children}
                 {#each input.children as child}
-                    <svelte:self input={child} />
+                    <svelte:self input={child} {onInputStateChange} />
                 {/each}
             {/key}
         </div>
@@ -100,5 +99,6 @@
         />
         <KebabButton callback={openFullTextInputEditor} />
     {/if}
+    <span>{input.state}</span>
     <!-- Kebab at the end for additional functionality (i.e. input edit in InputBox) -->
 </div>

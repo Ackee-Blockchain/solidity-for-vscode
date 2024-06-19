@@ -1,8 +1,26 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import type { ContractFunctionInput } from '../../shared/types';
 import type { AbiFunctionFragment } from 'web3-types';
 import { encodeFunctionCall, encodeParameters } from 'web3-eth-abi';
 import { FunctionInputBuildError, FunctionInputParseError } from '../../shared/errors';
 import { validateAndParseType } from '../../shared/validate';
+
+enum InputState {
+    EMPTY = 'EMPTY',
+    VALID = 'VALID',
+    INVALID = 'INVALID',
+    MISSING_DATA = 'MISSING' // used for lists, structs and multi inputs if some input is missing
+}
+
+export enum InputTypesInternal {
+    ROOT = 'ROOT',
+    MULTI = 'MULTI',
+    COMPONENT = 'COMPONENT',
+    STATIC_LIST = 'STATIC_LIST',
+    DYNAMIC_LIST = 'DYNAMIC_LIST',
+    LEAF = 'LEAF'
+}
 
 export function buildTree(abi: AbiFunctionFragment): RootInputHandler {
     const root = new RootInputHandler(abi);
@@ -60,9 +78,11 @@ export abstract class InputHandler {
     public children: Array<InputHandler>;
     public parent: InputHandler | undefined;
     protected _abiParameter: any;
+    protected _state: InputState;
 
     constructor(data: any) {
         this._abiParameter = data;
+        this._state = InputState.EMPTY;
 
         this.name = data?.name;
         this.type = data?.type;
@@ -82,6 +102,8 @@ export abstract class InputHandler {
         return this.name ? `${this.name}: ${this.type}` : this.type;
     }
 
+    public abstract get errors(): string[];
+
     /*
      * Returns the value of the input(s) as a string
      */
@@ -94,9 +116,26 @@ export abstract class InputHandler {
 
     public abstract set(value: string): void;
 
+    public get state(): InputState {
+        return this._state;
+    }
+
+    protected set state(state: InputState) {
+        if (this._state === state) {
+            return;
+        }
+        this._state = state;
+        this.parent?._updateState();
+    }
+
     protected abstract _buildTree(): void;
 
     protected _beforeBuildTree(data: any) {}
+
+    protected abstract _updateState(): void;
+
+    // @dev used in svelte
+    public expanded: boolean = false;
 }
 
 export class RootInputHandler {
@@ -129,6 +168,13 @@ export class RootInputHandler {
         this._child?.set(value);
     }
 
+    public get state(): InputState {
+        if (this._child === undefined) {
+            throw new FunctionInputBuildError('Cannot get state of undefined child');
+        }
+        return this._child.state;
+    }
+
     /*
      * Encodes the input values
      * Includes function selector
@@ -136,7 +182,15 @@ export class RootInputHandler {
      * @returns {string} - Encoded calldata
      */
     public calldata(): string {
-        // @todo add support for function type - it has to be changed from "function" to "bytes24"
+        if (!this.hasInputs()) {
+            return '';
+        }
+
+        if (this.state !== InputState.VALID) {
+            throw new FunctionInputParseError('Input state is invalid');
+        }
+
+        console.log('calldata', this.getValues() ?? []);
         const _calldata = encodeFunctionCall(this._correctedAbi, this.getValues() ?? []);
 
         return _calldata.slice(2); // remove 0x
@@ -149,7 +203,14 @@ export class RootInputHandler {
      * @returns {string} - Encoded parameters
      */
     public encodedParameters() {
-        // @todo add support for function type - it has to be changed from "function" to "bytes24"
+        if (!this.hasInputs()) {
+            return '';
+        }
+
+        if (this.state !== InputState.VALID) {
+            throw new FunctionInputParseError('Input state is invalid');
+        }
+
         const _encodedParams = encodeParameters(
             this._correctedAbi.inputs?.map((input: any) => input.type) ?? [],
             this.getValues() ?? []
@@ -217,7 +278,7 @@ export class RootInputHandler {
     public get multiInputs() {
         if (this._child?.internalType !== InputTypesInternal.MULTI) {
             // return [];
-            throw new FunctionInputBuildError('RootInput: Not a multi input');
+            throw new FunctionInputBuildError('Cannot get multi inputs from non-multi input');
         }
 
         return this._child.children;
@@ -226,20 +287,14 @@ export class RootInputHandler {
     public get singleInput() {
         if (this._child?.internalType === InputTypesInternal.MULTI) {
             // return undefined;
-            throw new FunctionInputBuildError('RootInput: Not a single input');
+            throw new FunctionInputBuildError('Cannot get single input from multi input');
         }
 
         return this._child!;
     }
 
     // TODO remove if unused
-    public isExpandable() {
-        return (
-            this._child?.internalType === InputTypesInternal.DYNAMIC_LIST ||
-            this._child?.internalType === InputTypesInternal.MULTI
-        );
-        this._child?.internalType === InputTypesInternal.MULTI;
-    }
+    public isExpandable() {}
 }
 
 class MultiInputHandler extends InputHandler {
@@ -250,14 +305,22 @@ class MultiInputHandler extends InputHandler {
     }
 
     public getString(): string | undefined {
-        if (this.children.every((child: InputHandler) => child.getString() === undefined)) {
+        if (this.state === InputState.INVALID) {
             return undefined;
         }
 
-        return `${this.children.map((child: InputHandler) => child.getString()).join(',')}`;
+        if (this.state === InputState.EMPTY) {
+            return '';
+        }
+
+        return `${this.children.map((child: InputHandler) => child.getString()).join(', ')}`;
     }
 
     public getValues() {
+        if (this.state === InputState.INVALID) {
+            return undefined;
+        }
+
         return this.children.map((child: InputHandler) => child.getValues());
     }
 
@@ -294,51 +357,96 @@ class MultiInputHandler extends InputHandler {
     public override get description() {
         return this.children.map((child: InputHandler) => child.type).join(', ');
     }
+
+    public override get errors() {
+        if (this.state !== InputState.INVALID) {
+            return [];
+        }
+
+        return this.children.reduce((errors: string[], child: InputHandler) => {
+            return errors.concat(child.errors);
+        }, []);
+    }
+
+    protected _updateState(): void {
+        this.state = _getStateFromChildren(this.children);
+    }
 }
 
 class LeafInputHandler extends InputHandler {
     protected _value: string | undefined;
+    private _error: string | undefined;
 
     constructor(data: any) {
         super(data);
 
         this.internalType = InputTypesInternal.LEAF;
-        console.log('leaf type', this.type);
     }
 
     public getString() {
-        console.log('leaf value', this._value);
+        if (this.state === InputState.INVALID) {
+            return this._value;
+        }
+
+        if (this.state === InputState.EMPTY) {
+            return '';
+        }
+
         // @todo should return based on type
         // @dev this cannot return undefined, because you then get smth like [(,[],[()])] displayed at the root
         if (this.type === 'string' && this._value !== undefined && this._value !== '""') {
             return `"${this._value}"`;
         }
+
         return this._value;
     }
 
     public getValues(): any {
+        if (this.state === InputState.INVALID) {
+            return undefined;
+        }
+
         return this._value;
     }
 
-    public set(value: string) {
-        value = value?.trim();
+    public set(_value: string) {
+        let value = _value?.trim();
 
         if (value === '') {
             this._value = undefined;
+            this.state = InputState.EMPTY;
+            this._error = undefined;
             return;
         }
 
-        if (this.type === undefined) {
-            throw new FunctionInputParseError('LeafInput: Type is not defined');
+        try {
+            value = validateAndParseType(value, this.type!);
+        } catch (e) {
+            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
+
+            this._value = value;
+            this.state = InputState.INVALID;
+            this._error = errorMessage;
+
+            console.error(errorMessage);
+            return;
         }
 
-        value = validateAndParseType(value, this.type);
-
         this._value = value;
-        console.log('leaf set', this._value);
+        this.state = InputState.VALID;
+        this._error = undefined;
     }
 
-    protected _buildTree() {}
+    public override get errors() {
+        if (this.state !== InputState.INVALID) {
+            return [];
+        }
+        return this._error ? [this._error] : [];
+    }
+
+    protected override _buildTree() {}
+
+    protected override _updateState(): void {}
 }
 
 class ComponentInputHandler extends InputHandler {
@@ -348,14 +456,22 @@ class ComponentInputHandler extends InputHandler {
     }
 
     public getString() {
-        if (this.children.every((child: InputHandler) => child.getString() === undefined)) {
+        if (this.state === InputState.INVALID) {
             return undefined;
+        }
+
+        if (this.state === InputState.EMPTY) {
+            return '';
         }
 
         return `(${this.children.map((child: InputHandler) => child.getString()).join(',')})`;
     }
 
     public getValues() {
+        if (this.state === InputState.INVALID) {
+            return undefined;
+        }
+
         return this.children.map((child: InputHandler) => child.getValues());
     }
 
@@ -378,6 +494,16 @@ class ComponentInputHandler extends InputHandler {
         });
     }
 
+    public override get errors() {
+        if (this.state !== InputState.INVALID) {
+            return [];
+        }
+
+        return this.children.reduce((errors: string[], child: InputHandler) => {
+            return errors.concat(child.errors);
+        }, []);
+    }
+
     protected _buildTree() {
         if (!this._abiParameter || !this._abiParameter.components) {
             throw new FunctionInputBuildError('ComponentInput: ABI is not defined or empty');
@@ -386,6 +512,10 @@ class ComponentInputHandler extends InputHandler {
         this._abiParameter.components.forEach((input: any) => {
             this.addChild(createInput(input));
         });
+    }
+
+    protected _updateState(): void {
+        this.state = _getStateFromChildren(this.children);
     }
 }
 
@@ -408,14 +538,22 @@ class StaticListInputHandler extends InputHandler {
     }
 
     public getString() {
-        if (this.children.every((child: InputHandler) => child.getString() === undefined)) {
+        if (this.state === InputState.INVALID) {
             return undefined;
+        }
+
+        if (this.state === InputState.EMPTY) {
+            return '';
         }
 
         return `[${this.children.map((child: InputHandler) => child.getString()).join(',')}]`;
     }
 
     public getValues() {
+        if (this.state === InputState.INVALID) {
+            return undefined;
+        }
+
         return this.children.map((child: InputHandler) => child.getValues());
     }
 
@@ -439,6 +577,16 @@ class StaticListInputHandler extends InputHandler {
         });
     }
 
+    public override get errors() {
+        if (this.state !== InputState.INVALID) {
+            return [];
+        }
+
+        return this.children.reduce((errors: string[], child: InputHandler) => {
+            return errors.concat(child.errors);
+        }, []);
+    }
+
     protected _buildTree() {
         if (!this.length || !this._listElement) {
             throw new FunctionInputBuildError(
@@ -455,6 +603,10 @@ class StaticListInputHandler extends InputHandler {
                 })
             );
         }
+    }
+
+    protected _updateState(): void {
+        this.state = _getStateFromChildren(this.children);
     }
 }
 
@@ -477,14 +629,22 @@ export class DynamicListInputHandler extends InputHandler {
     }
 
     public getString() {
-        if (this.children.every((child: InputHandler) => child.getString() === undefined)) {
+        if (this.state === InputState.INVALID) {
             return undefined;
+        }
+
+        if (this.state === InputState.EMPTY) {
+            return '';
         }
 
         return `[${this.children.map((child: InputHandler) => child.getString()).join(',')}]`;
     }
 
     public getValues() {
+        if (this.state === InputState.INVALID) {
+            return undefined;
+        }
+
         return this.children.map((child: InputHandler) => child.getValues());
     }
 
@@ -559,6 +719,36 @@ export class DynamicListInputHandler extends InputHandler {
         this.children.pop();
         this.length--;
     }
+
+    protected _updateState(): void {
+        this.state = _getStateFromChildren(this.children);
+    }
+
+    public override get errors() {
+        if (this.state !== InputState.INVALID) {
+            return [];
+        }
+
+        return this.children.reduce((errors: string[], child: InputHandler) => {
+            return errors.concat(child.errors);
+        }, []);
+    }
+}
+
+function _getStateFromChildren(children: Array<InputHandler>) {
+    if (children.some((child: InputHandler) => child.state === InputState.INVALID)) {
+        return InputState.INVALID;
+    }
+
+    if (children.every((child: InputHandler) => child.state === InputState.VALID)) {
+        return InputState.VALID;
+    }
+
+    if (children.every((child: InputHandler) => child.state === InputState.EMPTY)) {
+        return InputState.EMPTY;
+    }
+
+    return InputState.MISSING_DATA;
 }
 
 function splitNestedLists(input: string): string[] {
@@ -597,13 +787,4 @@ function splitNestedLists(input: string): string[] {
     }
 
     return result;
-}
-
-export enum InputTypesInternal {
-    ROOT = 'ROOT',
-    MULTI = 'MULTI',
-    COMPONENT = 'COMPONENT',
-    STATIC_LIST = 'STATIC_LIST',
-    DYNAMIC_LIST = 'DYNAMIC_LIST',
-    LEAF = 'LEAF'
 }
