@@ -62,6 +62,7 @@ export enum WebviewMessage {
     onInfo = 'onInfo',
     onError = 'onError',
     getTextFromInputBox = 'getTextFromInputBox',
+    copyToClipboard = 'copyToClipboard',
     setState = 'setState',
     getState = 'getState',
     onCompile = 'onCompile',
@@ -69,7 +70,7 @@ export enum WebviewMessage {
     onContractFunctionCall = 'onContractFunctionCall',
     onUndeployContract = 'onUndeployContract', // TODO rename
     onGetAccounts = 'onGetAccounts',
-    onGetBalances = 'onGetBalances', // @ todo rename, probably dony use on everywhere
+    onGetBalances = 'onGetBalances', // @ todo rename, probably dony use 'on' everywhere
     onSetBalances = 'onSetBalances'
 }
 

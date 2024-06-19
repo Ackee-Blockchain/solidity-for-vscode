@@ -166,6 +166,20 @@ Worklog:
     [] for validation look if web3js has some funcs
 
 
+    [] add loader while loading window
+    [
+    [] fix the setBalances ui
+        - add better display of balance, also be able to parse balance from string
+
+    [] try to use the icon api and remove the icon classes
+
+    ☐ add copy to clipboard command
+
+    remove unused commands
+
+    remove hardcoded webviewmessage strings
+
+
 Questions for User Testing:
     ☐ in history, what data is important to you to see at first glance
     [] topUp or set acc balance?

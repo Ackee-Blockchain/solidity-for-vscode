@@ -1,5 +1,12 @@
 // import assert from 'assert';
 import { FunctionInputParseError } from './errors';
+import { toWei, type EtherUnits } from 'web3-utils';
+
+const denominations: { [key: string]: number } = {
+    ether: 1,
+    wei: 18,
+    gwei: 9
+};
 
 export function validateAndParseType(value: string, type: string): string {
     value = value.trim();
@@ -78,7 +85,7 @@ export function validateAndParseType(value: string, type: string): string {
         case 'uint64':
         case 'uint128':
         case 'uint256':
-            const parsedUintValue = _parseComplexInt(value);
+            const parsedUintValue = parseComplexNumber(value);
             _validateUintType(parsedUintValue, type);
 
             return parsedUintValue.toString();
@@ -90,7 +97,7 @@ export function validateAndParseType(value: string, type: string): string {
         case 'int64':
         case 'int128':
         case 'int256':
-            const parsedIntValue = _parseComplexInt(value);
+            const parsedIntValue = parseComplexNumber(value);
             _validateIntType(parsedIntValue, type);
 
             return parsedIntValue.toString();
@@ -291,13 +298,16 @@ function _validateIntType(value: number, type: string): void {
 /**
  * Parses a complex integer value.
  * If the value contains '**', it will be treated as a power operation and the result will be returned.
+ * Also supports string denominators
  * Otherwise, the original value will be returned.
  *
  * @param value - The string value to parse.
  * @returns The parsed complex integer value.
  * @throws {FunctionInputParseError} If the value cannot be parsed as a complex integer.
  */
-function _parseComplexInt(value: string): number {
+export function parseComplexNumber(value: string): number {
+    value = value.trim();
+
     // check if it is a power operation
     if (value.includes('**')) {
         const [base, power] = value.split('**');
@@ -309,6 +319,29 @@ function _parseComplexInt(value: string): number {
         }
 
         return parsedBase ** parsedPower;
+    }
+
+    // check if it is a value with string denominator
+    const match = value.match(/^(\d+)\s*(\w+)$/);
+    if (match) {
+        const parsedValue = parseFloat(match[1]);
+        if (isNaN(parsedValue)) {
+            throw new FunctionInputParseError(`Cannot parse uint value "${match[1]}"`);
+        }
+
+        console.log('parsing denominators', match[1], match[2]);
+
+        const convertedValue = toWei(parsedValue, match[2] as EtherUnits);
+
+        console.log(convertedValue);
+        const parsedConvertedValue = parseFloat(convertedValue);
+        if (isNaN(parsedConvertedValue)) {
+            throw new FunctionInputParseError(
+                `Cannot parse converted uint value "${convertedValue}"`
+            );
+        }
+
+        return parsedConvertedValue;
     }
 
     // return classic integer

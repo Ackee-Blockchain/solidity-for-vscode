@@ -1,14 +1,30 @@
-// import { FunctionInputParseError } from './errors';
-// import { encodeFunctionCall, encodeParameters } from 'web3-utils';
+import { FunctionInputParseError } from './errors';
 
-// export function parseEthValue(value: string) {
-//     if (value === '') {
-//         return undefined;
-//     }
-//     const parsed = parseFloat(value);
-//     if (isNaN(parsed)) {
-//         throw new FunctionInputParseError(`Invalid value: ${value}`);
-//     }
+export function displayEtherValue(value: number | undefined) {
+    if (value === undefined) {
+        return 'N/A';
+    }
 
-//     return parsed;
-// }
+    if (10 ** 14 <= value && value < 10 ** 23) {
+        return `${(value / 10 ** 18).toFixed(4)} ETH`;
+    }
+
+    return `${(value / 10 ** 18).toExponential(3)} ETH`;
+
+    // if (value < 10 ** 4) {
+    //     // return wei
+    //     return `${value} wei`;
+    // }
+
+    // if (value < 10 ** 15) {
+    //     // return gwei
+    //     return `${value.toExponential(3)} gwei`;
+    // }
+
+    // if (value < 10 ** 21) {
+    //     // return eth
+    //     return `${value / 10 ** 18} ether`;
+    // }
+
+    // return `${value.toExponential(3)} eth`;
+}

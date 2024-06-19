@@ -590,7 +590,6 @@
                 {
                     "id": "sake-output",
                     "name": "Output"
-
                 }
             ]
         },
@@ -808,7 +807,8 @@
         "node-fetch": "^3.3.2",
         "vscode-languageclient": "^8.0.1",
         "wait-port": "^0.3.0",
-        "web3-eth-abi": "^4.2.2"
+        "web3-eth-abi": "^4.2.2",
+        "web3-utils": "^4.3.0"
     },
     "extensionDependencies": [
         "EFanZh.graphviz-preview"

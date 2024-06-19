@@ -4,7 +4,7 @@ import { getBasePage } from '../utils/getBasePage';
 import { MessageHandlerData } from '@estruyf/vscode';
 import { BaseState } from '../state/BaseState';
 import { DeploymentState } from '../state/DeploymentState';
-import { loadSampleAbi } from '../commands';
+import { copyToClipboard, loadSampleAbi } from '../commands';
 import {
     StateId,
     WebviewMessageData,
@@ -130,6 +130,14 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     requestId,
                     payload: value
                 } as MessageHandlerData<string>);
+                break;
+            }
+
+            case WebviewMessage.copyToClipboard: {
+                if (!payload) {
+                    return;
+                }
+                copyToClipboard(payload);
                 break;
             }
 

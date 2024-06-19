@@ -18,11 +18,13 @@
     import { messageHandler } from '@estruyf/vscode/dist/client';
     import EtherValueInput from './EtherValueInput.svelte';
     import CopyButton from './icons/CopyButton.svelte';
+    import { parseComplexNumber } from '../../shared/validate';
+    import { displayEtherValue } from '../../shared/ether';
 
     provideVSCodeDesignSystem().register(vsCodeDropdown(), vsCodeOption(), vsCodeTextField());
 
     let accounts: AccountStateData[];
-    let value: number | undefined;
+    let value: string | undefined;
     let selectedAccount: AccountStateData | undefined;
 
     onMount(() => {
@@ -89,7 +91,8 @@
     }
 
     function handleValueChange(event: any) {
-        const _value = parseInt(event.target.value);
+        // const _value = parseInt(event.target.value);
+        const _value = event.target.value;
         if (isNaN(_value)) {
             value = undefined;
             return;
@@ -98,22 +101,35 @@
     }
 
     async function topUp() {
+        // @todo move this to commands
         if (selectedAccount === undefined) {
             return;
         }
 
-        const value = await messageHandler.request<string>(
+        const topUpValue = await messageHandler.request<string>(
             WebviewMessage.getTextFromInputBox,
-            selectedAccount?.address
+            selectedAccount.balance
         );
 
-        if (value === undefined) {
+        if (topUpValue === undefined) {
+            return;
+        }
+
+        let parsedTopUpValue;
+        try {
+            parsedTopUpValue = parseComplexNumber(topUpValue);
+        } catch (e) {
+            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
+            messageHandler.send(
+                WebviewMessage.onError,
+                'Value could not be parsed: ' + errorMessage
+            );
             return;
         }
 
         const _params: WakeSetBalancesRequestParams = {
             balances: {
-                [selectedAccount.address]: parseInt(value)
+                [selectedAccount.address]: parsedTopUpValue
             }
         };
 
@@ -122,12 +138,32 @@
         console.log('top up success', success);
     }
 
+    export function copyAddress() {
+        if (selectedAccount === undefined) {
+            return;
+        }
+
+        messageHandler.send(WebviewMessage.copyToClipboard, selectedAccount.address);
+    }
+
     export function getSelectedAccount(): AccountStateData | undefined {
         return selectedAccount;
     }
 
     export function getValue(): number | undefined {
-        return value;
+        if (value === undefined) {
+            return undefined;
+        }
+        try {
+            return parseComplexNumber(value);
+        } catch (e) {
+            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
+            messageHandler.send(
+                WebviewMessage.onError,
+                'Value could not be parsed: ' + errorMessage
+            );
+            return;
+        }
     }
 </script>
 
@@ -145,12 +181,12 @@
                 <div class="w-full flex flex-row gap-1 items-center h-[20px]">
                     <span class="flex-1 truncate text-sm">{selectedAccount.address}</span>
                     <!-- <span class="flex-1 truncate text-sm">{accounts[selectedAccountIndex].address}</span> -->
-                    <CopyButton callback={topUp} />
+                    <CopyButton callback={copyAddress} />
                 </div>
                 <div class="w-full flex flex-row gap-1 items-center h-[20px]">
-                    <span class="text-sm flex-1">{selectedAccount.balance}</span>
+                    <span class="text-sm flex-1">{displayEtherValue(selectedAccount.balance)}</span>
                     <!-- <span class="text-sm flex-1">{accounts[selectedAccountIndex].balance}ETH</span> -->
-                    <IconButton>+</IconButton>
+                    <IconButton callback={topUp}>+</IconButton>
                 </div>
             </div>
 
