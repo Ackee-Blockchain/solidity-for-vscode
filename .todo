@@ -31,6 +31,9 @@ Frontend:
             ✔ done, strings have "" @done(24-06-18 13:09)
         ✔ remove trailing whiteline, in that case input fails to be encoded @done(24-06-15 17:03)
         ☐ save inputs into some state (so they dont get lost when run tab is closed)
+        [] add visible error border to input on error
+        [] refactor so taht all inputs have a valid property
+        [] when removing a variable, first its undefined and then after removing it again its "" wtf
 
     Other:
         ✔ history of txs @done(24-06-15 16:41)

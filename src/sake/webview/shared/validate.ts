@@ -306,11 +306,25 @@ function _validateIntType(value: number, type: string): void {
  * @throws {FunctionInputParseError} If the value cannot be parsed as a complex integer.
  */
 export function parseComplexNumber(value: string): number {
-    value = value.trim();
+    console.log('parseComplexNumber', value);
+    value = value.trim().replace('_', '');
+
+    // return classic integer
+    let match = value.match(/^(\d+)$/);
+    if (match) {
+        const parsedValue = parseInt(match[1]);
+        if (isNaN(parsedValue)) {
+            throw new FunctionInputParseError(`Cannot parse uint value "${match[1]}"`);
+        }
+
+        console.log('parsing classic', parsedValue);
+        return parsedValue;
+    }
 
     // check if it is a power operation
-    if (value.includes('**')) {
-        const [base, power] = value.split('**');
+    match = value.match(/^(\d+)\s*(?:\*{2}|\^)\s*(\d+)$/);
+    if (match) {
+        const [base, power] = match.slice(1);
         const parsedBase = parseInt(base);
         const parsedPower = parseInt(power);
 
@@ -318,11 +332,12 @@ export function parseComplexNumber(value: string): number {
             throw new FunctionInputParseError(`Cannot parse uint value "${value}"`);
         }
 
+        console.log('parsing power', parsedBase, parsedPower, parsedBase ** parsedPower);
         return parsedBase ** parsedPower;
     }
 
     // check if it is a value with string denominator
-    const match = value.match(/^(\d+)\s*(\w+)$/);
+    match = value.match(/^(\d+)\s*([a-zA-Z]+)$/);
     if (match) {
         const parsedValue = parseFloat(match[1]);
         if (isNaN(parsedValue)) {
@@ -341,16 +356,11 @@ export function parseComplexNumber(value: string): number {
             );
         }
 
+        console.log('parsing denominators', parsedConvertedValue);
         return parsedConvertedValue;
     }
 
-    // return classic integer
-    const parsedValue = parseInt(value);
-    if (isNaN(parsedValue)) {
-        throw new FunctionInputParseError(`Cannot parse uint value "${value}"`);
-    }
-
-    return parsedValue;
+    throw new FunctionInputParseError(`Cannot parse uint value "${value}"`);
 }
 
 function assert(condition: boolean, message: string): void {
