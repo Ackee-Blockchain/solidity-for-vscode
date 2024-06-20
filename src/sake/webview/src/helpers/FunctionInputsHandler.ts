@@ -10,7 +10,7 @@ enum InputState {
     EMPTY = 'EMPTY',
     VALID = 'VALID',
     INVALID = 'INVALID',
-    MISSING_DATA = 'MISSING' // used for lists, structs and multi inputs if some input is missing
+    MISSING_DATA = 'MISSING' // used for lists, structs and multi-inputs if some input is missing
 }
 
 export enum InputTypesInternal {
@@ -71,7 +71,16 @@ function createInput(input: ContractFunctionInput) {
     });
 }
 
-export abstract class InputHandler {
+abstract class InputHandlerInterface {
+    public abstract get description(): string;
+    public abstract get errors(): string[];
+    public abstract getString(): string | undefined;
+    public abstract getValues(): any;
+    public abstract set(value: string): boolean;
+    public abstract get state(): InputState;
+}
+
+export abstract class InputHandler extends InputHandlerInterface {
     public internalType!: InputTypesInternal;
     public name: string | undefined;
     public type: string | undefined;
@@ -79,8 +88,11 @@ export abstract class InputHandler {
     public parent: InputHandler | undefined;
     protected _abiParameter: any;
     protected _state: InputState;
+    protected _error: string | undefined;
+    protected _value: string | undefined;
 
     constructor(data: any) {
+        super();
         this._abiParameter = data;
         this._state = InputState.EMPTY;
 
@@ -98,23 +110,95 @@ export abstract class InputHandler {
         input.parent = this;
     }
 
-    public get description() {
+    public override get description(): string {
+        if (this.type === undefined) {
+            return '';
+        }
         return this.name ? `${this.name}: ${this.type}` : this.type;
     }
 
-    public abstract get errors(): string[];
+    public get errors(): string[] {
+        if (this.state !== InputState.INVALID) {
+            return [];
+        }
+
+        if (this._error !== undefined) {
+            return [this._error];
+        }
+
+        return this.children.reduce((errors: string[], child: InputHandler) => {
+            return errors.concat(child.errors);
+        }, []);
+    }
+
+    public isInvalid(): boolean {
+        return this.state === InputState.INVALID;
+    }
 
     /*
      * Returns the value of the input(s) as a string
      */
-    public abstract getString(): string | undefined;
+    public getString(): string | undefined {
+        if (this.state === InputState.INVALID) {
+            return this._value;
+        }
+
+        if (this.state === InputState.EMPTY) {
+            return '';
+        }
+
+        return this._getString();
+    }
+
+    protected abstract _getString(): string | undefined;
 
     /*
      * Returns the value of the input(s) as an object
      */
-    public abstract getValues(): any;
+    public getValues(): any {
+        if (this.state === InputState.INVALID) {
+            return undefined;
+        }
 
-    public abstract set(value: string): void;
+        this._getValues();
+    }
+
+    protected abstract _getValues(): any;
+
+    /**
+     * Sets the value of the input and handles any errors that occur.
+     * @param value - The value to set.
+     * @returns A boolean indicating whether the value was set successfully.
+     */
+    public set(value: string): boolean {
+        try {
+            this._set(value);
+            this._error = undefined;
+
+            return true;
+        } catch (e) {
+            // save error message
+            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
+            this._setErrors(errorMessage);
+
+            // save invalid string
+            this._value = value;
+
+            // reset all children
+            this.children.forEach((child: InputHandler) => child.set(''));
+
+            return false;
+        } finally {
+            // @todo move state update here
+        }
+    }
+
+    protected abstract _set(_value: string): void;
+
+    protected _setErrors(error: string) {
+        this._error = error;
+        this.state = InputState.INVALID;
+    }
 
     public get state(): InputState {
         return this._state;
@@ -138,11 +222,12 @@ export abstract class InputHandler {
     public expanded: boolean = false;
 }
 
-export class RootInputHandler {
+export class RootInputHandler extends InputHandlerInterface {
     private _abi: AbiFunctionFragment;
     private _child: InputHandler | undefined;
 
     constructor(abi: AbiFunctionFragment) {
+        super();
         this._abi = abi;
         console.log('abi', abi);
         this._buildTree();
@@ -153,7 +238,7 @@ export class RootInputHandler {
         return this._child?.getString() ?? '';
     }
 
-    public getValues() {
+    public getValues(): any {
         if (!this.hasInputs()) {
             return undefined;
         }
@@ -163,9 +248,13 @@ export class RootInputHandler {
         return this.isMultiInput() ? _values : [_values];
     }
 
-    public set(value: string) {
-        value = value?.trim();
-        this._child?.set(value);
+    public set(_value: string): boolean {
+        const value = _value?.trim();
+        return this._child?.set(value) ?? false;
+    }
+
+    public get errors(): string[] {
+        return this._child?.errors ?? [];
     }
 
     public get state(): InputState {
@@ -190,7 +279,6 @@ export class RootInputHandler {
             throw new FunctionInputParseError('Input state is invalid');
         }
 
-        console.log('calldata', this.getValues() ?? []);
         const _calldata = encodeFunctionCall(this._correctedAbi, this.getValues() ?? []);
 
         return _calldata.slice(2); // remove 0x
@@ -264,7 +352,7 @@ export class RootInputHandler {
     }
 
     public get description() {
-        return this._child?.description;
+        return this._child?.description ?? '';
     }
 
     public isMultiInput() {
@@ -275,26 +363,31 @@ export class RootInputHandler {
         return this._child !== undefined;
     }
 
+    /**
+     * Return multi-inputs
+     * @dev used in svelte
+     */
     public get multiInputs() {
         if (this._child?.internalType !== InputTypesInternal.MULTI) {
             // return [];
-            throw new FunctionInputBuildError('Cannot get multi inputs from non-multi input');
+            throw new FunctionInputBuildError('Cannot get multi-inputs from non-multi-input');
         }
 
         return this._child.children;
     }
 
+    /**
+     * Return single input
+     * @dev used in svelte
+     */
     public get singleInput() {
         if (this._child?.internalType === InputTypesInternal.MULTI) {
             // return undefined;
-            throw new FunctionInputBuildError('Cannot get single input from multi input');
+            throw new FunctionInputBuildError('Cannot get single input from multi-input');
         }
 
         return this._child!;
     }
-
-    // TODO remove if unused
-    public isExpandable() {}
 }
 
 class MultiInputHandler extends InputHandler {
@@ -304,28 +397,16 @@ class MultiInputHandler extends InputHandler {
         this.internalType = InputTypesInternal.MULTI;
     }
 
-    public getString(): string | undefined {
-        if (this.state === InputState.INVALID) {
-            return undefined;
-        }
-
-        if (this.state === InputState.EMPTY) {
-            return '';
-        }
-
+    protected override _getString(): string | undefined {
         return `${this.children.map((child: InputHandler) => child.getString()).join(', ')}`;
     }
 
-    public getValues() {
-        if (this.state === InputState.INVALID) {
-            return undefined;
-        }
-
+    protected override _getValues() {
         return this.children.map((child: InputHandler) => child.getValues());
     }
 
-    public set(value: string): void {
-        value = value?.trim();
+    protected _set(_value: string): void {
+        const value = _value?.trim();
         if (value === undefined || value === '') {
             this.children.forEach((child: InputHandler) => child.set(''));
             return;
@@ -333,10 +414,8 @@ class MultiInputHandler extends InputHandler {
 
         const values = splitNestedLists(value);
 
-        // TODO: add additional validation via regex here
-        // type validation should be done at the leaf level
         if (values.length !== this.children.length) {
-            throw new FunctionInputParseError('MultiInput: Invalid input length');
+            throw new FunctionInputParseError('Invalid length of multi-input');
         }
 
         this.children.forEach((child: InputHandler, index: number) => {
@@ -358,24 +437,13 @@ class MultiInputHandler extends InputHandler {
         return this.children.map((child: InputHandler) => child.type).join(', ');
     }
 
-    public override get errors() {
-        if (this.state !== InputState.INVALID) {
-            return [];
-        }
-
-        return this.children.reduce((errors: string[], child: InputHandler) => {
-            return errors.concat(child.errors);
-        }, []);
-    }
-
     protected _updateState(): void {
         this.state = _getStateFromChildren(this.children);
     }
 }
 
 class LeafInputHandler extends InputHandler {
-    protected _value: string | undefined;
-    private _error: string | undefined;
+    // @todo remove _error and use errors
 
     constructor(data: any) {
         super(data);
@@ -383,16 +451,7 @@ class LeafInputHandler extends InputHandler {
         this.internalType = InputTypesInternal.LEAF;
     }
 
-    public getString() {
-        if (this.state === InputState.INVALID) {
-            return this._value;
-        }
-
-        if (this.state === InputState.EMPTY) {
-            return '';
-        }
-
-        // @todo should return based on type
+    protected override _getString() {
         // @dev this cannot return undefined, because you then get smth like [(,[],[()])] displayed at the root
         if (this.type === 'string' && this._value !== undefined && this._value !== '""') {
             return `"${this._value}"`;
@@ -401,15 +460,11 @@ class LeafInputHandler extends InputHandler {
         return this._value;
     }
 
-    public getValues(): any {
-        if (this.state === InputState.INVALID) {
-            return undefined;
-        }
-
+    protected override _getValues() {
         return this._value;
     }
 
-    public set(_value: string) {
+    protected _set(_value: string) {
         let value = _value?.trim();
 
         if (value === '') {
@@ -419,28 +474,17 @@ class LeafInputHandler extends InputHandler {
             return;
         }
 
-        try {
-            value = validateAndParseType(value, this.type!);
-        } catch (e) {
-            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
-
-            this._value = value;
-            this.state = InputState.INVALID;
-            this._error = errorMessage;
-
-            console.error(errorMessage);
-            return;
-        }
+        value = validateAndParseType(value, this.type!);
 
         this._value = value;
         this.state = InputState.VALID;
-        this._error = undefined;
     }
 
-    public override get errors() {
+    public override get errors(): string[] {
         if (this.state !== InputState.INVALID) {
             return [];
         }
+
         return this._error ? [this._error] : [];
     }
 
@@ -455,28 +499,16 @@ class ComponentInputHandler extends InputHandler {
         this.internalType = InputTypesInternal.COMPONENT;
     }
 
-    public getString() {
-        if (this.state === InputState.INVALID) {
-            return undefined;
-        }
-
-        if (this.state === InputState.EMPTY) {
-            return '';
-        }
-
+    protected override _getString() {
         return `(${this.children.map((child: InputHandler) => child.getString()).join(',')})`;
     }
 
-    public getValues() {
-        if (this.state === InputState.INVALID) {
-            return undefined;
-        }
-
+    protected override _getValues() {
         return this.children.map((child: InputHandler) => child.getValues());
     }
 
-    public set(value: string) {
-        value = value?.trim();
+    protected _set(_value: string) {
+        const value = _value?.trim();
 
         if (value === undefined || value === '') {
             this.children.forEach((child: InputHandler) => child.set(''));
@@ -486,22 +518,16 @@ class ComponentInputHandler extends InputHandler {
         const _values = splitNestedLists(value);
 
         if (_values.length !== this.children.length) {
-            throw new FunctionInputParseError('ComponentInput: Invalid input length');
+            // reset all children
+            this.children.forEach((child: InputHandler) => {
+                child.set('');
+            });
+            this._setErrors('Invalid input length');
         }
 
         this.children.forEach((child: InputHandler, index: number) => {
             child.set(_values[index]);
         });
-    }
-
-    public override get errors() {
-        if (this.state !== InputState.INVALID) {
-            return [];
-        }
-
-        return this.children.reduce((errors: string[], child: InputHandler) => {
-            return errors.concat(child.errors);
-        }, []);
     }
 
     protected _buildTree() {
@@ -537,34 +563,16 @@ class StaticListInputHandler extends InputHandler {
         };
     }
 
-    public getString() {
-        if (this.state === InputState.INVALID) {
-            return undefined;
-        }
-
-        if (this.state === InputState.EMPTY) {
-            return '';
-        }
-
+    protected override _getString() {
         return `[${this.children.map((child: InputHandler) => child.getString()).join(',')}]`;
     }
 
-    public getValues() {
-        if (this.state === InputState.INVALID) {
-            return undefined;
-        }
-
+    protected override _getValues() {
         return this.children.map((child: InputHandler) => child.getValues());
     }
 
-    public set(value: string) {
-        value = value?.trim();
-
-        if (value === undefined || value === '') {
-            this.children = [];
-            this.length = 0;
-            return;
-        }
+    protected _set(_value: string) {
+        const value = _value?.trim();
 
         const _values = splitNestedLists(value);
 
@@ -575,16 +583,6 @@ class StaticListInputHandler extends InputHandler {
         this.children.forEach((child: InputHandler, index: number) => {
             child.set(_values[index]);
         });
-    }
-
-    public override get errors() {
-        if (this.state !== InputState.INVALID) {
-            return [];
-        }
-
-        return this.children.reduce((errors: string[], child: InputHandler) => {
-            return errors.concat(child.errors);
-        }, []);
     }
 
     protected _buildTree() {
@@ -628,11 +626,7 @@ export class DynamicListInputHandler extends InputHandler {
         };
     }
 
-    public getString() {
-        if (this.state === InputState.INVALID) {
-            return undefined;
-        }
-
+    protected override _getString() {
         if (this.state === InputState.EMPTY) {
             return '';
         }
@@ -640,16 +634,12 @@ export class DynamicListInputHandler extends InputHandler {
         return `[${this.children.map((child: InputHandler) => child.getString()).join(',')}]`;
     }
 
-    public getValues() {
-        if (this.state === InputState.INVALID) {
-            return undefined;
-        }
-
+    protected override _getValues() {
         return this.children.map((child: InputHandler) => child.getValues());
     }
 
-    public set(value: string) {
-        value = value?.trim();
+    protected _set(_value: string) {
+        const value = _value?.trim();
 
         if (value === undefined || value === '' || value === '[]') {
             this.children = [];
@@ -660,7 +650,7 @@ export class DynamicListInputHandler extends InputHandler {
         const _values = splitNestedLists(value);
 
         if (_values.length < 1) {
-            throw new FunctionInputParseError('DynamicListInput: Invalid length of list');
+            throw new FunctionInputParseError('Invalid length of list');
         }
 
         if (_values.length === 1 && _values[0] === '') {
@@ -722,16 +712,6 @@ export class DynamicListInputHandler extends InputHandler {
 
     protected _updateState(): void {
         this.state = _getStateFromChildren(this.children);
-    }
-
-    public override get errors() {
-        if (this.state !== InputState.INVALID) {
-            return [];
-        }
-
-        return this.children.reduce((errors: string[], child: InputHandler) => {
-            return errors.concat(child.errors);
-        }, []);
     }
 }
 

@@ -37,6 +37,10 @@
         return input as DynamicListInputHandler;
     };
 
+    onMount(() => {
+        console.log('mounting', input.name, input.type);
+    });
+
     const handleInput = (e: Event) => {
         const target = e.target as HTMLInputElement;
         try {
@@ -91,14 +95,23 @@
             {/key}
         </div>
     {:else}
-        <vscode-text-field
-            class="flex-1"
-            placeholder={input.description}
-            value={input.getString()}
-            on:change={handleInput}
-        />
-        <KebabButton callback={openFullTextInputEditor} />
+        <div class="flex flex-col gap-1">
+            <div class="w-full">
+                <vscode-text-field
+                    class="flex-1 {input.isInvalid() ? 'border-red-500' : ''}"
+                    placeholder={input.description}
+                    value={input.getString()}
+                    on:change={handleInput}
+                />
+                <KebabButton callback={openFullTextInputEditor} />
+            </div>
+
+            {#key input.errors}
+                {#each input.errors as error}
+                    <span class="text-xs text-red-500 w-full">{error}</span>
+                {/each}
+            {/key}
+        </div>
     {/if}
-    <span>{input.state}</span>
     <!-- Kebab at the end for additional functionality (i.e. input edit in InputBox) -->
 </div>

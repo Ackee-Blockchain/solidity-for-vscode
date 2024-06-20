@@ -34,6 +34,7 @@ Frontend:
         [] add visible error border to input on error
         [] refactor so taht all inputs have a valid property
         [] when removing a variable, first its undefined and then after removing it again its "" wtf
+        ☐ fixed being able to change static list size to 0
 
     Other:
         ✔ history of txs @done(24-06-15 16:41)
