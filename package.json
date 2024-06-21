@@ -764,6 +764,7 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
+        "@google-cloud/storage": "^7.11.2",
         "@hpcc-js/wasm": "^2.1.0",
         "@renovatebot/pep440": "^2.0.0",
         "applicationinsights": "^2.9.0",
@@ -772,6 +773,7 @@
         "node-fetch": "^3.3.2",
         "open": "^10.1.0",
         "pidtree": "^0.6.0",
+        "tar": "^7.4.0",
         "tmp": "^0.2.3",
         "vscode-languageclient": "^8.0.1",
         "wait-port": "^0.3.0"
