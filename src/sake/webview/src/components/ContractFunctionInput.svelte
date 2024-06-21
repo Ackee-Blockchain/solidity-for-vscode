@@ -2,7 +2,8 @@
     import {
         provideVSCodeDesignSystem,
         vsCodeButton,
-        vsCodeTextField
+        vsCodeTextField,
+        vsCodeTag
     } from '@vscode/webview-ui-toolkit';
     import { onMount } from 'svelte';
     import ExpandButton from './icons/ExpandButton.svelte';
@@ -17,11 +18,14 @@
         InputTypesInternal
     } from '../helpers/FunctionInputsHandler';
     import { WebviewMessage } from '../../shared/types';
+    import ErrorButton from './icons/ErrorButton.svelte';
+    import TextContainer from './TextContainer.svelte';
 
-    provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
+    provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField(), vsCodeTag());
 
     export let input: InputHandler;
     export let onInputStateChange: () => void;
+    export let expandable: boolean = true;
 
     const openFullTextInputEditor = async function () {
         const newValue = await messageHandler.request<string>(
@@ -59,16 +63,20 @@
     };
 </script>
 
-<div class="flex flex-row items-start gap-1">
+<div class="flex flex-1 flex-row items-end gap-1">
     <!-- Start of row -->
-    {#if input.internalType === InputTypesInternal.LEAF}
-        <IconSpacer />
-    {:else}
-        <ExpandButton bind:expanded={input.expanded} />
+    {#if expandable}
+        <div class="self-start">
+            {#if input.internalType === InputTypesInternal.LEAF}
+                <IconSpacer />
+            {:else}
+                <ExpandButton bind:expanded={input.expanded} />
+            {/if}
+        </div>
     {/if}
 
     <!-- Input box -->
-    {#if input.expanded}
+    {#if expandable && input.expanded}
         <div class="flex flex-col flex-1 gap-1">
             <div class="h-[28px] flex items-center">
                 <p class="text-md flex-1">{input.description}</p>
@@ -95,22 +103,43 @@
             {/key}
         </div>
     {:else}
-        <div class="flex flex-col gap-1">
-            <div class="w-full">
-                <vscode-text-field
-                    class="flex-1 {input.isInvalid() ? 'border-red-500' : ''}"
-                    placeholder={input.description}
-                    value={input.getString()}
-                    on:change={handleInput}
-                />
+        <div class="w-full flex flex-1 flex-row gap-1">
+            <!-- {#if input.isInvalid()}
+                    <span class="text-xs text-red-500 w-full">
+                        {input.errors.join(' • ')}
+                    </span>
+                {/if} -->
+            <vscode-text-field
+                class="flex-1 w-full {input.isInvalid() ? 'border-red-500' : ''}"
+                placeholder={input.description}
+                value={input.getString()}
+                on:change={handleInput}
+            />
+            {#if input.isInvalid()}
+                <!-- <span class="text-xs text-red-500 w-full">
+                        {input.errors.join(' • ')}
+                    </span> -->
+                <div class="relative inline-block group">
+                    <ErrorButton />
+                    <div
+                        class="absolute invisible group-hover:visible opacity-0 group-hover:opacity-100
+                            right-full top-1/2 transform -translate-y-1/2 mr-2 w-max z-[999]"
+                    >
+                        <TextContainer warning={true}>
+                            <div class="flex flex-col gap-1 text-sm">
+                                {#key input.errors}
+                                    {#each input.errors as error}
+                                        <span class="text-sm">{error}</span>
+                                    {/each}
+                                {/key}
+                            </div>
+                        </TextContainer>
+                    </div>
+                </div>
+                <!-- <vscode-tag class="text-xs text-red-500">{input.errors.join('\n')}</vscode-tag> -->
+            {:else}
                 <KebabButton callback={openFullTextInputEditor} />
-            </div>
-
-            {#key input.errors}
-                {#each input.errors as error}
-                    <span class="text-xs text-red-500 w-full">{error}</span>
-                {/each}
-            {/key}
+            {/if}
         </div>
     {/if}
     <!-- Kebab at the end for additional functionality (i.e. input edit in InputBox) -->

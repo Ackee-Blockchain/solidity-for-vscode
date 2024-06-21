@@ -140,7 +140,7 @@ export abstract class InputHandler extends InputHandlerInterface {
      */
     public getString(): string | undefined {
         if (this.state === InputState.INVALID) {
-            return this._value;
+            return this._value ?? this._getString();
         }
 
         if (this.state === InputState.EMPTY) {
@@ -160,7 +160,7 @@ export abstract class InputHandler extends InputHandlerInterface {
             return undefined;
         }
 
-        this._getValues();
+        return this._getValues();
     }
 
     protected abstract _getValues(): any;
@@ -244,6 +244,7 @@ export class RootInputHandler extends InputHandlerInterface {
         }
 
         const _values = this._child?.getValues();
+
         // @dev returned data has to be an array of inputs
         return this.isMultiInput() ? _values : [_values];
     }
@@ -278,6 +279,8 @@ export class RootInputHandler extends InputHandlerInterface {
         if (this.state !== InputState.VALID) {
             throw new FunctionInputParseError('Input state is invalid');
         }
+
+        console.log('calldata', this.getValues());
 
         const _calldata = encodeFunctionCall(this._correctedAbi, this.getValues() ?? []);
 
@@ -387,6 +390,18 @@ export class RootInputHandler extends InputHandlerInterface {
         }
 
         return this._child!;
+    }
+
+    /**
+     * Return child (either single or multi-input)
+     * @dev used in svelte
+     */
+    public get inputs() {
+        if (this._child === undefined) {
+            throw new FunctionInputBuildError('Cannot get inputs from undefined child');
+        }
+
+        return this._child;
     }
 }
 
@@ -500,7 +515,7 @@ class ComponentInputHandler extends InputHandler {
     }
 
     protected override _getString() {
-        return `(${this.children.map((child: InputHandler) => child.getString()).join(',')})`;
+        return `(${this.children.map((child: InputHandler) => child.getString()).join(', ')})`;
     }
 
     protected override _getValues() {
@@ -518,11 +533,7 @@ class ComponentInputHandler extends InputHandler {
         const _values = splitNestedLists(value);
 
         if (_values.length !== this.children.length) {
-            // reset all children
-            this.children.forEach((child: InputHandler) => {
-                child.set('');
-            });
-            this._setErrors('Invalid input length');
+            throw new FunctionInputParseError('Invalid length of struct');
         }
 
         this.children.forEach((child: InputHandler, index: number) => {
@@ -532,7 +543,7 @@ class ComponentInputHandler extends InputHandler {
 
     protected _buildTree() {
         if (!this._abiParameter || !this._abiParameter.components) {
-            throw new FunctionInputBuildError('ComponentInput: ABI is not defined or empty');
+            throw new FunctionInputBuildError('ABI is not defined or empty');
         }
 
         this._abiParameter.components.forEach((input: any) => {
@@ -564,7 +575,7 @@ class StaticListInputHandler extends InputHandler {
     }
 
     protected override _getString() {
-        return `[${this.children.map((child: InputHandler) => child.getString()).join(',')}]`;
+        return `[${this.children.map((child: InputHandler) => child.getString()).join(', ')}]`;
     }
 
     protected override _getValues() {
@@ -577,7 +588,7 @@ class StaticListInputHandler extends InputHandler {
         const _values = splitNestedLists(value);
 
         if (_values.length !== this.length) {
-            throw new FunctionInputParseError('StaticListInput: Invalid length of list');
+            throw new FunctionInputParseError('Invalid length of static list');
         }
 
         this.children.forEach((child: InputHandler, index: number) => {
@@ -587,9 +598,7 @@ class StaticListInputHandler extends InputHandler {
 
     protected _buildTree() {
         if (!this.length || !this._listElement) {
-            throw new FunctionInputBuildError(
-                'StaticListInput: length or listElement is not defined'
-            );
+            throw new FunctionInputBuildError('Static list length or listElement is not defined');
         }
 
         // create length children
@@ -631,7 +640,7 @@ export class DynamicListInputHandler extends InputHandler {
             return '';
         }
 
-        return `[${this.children.map((child: InputHandler) => child.getString()).join(',')}]`;
+        return `[${this.children.map((child: InputHandler) => child.getString()).join(', ')}]`;
     }
 
     protected override _getValues() {
@@ -674,9 +683,7 @@ export class DynamicListInputHandler extends InputHandler {
 
     protected _buildTree() {
         if (!this.length || !this._listElement) {
-            throw new FunctionInputBuildError(
-                'DynamicListInput: length or listElement is not defined'
-            );
+            throw new FunctionInputBuildError('Dynamic list length or listElement is not defined');
         }
 
         // create length children
