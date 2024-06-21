@@ -497,10 +497,17 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         outputChannel.appendLine(`Running '${path.join(venvPath, "bin", "activate")} && ${path.join(venvPath, "bin", "wake")} lsp --port ${wakePort}'`);
-        let wakeProcess = execa(
-            `. "${path.join(venvPath, "bin", "activate")}" && "${path.join(venvPath, "bin", "wake")}" lsp --port ${wakePort}`,
-            { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env }
-        );
+        if (process.platform === "win32") {
+            wakeProcess = execa(
+                `"${path.join(venvPath, "Scripts", "activate.bat")}" && ${path.join(venvPath, "Scripts", "wake")} lsp --port ${wakePort}`,
+                { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env }
+            );
+        } else {
+            wakeProcess = execa(
+                `. "${path.join(venvPath, "bin", "activate")}" && "${path.join(venvPath, "bin", "wake")}" lsp --port ${wakePort}`,
+                { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env }
+            );
+        }
 
         /*
         let wakeVersion: string
