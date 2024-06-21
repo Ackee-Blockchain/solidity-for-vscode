@@ -89,6 +89,7 @@ export enum EventType{
     ACTIVATE = "activate",
     MIGRATE = "migrate",
     ERROR_PIP_INSTALL = "error_pip_install",
+    ERROR_CERTIFI_PATH = "error_certifi_path",
     ERROR_WAKE_INSTALL_PIPX = "error_wake_install_pipx",
     ERROR_WAKE_INSTALL_PIP = "error_wake_install_pip",
     ERROR_WAKE_VERSION = "error_wake_version",

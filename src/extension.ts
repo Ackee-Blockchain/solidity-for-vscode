@@ -42,7 +42,7 @@ import { ExecaChildProcess, execa, execaSync } from 'execa';
 import { PrintersHandler } from './printers/PrintersHandler'
 import { GraphvizPreviewGenerator } from './graphviz/GraphvizPreviewGenerator';
 import pidtree = require('pidtree');
-
+import { CondaInstaller } from './conda';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ExecaChildProcess | undefined = undefined;
@@ -382,6 +382,7 @@ export async function activate(context: vscode.ExtensionContext) {
     let installed: boolean = false;
     let venv: boolean = false;
     let cwd: string|undefined = undefined;
+    let certifiPath: string|undefined = undefined;
 
     let solcIgnoredWarnings = extensionConfig.get<Array<integer|string>>('Wake.compiler.solc.ignoredWarnings', []);
 
@@ -412,6 +413,31 @@ export async function activate(context: vscode.ExtensionContext) {
                         outputChannel.appendLine(`Found 'eth-wake' in version ${version} in ${pathToExecutable} but the target minimal version is ${WAKE_TARGET_VERSION}.`);
                         await pipxUpgrade(outputChannel);
                     }
+
+                    if (pathToExecutable !== null && process.platform === "darwin") {
+                        const possiblePythonExecutable = ["python", "python3", "python3.8", "python3.9", "python3.10", "python3.11", "python3.12"];
+                        let pythonPath: string|undefined = undefined;
+
+                        for (const pythonExecutable of possiblePythonExecutable) {
+                            pythonPath = path.join(path.dirname(pathToExecutable), pythonExecutable);
+                            if (fs.existsSync(pythonPath)) {
+                                break;
+                            }
+                        }
+
+                        try {
+                            certifiPath = execaSync(
+                                pythonPath ?? "python3",
+                                ['-m', 'certifi']
+                            ).stdout.trim();
+                        } catch(err) {
+                            analytics.logCrash(EventType.ERROR_CERTIFI_PATH, err);
+                            if (err instanceof Error) {
+                                outputChannel.appendLine(err.toString());
+                            }
+                            outputChannel.appendLine("Unable to determine the path to the 'certifi' package.");
+                        }
+                    }
                 } catch(err) {
                     analytics.logCrash(EventType.ERROR_WAKE_INSTALL_PIPX, err);
                     if (err instanceof Error) {
@@ -439,10 +465,44 @@ export async function activate(context: vscode.ExtensionContext) {
                     }
                 }
             }
+
+            if (process.platform === "darwin") {
+                try {
+                    if (venv) {
+                        certifiPath = execaSync(`${venvActivateCommand} && ${pythonExecutable} -m certifi`, { shell: true }).stdout.trim();
+                    } else {
+                        certifiPath = execaSync(pythonExecutable, ['-m', 'certifi']).stdout.trim();
+                    }
+                } catch(err) {
+                    analytics.logCrash(EventType.ERROR_CERTIFI_PATH, err);
+                    if (err instanceof Error) {
+                        outputChannel.appendLine(err.toString());
+                    }
+                    outputChannel.appendLine("Unable to determine the path to the 'certifi' package.");
+                }
+            }
         }
     }
 
     if (!wakePort) {
+        const conda = new CondaInstaller(context, outputChannel);
+        const venvPath = await conda.setupConda();
+        wakePort = await getPort();
+        certifiPath = conda.certifiPath;
+
+        const env = { ...process.env, PYTHONIOENCODING: 'utf8' } as { [key: string]: string };
+        if (certifiPath) {
+            env.SSL_CERT_FILE = certifiPath;
+            env.REQUESTS_CA_BUNDLE = certifiPath;
+        }
+
+        outputChannel.appendLine(`Running '${path.join(venvPath, "bin", "activate")} && ${path.join(venvPath, "bin", "wake")} lsp --port ${wakePort}'`);
+        let wakeProcess = execa(
+            `. "${path.join(venvPath, "bin", "activate")}" && "${path.join(venvPath, "bin", "wake")}" lsp --port ${wakePort}`,
+            { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env }
+        );
+
+        /*
         let wakeVersion: string
         try {
             wakeVersion = getWakeVersion(pathToExecutable, venv, cwd);
@@ -470,18 +530,25 @@ export async function activate(context: vscode.ExtensionContext) {
 
         const wakePath: string = cwd ? path.join(cwd, "wake") : "wake";
 
+        const env = { ...process.env, PYTHONIOENCODING: 'utf8' } as { [key: string]: string };
+        if (certifiPath) {
+            env.SSL_CERT_FILE = certifiPath;
+            env.REQUESTS_CA_BUNDLE = certifiPath;
+        }
+
         if (venv) {
             outputChannel.appendLine(`Running '${venvActivateCommand} && wake lsp --port ${wakePort}' (v${wakeVersion})`);
-            wakeProcess = execa(`${venvActivateCommand} && wake lsp --port ${wakePort}`, { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
+            wakeProcess = execa(`${venvActivateCommand} && wake lsp --port ${wakePort}`, { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env });
         }
         else if (cwd === undefined) {
             outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (v${wakeVersion})`);
-            wakeProcess = execa('wake', ["lsp", "--port", String(wakePort)], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
+            wakeProcess = execa('wake', ["lsp", "--port", String(wakePort)], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env });
         } else {
             outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (v${wakeVersion})`);
             const cmd = process.platform === "win32" ? ".\\wake" : "./wake";
-            wakeProcess = execa(cmd, ["lsp", "--port", String(wakePort)], { cwd, shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' }});
+            wakeProcess = execa(cmd, ["lsp", "--port", String(wakePort)], { cwd, shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env });
         }
+        */
         wakeProcess.stderr?.on('data', (chunk) => {
             crashlog.push(chunk);
             if (crashlog.length > CRASHLOG_LIMIT){
