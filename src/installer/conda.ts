@@ -16,6 +16,7 @@ export class CondaInstaller implements Installer {
     private readonly publicKey: string;
     private readonly markerFile: string;
     private readonly activateCommand: string;
+    private readonly shell: string;
 
     constructor(
         private readonly context: vscode.ExtensionContext,
@@ -28,8 +29,10 @@ export class CondaInstaller implements Installer {
 
         if (process.platform === 'win32') {
             this.activateCommand = '"' + path.join(context.globalStorageUri.fsPath, 'wake-conda', 'Scripts', 'activate.bat') + '"';
+            this.shell = 'cmd.exe';
         } else {
             this.activateCommand = '. "' + path.join(context.globalStorageUri.fsPath, 'wake-conda', 'bin', 'activate') + '"';
+            this.shell = '/bin/bash';
         }
     }
 
@@ -128,7 +131,7 @@ export class CondaInstaller implements Installer {
             title: `Setting up conda environment`,
             cancellable: false
         }, async () => {
-            execaSync(`${this.activateCommand} && conda-unpack`, { shell: true });
+            execaSync(`${this.activateCommand} && conda-unpack`, { shell: this.shell });
         });
     }
 
@@ -215,7 +218,7 @@ export class CondaInstaller implements Installer {
 
     private getCertifiPath(): string | undefined {
         try {
-            return execaSync(`${this.activateCommand} && python -c "import certifi; print(certifi.where())"`, { shell: true }).stdout;
+            return execaSync(`${this.activateCommand} && python -c "import certifi; print(certifi.where())"`, { shell: this.shell }).stdout;
         } catch (error) {
             this.analytics.logCrash(EventType.ERROR_CERTIFI_PATH, error);
             return undefined;
@@ -238,7 +241,7 @@ export class CondaInstaller implements Installer {
         this.outputChannel.appendLine(`Running '${this.activateCommand} && wake lsp --port ${port}'`);
         return execa(
             `${this.activateCommand} && wake lsp --port ${port}`,
-            { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env }
+            { shell: this.shell, stdio: ['ignore', 'ignore', 'pipe'], env: env }
         );
     }
 }

@@ -9,6 +9,7 @@ export class ManualInstaller implements Installer {
     protected readonly venvPath: string;
     protected readonly venvActivateCommand: string;
     protected readonly pythonExecutable: string;
+    protected readonly shell: string;
 
     protected venv: boolean = false;
     protected cwd: string|undefined = undefined;
@@ -23,8 +24,10 @@ export class ManualInstaller implements Installer {
 
         if (process.platform === "win32") {
             this.venvActivateCommand = '"' + path.join(this.venvPath, "Scripts", "activate.bat") + '"';
+            this.shell = 'cmd.exe';
         } else {
             this.venvActivateCommand = '. "' + path.join(this.venvPath, "bin", "activate") + '"';
+            this.shell = '/bin/bash';
         }
 
         this.pythonExecutable = this.findPython();
@@ -66,7 +69,7 @@ export class ManualInstaller implements Installer {
             return execaSync(pathToExecutable, ["--version"]).stdout.trim();
         }
         if (venv) {
-            return execaSync(`${this.venvActivateCommand} && wake --version`, { shell: true }).stdout.trim();
+            return execaSync(`${this.venvActivateCommand} && wake --version`, { shell: this.shell }).stdout.trim();
         }
         if (cwd === undefined) {
             return execaSync("wake", ["--version"]).stdout.trim();
@@ -104,9 +107,9 @@ export class ManualInstaller implements Installer {
         if (process.platform === 'darwin') {
             try {
                 if (this.venv) {
-                    certifiPath = execaSync(`${this.venvActivateCommand} && python -c "import certifi; print(certifi.where())"`, { shell: true }).stdout;
+                    certifiPath = execaSync(`${this.venvActivateCommand} && python -c "import certifi; print(certifi.where())"`, { shell: this.shell }).stdout;
                 } else {
-                    certifiPath = execaSync(`${this.pythonExecutable} -m certifi`, { shell: true }).stdout;
+                    certifiPath = execaSync(`${this.pythonExecutable} -m certifi`, { shell: this.shell }).stdout;
                 }
             } catch (error) {
                 this.analytics.logCrash(EventType.ERROR_CERTIFI_PATH, error);
@@ -126,15 +129,15 @@ export class ManualInstaller implements Installer {
 
         if (this.venv) {
             this.outputChannel.appendLine(`Running '${this.venvActivateCommand} && wake lsp --port ${port}' (v${version})`);
-            return execa(`${this.venvActivateCommand} && wake lsp --port ${port}`, { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env });
+            return execa(`${this.venvActivateCommand} && wake lsp --port ${port}`, { shell: this.shell, stdio: ['ignore', 'ignore', 'pipe'], env: env });
         }
         else if (this.cwd === undefined) {
             this.outputChannel.appendLine(`Running '${wakePath} lsp --port ${port}' (v${version})`);
-            return execa('wake', ["lsp", "--port", String(port)], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env });
+            return execa('wake', ["lsp", "--port", String(port)], { shell: this.shell, stdio: ['ignore', 'ignore', 'pipe'], env: env });
         } else {
             this.outputChannel.appendLine(`Running '${wakePath} lsp --port ${port}' (v${version})`);
             const cmd = process.platform === "win32" ? ".\\wake" : "./wake";
-            return execa(cmd, ["lsp", "--port", String(port)], { cwd: this.cwd, shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env });
+            return execa(cmd, ["lsp", "--port", String(port)], { cwd: this.cwd, shell: this.shell, stdio: ['ignore', 'ignore', 'pipe'], env: env });
         }
     }
 }
