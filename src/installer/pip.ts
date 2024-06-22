@@ -236,9 +236,9 @@ export class PipInstaller extends ManualInstaller {
                         cancellable: false
                     }, async () => {
                         if (WAKE_PRERELEASE) {
-                            out = execaSync(`${this.venvActivateCommand} && pip install eth-wake -U --pre`, { shell: true }).stdout;
+                            out = execaSync(`${this.venvActivateCommand} && pip install eth-wake -U --pre`, { shell: this.shell }).stdout;
                         } else {
-                            out = execaSync(`${this.venvActivateCommand} && pip install eth-wake -U`, { shell: true }).stdout;
+                            out = execaSync(`${this.venvActivateCommand} && pip install eth-wake -U`, { shell: this.shell }).stdout;
                         }
                     });
                     if (out.trim().length > 0) {
