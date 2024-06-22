@@ -6,16 +6,19 @@ import * as crypto from 'crypto';
 import * as tmp from 'tmp';
 import { Storage } from '@google-cloud/storage';
 import { execaSync } from 'execa';
+import { compare } from '@renovatebot/pep440';
 
 export class CondaInstaller {
     private readonly bucketName = 'wake-venv';
     private readonly storage = new Storage();
     private readonly publicKey: string;
+    private readonly markerFile: string;
     private readonly activateCommand: string;
 
     constructor(private readonly context: vscode.ExtensionContext, private readonly outputChannel: vscode.OutputChannel) {
         const pubkeyPath = context.asAbsolutePath('resources/conda_public_key.pem');
         this.publicKey = fs.readFileSync(pubkeyPath, 'utf8');
+        this.markerFile = path.join(context.globalStorageUri.fsPath, '.conda-version');
 
         if (process.platform === 'win32') {
             this.activateCommand = '"' + path.join(context.globalStorageUri.fsPath, 'conda', 'Scripts', 'activate.bat') + '"';
@@ -102,6 +105,10 @@ export class CondaInstaller {
             throw new Error('Hash mismatch, the file may be corrupted or tampered with.');
         }
 
+        if (fs.existsSync(this.markerFile)) {
+            fs.rmSync(this.markerFile);
+        }
+
         if (fs.existsSync(extractPath)) {
             fs.rmSync(extractPath, { recursive: true });
         }
@@ -128,36 +135,69 @@ export class CondaInstaller {
     }
 
     async setupConda(): Promise<string> {
+        const [files] = await this.storage.bucket(this.bucketName).getFiles();
+
+        let latestVersion = undefined;
+        let latestFile = undefined;
+        let platform;
+        if (process.platform === 'win32') {
+            platform = 'windows';
+        } else if (process.platform === 'darwin') {
+            platform = 'macos';
+        } else if (process.platform === 'linux') {
+            platform = 'linux';
+        } else {
+            throw new Error(`Unsupported platform ${process.platform}`);
+        }
+        // arch can be used as is
+
+        for (const file of files) {
+            const [metadata] = await file.getMetadata();
+            if (metadata.metadata === undefined || !(typeof metadata.metadata['version'] === 'string')) {
+                continue;
+            }
+            if (
+                metadata.metadata['os'] === platform &&
+                metadata.metadata['arch'] === process.arch &&
+                (latestVersion === undefined || compare(metadata.metadata['version'], latestVersion) > 0)
+            ) {
+                latestVersion = metadata.metadata['version'];
+                latestFile = file;
+            }
+        }
+
+        if (latestFile === undefined || latestVersion === undefined) {
+            throw new Error(`No conda environment available for platform ${process.platform} and architecture ${process.arch}`);
+        }
+
         const extractPath = path.join(this.context.globalStorageUri.fsPath, 'conda');
 
-        if (fs.existsSync(path.join(this.context.globalStorageUri.fsPath, '.conda'))) {
+        if (!fs.existsSync(this.markerFile)) {
+            // no conda environment installed yet
+            await this.verifyAndExtractArchive(extractPath, latestFile.name);
+            fs.writeFileSync(this.markerFile, latestVersion);
+
+            // TODO: do we have to restart the extension because of overwritten binaries?
+
             return extractPath;
         }
-        this.outputChannel.appendLine('Setting up conda environment...');
 
-        let filename: string = 'wake';
-        if (process.platform === 'win32') {
-            filename += '-Windows';
-        } else if (process.platform === 'darwin') {
-            filename += '-macOS';
-        } else if (process.platform === 'linux') {
-            filename += '-Linux';
-        } else {
-            throw new Error(`Unsupported platform: ${process.platform}`);
+        const currentVersion = fs.readFileSync(this.markerFile, 'utf8').trim();
+        if (compare(currentVersion, latestVersion) >= 0) {
+            return extractPath;
         }
 
-        if (process.arch === 'x64') {
-            filename += '-X64';
-        } else if (process.arch === 'arm64') {
-            filename += '-ARM64';
-        } else {
-            throw new Error(`Unsupported architecture: ${process.arch}`);
-        }
+        // offer an update
+        // TODO: better message
+        const message = `A new conda environment version is available. Would you like to update to version ${latestVersion}?`;
 
-        filename += '.tar.gz';
-
-        await this.verifyAndExtractArchive(extractPath, filename);
-        fs.writeFileSync(path.join(this.context.globalStorageUri.fsPath, '.conda'), '');
+        vscode.window.showInformationMessage(message, 'Yes', 'No').then(async (update) => {
+            if (update === 'Yes') {
+                await this.verifyAndExtractArchive(extractPath, latestFile.name);
+                fs.writeFileSync(this.markerFile, latestVersion);
+            }
+            return update;
+        });
 
         return extractPath;
     }
