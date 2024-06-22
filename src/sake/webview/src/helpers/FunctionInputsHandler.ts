@@ -189,6 +189,17 @@ export abstract class InputHandler extends InputHandlerInterface {
 
             return false;
         } finally {
+            // console.log(
+            //     'value set',
+            //     this._value,
+            //     'in',
+            //     this.name,
+            //     this.type,
+            //     'with state',
+            //     this.state,
+            //     'parent state',
+            //     this.parent?.state
+            // );
             // @todo move state update here
         }
     }
@@ -229,7 +240,6 @@ export class RootInputHandler extends InputHandlerInterface {
     constructor(abi: AbiFunctionFragment) {
         super();
         this._abi = abi;
-        console.log('abi', abi);
         this._buildTree();
     }
 
@@ -279,8 +289,6 @@ export class RootInputHandler extends InputHandlerInterface {
         if (this.state !== InputState.VALID) {
             throw new FunctionInputParseError('Input state is invalid');
         }
-
-        console.log('calldata', this.getValues());
 
         const _calldata = encodeFunctionCall(this._correctedAbi, this.getValues() ?? []);
 
@@ -653,6 +661,7 @@ export class DynamicListInputHandler extends InputHandler {
         if (value === undefined || value === '' || value === '[]') {
             this.children = [];
             this.length = 0;
+            this.state = InputState.VALID;
             return;
         }
 
@@ -665,6 +674,7 @@ export class DynamicListInputHandler extends InputHandler {
         if (_values.length === 1 && _values[0] === '') {
             this.children = [];
             this.length = 0;
+            this.state = InputState.VALID;
             return;
         }
 

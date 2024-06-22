@@ -15,7 +15,10 @@ export function validateAndParseType(value: string, type: string): string {
 
     switch (type) {
         case 'string':
-            if (value.startsWith('"') && value.endsWith('"')) {
+            if (
+                (value.startsWith('"') && value.endsWith('"')) ||
+                (value.startsWith("'") && value.endsWith("'"))
+            ) {
                 value = value.slice(1, -1);
             }
 
