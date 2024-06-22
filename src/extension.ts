@@ -115,6 +115,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let solcIgnoredWarnings = extensionConfig.get<Array<integer|string>>('Wake.compiler.solc.ignoredWarnings', []);
 
+    let folders: string[] = vscode.workspace.getConfiguration('python').get('venvPath', []);
+
+    if (!folders.includes(context.globalStorageUri.fsPath)) {
+        vscode.workspace.getConfiguration('python').update('venvPath', folders.concat(context.globalStorageUri.fsPath), vscode.ConfigurationTarget.Global);
+    }
+
     if (!wakePort) {
         let installer: Installer;
 
