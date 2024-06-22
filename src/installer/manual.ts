@@ -19,7 +19,7 @@ export class ManualInstaller implements Installer {
         protected readonly analytics: Analytics,
         protected readonly executablePath: string | null,
     ) {
-        this.venvPath = path.join(context.globalStorageUri.fsPath, "venv");
+        this.venvPath = path.join(context.globalStorageUri.fsPath, "wake-venv");
 
         if (process.platform === "win32") {
             this.venvActivateCommand = '"' + path.join(this.venvPath, "Scripts", "activate.bat") + '"';
