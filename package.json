@@ -577,13 +577,8 @@
             "sake": [
                 {
                     "type": "webview",
-                    "id": "sake-compile-deploy",
-                    "name": "Compile & Deploy"
-                },
-                {
-                    "type": "webview",
-                    "id": "sake-run",
-                    "name": "Run"
+                    "id": "sake",
+                    "name": "Sake"
                 }
             ],
             "sake-output": [

@@ -63,7 +63,8 @@
     <div class="flex flex-1 gap-1 {expanded ? 'w-full' : ''}">
         {#if inputRoot.hasInputs()}
             <ExpandButton bind:expanded />
-        {:else if !isConstructor}
+            <!-- {:else if !isConstructor} -->
+        {:else}
             <IconSpacer />
         {/if}
         <!-- svelte-ignore a11y-click-events-have-key-events -->

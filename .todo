@@ -35,6 +35,7 @@ Frontend:
         [] refactor so taht all inputs have a valid property
         [] when removing a variable, first its undefined and then after removing it again its "" wtf
         ☐ fixed being able to change static list size to 0
+        [] Multitype input does not reset its state to empty when all values are empty
 
     Other:
         ✔ history of txs @done(24-06-15 16:41)
@@ -182,6 +183,8 @@ Worklog:
     remove unused commands
 
     remove hardcoded webviewmessage strings
+
+    ☐ api call for getWakeVersion @critical
 
 
 Questions for User Testing:

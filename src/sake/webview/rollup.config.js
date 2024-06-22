@@ -59,5 +59,15 @@ export default [
             file: 'dist/compile-deploy/webview.js'
         },
         ..._defaultConfig,
-    }
+    },
+    {
+        input: 'src/pages/sake/page.ts',
+        output: {
+            sourcemap: true,
+            format: 'cjs',
+            name: 'app',
+            file: 'dist/sake/webview.js'
+        },
+        ..._defaultConfig,
+    },
 ];

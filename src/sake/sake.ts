@@ -2,10 +2,11 @@ import * as vscode from 'vscode';
 import {
     DeployWebviewProvider,
     CompilerWebviewProvider,
-    RunWebviewProvider
+    RunWebviewProvider,
+    SakeWebviewProvider
 } from './providers/WebviewProviders';
 import { StatusBarEnvironmentProvider } from './providers/StatusBarEnvironmentProvider';
-import { copyToClipboardHandler, loadSampleAbi, getTextFromInputBox } from './commands';
+import { copyToClipboard, loadSampleAbi, getTextFromInputBox } from './commands';
 import { DeploymentState } from './state/DeploymentState';
 import { CompilationState } from './state/CompilationState';
 import {
@@ -24,6 +25,7 @@ import { AccountState } from './state/AccountState';
 import { SakeOutputTreeProvider } from './providers/OutputTreeProvider';
 import { TxHistoryState } from './state/TxHistoryState';
 import { showTxFromHistory } from './utils/output';
+import { copyToClipboardHandler } from '../commands';
 
 export function activateSake(context: vscode.ExtensionContext, client: LanguageClient | undefined) {
     // const sidebarCompilerProvider = new CompilerWebviewProvider(context.extensionUri);
@@ -41,14 +43,19 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
         vscode.window.registerTreeDataProvider('sake-output', sakeOutputProvider)
     );
 
-    const sidebarDeployProvider = new DeployWebviewProvider(context.extensionUri);
-    context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider('sake-compile-deploy', sidebarDeployProvider)
-    );
+    // const sidebarDeployProvider = new DeployWebviewProvider(context.extensionUri);
+    // context.subscriptions.push(
+    //     vscode.window.registerWebviewViewProvider('sake-compile-deploy', sidebarDeployProvider)
+    // );
 
-    const sidebarRunProvider = new RunWebviewProvider(context.extensionUri);
+    // const sidebarRunProvider = new RunWebviewProvider(context.extensionUri);
+    // context.subscriptions.push(
+    //     vscode.window.registerWebviewViewProvider('sake-run', sidebarRunProvider)
+    // );
+
+    const sidebarSakeProvider = new SakeWebviewProvider(context.extensionUri);
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider('sake-run', sidebarRunProvider)
+        vscode.window.registerWebviewViewProvider('sake', sidebarSakeProvider)
     );
 
     const deploymentState = DeploymentState.getInstance();
@@ -64,6 +71,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
         })
     );
 
+    // @todo remove
     context.subscriptions.push(
         vscode.commands.registerCommand('sake.sampleDeploy', async () => {
             const sampleContractAbi = await loadSampleAbi();

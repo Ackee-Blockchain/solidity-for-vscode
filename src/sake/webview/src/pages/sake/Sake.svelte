@@ -6,9 +6,15 @@
         vsCodeOption,
         vsCodeDivider,
         vsCodeCheckbox,
-        vsCodeTextField
+        vsCodeTextField,
+        vsCodePanels,
+        vsCodePanelTab,
+        vsCodeBadge,
+        vsCodePanelView
     } from '@vscode/webview-ui-toolkit';
     import Contract from '../../components/Contract.svelte';
+    import Run from '../../pages/run/Run.svelte';
+    import CompileDeploy from './CompileDeploy.svelte';
     import Divider from '../../components/Divider.svelte';
     import CallSetup from '../../components/CallSetup.svelte';
     import {
@@ -28,7 +34,11 @@
         vsCodeOption(),
         vsCodeDivider(),
         vsCodeCheckbox(),
-        vsCodeTextField()
+        vsCodeTextField(),
+        vsCodePanels(),
+        vsCodePanelTab(),
+        vsCodeBadge(),
+        vsCodePanelView()
     );
 
     let deployedContracts: Array<any> = [];
@@ -85,24 +95,43 @@
     };
 </script>
 
-<main class="w-full">
-    <CallSetup bind:this={callSetup} />
+<main>
+    <!-- <CallSetup bind:this={callSetup} />
 
-    <Divider />
+    <Divider /> -->
 
-    <section>
-        <p class="mb-2">Deployed Contracts</p>
-        {#each deployedContracts as contract, i}
-            {#if i > 0}
-                <Divider />
+    <vscode-panels class="w-full">
+        <vscode-panel-tab id="tab-1">Compile & Deploy</vscode-panel-tab>
+        <vscode-panel-tab id="tab-2">
+            Deployed contracts
+            {#if deployedContracts.length > 0}
+                <vscode-badge appearance="secondary">{deployedContracts.length}</vscode-badge>
             {/if}
-            <Contract {contract} onFunctionCall={call} />
-        {/each}
-    </section>
+        </vscode-panel-tab>
+        <vscode-panel-tab id="tab-3">Mimi</vscode-panel-tab>
+
+        <vscode-panel-view id="view-1">
+            <CompileDeploy />
+        </vscode-panel-view>
+        <vscode-panel-view id="view-2">
+            <Run />
+        </vscode-panel-view>
+        <vscode-panel-view id="view-3">
+            <ul>
+                {#each { length: 200 } as _, i}
+                    <li>{i + 1}</li>
+                {/each}
+            </ul>
+        </vscode-panel-view>
+    </vscode-panels>
 </main>
 
 <style global>
     @tailwind base;
     @tailwind components;
     @tailwind utilities;
+
+    body {
+        padding: 0 10px 10px !important;
+    }
 </style>
