@@ -25,7 +25,7 @@ export class Analytics{
     context : vscode.ExtensionContext;
     telemetryLogger: vscode.TelemetryLogger;
 
-    constructor(context: vscode.ExtensionContext){
+    constructor(context: vscode.ExtensionContext, private readonly installation: string){
         appInsights.setup(env.TELEMETRY_KEY)
             .setAutoCollectRequests(false)
             .setAutoCollectPerformance(false)
@@ -64,6 +64,7 @@ export class Analytics{
                 'common.vscodeversion': vscode.version,
                 'common.os': process.platform.toString(),
                 'common.nodeArch': process.arch,
+                'installation': this.installation,
             }
         );
     }
@@ -79,7 +80,8 @@ export class Analytics{
                 'common.vscodeversion': vscode.version,
                 'common.os': process.platform.toString(),
                 'common.nodeArch': process.arch,
-                'error': error.toString().slice(-8100)
+                'installation': this.installation,
+                'error': error.toString().slice(-8100),
             }
         );
     }
@@ -88,6 +90,7 @@ export class Analytics{
 export enum EventType{
     ACTIVATE = "activate",
     MIGRATE = "migrate",
+    ERROR_PYTHON_VERSION = "error_python_version",
     ERROR_PIP_INSTALL = "error_pip_install",
     ERROR_CERTIFI_PATH = "error_certifi_path",
     ERROR_WAKE_INSTALL_PIPX = "error_wake_install_pipx",

@@ -11,8 +11,6 @@ import {
     StreamInfo,
     integer,
     Diagnostic,
-    ProgressType,
-    ErrorHandler,
     ShowMessageNotification,
     MessageType,
     LogMessageNotification,
@@ -22,14 +20,8 @@ import { Graphviz } from "@hpcc-js/wasm";
 import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler, newDetector, newPrinter } from './commands';
 import { hideCoverageCallback, initCoverage, showCoverageCallback } from './coverage';
 
-import * as https from 'https';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as tmp from 'tmp';
-
 import getPort = require('get-port');
 import waitPort = require('wait-port');
-import { compare } from '@renovatebot/pep440';
 import { GroupBy, Impact, Confidence } from "./detections/WakeTreeDataProvider";
 import { SolcTreeDataProvider } from './detections/SolcTreeDataProvider';
 import { WakeTreeDataProvider } from './detections/WakeTreeDataProvider';
@@ -42,7 +34,11 @@ import { ExecaChildProcess, execa, execaSync } from 'execa';
 import { PrintersHandler } from './printers/PrintersHandler'
 import { GraphvizPreviewGenerator } from './graphviz/GraphvizPreviewGenerator';
 import pidtree = require('pidtree');
-import { CondaInstaller } from './conda';
+import { CondaInstaller } from './installer/conda';
+import { Installer } from './installer/installerInterface';
+import { PipxInstaller } from './installer/pipx';
+import { PipInstaller } from './installer/pip';
+import { ManualInstaller } from './installer/manual';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ExecaChildProcess | undefined = undefined;
@@ -53,14 +49,10 @@ let analytics: Analytics;
 let errorHandler: ClientErrorHandler;
 let printers: PrintersHandler;
 let crashlog: string[] = [];
-let venvPath: string;
-let venvActivateCommand: string;
 let graphvizGenerator: GraphvizPreviewGenerator;
 
 //export let log: Log
 
-const WAKE_TARGET_VERSION = "4.10.1";
-const WAKE_PRERELEASE = false;
 const CRASHLOG_LIMIT = 1000;
 
 interface DiagnosticNotification{
@@ -69,7 +61,6 @@ interface DiagnosticNotification{
 }
 
 function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification){
-    //outputChannel.appendLine(JSON.stringify(detection));
     let diags = detection.diagnostics.map(it => convertDiagnostics(it)).filter(item => !item.data.ignored);
     diagnosticCollection.set(vscode.Uri.parse(detection.uri), diags);
 
@@ -87,475 +78,61 @@ function onNotification(outputChannel: vscode.OutputChannel, detection: Diagnost
     }
 }
 
-async function installPip(outputChannel: vscode.OutputChannel, pythonExecutable: string) {
-    var tempFile = tmp.fileSync({ mode: 0o644 });
-    const url = "https://bootstrap.pypa.io/get-pip.py";
-
-    outputChannel.appendLine(`Downloading ${url} to ${tempFile.name}`);
-
-    await new Promise<void>((resolve, reject) => {
-        https.get(url, (response) => {
-            if (response.statusCode !== 200) {
-                reject(new Error(`Failed to download ${url}: ${response.statusCode}`));
-                return;
-            }
-
-            const file = fs.createWriteStream(tempFile.name);
-            response.pipe(file);
-
-            file.on('finish', () => {
-                file.close((err) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-
-                    outputChannel.appendLine(`Running '${pythonExecutable} ${tempFile.name} --user'`);
-
-                    try {
-                        const result = execaSync(pythonExecutable, [tempFile.name, "--user"]);
-                        if (result.exitCode !== 0) {
-                            reject(new Error(`Failed to install pip: ${result.stderr}`));
-                            return;
-                        }
-                    } catch(err) {
-                        reject(err);
-                        return;
-                    }
-
-                    resolve();
-                });
-            }).on('error', (err) => {
-                reject(err);
-            });
-        }).on('error', (err) => {
-            reject(err);
-        });
-    });
-}
-
-async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<boolean> {
-    // check if pip is available and install it if not
-    try {
-        execaSync(pythonExecutable, ["-m", "pip", "--version"]);
-    } catch(err) {
-        try {
-            outputChannel.appendLine(`Running '${pythonExecutable} -m ensurepip'`);
-            execaSync(pythonExecutable, ["-m", "ensurepip"]);
-        } catch(err) {
-            if (err instanceof Error) {
-                outputChannel.appendLine("Failed to install pip:");
-                outputChannel.appendLine(err.toString());
-            }
-            try {
-                outputChannel.appendLine(`Running '${pythonExecutable} -m ensurepip --user'`);
-                execaSync(pythonExecutable, ["-m", "ensurepip", "--user"]);
-            } catch(err) {
-                if (err instanceof Error) {
-                    outputChannel.appendLine("Failed to install pip into user site-packages:");
-                    outputChannel.appendLine(err.toString());
-                }
-                try {
-                    await installPip(outputChannel, pythonExecutable);
-                } catch(err) {
-                    analytics.logCrash(EventType.ERROR_PIP_INSTALL, err);
-
-                    if (err instanceof Error) {
-                        outputChannel.appendLine("Failed to install pip:");
-                        outputChannel.appendLine(err.toString());
-                        outputChannel.show(true);
-                    }
-
-                    return false;
-                }
-            }
-        }
-    }
-
-    try {
-        let out;
-        if (WAKE_PRERELEASE) {
-            outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --pre'`);
-            out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre"]).stdout;
-        } else {
-            outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U'`);
-            out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U"]).stdout;
-        }
-        outputChannel.appendLine(out);
-        return true;
-    } catch(err) {
-        if (err instanceof Error) {
-            outputChannel.appendLine("Failed to execute the previous command:");
-            outputChannel.appendLine(err.toString());
-        }
-
-        try {
-            let out;
-            if (WAKE_PRERELEASE) {
-                outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --pre --user'`);
-                out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre", "--user"]).stdout;
-            } else {
-                outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --user'`);
-                out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--user"]).stdout;
-            }
-            outputChannel.appendLine(out);
-            return true;
-        } catch(err) {
-            if (err instanceof Error) {
-                outputChannel.appendLine("Failed to install PyPi package 'eth-wake':");
-                outputChannel.appendLine(err.toString());
-            }
-
-            try {
-                if (!fs.existsSync(venvPath)) {
-                    outputChannel.appendLine(`Running '${pythonExecutable} -m venv ${venvPath}'`);
-                    execaSync(pythonExecutable, ["-m", "venv", venvPath]);
-                }
-
-                let out;
-                if (WAKE_PRERELEASE) {
-                    outputChannel.appendLine(`Running '${venvActivateCommand} && pip install eth-wake -U --pre'`);
-                    out = execaSync(`${venvActivateCommand} && pip install eth-wake -U --pre`, { shell: true }).stdout;
-                } else {
-                    outputChannel.appendLine(`Running '${venvActivateCommand} && pip install eth-wake -U'`);
-                    out = execaSync(`${venvActivateCommand} && pip install eth-wake -U`, { shell: true }).stdout;
-                }
-                outputChannel.appendLine(out);
-                return true;
-            } catch(err) {
-                analytics.logCrash(EventType.ERROR_WAKE_INSTALL_PIP, err);
-
-                if (err instanceof Error) {
-                    outputChannel.appendLine("Failed to install PyPi package 'eth-wake' into venv:");
-                    outputChannel.appendLine(err.toString());
-                    outputChannel.show(true);
-                }
-
-                return false;
-            }
-        }
-    }
-}
-
-function getWakeVersion(pathToExecutable: string|null, venv: boolean, cwd?: string): string {
-    if (pathToExecutable) {
-        return execaSync(pathToExecutable, ["--version"]).stdout.trim();
-    }
-    if (venv) {
-        return execaSync(`${venvActivateCommand} && wake --version`, { shell: true }).stdout.trim();
-    }
-    if (cwd === undefined) {
-        return execaSync("wake", ["--version"]).stdout.trim();
-    }
-    else {
-        return execaSync("./wake", ["--version"], {"cwd": cwd}).stdout.trim();
-    }
-}
-
-async function checkWakeInstalled(outputChannel: vscode.OutputChannel, venv: boolean, cwd?: string): Promise<boolean> {
-    try {
-        const version: string = getWakeVersion(null, venv, cwd);
-
-        if (compare(version, WAKE_TARGET_VERSION) < 0) {
-            if (cwd === undefined) {
-                outputChannel.appendLine(`Found 'eth-wake' in version ${version} in PATH but the target minimal version is ${WAKE_TARGET_VERSION}.`);
-            } else {
-                outputChannel.appendLine(`Found 'eth-wake' in version ${version} in '${cwd}' but the target minimal version is ${WAKE_TARGET_VERSION}.`);
-            }
-            return false;
-        }
-        return true;
-    } catch(err) {
-        return false;
-    }
-}
-
-async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<[boolean, boolean, string|undefined]> {
-    let installed: boolean = await checkWakeInstalled(outputChannel, false);
-    let venv: boolean = false;
-    let cwd: string|undefined = undefined;
-
-    if (!installed) {
-        const globalPackages = execaSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).stdout.trim();
-        installed = await checkWakeInstalled(outputChannel, false, globalPackages);
-        if (installed) {
-            outputChannel.appendLine(`Consider adding '${globalPackages}' to your PATH environment variable.`);
-            cwd = globalPackages;
-        }
-    }
-    if (!installed) {
-        const userPackages = execaSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).stdout.trim();
-        installed = await checkWakeInstalled(outputChannel, false, userPackages);
-        if (installed) {
-            outputChannel.appendLine(`Consider adding '${userPackages}' to your PATH environment variable.`);
-            cwd = userPackages;
-        }
-    }
-    if (!installed && fs.existsSync(venvPath)) {
-        installed = await checkWakeInstalled(outputChannel, true);
-        if (installed) {
-            venv = true;
-        }
-    }
-
-    return [installed, venv, cwd];
-}
-
-function findPython(outputChannel: vscode.OutputChannel): string {
-    try {
-        const pythonVersion = execaSync("python3", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).stdout.trim();
-
-        if (compare(pythonVersion, "3.8.0") < 0) {
-            outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.8 must be installed.`);
-            throw new Error("Python version too old");
-        }
-        return "python3";
-    } catch(err) {
-        try {
-            const pythonVersion = execaSync("python", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).stdout.trim();
-
-            if (compare(pythonVersion, "3.8.0") < 0) {
-                outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.8 must be installed.`);
-                throw new Error("Python version too old");
-            }
-            return "python";
-        } catch(err) {
-            outputChannel.appendLine("Python >=3.8 must be installed.");
-            throw new Error("Python not found");
-        }
-    }
-}
-
-async function pipxInstall(outputChannel: vscode.OutputChannel): Promise<void> {
-    let out: string = "";
-    if (WAKE_PRERELEASE) {
-        outputChannel.appendLine(`Running 'pipx install --pip-args=--pre eth-wake'`);
-        out = execaSync("pipx", ["install", "--pip-args=--pre", "eth-wake"]).stdout;
-    } else {
-        outputChannel.appendLine(`Running 'pipx install eth-wake'`);
-        out = execaSync("pipx", ["install", "eth-wake"]).stdout;
-    }
-    if (out.trim().length > 0) {
-        outputChannel.appendLine(out);
-    }
-}
-
-async function pipxUpgrade(outputChannel: vscode.OutputChannel): Promise<void> {
-    let out: string = "";
-    if (WAKE_PRERELEASE) {
-        outputChannel.appendLine(`Running 'pipx upgrade --pip-args=--pre eth-wake'`);
-        out = execaSync("pipx", ["upgrade", "--pip-args=--pre", "eth-wake"]).stdout;
-    } else {
-        outputChannel.appendLine(`Running 'pipx upgrade eth-wake'`);
-        out = execaSync("pipx", ["upgrade", "eth-wake"]).stdout;
-    }
-    if (out.trim().length > 0) {
-        outputChannel.appendLine(out);
-    }
-}
-
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-    analytics = new Analytics(context);
     const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
-    outputChannel.show(true);
-    errorHandler = new ClientErrorHandler(outputChannel, analytics);
-    venvPath = path.join(context.globalStorageUri.fsPath, "venv");
-
-    if (process.platform === "win32") {
-        venvActivateCommand = '"' + path.join(venvPath, "Scripts", "activate.bat") + '"';
-    } else {
-        venvActivateCommand = '. "' + path.join(venvPath, "bin", "activate") + '"';
-    }
-
-    migrateConfig();
-
     const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
-    const autoInstall: boolean = extensionConfig.get<boolean>('Wake.autoInstall', true);
-    let usePipx: boolean = extensionConfig.get<boolean>('Wake.usePipx', true);
+
+    let wakePort: number|undefined = extensionConfig.get('Wake.port', undefined);
     let pathToExecutable: string|null = extensionConfig.get<string | null>('Wake.pathToExecutable', null);
     if (pathToExecutable?.trim()?.length === 0) {
         pathToExecutable = null;
     }
-    let wakePort: number|undefined = extensionConfig.get('Wake.port', undefined);
-    let installed: boolean = false;
-    let venv: boolean = false;
-    let cwd: string|undefined = undefined;
-    let certifiPath: string|undefined = undefined;
+    let installationMethod: string = extensionConfig.get<string>('Wake.installationMethod', "conda");
+
+    let method = "";
+    if (wakePort) {
+        method = "port";
+    } else if (pathToExecutable !== null) {
+        method = "path";
+    } else if (installationMethod === "conda") {
+        method = "conda";
+    } else if (installationMethod === "pipx") {
+        method = "pipx";
+    } else if (installationMethod === "pip") {
+        method = "pip";
+    } else if (installationMethod === "manual") {
+        method = "manual";
+    } else {
+        throw new Error(`Unknown installation method: ${installationMethod}`);
+    }
+
+    analytics = new Analytics(context, method);
+    errorHandler = new ClientErrorHandler(outputChannel, analytics);
+
+    migrateConfig();
 
     let solcIgnoredWarnings = extensionConfig.get<Array<integer|string>>('Wake.compiler.solc.ignoredWarnings', []);
 
-    if (autoInstall && !pathToExecutable && !wakePort) {
-        if (usePipx) {
-            let pipxList;
-            try {
-                pipxList = JSON.parse(execaSync("pipx", ["list", "--json"]).stdout.trim());
-            } catch(err) {
-                usePipx = false;
-            }
-
-            if (usePipx) {
-                try {
-                    if (!("eth-wake" in pipxList.venvs)) {
-                        await pipxInstall(outputChannel);
-                        pipxList = JSON.parse(execaSync("pipx", ["list", "--json"]).stdout.trim());
-                    }
-
-                    for (const appPath of pipxList.venvs["eth-wake"].metadata.main_package.app_paths) {
-                        if (path.parse(appPath.__Path__).name === "wake") {
-                            pathToExecutable = appPath.__Path__;
-                            break;
-                        }
-                    }
-                    const version: string = getWakeVersion(pathToExecutable, false, cwd);
-                    if (compare(version, WAKE_TARGET_VERSION) < 0) {
-                        outputChannel.appendLine(`Found 'eth-wake' in version ${version} in ${pathToExecutable} but the target minimal version is ${WAKE_TARGET_VERSION}.`);
-                        await pipxUpgrade(outputChannel);
-                    }
-
-                    if (pathToExecutable !== null && process.platform === "darwin") {
-                        const possiblePythonExecutable = ["python", "python3", "python3.8", "python3.9", "python3.10", "python3.11", "python3.12"];
-                        let pythonPath: string|undefined = undefined;
-
-                        for (const pythonExecutable of possiblePythonExecutable) {
-                            pythonPath = path.join(path.dirname(pathToExecutable), pythonExecutable);
-                            if (fs.existsSync(pythonPath)) {
-                                break;
-                            }
-                        }
-
-                        try {
-                            certifiPath = execaSync(
-                                pythonPath ?? "python3",
-                                ['-m', 'certifi']
-                            ).stdout.trim();
-                        } catch(err) {
-                            analytics.logCrash(EventType.ERROR_CERTIFI_PATH, err);
-                            if (err instanceof Error) {
-                                outputChannel.appendLine(err.toString());
-                            }
-                            outputChannel.appendLine("Unable to determine the path to the 'certifi' package.");
-                        }
-                    }
-                } catch(err) {
-                    analytics.logCrash(EventType.ERROR_WAKE_INSTALL_PIPX, err);
-                    if (err instanceof Error) {
-                        outputChannel.appendLine(err.toString());
-                        outputChannel.show(true);
-                    }
-                    return;
-                }
-            }
-        }
-
-        if (!usePipx) {
-            const pythonExecutable = findPython(outputChannel);
-
-            [installed, venv, cwd] = await findWakeDir(outputChannel, pythonExecutable);
-            if (!installed) {
-                outputChannel.appendLine("Installing PyPi package 'eth-wake'.");
-                installed = await installWake(outputChannel, pythonExecutable);
-
-                if (installed) {
-                    [installed, venv, cwd] = await findWakeDir(outputChannel, pythonExecutable);
-
-                    if (!installed) {
-                        outputChannel.appendLine("'eth-wake' installed but cannot be found in PATH or pip site-packages.");
-                    }
-                }
-            }
-
-            if (process.platform === "darwin") {
-                try {
-                    if (venv) {
-                        certifiPath = execaSync(`${venvActivateCommand} && ${pythonExecutable} -m certifi`, { shell: true }).stdout.trim();
-                    } else {
-                        certifiPath = execaSync(pythonExecutable, ['-m', 'certifi']).stdout.trim();
-                    }
-                } catch(err) {
-                    analytics.logCrash(EventType.ERROR_CERTIFI_PATH, err);
-                    if (err instanceof Error) {
-                        outputChannel.appendLine(err.toString());
-                    }
-                    outputChannel.appendLine("Unable to determine the path to the 'certifi' package.");
-                }
-            }
-        }
-    }
-
     if (!wakePort) {
-        const conda = new CondaInstaller(context, outputChannel);
-        const venvPath = await conda.setupConda();
-        wakePort = await getPort();
-        certifiPath = conda.certifiPath;
+        let installer: Installer;
 
-        const env = { ...process.env, PYTHONIOENCODING: 'utf8' } as { [key: string]: string };
-        if (certifiPath) {
-            env.SSL_CERT_FILE = certifiPath;
-            env.REQUESTS_CA_BUNDLE = certifiPath;
-        }
-
-        outputChannel.appendLine(`Running '${path.join(venvPath, "bin", "activate")} && ${path.join(venvPath, "bin", "wake")} lsp --port ${wakePort}'`);
-        if (process.platform === "win32") {
-            wakeProcess = execa(
-                `"${path.join(venvPath, "Scripts", "activate.bat")}" && ${path.join(venvPath, "Scripts", "wake")} lsp --port ${wakePort}`,
-                { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env }
-            );
+        if (method === "conda") {
+            installer = new CondaInstaller(context, outputChannel, analytics);
+        } else if (method === "pipx") {
+            installer = new PipxInstaller(context, outputChannel, analytics);
+        } else if (method === "pip") {
+            installer = new PipInstaller(context, outputChannel, analytics, pathToExecutable);
         } else {
-            wakeProcess = execa(
-                `. "${path.join(venvPath, "bin", "activate")}" && "${path.join(venvPath, "bin", "wake")}" lsp --port ${wakePort}`,
-                { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env }
-            );
+            installer = new ManualInstaller(context, outputChannel, analytics, pathToExecutable);
         }
 
-        /*
-        let wakeVersion: string
-        try {
-            wakeVersion = getWakeVersion(pathToExecutable, venv, cwd);
-            if (compare(wakeVersion, WAKE_TARGET_VERSION) < 0) {
-                analytics.logEvent(EventType.ERROR_WAKE_VERSION);
-                outputChannel.appendLine(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`);
-                outputChannel.show(true);
-                return;
-            }
-        } catch(err) {
-            analytics.logCrash(EventType.ERROR_WAKE_VERSION_UNKNOWN, err);
-            if (err instanceof Error) {
-                outputChannel.appendLine(err.toString());
-                outputChannel.show(true);
-            }
-            outputChannel.appendLine(`Unable to determine the version of 'eth-wake' PyPi package.`);
-            return;
-        }
+        await installer.setup();
 
         wakePort = await getPort();
+        wakeProcess = installer.startWake(wakePort);
 
-        if (pathToExecutable !== null) {
-            cwd = path.dirname(pathToExecutable);
-        }
-
-        const wakePath: string = cwd ? path.join(cwd, "wake") : "wake";
-
-        const env = { ...process.env, PYTHONIOENCODING: 'utf8' } as { [key: string]: string };
-        if (certifiPath) {
-            env.SSL_CERT_FILE = certifiPath;
-            env.REQUESTS_CA_BUNDLE = certifiPath;
-        }
-
-        if (venv) {
-            outputChannel.appendLine(`Running '${venvActivateCommand} && wake lsp --port ${wakePort}' (v${wakeVersion})`);
-            wakeProcess = execa(`${venvActivateCommand} && wake lsp --port ${wakePort}`, { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env });
-        }
-        else if (cwd === undefined) {
-            outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (v${wakeVersion})`);
-            wakeProcess = execa('wake', ["lsp", "--port", String(wakePort)], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env });
-        } else {
-            outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (v${wakeVersion})`);
-            const cmd = process.platform === "win32" ? ".\\wake" : "./wake";
-            wakeProcess = execa(cmd, ["lsp", "--port", String(wakePort)], { cwd, shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env });
-        }
-        */
         wakeProcess.stderr?.on('data', (chunk) => {
             crashlog.push(chunk);
             if (crashlog.length > CRASHLOG_LIMIT){
@@ -565,12 +142,14 @@ export async function activate(context: vscode.ExtensionContext) {
         wakeProcess.on('error', (error) => {
             if (error) {
                 outputChannel.appendLine(error.message);
+                outputChannel.show(true);
                 throw error;
             }
         });
         wakeProcess.on('exit', () => {
             analytics.logCrash(EventType.ERROR_WAKE_CRASH, new Error(crashlog.join("\n")));
             printCrashlog(outputChannel);
+            outputChannel.show(true);
             wakeProcess = undefined;
         });
     } else {
@@ -583,6 +162,7 @@ export async function activate(context: vscode.ExtensionContext) {
         timeout: 15000
     })) {
         outputChannel.appendLine(`Timed out waiting for port ${wakePort} to open.`);
+        outputChannel.show(true);
     }
 
     const serverOptions: ServerOptions = async () => {

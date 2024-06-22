@@ -5,17 +5,23 @@ import * as tar from 'tar';
 import * as crypto from 'crypto';
 import * as tmp from 'tmp';
 import { Storage } from '@google-cloud/storage';
-import { execaSync } from 'execa';
+import { ExecaChildProcess, execaSync, execa } from 'execa';
 import { compare } from '@renovatebot/pep440';
+import { Analytics, EventType } from '../Analytics';
+import { Installer } from './installerInterface';
 
-export class CondaInstaller {
+export class CondaInstaller implements Installer {
     private readonly bucketName = 'wake-venv';
     private readonly storage = new Storage();
     private readonly publicKey: string;
     private readonly markerFile: string;
     private readonly activateCommand: string;
 
-    constructor(private readonly context: vscode.ExtensionContext, private readonly outputChannel: vscode.OutputChannel) {
+    constructor(
+        private readonly context: vscode.ExtensionContext,
+        private readonly outputChannel: vscode.OutputChannel,
+        private readonly analytics: Analytics,
+    ) {
         const pubkeyPath = context.asAbsolutePath('resources/conda_public_key.pem');
         this.publicKey = fs.readFileSync(pubkeyPath, 'utf8');
         this.markerFile = path.join(context.globalStorageUri.fsPath, '.conda-version');
@@ -24,14 +30,6 @@ export class CondaInstaller {
             this.activateCommand = '"' + path.join(context.globalStorageUri.fsPath, 'conda', 'Scripts', 'activate.bat') + '"';
         } else {
             this.activateCommand = '. "' + path.join(context.globalStorageUri.fsPath, 'conda', 'bin', 'activate') + '"';
-        }
-    }
-
-    get certifiPath(): string | undefined {
-        try {
-            return execaSync(`${this.activateCommand} && python -c "import certifi; print(certifi.where())"`, { shell: true }).stdout;
-        } catch (error) {
-            return undefined;
         }
     }
 
@@ -134,7 +132,7 @@ export class CondaInstaller {
         });
     }
 
-    async setupConda(): Promise<string> {
+    async setup(): Promise<void> {
         const [files] = await this.storage.bucket(this.bucketName).getFiles();
 
         let latestVersion = undefined;
@@ -179,12 +177,12 @@ export class CondaInstaller {
 
             // TODO: do we have to restart the extension because of overwritten binaries?
 
-            return extractPath;
+            return;
         }
 
         const currentVersion = fs.readFileSync(this.markerFile, 'utf8').trim();
         if (compare(currentVersion, latestVersion) >= 0) {
-            return extractPath;
+            return;
         }
 
         // offer an update
@@ -198,7 +196,34 @@ export class CondaInstaller {
             }
             return update;
         });
+    }
 
-        return extractPath;
+    private getCertifiPath(): string | undefined {
+        try {
+            return execaSync(`${this.activateCommand} && python -c "import certifi; print(certifi.where())"`, { shell: true }).stdout;
+        } catch (error) {
+            this.analytics.logCrash(EventType.ERROR_CERTIFI_PATH, error);
+            return undefined;
+        }
+    }
+
+    startWake(port: number): ExecaChildProcess {
+        const env = { ...process.env, PYTHONIOENCODING: 'utf8' } as { [key: string]: string };
+
+        let certifiPath = undefined;
+        if (process.platform === 'darwin') {
+            certifiPath = this.getCertifiPath();
+        }
+
+        if (certifiPath) {
+            env.SSL_CERT_FILE = certifiPath;
+            env.REQUESTS_CA_BUNDLE = certifiPath;
+        }
+
+        this.outputChannel.appendLine(`Running '${this.activateCommand} && wake lsp --port ${port}'`);
+        return execa(
+            `${this.activateCommand} && wake lsp --port ${port}`,
+            { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: env }
+        );
     }
 }
