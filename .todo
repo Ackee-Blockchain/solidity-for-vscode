@@ -178,15 +178,15 @@ Worklog:
 
     [] try to use the icon api and remove the icon classes
 
-    ☐ add copy to clipboard command
-
+    ✔ add copy to clipboard command @done(24-06-23 10:31)
     remove unused commands
-
     remove hardcoded webviewmessage strings
-
     ☐ api call for getWakeVersion @critical
+    ✔ deploy filter @done(24-06-22 23:50)
+    move input warning inside input box
 
 
 Questions for User Testing:
     ☐ in history, what data is important to you to see at first glance
     [] topUp or set acc balance?
+

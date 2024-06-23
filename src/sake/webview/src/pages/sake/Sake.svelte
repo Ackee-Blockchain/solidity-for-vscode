@@ -26,6 +26,7 @@
     } from '../../../shared/types';
     import { onMount } from 'svelte';
     import { messageHandler } from '@estruyf/vscode/dist/client';
+    import Tabs from '../../components/Tabs.svelte';
     // import '../../../shared/types'; // Importing types to avoid TS error
 
     provideVSCodeDesignSystem().register(
@@ -93,12 +94,38 @@
 
         await messageHandler.send(WebviewMessage.onContractFunctionCall, payload);
     };
+
+    enum TabId {
+        CompileDeploy = 0,
+        DeployedContracts = 1,
+        Mimi = 2,
+        Mimi2 = 3
+    }
+
+    let tabs: { id: any; label: string }[] = [
+        {
+            id: TabId.CompileDeploy,
+            label: 'Compile & Deploy'
+        },
+        {
+            id: TabId.DeployedContracts,
+            label: 'Deployed contracts'
+        },
+        {
+            id: TabId.Mimi,
+            label: 'Mimi'
+        },
+        {
+            id: TabId.Mimi,
+            label: 'Kokoska kokosova'
+        }
+    ];
 </script>
 
-<main>
+<main class="h-full my-0 overflow-hidden">
     <!-- <CallSetup bind:this={callSetup} />
 
-    <Divider /> -->
+    <Divider />
 
     <vscode-panels class="w-full">
         <vscode-panel-tab id="tab-1">Compile & Deploy</vscode-panel-tab>
@@ -109,6 +136,7 @@
             {/if}
         </vscode-panel-tab>
         <vscode-panel-tab id="tab-3">Mimi</vscode-panel-tab>
+        <vscode-panel-tab id="tab-4">Kokoska kokosova</vscode-panel-tab>
 
         <vscode-panel-view id="view-1">
             <CompileDeploy />
@@ -123,7 +151,37 @@
                 {/each}
             </ul>
         </vscode-panel-view>
-    </vscode-panels>
+    </vscode-panels> -->
+
+    <Tabs {tabs}>
+        <svelte:fragment slot="tab-header" let:tabId>
+            {#if tabId == TabId.DeployedContracts}
+                <vscode-badge appearance="secondary">{deployedContracts.length}</vscode-badge>
+            {/if}
+        </svelte:fragment>
+        <svelte:fragment slot="content-fixed" let:tabId>
+            {#if tabId == TabId.CompileDeploy}
+                <CallSetup bind:this={callSetup} />
+            {:else if tabId == TabId.DeployedContracts}
+                <CallSetup bind:this={callSetup} />
+            {:else if tabId == TabId.Mimi}
+                <CallSetup bind:this={callSetup} />
+            {/if}
+        </svelte:fragment>
+        <svelte:fragment slot="content-scrollable" let:tabId>
+            {#if tabId == TabId.CompileDeploy}
+                <CompileDeploy />
+            {:else if tabId == TabId.DeployedContracts}
+                <Run />
+            {:else if tabId == TabId.Mimi}
+                <ul>
+                    {#each { length: 200 } as _, i}
+                        <li>{i + 1}</li>
+                    {/each}
+                </ul>
+            {/if}
+        </svelte:fragment>
+    </Tabs>
 </main>
 
 <style global>
@@ -132,6 +190,7 @@
     @tailwind utilities;
 
     body {
-        padding: 0 10px 10px !important;
+        /* padding: 0 10px 10px !important; */
+        padding: 0 !important;
     }
 </style>
