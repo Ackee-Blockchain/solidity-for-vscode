@@ -34,11 +34,11 @@ import { ExecaChildProcess, execa, execaSync } from 'execa';
 import { PrintersHandler } from './printers/PrintersHandler'
 import { GraphvizPreviewGenerator } from './graphviz/GraphvizPreviewGenerator';
 import pidtree = require('pidtree');
-import { CondaInstaller } from './installer/conda';
-import { Installer } from './installer/installerInterface';
-import { PipxInstaller } from './installer/pipx';
-import { PipInstaller } from './installer/pip';
-import { ManualInstaller } from './installer/manual';
+import { CondaInstaller } from './installers/conda';
+import { Installer } from './installers/installerInterface';
+import { PipxInstaller } from './installers/pipx';
+import { PipInstaller } from './installers/pip';
+import { ManualInstaller } from './installers/manual';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ExecaChildProcess | undefined = undefined;
