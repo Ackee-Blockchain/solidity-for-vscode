@@ -11,12 +11,14 @@ import { messageHandler } from '@estruyf/vscode/dist/client';
 /**
  * frontend svelte data
  */
+
 export const selectedAccount = writable<AccountStateData | undefined>(undefined);
 export const selectedValue = writable<number | undefined>(undefined);
 
 /**
  * backend data
  */
+
 export const accounts = writable<AccountStateData[]>([]);
 export const deployedContracts = writable<CompiledContract[]>([]);
 export const compiledContracts = writable<CompilationStateData>(undefined);

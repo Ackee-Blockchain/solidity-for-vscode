@@ -10,7 +10,8 @@
         vsCodePanels,
         vsCodePanelTab,
         vsCodeBadge,
-        vsCodePanelView
+        vsCodePanelView,
+        vsCodeProgressRing
     } from '@vscode/webview-ui-toolkit';
     import Contract from '../../components/Contract.svelte';
     import CallSetup from '../../components/CallSetup.svelte';
@@ -38,7 +39,8 @@
         vsCodePanels(),
         vsCodePanelTab(),
         vsCodeBadge(),
-        vsCodePanelView()
+        vsCodePanelView(),
+        vsCodeProgressRing()
     );
 
     let deployedContracts: Array<any> = [];
@@ -80,7 +82,10 @@
 
 <main class="h-full my-0 overflow-hidden">
     {#if initLoading}
-        <span>Connecting with Wake...</span>
+        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+            <vscode-progress-ring />
+            <span>Connecting with Wake...</span>
+        </div>
     {:else}
         <Tabs {tabs}>
             <svelte:fragment slot="tab-header" let:tabId>
