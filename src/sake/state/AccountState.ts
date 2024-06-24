@@ -17,7 +17,12 @@ export class AccountState extends BaseState<AccountStateData[]> {
 
     public setAccounts(accounts: AccountStateData[]) {
         // TODO validate payload
-        this.state = accounts;
+        this.state = accounts.map((account, i) => {
+            return {
+                ...account,
+                nick: `Account ${i}`
+            };
+        });
     }
 
     /**

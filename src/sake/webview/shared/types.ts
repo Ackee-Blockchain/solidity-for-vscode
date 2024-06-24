@@ -150,6 +150,7 @@ export interface CompilationStateData {
 export type AccountStateData = {
     address: string;
     balance: number | undefined;
+    nick: string | undefined;
 };
 
 export type TxHistoryStateData = TxDeploymentOutput | TxFunctionCallOutput;
