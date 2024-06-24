@@ -41,6 +41,7 @@
             <slot name="content-fixed" tabId={activeTabId}></slot>
         </div>
     </div>
+
     <Divider />
 
     <div class="w-full flex-1 overflow-y-auto overflow-x-hidden p-[10px] vscode-shadow">

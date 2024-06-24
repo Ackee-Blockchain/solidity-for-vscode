@@ -23,57 +23,8 @@
 
     provideVSCodeDesignSystem().register(vsCodeDropdown(), vsCodeOption(), vsCodeTextField());
 
-    let accounts: AccountStateData[];
-    let value: string | undefined;
-    let selectedAccount: AccountStateData | undefined;
-
-    onMount(() => {
-        messageHandler.send(WebviewMessage.onGetAccounts);
-    });
-
-    window.addEventListener('message', (event) => {
-        if (!event.data.command) return;
-
-        const { command, payload, stateId } = event.data;
-
-        switch (command) {
-            case WebviewMessage.getState:
-                if (stateId == StateId.Accounts) {
-                    console.log('callsetup got state', payload);
-
-                    const _payload = payload as AccountStateData[];
-                    accounts = _payload;
-
-                    // if no accounts, reset selected account
-                    if (accounts.length === 0) {
-                        selectedAccount = undefined;
-                        return;
-                    }
-
-                    // check if selected account is still in the list, if not select the first account
-                    if (
-                        selectedAccount === undefined ||
-                        (selectedAccount !== undefined &&
-                            !accounts.some(
-                                (account) => account.address === selectedAccount!.address
-                            ))
-                    ) {
-                        selectedAccount = accounts[0];
-                        return;
-                    }
-
-                    // if selectedAccount is in payload, update selectedAccount
-                    // @dev accounts.find should not return undefined, since checked above
-                    selectedAccount = accounts.find(
-                        (account) => account.address === selectedAccount!.address
-                    );
-
-                    return;
-                }
-
-                break;
-        }
-    });
+    import { selectedValue, selectedAccount, accounts } from '../helpers/store';
+    import { copyToClipboard, setBalance } from '../helpers/api';
 
     function handleAccountChange(event: any) {
         const _selectedAccountIndex = event.detail.value;
@@ -81,34 +32,42 @@
         if (
             _selectedAccountIndex === undefined ||
             _selectedAccountIndex < 0 ||
-            _selectedAccountIndex >= accounts.length
+            _selectedAccountIndex >= $accounts.length
         ) {
-            selectedAccount = undefined;
+            selectedAccount.set(undefined);
             return;
         }
 
-        selectedAccount = accounts[_selectedAccountIndex];
+        selectedAccount.set($accounts[_selectedAccountIndex]);
     }
 
     function handleValueChange(event: any) {
         // const _value = parseInt(event.target.value);
         const _value = event.target.value;
         if (isNaN(_value)) {
-            value = undefined;
+            selectedValue.set(undefined);
             return;
         }
-        value = _value;
+        try {
+            selectedValue.set(parseComplexNumber(_value));
+        } catch (e) {
+            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
+            messageHandler.send(
+                WebviewMessage.onError,
+                'Value could not be parsed: ' + errorMessage
+            );
+        }
     }
 
     async function topUp() {
         // @todo move this to commands
-        if (selectedAccount === undefined) {
+        if ($selectedAccount === undefined) {
             return;
         }
 
         const topUpValue = await messageHandler.request<string>(
             WebviewMessage.getTextFromInputBox,
-            selectedAccount.balance
+            $selectedAccount.balance
         );
 
         if (topUpValue === undefined) {
@@ -127,43 +86,9 @@
             return;
         }
 
-        const _params: WakeSetBalancesRequestParams = {
-            balances: {
-                [selectedAccount.address]: parsedTopUpValue
-            }
-        };
-
-        const success = await messageHandler.request(WebviewMessage.onSetBalances, _params);
+        const success = setBalance($selectedAccount.address, parsedTopUpValue);
 
         console.log('top up success', success);
-    }
-
-    export function copyAddress() {
-        if (selectedAccount === undefined) {
-            return;
-        }
-
-        messageHandler.send(WebviewMessage.copyToClipboard, selectedAccount.address);
-    }
-
-    export function getSelectedAccount(): AccountStateData | undefined {
-        return selectedAccount;
-    }
-
-    export function getValue(): number | undefined {
-        if (value === undefined) {
-            return undefined;
-        }
-        try {
-            return parseComplexNumber(value);
-        } catch (e) {
-            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
-            messageHandler.send(
-                WebviewMessage.onError,
-                'Value could not be parsed: ' + errorMessage
-            );
-            return;
-        }
     }
 </script>
 
@@ -171,20 +96,21 @@
     <section>
         <p class="ml-1 mb-2">Account</p>
         <vscode-dropdown position="below" class="w-full mb-2" on:change={handleAccountChange}>
-            {#each accounts as account, i}
+            {#each $accounts as account, i}
                 <vscode-option value={i}>Account {i}</vscode-option>
             {/each}
         </vscode-dropdown>
 
-        {#if selectedAccount !== undefined}
+        {#if $selectedAccount !== undefined}
             <div class="w-full px-1 mb-3">
                 <div class="w-full flex flex-row gap-1 items-center h-[20px]">
-                    <span class="flex-1 truncate text-sm">{selectedAccount.address}</span>
+                    <span class="flex-1 truncate text-sm">{$selectedAccount.address}</span>
                     <!-- <span class="flex-1 truncate text-sm">{accounts[selectedAccountIndex].address}</span> -->
-                    <CopyButton callback={copyAddress} />
+                    <CopyButton callback={() => copyToClipboard($selectedAccount.address)} />
                 </div>
                 <div class="w-full flex flex-row gap-1 items-center h-[20px]">
-                    <span class="text-sm flex-1">{displayEtherValue(selectedAccount.balance)}</span>
+                    <span class="text-sm flex-1">{displayEtherValue($selectedAccount.balance)}</span
+                    >
                     <!-- <span class="text-sm flex-1">{accounts[selectedAccountIndex].balance}ETH</span> -->
                     <IconButton callback={topUp}>+</IconButton>
                 </div>
@@ -200,7 +126,7 @@
                     <vscode-text-field
                         placeholder="Value"
                         class="w-full"
-                        {value}
+                        value={$selectedValue}
                         on:change={handleValueChange}
                     ></vscode-text-field>
                     <!-- <EtherValueInput /> -->

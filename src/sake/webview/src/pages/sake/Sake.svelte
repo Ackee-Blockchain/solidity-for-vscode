@@ -13,20 +13,19 @@
         vsCodePanelView
     } from '@vscode/webview-ui-toolkit';
     import Contract from '../../components/Contract.svelte';
-    import Run from '../../pages/run/Run.svelte';
-    import CompileDeploy from './CompileDeploy.svelte';
-    import Divider from '../../components/Divider.svelte';
     import CallSetup from '../../components/CallSetup.svelte';
     import {
-        StateId,
-        WebviewMessage,
         type FunctionCallPayload,
         type WakeFunctionCallRequestParams,
         type ContractFunction as ContractFunctionType
     } from '../../../shared/types';
     import { onMount } from 'svelte';
-    import { messageHandler } from '@estruyf/vscode/dist/client';
     import Tabs from '../../components/Tabs.svelte';
+    import { selectedAccount, selectedValue, setupStores } from '../../helpers/store';
+    import { functionCall, showErrorMessage } from '../../helpers/api';
+    import Compile from './Compile.svelte';
+    import Deploy from './Deploy.svelte';
+    import Run from './Run.svelte';
     // import '../../../shared/types'; // Importing types to avoid TS error
 
     provideVSCodeDesignSystem().register(
@@ -43,57 +42,14 @@
     );
 
     let deployedContracts: Array<any> = [];
-    let callSetup: CallSetup;
+    let initLoading = true;
 
-    onMount(() => {
-        messageHandler.send(WebviewMessage.getState, StateId.DeployedContracts);
-    });
-
-    window.addEventListener('message', (event) => {
-        if (!event.data.command) return;
-
-        const { command, payload, stateId } = event.data;
-
-        switch (command) {
-            case WebviewMessage.getState: {
-                if (stateId === StateId.DeployedContracts) {
-                    deployedContracts = payload;
-                }
-
-                break;
-            }
-        }
+    onMount(async () => {
+        await setupStores();
+        initLoading = false;
     });
 
     // @todo extract into a helper function
-    const call = async function (
-        calldata: string,
-        contract_address: string,
-        func: ContractFunctionType
-    ) {
-        const _sender: string | undefined = callSetup.getSelectedAccount()?.address;
-        if (_sender === undefined) {
-            messageHandler.send(WebviewMessage.onError, 'Failed deployment, undefined sender');
-            return;
-        }
-
-        const _value: number = callSetup.getValue() ?? 0;
-
-        const requestParams: WakeFunctionCallRequestParams = {
-            contract_address: contract_address,
-            sender: _sender,
-            calldata: calldata,
-            // @dev automatically set value to 0 if function is not payable
-            value: func.stateMutability === 'payable' ? _value : 0
-        };
-
-        const payload: FunctionCallPayload = {
-            func: func,
-            requestParams: requestParams
-        };
-
-        await messageHandler.send(WebviewMessage.onContractFunctionCall, payload);
-    };
 
     enum TabId {
         CompileDeploy = 0,
@@ -123,65 +79,40 @@
 </script>
 
 <main class="h-full my-0 overflow-hidden">
-    <!-- <CallSetup bind:this={callSetup} />
-
-    <Divider />
-
-    <vscode-panels class="w-full">
-        <vscode-panel-tab id="tab-1">Compile & Deploy</vscode-panel-tab>
-        <vscode-panel-tab id="tab-2">
-            Deployed contracts
-            {#if deployedContracts.length > 0}
-                <vscode-badge appearance="secondary">{deployedContracts.length}</vscode-badge>
-            {/if}
-        </vscode-panel-tab>
-        <vscode-panel-tab id="tab-3">Mimi</vscode-panel-tab>
-        <vscode-panel-tab id="tab-4">Kokoska kokosova</vscode-panel-tab>
-
-        <vscode-panel-view id="view-1">
-            <CompileDeploy />
-        </vscode-panel-view>
-        <vscode-panel-view id="view-2">
-            <Run />
-        </vscode-panel-view>
-        <vscode-panel-view id="view-3">
-            <ul>
-                {#each { length: 200 } as _, i}
-                    <li>{i + 1}</li>
-                {/each}
-            </ul>
-        </vscode-panel-view>
-    </vscode-panels> -->
-
-    <Tabs {tabs}>
-        <svelte:fragment slot="tab-header" let:tabId>
-            {#if tabId == TabId.DeployedContracts}
-                <vscode-badge appearance="secondary">{deployedContracts.length}</vscode-badge>
-            {/if}
-        </svelte:fragment>
-        <svelte:fragment slot="content-fixed" let:tabId>
-            {#if tabId == TabId.CompileDeploy}
-                <CallSetup bind:this={callSetup} />
-            {:else if tabId == TabId.DeployedContracts}
-                <CallSetup bind:this={callSetup} />
-            {:else if tabId == TabId.Mimi}
-                <CallSetup bind:this={callSetup} />
-            {/if}
-        </svelte:fragment>
-        <svelte:fragment slot="content-scrollable" let:tabId>
-            {#if tabId == TabId.CompileDeploy}
-                <CompileDeploy />
-            {:else if tabId == TabId.DeployedContracts}
-                <Run />
-            {:else if tabId == TabId.Mimi}
-                <ul>
-                    {#each { length: 200 } as _, i}
-                        <li>{i + 1}</li>
-                    {/each}
-                </ul>
-            {/if}
-        </svelte:fragment>
-    </Tabs>
+    {#if initLoading}
+        <span>Connecting with Wake...</span>
+    {:else}
+        <Tabs {tabs}>
+            <svelte:fragment slot="tab-header" let:tabId>
+                {#if tabId == TabId.DeployedContracts}
+                    <vscode-badge appearance="secondary">{deployedContracts.length}</vscode-badge>
+                {/if}
+            </svelte:fragment>
+            <svelte:fragment slot="content-fixed" let:tabId>
+                {#if tabId == TabId.CompileDeploy}
+                    <CallSetup />
+                    <Compile />
+                {:else if tabId == TabId.DeployedContracts}
+                    <CallSetup />
+                {:else if tabId == TabId.Mimi}
+                    <CallSetup />
+                {/if}
+            </svelte:fragment>
+            <svelte:fragment slot="content-scrollable" let:tabId>
+                {#if tabId == TabId.CompileDeploy}
+                    <Deploy />
+                {:else if tabId == TabId.DeployedContracts}
+                    <Run />
+                {:else if tabId == TabId.Mimi}
+                    <ul>
+                        {#each { length: 200 } as _, i}
+                            <li>{i + 1}</li>
+                        {/each}
+                    </ul>
+                {/if}
+            </svelte:fragment>
+        </Tabs>
+    {/if}
 </main>
 
 <style global>
