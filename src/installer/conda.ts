@@ -146,7 +146,14 @@ export class CondaInstaller implements Installer {
         } else {
             throw new Error(`Unsupported platform ${process.platform}`);
         }
-        // arch can be used as is
+
+        let arch;
+        if (platform === 'windows' && process.arch === 'arm64') {
+            // take advantage of x64 emulation on Windows ARM
+            arch = 'x64';
+        } else {
+            arch = process.arch;
+        }
 
         let promise = new Promise<[File|undefined, string|undefined]>(async (resolve, reject) => {
             let latestVersion = undefined;
@@ -162,7 +169,7 @@ export class CondaInstaller implements Installer {
                     }
                     if (
                         metadata.metadata['os'] === platform &&
-                        metadata.metadata['arch'] === process.arch &&
+                        metadata.metadata['arch'] === arch &&
                         (latestVersion === undefined || compare(metadata.metadata['version'], latestVersion) > 0)
                     ) {
                         latestVersion = metadata.metadata['version'];
