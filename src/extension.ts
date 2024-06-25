@@ -126,7 +126,7 @@ export async function activate(context: vscode.ExtensionContext) {
         let installer: Installer;
 
         if (method === "conda") {
-            installer = new CondaInstaller(context, outputChannel, analytics);
+            installer = new CondaInstaller(context, outputChannel, analytics, prerelease);
         } else if (method === "pipx") {
             installer = new PipxInstaller(context, outputChannel, analytics, prerelease);
         } else if (method === "pip") {
