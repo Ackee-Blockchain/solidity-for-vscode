@@ -45,7 +45,7 @@ export class CondaInstaller implements Installer {
             const file = this.storage.bucket(this.bucketName).file(filename);
 
             const [metadata] = await file.getMetadata();
-            const fileSize = metadata.size;
+            const fileSize = metadata.size !== undefined ? (typeof metadata.size === 'string' ? parseInt(metadata.size) : metadata.size) : 0;
 
             const destFile = fs.createWriteStream(destination);
             const fileStream = file.createReadStream();
@@ -60,11 +60,13 @@ export class CondaInstaller implements Installer {
                 });
 
                 fileStream.on('data', (chunk: Buffer) => {
-                    downloadedBytes += chunk.length;
-                    const percentage = Math.floor((downloadedBytes / fileSize) * 100);
-                    progress.report({ increment: percentage - lastPercentage, message: `${percentage}%` });
+                    if (fileSize !== 0) {
+                        downloadedBytes += chunk.length;
+                        const percentage = Math.floor((downloadedBytes / fileSize) * 100);
+                        progress.report({ increment: percentage - lastPercentage, message: `${percentage}%` });
 
-                    lastPercentage = percentage;
+                        lastPercentage = percentage;
+                    }
                 });
                 fileStream.on('error', (err: Error) => {
                     reject(err);
@@ -136,7 +138,7 @@ export class CondaInstaller implements Installer {
     }
 
     async setup(): Promise<void> {
-        let platform;
+        let platform: string;
         if (process.platform === 'win32') {
             platform = 'windows';
         } else if (process.platform === 'darwin') {
@@ -147,7 +149,7 @@ export class CondaInstaller implements Installer {
             throw new Error(`Unsupported platform ${process.platform}`);
         }
 
-        let arch;
+        let arch: string;
         if (platform === 'windows' && process.arch === 'arm64') {
             // take advantage of x64 emulation on Windows ARM
             arch = 'x64';
