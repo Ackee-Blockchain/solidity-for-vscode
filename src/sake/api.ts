@@ -54,12 +54,14 @@ export async function getAccounts(client: LanguageClient | undefined) {
 
         // @dev set the state here also, even though it will be updated in getBalances
         // this is because balances only update existing accounts state
-        const _accountStateData = result.map((address) => {
+        const _accountStateData = result.map((address, i) => {
             return {
                 address: address,
-                balance: undefined
-            };
+                balance: undefined,
+                nick: `Account ${i}`
+            } as AccountStateData;
         });
+
         accountState.setAccountsSilent(_accountStateData);
 
         getBalances({ addresses: result }, client);

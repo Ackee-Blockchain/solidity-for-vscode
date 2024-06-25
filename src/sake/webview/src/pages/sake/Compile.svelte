@@ -19,6 +19,7 @@
     } from '../../../shared/types';
     import { onMount } from 'svelte';
     import Constructor from '../../components/Constructor.svelte';
+    import { compilationState } from '../../helpers/store';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -30,45 +31,12 @@
     );
 
     let compiling = false;
-    let dirtyCompilation = false;
-
-    onMount(() => {
-        messageHandler.send(WebviewMessage.getState, StateId.CompiledContracts);
-    });
-
-    const setCompilationState = (payload: CompilationStateData) => {
-        dirtyCompilation = payload.dirty;
-    };
 
     const compile = async () => {
         compiling = true;
-
-        const success = await messageHandler.request<boolean>(WebviewMessage.onCompile);
-        if (success) {
-            dirtyCompilation = false;
-        }
-
+        await messageHandler.request<boolean>(WebviewMessage.onCompile);
         compiling = false;
     };
-
-    window.addEventListener('message', (event) => {
-        if (!event.data.command) return;
-
-        const { command, payload, stateId } = event.data;
-
-        switch (command) {
-            case WebviewMessage.getState:
-                if (stateId == StateId.CompiledContracts) {
-                    if (payload === undefined) {
-                        return;
-                    }
-                    setCompilationState(payload as CompilationStateData);
-                    return;
-                }
-
-                break;
-        }
-    });
 </script>
 
 <section>
@@ -81,12 +49,12 @@
     <vscode-button
         class="w-full"
         on:click={compile}
-        appearence={dirtyCompilation ? 'primary' : 'secondary'}
+        appearence={$compilationState.dirty ? 'primary' : 'secondary'}
         disabled={compiling}
     >
         {compiling ? 'Compiling...' : 'Compile all'}
     </vscode-button>
-    {#if dirtyCompilation}
+    {#if $compilationState.dirty}
         <div
             class="text-sm px-2 py-1 bg-gray-800 rounded relative top--2 text-center pt-2 pb-1"
             style="z-index:0;"

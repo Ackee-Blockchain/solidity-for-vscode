@@ -13,17 +13,10 @@
         vsCodePanelView,
         vsCodeProgressRing
     } from '@vscode/webview-ui-toolkit';
-    import Contract from '../../components/Contract.svelte';
     import CallSetup from '../../components/CallSetup.svelte';
-    import {
-        type FunctionCallPayload,
-        type WakeFunctionCallRequestParams,
-        type ContractFunction as ContractFunctionType
-    } from '../../../shared/types';
     import { onMount } from 'svelte';
     import Tabs from '../../components/Tabs.svelte';
-    import { selectedAccount, selectedValue, setupStores } from '../../helpers/store';
-    import { functionCall, showErrorMessage } from '../../helpers/api';
+    import { deployedContracts, setupStores } from '../../helpers/store';
     import Compile from './Compile.svelte';
     import Deploy from './Deploy.svelte';
     import Run from './Run.svelte';
@@ -43,7 +36,6 @@
         vsCodeProgressRing()
     );
 
-    let deployedContracts: Array<any> = [];
     let initLoading = true;
 
     onMount(async () => {
@@ -68,14 +60,6 @@
         {
             id: TabId.DeployedContracts,
             label: 'Deployed contracts'
-        },
-        {
-            id: TabId.Mimi,
-            label: 'Mimi'
-        },
-        {
-            id: TabId.Mimi,
-            label: 'Kokoska kokosova'
         }
     ];
 </script>
@@ -90,7 +74,10 @@
         <Tabs {tabs}>
             <svelte:fragment slot="tab-header" let:tabId>
                 {#if tabId == TabId.DeployedContracts}
-                    <vscode-badge appearance="secondary">{deployedContracts.length}</vscode-badge>
+                    <vscode-badge appearance="secondary">
+                        <!-- style="padding:5px 3px;" -->
+                        {$deployedContracts.length}
+                    </vscode-badge>
                 {/if}
             </svelte:fragment>
             <svelte:fragment slot="content-fixed" let:tabId>

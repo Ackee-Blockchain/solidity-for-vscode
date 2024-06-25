@@ -1,10 +1,12 @@
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import {
     WebviewMessage,
+    type DeploymentStateData,
     type FunctionCallPayload,
     type WakeDeploymentRequestParams,
     type WakeSetBalancesRequestParams
 } from '../../shared/types';
+import { deployedContracts } from './store';
 
 export function copyToClipboard(stringToCopy: string) {
     messageHandler.send(WebviewMessage.copyToClipboard, stringToCopy);
@@ -48,4 +50,19 @@ export function showErrorMessage(message: string) {
 
 export function showInfoMessage(message: string) {
     messageHandler.send(WebviewMessage.onInfo, message);
+}
+
+export async function getInputFromTopBar(message: string = '') {
+    return await messageHandler.request<string>(WebviewMessage.getTextFromInputBox, message);
+}
+
+export async function compileContracts(): Promise<boolean> {
+    return await messageHandler.request<boolean>(WebviewMessage.onCompile);
+}
+
+export async function removeContract(contract: DeploymentStateData) {
+    return await messageHandler.request<boolean>(WebviewMessage.onUndeployContract, contract);
+    // deployedContracts.update((state) => {
+    //     return state.filter((c) => c.address !== contract.address);
+    // });
 }

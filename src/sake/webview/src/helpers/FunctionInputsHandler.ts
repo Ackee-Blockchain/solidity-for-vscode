@@ -135,6 +135,10 @@ export abstract class InputHandler extends InputHandlerInterface {
         return this.state === InputState.INVALID;
     }
 
+    public isValid(): boolean {
+        return this.state === InputState.VALID;
+    }
+
     /*
      * Returns the value of the input(s) as a string
      */

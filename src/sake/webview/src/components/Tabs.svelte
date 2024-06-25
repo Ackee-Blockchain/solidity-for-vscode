@@ -25,26 +25,26 @@
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <!-- svelte-ignore a11y-missing-attribute -->
                         <a
-                            class="monaco-button"
+                            class="monaco-button flex gap-2"
                             class:active={activeTabId === tab.id}
                             on:click={() => selectTab(tab.id)}
                         >
                             <span>{tab.label}</span>
-                            <slot name="tab-header" tabId={tab.id} />
+                            <slot name="tab-header" tabId={tab.id} class="ms-1" />
                         </a>
                     </li>
                 {/each}
             </ul>
         </div>
         <!-- <Divider /> -->
-        <div class="w-full p-[10px]">
+        <div class="w-full p-[10px] flex flex-col gap-4">
             <slot name="content-fixed" tabId={activeTabId}></slot>
         </div>
     </div>
 
-    <Divider />
+    <Divider className="my-2" />
 
-    <div class="w-full flex-1 overflow-y-auto overflow-x-hidden p-[10px] vscode-shadow">
+    <div class="w-full flex-1 overflow-y-auto overflow-x-hidden p-[10px]">
         <slot name="content-scrollable" tabId={activeTabId}></slot>
     </div>
 </div>

@@ -1,4 +1,8 @@
-<hr class="my-6" />
+<script lang="ts">
+    export let className: string | undefined = undefined;
+</script>
+
+<hr class={className ?? 'my-3'} />
 
 <style>
     hr {

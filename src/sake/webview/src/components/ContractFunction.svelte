@@ -24,6 +24,7 @@
     export let func: ContractFunctionType;
     export let onFunctionCall: (calldata: string, func: ContractFunctionType) => void;
     export let isConstructor: boolean = false;
+    export let isCalldata: boolean = false;
     let expanded: boolean = false;
     let inputRoot: RootInputHandler;
     $: funcChanged(func);
@@ -36,6 +37,7 @@
     async function submit() {
         let _encodedInput: string;
         try {
+            // if isCalldata
             _encodedInput = isConstructor ? inputRoot.encodedParameters() : inputRoot.calldata();
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;

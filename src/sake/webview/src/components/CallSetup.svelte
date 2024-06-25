@@ -5,18 +5,7 @@
         vsCodeDropdown,
         vsCodeOption
     } from '@vscode/webview-ui-toolkit';
-    import Spacer from './Spacer.svelte';
     import IconButton from './IconButton.svelte';
-    import { onMount } from 'svelte';
-    import {
-        StateId,
-        WebviewMessage,
-        type Account,
-        type AccountStateData,
-        type WakeSetBalancesRequestParams
-    } from '../../shared/types';
-    import { messageHandler } from '@estruyf/vscode/dist/client';
-    import EtherValueInput from './EtherValueInput.svelte';
     import CopyButton from './icons/CopyButton.svelte';
     import { parseComplexNumber } from '../../shared/validate';
     import { displayEtherValue } from '../../shared/ether';
@@ -24,7 +13,12 @@
     provideVSCodeDesignSystem().register(vsCodeDropdown(), vsCodeOption(), vsCodeTextField());
 
     import { selectedValue, selectedAccount, accounts } from '../helpers/store';
-    import { copyToClipboard, setBalance } from '../helpers/api';
+    import {
+        copyToClipboard,
+        getInputFromTopBar,
+        setBalance,
+        showErrorMessage
+    } from '../helpers/api';
 
     function handleAccountChange(event: any) {
         const _selectedAccountIndex = event.detail.value;
@@ -44,31 +38,25 @@
     function handleValueChange(event: any) {
         // const _value = parseInt(event.target.value);
         const _value = event.target.value;
-        if (isNaN(_value)) {
+        if (_value === '' || _value === undefined) {
             selectedValue.set(undefined);
             return;
         }
         try {
+            console.log('parsed value', parseComplexNumber(_value));
             selectedValue.set(parseComplexNumber(_value));
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
-            messageHandler.send(
-                WebviewMessage.onError,
-                'Value could not be parsed: ' + errorMessage
-            );
+            showErrorMessage('Value could not be parsed: ' + errorMessage);
         }
     }
 
     async function topUp() {
-        // @todo move this to commands
         if ($selectedAccount === undefined) {
             return;
         }
 
-        const topUpValue = await messageHandler.request<string>(
-            WebviewMessage.getTextFromInputBox,
-            $selectedAccount.balance
-        );
+        const topUpValue = await getInputFromTopBar($selectedAccount.balance?.toString());
 
         if (topUpValue === undefined) {
             return;
@@ -79,61 +67,56 @@
             parsedTopUpValue = parseComplexNumber(topUpValue);
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
-            messageHandler.send(
-                WebviewMessage.onError,
-                'Value could not be parsed: ' + errorMessage
-            );
+            showErrorMessage('Value could not be parsed: ' + errorMessage);
             return;
         }
 
-        const success = setBalance($selectedAccount.address, parsedTopUpValue);
-
-        console.log('top up success', success);
+        setBalance($selectedAccount.address, parsedTopUpValue);
     }
 </script>
 
 {#if accounts !== undefined}
-    <section>
-        <p class="ml-1 mb-2">Account</p>
-        <vscode-dropdown position="below" class="w-full mb-2" on:change={handleAccountChange}>
-            {#each $accounts as account, i}
-                <vscode-option value={i}>Account {i}</vscode-option>
-            {/each}
-        </vscode-dropdown>
-
-        {#if $selectedAccount !== undefined}
-            <div class="w-full px-1 mb-3">
-                <div class="w-full flex flex-row gap-1 items-center h-[20px]">
-                    <span class="flex-1 truncate text-sm">{$selectedAccount.address}</span>
-                    <!-- <span class="flex-1 truncate text-sm">{accounts[selectedAccountIndex].address}</span> -->
-                    <CopyButton callback={() => copyToClipboard($selectedAccount.address)} />
-                </div>
-                <div class="w-full flex flex-row gap-1 items-center h-[20px]">
-                    <span class="text-sm flex-1">{displayEtherValue($selectedAccount.balance)}</span
+    <section class="flex flex-col gap-1">
+        <div>
+            <vscode-dropdown position="below" class="w-full mb-2" on:change={handleAccountChange}>
+                {#each $accounts as account, i}
+                    <vscode-option value={i} selected={account.address == $selectedAccount?.address}
+                        >Account {i}</vscode-option
                     >
-                    <!-- <span class="text-sm flex-1">{accounts[selectedAccountIndex].balance}ETH</span> -->
-                    <IconButton callback={topUp}>+</IconButton>
-                </div>
-            </div>
+                {/each}
+                <!-- @dev hack to display selected account -->
+                <span slot="selected-value">
+                    {$selectedAccount?.nick ?? $selectedAccount?.address}
+                </span>
+            </vscode-dropdown>
 
-            <div class="w-full flex flex-row gap-3">
-                <!-- <div>
-                <p class="ml-1 text-sm">Gas limit</p>
-                <vscode-text-field placeholder="Gas limit" class="w-full"></vscode-text-field>
-            </div> -->
-                <div>
-                    <p class="ml-1 text-sm">Value</p>
-                    <vscode-text-field
-                        placeholder="Value"
-                        class="w-full"
-                        value={$selectedValue}
-                        on:change={handleValueChange}
-                    ></vscode-text-field>
-                    <!-- <EtherValueInput /> -->
+            {#if $selectedAccount !== undefined}
+                <div class="w-full px-1 mb-3">
+                    <div class="w-full flex flex-row gap-1 items-center h-[20px]">
+                        <span class="flex-1 truncate text-sm">{$selectedAccount.address}</span>
+                        <!-- <span class="flex-1 truncate text-sm">{accounts[selectedAccountIndex].address}</span> -->
+                        <CopyButton callback={() => copyToClipboard($selectedAccount.address)} />
+                    </div>
+                    <div class="w-full flex flex-row gap-1 items-center h-[20px]">
+                        <span class="text-sm flex-1"
+                            >{displayEtherValue($selectedAccount.balance)}</span
+                        >
+                        <!-- <span class="text-sm flex-1">{accounts[selectedAccountIndex].balance}ETH</span> -->
+                        <IconButton callback={topUp}>+</IconButton>
+                    </div>
                 </div>
-                <!-- <p>Value</p>
-            <vscode-text-field placeholder="Value" class="w-full"></vscode-text-field> -->
-            </div>
-        {/if}
+            {/if}
+        </div>
+
+        <div class="w-full flex flex-row gap-3">
+            <vscode-text-field
+                placeholder="Value"
+                class="w-full"
+                value={$selectedValue}
+                on:change={handleValueChange}
+            >
+                <span slot="end" class="flex justify-center align-middle leading-5">Ξ</span>
+            </vscode-text-field>
+        </div>
     </section>
 {/if}

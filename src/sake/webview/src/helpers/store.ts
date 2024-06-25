@@ -4,7 +4,8 @@ import {
     WebviewMessage,
     type AccountStateData,
     type CompilationStateData,
-    type CompiledContract
+    type CompiledContract,
+    type DeploymentStateData
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
 
@@ -20,8 +21,11 @@ export const selectedValue = writable<number | undefined>(undefined);
  */
 
 export const accounts = writable<AccountStateData[]>([]);
-export const deployedContracts = writable<CompiledContract[]>([]);
-export const compiledContracts = writable<CompilationStateData>(undefined);
+export const deployedContracts = writable<DeploymentStateData[]>([]);
+export const compilationState = writable<CompilationStateData>({
+    contracts: [],
+    dirty: true
+});
 
 /**
  * setup stores
@@ -30,6 +34,12 @@ export const compiledContracts = writable<CompilationStateData>(undefined);
 export async function setupStores() {
     setupListeners();
     await init();
+    selectedAccount.subscribe((value) => {
+        console.log('selected account set', value);
+    });
+    selectedValue.subscribe((value) => {
+        console.log('selected value set', value);
+    });
 }
 
 async function init() {
@@ -49,6 +59,7 @@ function setupListeners() {
         switch (command) {
             case WebviewMessage.getState: {
                 if (stateId === StateId.DeployedContracts) {
+                    console.log('deployed contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
@@ -60,7 +71,7 @@ function setupListeners() {
                     if (payload === undefined) {
                         return;
                     }
-                    compiledContracts.set(payload);
+                    compilationState.set(payload);
                     return;
                 }
 

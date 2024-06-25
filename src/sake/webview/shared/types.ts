@@ -147,11 +147,11 @@ export interface CompilationStateData {
     // TODO add isDirty
 }
 
-export type AccountStateData = {
+export interface AccountStateData {
     address: string;
     balance: number | undefined;
     nick: string | undefined;
-};
+}
 
 export type TxHistoryStateData = TxDeploymentOutput | TxFunctionCallOutput;
 

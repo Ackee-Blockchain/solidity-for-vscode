@@ -3,10 +3,8 @@ import { ContractFunction } from '../webview/shared/types';
 
 export function decodeCallReturnValue(returnValue: string, func: ContractFunction) {
     if (func.outputs === undefined) {
-        throw new Error("Function does not have defined outputs");
+        return returnValue;
+        throw new Error('Function does not have defined outputs');
     }
-    return decodeParameters(
-        func.outputs!,
-        returnValue
-    )
+    return decodeParameters(func.outputs!, returnValue);
 }

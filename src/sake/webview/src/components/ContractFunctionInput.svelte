@@ -114,11 +114,73 @@
                 placeholder={input.description}
                 value={input.getString()}
                 on:change={handleInput}
-            />
-            {#if input.isInvalid()}
-                <!-- <span class="text-xs text-red-500 w-full">
-                        {input.errors.join(' • ')}
-                    </span> -->
+            >
+                {#if input.isInvalid()}
+                    <div slot="end" class="relative inline-block group">
+                        <span class="text-vscodeError cursor-pointer">
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                ><path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M7.56 1h.88l6.54 12.26-.44.74H1.44L1 13.26 7.56 1zM8 2.28L2.28 13H13.7L8 2.28zM8.625 12v-1h-1.25v1h1.25zm-1.25-2V6h1.25v4h-1.25z"
+                                /></svg
+                            >
+                        </span>
+
+                        <div
+                            class="absolute invisible group-hover:visible opacity-0 group-hover:opacity-100
+                            right-full top-1/2 transform -translate-y-1/2 mr-2 w-max z-[999]"
+                        >
+                            <TextContainer warning={true}>
+                                <div class="flex flex-col gap-1 text-sm">
+                                    {#key input.errors}
+                                        {#each input.errors as error}
+                                            <span class="text-sm">{error}</span>
+                                        {/each}
+                                    {/key}
+                                </div>
+                            </TextContainer>
+                        </div>
+                    </div>
+                    <!-- {:else if input.isValid()}
+                    <div slot="end" class="relative inline-block group">
+                        <span class="text-emerald-400">
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                ><path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M14.431 3.323l-8.47 10-.79-.036-3.35-4.77.818-.574 2.978 4.24 8.051-9.506.764.646z"
+                                /></svg
+                            >
+                        </span>
+                    </div> -->
+                {:else}
+                    <div slot="end" class="relative inline-block group">
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <span class="cursor-pointer" on:click={openFullTextInputEditor}>
+                            <svg
+                                width="16"
+                                height="16"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                ><path d="M10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" /></svg
+                            >
+                        </span>
+                    </div>
+                {/if}
+            </vscode-text-field>
+            <!-- {#if input.isInvalid()}
+
                 <div class="relative inline-block group">
                     <ErrorButton />
                     <div
@@ -136,10 +198,9 @@
                         </TextContainer>
                     </div>
                 </div>
-                <!-- <vscode-tag class="text-xs text-red-500">{input.errors.join('\n')}</vscode-tag> -->
             {:else}
                 <KebabButton callback={openFullTextInputEditor} />
-            {/if}
+            {/if} -->
         </div>
     {/if}
     <!-- Kebab at the end for additional functionality (i.e. input edit in InputBox) -->

@@ -18,6 +18,7 @@ module.exports = {
             vscodeBackground: 'var(--vscode-editor-background)',
             vscodeInputForeground: 'var(--vscode-input-foreground)',
             vscodeInputBackground: 'var(--vscode-input-background)',
+            darkBackground: 'var(--vscode-editorWidget-background)',
         },
         colors: {
             vscodeForeground: 'var(--vscode-editor-foreground)',

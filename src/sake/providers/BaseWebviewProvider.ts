@@ -199,7 +199,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case 'undeployContract': {
+            case WebviewMessage.onUndeployContract: {
                 if (!payload) {
                     return;
                 }

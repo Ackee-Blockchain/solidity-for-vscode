@@ -552,7 +552,7 @@
                 {
                     "id": "sake",
                     "title": "Sake",
-                    "icon": "resources/icons/activity_bar_wake.png"
+                    "icon": "resources/icons/sake.png"
                 }
             ],
             "panel": [
