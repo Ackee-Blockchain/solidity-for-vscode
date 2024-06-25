@@ -2,19 +2,20 @@ import * as vscode from 'vscode';
 import { ExecaChildProcess, execaSync, execa } from "execa";
 import { compare } from '@renovatebot/pep440';
 import { Analytics, EventType } from '../Analytics';
-import { Installer, WAKE_PRERELEASE, WAKE_TARGET_VERSION } from './installerInterface';
+import { Installer, WAKE_TARGET_VERSION } from './installerInterface';
 
 export class PipxInstaller implements Installer {
     constructor(
         private readonly context: vscode.ExtensionContext,
         private readonly outputChannel: vscode.OutputChannel,
         private readonly analytics: Analytics,
+        private readonly prerelease: boolean,
     ) {
     }
 
     private async pipxInstall(): Promise<void> {
         let message;
-        if (WAKE_PRERELEASE) {
+        if (this.prerelease) {
             message = "Running 'pipx install --pip-args=--pre eth-wake'";
         } else {
             message = "Running 'pipx install eth-wake'";
@@ -27,7 +28,7 @@ export class PipxInstaller implements Installer {
             cancellable: false
         }, async () => {
             let out: string = "";
-            if (WAKE_PRERELEASE) {
+            if (this.prerelease) {
                 out = execaSync("pipx", ["install", "--pip-args=--pre", "eth-wake"]).stdout;
             } else {
                 out = execaSync("pipx", ["install", "eth-wake"]).stdout;
@@ -40,7 +41,7 @@ export class PipxInstaller implements Installer {
 
     private async pipxUpgrade(): Promise<void> {
         let message;
-        if (WAKE_PRERELEASE) {
+        if (this.prerelease) {
             message = "Running 'pipx upgrade --pip-args=--pre eth-wake'";
         } else {
             message = "Running 'pipx upgrade eth-wake'";
@@ -53,7 +54,7 @@ export class PipxInstaller implements Installer {
             cancellable: false
         }, async () => {
             let out: string = "";
-            if (WAKE_PRERELEASE) {
+            if (this.prerelease) {
                 this.outputChannel.appendLine(`Running 'pipx upgrade --pip-args=--pre eth-wake'`);
                 out = execaSync("pipx", ["upgrade", "--pip-args=--pre", "eth-wake"]).stdout;
             } else {

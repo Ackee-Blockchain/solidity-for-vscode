@@ -80,6 +80,11 @@
                         "default": "conda",
                         "description": "Method used to install Wake language server."
                     },
+                    "Tools-for-Solidity.Wake.prerelease": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Install prerelease versions of Wake."
+                    },
                     "Tools-for-Solidity.Wake.pathToExecutable": {
                         "type": "string",
                         "description": "Path to Wake executable, overrides Tools-for-Solidity.Wake.installationMethod."

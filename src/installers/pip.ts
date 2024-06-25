@@ -4,11 +4,21 @@ import * as https from 'https';
 import * as tmp from 'tmp';
 import { execaSync } from 'execa';
 import { compare } from '@renovatebot/pep440';
-import { WAKE_PRERELEASE, WAKE_TARGET_VERSION } from "./installerInterface";
+import { WAKE_TARGET_VERSION } from "./installerInterface";
 import { ManualInstaller } from "./manual";
-import { EventType } from "../Analytics";
+import { Analytics, EventType } from "../Analytics";
 
 export class PipInstaller extends ManualInstaller {
+    constructor(
+        protected readonly context: vscode.ExtensionContext,
+        protected readonly outputChannel: vscode.OutputChannel,
+        protected readonly analytics: Analytics,
+        protected readonly executablePath: string | null,
+        private readonly prerelease: boolean,
+    ) {
+        super(context, outputChannel, analytics, executablePath);
+    }
+
     async checkWakeInstalled(venv: boolean, cwd?: string): Promise<boolean> {
         try {
             const version: string = this.getWakeVersion(null, venv, cwd);
@@ -153,7 +163,7 @@ export class PipInstaller extends ManualInstaller {
             let out = "";
             let message;
 
-            if (WAKE_PRERELEASE) {
+            if (this.prerelease) {
                 message = `Running '${this.pythonExecutable} -m pip install eth-wake -U --pre'`;
             } else {
                 message = `Running '${this.pythonExecutable} -m pip install eth-wake -U'`;
@@ -166,7 +176,7 @@ export class PipInstaller extends ManualInstaller {
                 cancellable: false
             }, async () => {
                 out = execaSync(this.pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre"]).stdout;
-                if (WAKE_PRERELEASE) {
+                if (this.prerelease) {
                     out = execaSync(this.pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre"]).stdout;
                 } else {
                     out = execaSync(this.pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U"]).stdout;
@@ -186,7 +196,7 @@ export class PipInstaller extends ManualInstaller {
                 let out = "";
                 let message;
 
-                if (WAKE_PRERELEASE) {
+                if (this.prerelease) {
                     message = `Running '${this.pythonExecutable} -m pip install eth-wake -U --pre --user'`;
                 } else {
                     message = `Running '${this.pythonExecutable} -m pip install eth-wake -U --user'`;
@@ -198,7 +208,7 @@ export class PipInstaller extends ManualInstaller {
                     title: message,
                     cancellable: false
                 }, async () => {
-                    if (WAKE_PRERELEASE) {
+                    if (this.prerelease) {
                         out = execaSync(this.pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre", "--user"]).stdout;
                     } else {
                         out = execaSync(this.pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--user"]).stdout;
@@ -223,7 +233,7 @@ export class PipInstaller extends ManualInstaller {
                     let out = "";
                     let message;
 
-                    if (WAKE_PRERELEASE) {
+                    if (this.prerelease) {
                         message = `Running '${this.venvActivateCommand} && pip install eth-wake -U --pre'`;
                     } else {
                         message = `Running '${this.venvActivateCommand} && pip install eth-wake -U'`;
@@ -235,7 +245,7 @@ export class PipInstaller extends ManualInstaller {
                         title: message,
                         cancellable: false
                     }, async () => {
-                        if (WAKE_PRERELEASE) {
+                        if (this.prerelease) {
                             out = execaSync(`${this.venvActivateCommand} && pip install eth-wake -U --pre`, { shell: this.shell }).stdout;
                         } else {
                             out = execaSync(`${this.venvActivateCommand} && pip install eth-wake -U`, { shell: this.shell }).stdout;

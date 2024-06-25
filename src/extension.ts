@@ -90,6 +90,7 @@ export async function activate(context: vscode.ExtensionContext) {
         pathToExecutable = null;
     }
     let installationMethod: string = extensionConfig.get<string>('Wake.installationMethod', "conda");
+    let prerelease: boolean = extensionConfig.get<boolean>('Wake.prerelease', false);
 
     let method = "";
     if (wakePort) {
@@ -127,9 +128,9 @@ export async function activate(context: vscode.ExtensionContext) {
         if (method === "conda") {
             installer = new CondaInstaller(context, outputChannel, analytics);
         } else if (method === "pipx") {
-            installer = new PipxInstaller(context, outputChannel, analytics);
+            installer = new PipxInstaller(context, outputChannel, analytics, prerelease);
         } else if (method === "pip") {
-            installer = new PipInstaller(context, outputChannel, analytics, pathToExecutable);
+            installer = new PipInstaller(context, outputChannel, analytics, pathToExecutable, prerelease);
         } else {
             installer = new ManualInstaller(context, outputChannel, analytics, pathToExecutable);
         }
