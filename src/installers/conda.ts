@@ -97,6 +97,7 @@ export class CondaInstaller implements Installer {
         const hashData = fs.readFileSync(hashPath);
 
         if (!this.verifySignature(hashData, signature)) {
+            await vscode.window.showErrorMessage(`Signature verification failed for ${filename}`);
             throw new Error('Signature verification failed');
         }
 
@@ -105,6 +106,7 @@ export class CondaInstaller implements Installer {
         const actualHash = crypto.createHash('sha256').update(fileBuffer).digest();
 
         if (!expectedHash.equals(actualHash)) {
+            await vscode.window.showErrorMessage(`Hash mismatch for ${filename}`);
             throw new Error('Hash mismatch, the file may be corrupted or tampered with.');
         }
 
@@ -146,6 +148,7 @@ export class CondaInstaller implements Installer {
         } else if (process.platform === 'linux') {
             platform = 'linux';
         } else {
+            await vscode.window.showErrorMessage(`Unsupported platform ${process.platform}`);
             throw new Error(`Unsupported platform ${process.platform}`);
         }
 
@@ -202,7 +205,8 @@ export class CondaInstaller implements Installer {
 
             // no conda environment installed yet
             if (latestFile === undefined || latestVersion === undefined) {
-                throw new Error(`No conda environment available for platform ${process.platform} and architecture ${process.arch}`);
+                await vscode.window.showErrorMessage(`No conda environment found for platform ${process.platform} and architecture ${process.arch}`);
+                throw new Error(`No conda environment found for platform ${process.platform} and architecture ${process.arch}`);
             }
 
             await this.verifyAndExtractArchive(extractPath, latestFile.name);
