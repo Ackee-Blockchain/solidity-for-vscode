@@ -6,7 +6,7 @@ import * as crypto from 'crypto';
 import * as tmp from 'tmp';
 import { File, Storage } from '@google-cloud/storage';
 import { ExecaChildProcess, execaSync, execa } from 'execa';
-import { compare } from '@renovatebot/pep440';
+import { compare, explain } from '@renovatebot/pep440';
 import { Analytics, EventType } from '../Analytics';
 import { Installer, WAKE_MIN_VERSION } from './installerInterface';
 
@@ -22,6 +22,7 @@ export class CondaInstaller implements Installer {
         private readonly context: vscode.ExtensionContext,
         private readonly outputChannel: vscode.OutputChannel,
         private readonly analytics: Analytics,
+        private readonly prerelease: boolean,
     ) {
         const pubkeyPath = context.asAbsolutePath('resources/conda_public_key.pem');
         this.publicKey = fs.readFileSync(pubkeyPath, 'utf8');
@@ -172,10 +173,17 @@ export class CondaInstaller implements Installer {
                     if (metadata.metadata === undefined || !(typeof metadata.metadata['version'] === 'string')) {
                         continue;
                     }
+
+                    const explained = explain(metadata.metadata['version']);
+                    if (explained === null) {
+                        continue;
+                    }
+
                     if (
                         metadata.metadata['os'] === platform &&
                         metadata.metadata['arch'] === arch &&
-                        (latestVersion === undefined || compare(metadata.metadata['version'], latestVersion) > 0)
+                        (latestVersion === undefined || compare(metadata.metadata['version'], latestVersion) > 0) &&
+                        (this.prerelease || !explained.is_prerelease)
                     ) {
                         latestVersion = metadata.metadata['version'];
                         latestFile = file;
