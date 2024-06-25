@@ -8,7 +8,7 @@ import { File, Storage } from '@google-cloud/storage';
 import { ExecaChildProcess, execaSync, execa } from 'execa';
 import { compare } from '@renovatebot/pep440';
 import { Analytics, EventType } from '../Analytics';
-import { Installer } from './installerInterface';
+import { Installer, WAKE_MIN_VERSION } from './installerInterface';
 
 export class CondaInstaller implements Installer {
     private readonly bucketName = 'wake-venv';
@@ -185,7 +185,19 @@ export class CondaInstaller implements Installer {
 
         const extractPath = path.join(this.context.globalStorageUri.fsPath, 'wake-conda');
 
-        if (!fs.existsSync(this.markerFile)) {
+        let currentVersion = undefined;
+        if (fs.existsSync(this.markerFile)) {
+            try {
+                currentVersion = fs.readFileSync(this.markerFile, 'utf8').trim();
+            } catch (error) {}
+        }
+
+        if (currentVersion === undefined || compare(currentVersion, WAKE_MIN_VERSION) < 0) {
+            if (currentVersion !== undefined) {
+                await vscode.window.showInformationMessage(
+                    `The conda environment in version ${currentVersion} installed but the minimal version is ${WAKE_MIN_VERSION}. Updating...`,
+                );
+            }
             let [latestFile, latestVersion] = await promise;
 
             // no conda environment installed yet
@@ -205,7 +217,6 @@ export class CondaInstaller implements Installer {
                     return;
                 }
 
-                const currentVersion = fs.readFileSync(this.markerFile, 'utf8').trim();
                 if (compare(currentVersion, latestVersion) >= 0) {
                     return;
                 }

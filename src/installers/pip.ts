@@ -4,7 +4,7 @@ import * as https from 'https';
 import * as tmp from 'tmp';
 import { execaSync } from 'execa';
 import { compare } from '@renovatebot/pep440';
-import { WAKE_TARGET_VERSION } from "./installerInterface";
+import { WAKE_MIN_VERSION } from "./installerInterface";
 import { ManualInstaller } from "./manual";
 import { Analytics, EventType } from "../Analytics";
 
@@ -23,11 +23,11 @@ export class PipInstaller extends ManualInstaller {
         try {
             const version: string = this.getWakeVersion(null, venv, cwd);
 
-            if (compare(version, WAKE_TARGET_VERSION) < 0) {
+            if (compare(version, WAKE_MIN_VERSION) < 0) {
                 if (cwd === undefined) {
-                    this.outputChannel.appendLine(`Found 'eth-wake' in version ${version} in PATH but the target minimal version is ${WAKE_TARGET_VERSION}.`);
+                    this.outputChannel.appendLine(`Found 'eth-wake' in version ${version} in PATH but the target minimal version is ${WAKE_MIN_VERSION}.`);
                 } else {
-                    this.outputChannel.appendLine(`Found 'eth-wake' in version ${version} in '${cwd}' but the target minimal version is ${WAKE_TARGET_VERSION}.`);
+                    this.outputChannel.appendLine(`Found 'eth-wake' in version ${version} in '${cwd}' but the target minimal version is ${WAKE_MIN_VERSION}.`);
                 }
                 return false;
             }

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { ExecaChildProcess, execaSync, execa } from "execa";
 import { compare } from '@renovatebot/pep440';
 import { Analytics, EventType } from '../Analytics';
-import { Installer, WAKE_TARGET_VERSION } from './installerInterface';
+import { Installer, WAKE_MIN_VERSION } from './installerInterface';
 
 export class PipxInstaller implements Installer {
     constructor(
@@ -120,8 +120,8 @@ export class PipxInstaller implements Installer {
             }
 
             const version: string = this.getWakeVersion();
-            if (compare(version, WAKE_TARGET_VERSION) < 0) {
-                this.outputChannel.appendLine(`Found 'eth-wake' in version ${version} but the target minimal version is ${WAKE_TARGET_VERSION}.`);
+            if (compare(version, WAKE_MIN_VERSION) < 0) {
+                this.outputChannel.appendLine(`Found 'eth-wake' in version ${version} but the target minimal version is ${WAKE_MIN_VERSION}.`);
                 await this.pipxUpgrade();
             }
         } catch(err) {

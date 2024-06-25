@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { ExecaChildProcess, execaSync, execa } from 'execa';
 import { compare } from '@renovatebot/pep440';
-import { Installer, WAKE_TARGET_VERSION } from "./installerInterface";
+import { Installer, WAKE_MIN_VERSION } from "./installerInterface";
 import { Analytics, EventType } from "../Analytics";
 
 export class ManualInstaller implements Installer {
@@ -86,9 +86,9 @@ export class ManualInstaller implements Installer {
         let version: string;
         try {
             version = this.getWakeVersion(this.executablePath, this.venv, this.cwd);
-            if (compare(version, WAKE_TARGET_VERSION) < 0) {
+            if (compare(version, WAKE_MIN_VERSION) < 0) {
                 this.analytics.logEvent(EventType.ERROR_WAKE_VERSION);
-                this.outputChannel.appendLine(`PyPi package 'eth-wake' in version ${version} installed but the target minimal version is ${WAKE_TARGET_VERSION}.`);
+                this.outputChannel.appendLine(`PyPi package 'eth-wake' in version ${version} installed but the target minimal version is ${WAKE_MIN_VERSION}.`);
                 this.outputChannel.show(true);
                 throw new Error("Wake version too old");
             }
