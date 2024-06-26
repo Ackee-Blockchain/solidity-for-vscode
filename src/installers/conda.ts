@@ -11,7 +11,7 @@ import { Analytics, EventType } from '../Analytics';
 import { Installer, WAKE_MIN_VERSION } from './installerInterface';
 
 export class CondaInstaller implements Installer {
-    private readonly bucketName = 'wake-venv';
+    private readonly bucketName = 'wake-conda';
     private readonly storage = new Storage();
     private readonly publicKey: string;
     private readonly markerFile: string;
