@@ -196,7 +196,7 @@ export class CondaInstaller implements Installer {
 
         const extractPath = path.join(this.context.globalStorageUri.fsPath, 'wake-conda');
 
-        let currentVersion = undefined;
+        let currentVersion: string | undefined = undefined;
         if (fs.existsSync(this.markerFile)) {
             try {
                 currentVersion = fs.readFileSync(this.markerFile, 'utf8').trim();
@@ -229,7 +229,7 @@ export class CondaInstaller implements Installer {
                     return;
                 }
 
-                if (compare(currentVersion, latestVersion) >= 0) {
+                if (compare(currentVersion!, latestVersion) >= 0) {
                     return;
                 }
 
