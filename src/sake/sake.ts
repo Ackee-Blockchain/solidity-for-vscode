@@ -16,7 +16,8 @@ import {
     WakeFunctionCallRequestParams,
     FunctionCallPayload,
     WakeGetBalancesRequestParams,
-    WakeSetBalancesRequestParams
+    WakeSetBalancesRequestParams,
+    DeploymentStateData
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { parseCompilationResult } from './utils/compilation';
@@ -75,11 +76,12 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     context.subscriptions.push(
         vscode.commands.registerCommand('sake.sampleDeploy', async () => {
             const sampleContractAbi = await loadSampleAbi();
-            const sampleContract: Contract = {
+            const sampleContract: DeploymentStateData = {
                 name: 'SampleContract',
-                balance: 0, // had to add this
+                balance: undefined, // had to add this
                 address: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
-                abi: sampleContractAbi
+                abi: sampleContractAbi,
+                nick: undefined
             };
             deploymentState.deploy(sampleContract);
         })

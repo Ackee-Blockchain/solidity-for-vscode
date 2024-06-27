@@ -213,7 +213,9 @@ export async function deploy(
             const _deploymentData: DeploymentStateData = {
                 name: _contractCompilationData.name,
                 address: result.contractAddress!,
-                abi: _contractCompilationData.abi
+                abi: _contractCompilationData.abi,
+                balance: undefined,
+                nick: undefined
             };
 
             deploymentState.deploy(_deploymentData);
