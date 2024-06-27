@@ -198,6 +198,8 @@ Questions for User Testing:
 Now:
     ✔ nicks for deployed contracts @done(24-06-27 11:33)
     ✔ calldata fix @done(24-06-27 11:44)
-    fix input issues
-    calltrace parsing
-    welcome page
+    ✔ fix input issues @done(24-06-27 13:51)
+        double check everything
+    ☐ calltrace parsing
+    fix css issues when windows is to onarrow
+    ☐ welcome page

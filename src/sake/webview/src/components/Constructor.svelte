@@ -19,7 +19,7 @@
 
     export let abi: ContractAbi | undefined;
     export let onDeploy: (calldata: string) => void;
-    export let name: string | undefined;
+    export let name: string;
     let constructor: ContractFunctionType | undefined;
     let deployFunction: ContractFunction;
     $: getConstructor(abi);
@@ -43,14 +43,14 @@
                 outputs: [],
                 stateMutability: 'unpayable',
                 type: 'constructor',
-                name: 'Deploy'
+                name: name
             };
             return;
+        } else {
+            constructor = constructors[0];
         }
 
-        const _constructor = constructors[0];
-        _constructor.name = name ?? 'Deploy';
-        constructor = _constructor;
+        constructor.name = name;
     };
 </script>
 

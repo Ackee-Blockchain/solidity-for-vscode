@@ -160,7 +160,7 @@
         <div class="my-4"></div>
 
         {#if selectedContract !== undefined}
-            <Constructor abi={selectedContract.abi} onDeploy={deploy} />
+            <Constructor abi={selectedContract.abi} onDeploy={deploy} name={selectContract.name} />
         {/if}
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
