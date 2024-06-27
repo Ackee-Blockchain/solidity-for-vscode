@@ -1,8 +1,13 @@
 <script lang="ts">
+    export let danger: boolean = false;
     export let warning: boolean = false;
 </script>
 
-<div class="vscode-text-container {warning ? 'vscode-text-container--warning' : ''}">
+<div
+    class="vscode-text-container
+    {danger ? 'vscode-text-container--danger' : ''}
+    {warning ? 'vscode-text-container--warning' : ''}"
+>
     <slot></slot>
 </div>
 
@@ -16,8 +21,13 @@
         background-color: var(--input-background);
     }
 
-    .vscode-text-container--warning {
+    .vscode-text-container--danger {
         border-color: var(--vscode-editorError-foreground);
         color: var(--vscode-editorError-foreground);
+    }
+
+    .vscode-text-container--warning {
+        border-color: var(--vscode-editorWarning-foreground);
+        color: var(--vscode-editorWarning-foreground);
     }
 </style>

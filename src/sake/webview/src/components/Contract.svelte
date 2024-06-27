@@ -44,15 +44,7 @@
         <ExpandButton bind:expanded />
         <div class="flex-1 overflow-x-hidden rounded ps-2 bg-vscodeInputBackground flex flex-col">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <div
-                class="w-full flex flex-row gap-1 items-center justify-between"
-                class:cursor-pointer={!expanded}
-                on:click={() => {
-                    if (!expanded) {
-                        expanded = true;
-                    }
-                }}
-            >
+            <div class="w-full flex flex-row gap-1 items-center justify-between">
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <ClickableSpan callback={() => setContractNick(contract)}>
                     {contract.nick ? `${contract.nick} (${contract.name})` : contract.name}

@@ -29,6 +29,7 @@ module.exports = {
             vscodeBorder: 'var(--vscode-editorWidget-border)',
             vscodeError: 'var(--vscode-editorError-foreground)',
             vscodeButtonPrimary: 'var(--button-primary-background);',
+            vscodeWarning: 'var(--vscode-editorWarning-foreground)',
         },
         borderRadius: {
             vscodeRounded: 'var(--corner-radius-round)',

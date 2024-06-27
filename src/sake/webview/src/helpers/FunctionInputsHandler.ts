@@ -139,6 +139,10 @@ export abstract class InputHandler extends InputHandlerInterface {
         return this.state === InputState.VALID;
     }
 
+    public isMissingData(): boolean {
+        return this.state === InputState.MISSING_DATA;
+    }
+
     /*
      * Returns the value of the input(s) as a string
      */
@@ -181,29 +185,30 @@ export abstract class InputHandler extends InputHandlerInterface {
 
             return true;
         } catch (e) {
-            // save error message
-            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
-            this._setErrors(errorMessage);
-
             // save invalid string
             this._value = value;
 
             // reset all children
             this.children.forEach((child: InputHandler) => child.set(''));
 
+            // save error message
+            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
+            this._setErrors(errorMessage);
+
             return false;
         } finally {
-            // console.log(
-            //     'value set',
-            //     this._value,
-            //     'in',
-            //     this.name,
-            //     this.type,
-            //     'with state',
-            //     this.state,
-            //     'parent state',
-            //     this.parent?.state
-            // );
+            console.log(
+                'value set',
+                this._value,
+                'in',
+                this.name,
+                this.internalType,
+                this.type,
+                'with state',
+                this.state,
+                'parent state',
+                this.parent?.state
+            );
             // @todo move state update here
         }
     }
@@ -465,16 +470,19 @@ class MultiInputHandler extends InputHandler {
             return;
         }
 
-        const values = splitNestedLists(value);
+        const _values = splitNestedLists(value);
 
-        console.log('multi-input values', values, this.children.length, this.children);
-
-        if (values.length !== this.children.length) {
+        if (_values.length > this.children.length) {
+            console.log('throwing');
             throw new FunctionInputParseError('Invalid length of multi-input');
         }
 
+        if (_values.length < this.children.length) {
+            this.state = InputState.MISSING_DATA;
+        }
+
         this.children.forEach((child: InputHandler, index: number) => {
-            child.set(values[index]);
+            index <= _values.length - 1 ? child.set(_values[index]) : child.set('');
         });
     }
 
@@ -572,12 +580,17 @@ class ComponentInputHandler extends InputHandler {
 
         const _values = splitNestedLists(value);
 
-        if (_values.length !== this.children.length) {
-            throw new FunctionInputParseError('Invalid length of struct');
+        if (_values.length > this.children.length) {
+            console.log('throwing');
+            throw new FunctionInputParseError('Invalid length of multi-input');
+        }
+
+        if (_values.length < this.children.length) {
+            this.state = InputState.MISSING_DATA;
         }
 
         this.children.forEach((child: InputHandler, index: number) => {
-            child.set(_values[index]);
+            index <= _values.length - 1 ? child.set(_values[index]) : child.set('');
         });
     }
 
