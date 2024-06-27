@@ -71,7 +71,8 @@ export enum WebviewMessage {
     onUndeployContract = 'onUndeployContract', // TODO rename
     onGetAccounts = 'onGetAccounts',
     onGetBalances = 'onGetBalances', // @ todo rename, probably dony use 'on' everywhere
-    onSetBalances = 'onSetBalances'
+    onSetBalances = 'onSetBalances',
+    onSetContractNick = 'onSetContractNick'
 }
 
 // TODO create pairs of WebviewMessage and WebviewInput and WebviewOutput
@@ -139,6 +140,8 @@ export interface DeploymentStateData {
     name: string;
     address: string;
     abi: any;
+    balance: number | undefined;
+    nick: string | undefined;
 }
 
 export interface CompilationStateData {

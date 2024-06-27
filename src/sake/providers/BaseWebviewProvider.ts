@@ -9,7 +9,8 @@ import {
     StateId,
     WebviewMessageData,
     WebviewMessage,
-    WakeDeploymentRequestParams
+    WakeDeploymentRequestParams,
+    DeploymentStateData
 } from '../webview/shared/types';
 import { CompilationState } from '../state/CompilationState';
 import { AccountState } from '../state/AccountState';
@@ -124,7 +125,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessage.getTextFromInputBox: {
-                const value = await vscode.window.showInputBox({ value: payload });
+                const value = await vscode.window.showInputBox(payload);
                 webviewView.webview.postMessage({
                     command,
                     requestId,
@@ -315,6 +316,29 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 } as MessageHandlerData<boolean>);
 
                 break;
+            }
+
+            case WebviewMessage.onSetContractNick: {
+                if (!payload) {
+                    console.error('No set contract nick params provided');
+                    return;
+                }
+
+                const nick = await vscode.window.showInputBox({
+                    value: (payload as DeploymentStateData).nick,
+                    title: 'Set a contract nickname'
+                });
+
+                console.log('nick', !nick, nick);
+
+                if (nick === undefined) {
+                    return;
+                }
+
+                this._getDeployedContracts().updateContract({
+                    ...(payload as DeploymentStateData),
+                    nick: !nick ? undefined : nick
+                });
             }
 
             default: {

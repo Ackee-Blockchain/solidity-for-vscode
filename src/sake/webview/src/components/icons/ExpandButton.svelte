@@ -1,10 +1,13 @@
 <script lang="ts">
+    import DefaultButton from './DefaultButton.svelte';
+
     export let expanded: boolean;
 </script>
 
-<button
-    class="flex-initial rounded bg-transparent p-[4px] h-[26px] w-[26px]"
-    on:click={() => (expanded = !expanded)}
+<DefaultButton
+    callback={() => {
+        expanded = !expanded;
+    }}
 >
     {#if expanded}
         <!-- chevron down from codicons -->
@@ -37,4 +40,4 @@
             /></svg
         >
     {/if}
-</button>
+</DefaultButton>

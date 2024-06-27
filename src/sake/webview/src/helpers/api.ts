@@ -52,8 +52,14 @@ export function showInfoMessage(message: string) {
     messageHandler.send(WebviewMessage.onInfo, message);
 }
 
-export async function getInputFromTopBar(message: string = '') {
-    return await messageHandler.request<string>(WebviewMessage.getTextFromInputBox, message);
+export async function getInputFromTopBar(
+    value: string = '',
+    title: string | undefined = undefined
+) {
+    return await messageHandler.request<string>(WebviewMessage.getTextFromInputBox, {
+        value: value,
+        title: title
+    });
 }
 
 export async function compileContracts(): Promise<boolean> {
@@ -65,4 +71,8 @@ export async function removeContract(contract: DeploymentStateData) {
     // deployedContracts.update((state) => {
     //     return state.filter((c) => c.address !== contract.address);
     // });
+}
+
+export async function setContractNick(contract: DeploymentStateData) {
+    return await messageHandler.request<boolean>(WebviewMessage.onSetContractNick, contract);
 }

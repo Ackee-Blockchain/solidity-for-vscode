@@ -300,6 +300,32 @@ export class RootInputHandler extends InputHandlerInterface {
     }
 
     /*
+     * Returns raw calldata
+     * Does not do any encoding
+     * Used for raw calldata function call
+     *
+     * @returns {string}
+     */
+    public rawCalldata(): string {
+        if (!this.hasInputs()) {
+            return '';
+        }
+
+        if (this.state !== InputState.VALID) {
+            throw new FunctionInputParseError('Input state is invalid');
+        }
+
+        const _calldata = this.getValues();
+        console.log('raw calldata', this.getValues(), this.getValues()[0]);
+
+        if (!Array.isArray(_calldata) || _calldata.length !== 1) {
+            throw new FunctionInputParseError('Invalid data for raw calldata');
+        }
+
+        return _calldata[0].slice(2); // remove 0x
+    }
+
+    /*
      * Encodes the input values into
      * Does not include function selector (used in constructor)
      *

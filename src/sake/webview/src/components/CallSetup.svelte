@@ -7,6 +7,7 @@
     } from '@vscode/webview-ui-toolkit';
     import IconButton from './IconButton.svelte';
     import CopyButton from './icons/CopyButton.svelte';
+    import ClickableSpan from './ClickableSpan.svelte';
     import { parseComplexNumber } from '../../shared/validate';
     import { displayEtherValue } from '../../shared/ether';
 
@@ -19,6 +20,7 @@
         setBalance,
         showErrorMessage
     } from '../helpers/api';
+    import CopyableSpan from './CopyableSpan.svelte';
 
     function handleAccountChange(event: any) {
         const _selectedAccountIndex = event.detail.value;
@@ -43,7 +45,6 @@
             return;
         }
         try {
-            console.log('parsed value', parseComplexNumber(_value));
             selectedValue.set(parseComplexNumber(_value));
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
@@ -56,7 +57,10 @@
             return;
         }
 
-        const topUpValue = await getInputFromTopBar($selectedAccount.balance?.toString());
+        const topUpValue = await getInputFromTopBar(
+            $selectedAccount.balance?.toString(),
+            'Update balance of account'
+        );
 
         if (topUpValue === undefined) {
             return;
@@ -93,16 +97,20 @@
             {#if $selectedAccount !== undefined}
                 <div class="w-full px-1 mb-3">
                     <div class="w-full flex flex-row gap-1 items-center h-[20px]">
-                        <span class="flex-1 truncate text-sm">{$selectedAccount.address}</span>
+                        <!-- <span class="flex-1 truncate text-sm">{$selectedAccount.address}</span> -->
                         <!-- <span class="flex-1 truncate text-sm">{accounts[selectedAccountIndex].address}</span> -->
-                        <CopyButton callback={() => copyToClipboard($selectedAccount.address)} />
+                        <CopyableSpan
+                            text={$selectedAccount.address}
+                            className="flex-1 truncate text-sm"
+                        />
+                        <!-- <CopyButton callback={() => copyToClipboard($selectedAccount.address)} /> -->
                     </div>
                     <div class="w-full flex flex-row gap-1 items-center h-[20px]">
-                        <span class="text-sm flex-1"
-                            >{displayEtherValue($selectedAccount.balance)}</span
-                        >
+                        <ClickableSpan className="text-sm flex-1" callback={topUp}>
+                            {displayEtherValue($selectedAccount.balance)}
+                        </ClickableSpan>
                         <!-- <span class="text-sm flex-1">{accounts[selectedAccountIndex].balance}ETH</span> -->
-                        <IconButton callback={topUp}>+</IconButton>
+                        <!-- <IconButton callback={topUp}>+</IconButton> -->
                     </div>
                 </div>
             {/if}

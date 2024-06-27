@@ -1,5 +1,5 @@
-import { DeploymentStateData, StateId } from "../webview/shared/types";
-import { BaseState } from "./BaseState";
+import { DeploymentStateData, StateId } from '../webview/shared/types';
+import { BaseState } from './BaseState';
 
 export class DeploymentState extends BaseState<DeploymentStateData[]> {
     private static _instance: DeploymentState;
@@ -23,6 +23,16 @@ export class DeploymentState extends BaseState<DeploymentStateData[]> {
 
     public undeploy(contract: DeploymentStateData) {
         const _state = this.state.filter((c) => c.address !== contract.address);
+        this.state = _state;
+    }
+
+    public updateContract(contract: DeploymentStateData) {
+        const _state = this.state.map((c) => {
+            if (c.address === contract.address) {
+                c = contract;
+            }
+            return c;
+        });
         this.state = _state;
     }
 

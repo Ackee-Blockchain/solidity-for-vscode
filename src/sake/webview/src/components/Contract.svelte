@@ -17,8 +17,11 @@
         type DeploymentStateData
     } from '../../shared/types';
     import { messageHandler } from '@estruyf/vscode/dist/client';
-    import { copyToClipboard, removeContract } from '../helpers/api';
+    import { copyToClipboard, removeContract, setContractNick } from '../helpers/api';
     import CalldataBytes from './CalldataBytes.svelte';
+    import { filter } from '@renovatebot/pep440';
+    import CopyableSpan from './CopyableSpan.svelte';
+    import ClickableSpan from './ClickableSpan.svelte';
 
     provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
@@ -29,6 +32,7 @@
         func: ContractFunctionType
     ) => void;
     let expanded = false;
+    $: filteredAbi = contract.abi.filter((func: any) => func.type == 'function');
 
     const _onFunctionCall = (calldata: string, func: ContractFunctionType) => {
         onFunctionCall(calldata, contract.address, func);
@@ -38,9 +42,12 @@
 <div class="flex flex-col gap-1">
     <div class="flex flex-row gap-1">
         <ExpandButton bind:expanded />
-        <div class="flex-1 overflow-x-hidden rounded px-2 bg-vscodeInputBackground flex flex-col">
+        <div class="flex-1 overflow-x-hidden rounded ps-2 bg-vscodeInputBackground flex flex-col">
             <div class="w-full flex flex-row gap-1 items-center justify-between">
-                <p>{contract.name}</p>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <ClickableSpan callback={() => setContractNick(contract)}>
+                    {contract.nick ? `${contract.nick} (${contract.name})` : contract.name}
+                </ClickableSpan>
                 <DeleteButton
                     callback={() => {
                         removeContract(contract);
@@ -49,9 +56,10 @@
             </div>
 
             {#if expanded}
-                <div class="w-full flex flex-row gap-1 items-center justify-between">
-                    <span class="truncate text-sm">{contract.address}</span>
-                    <CopyButton callback={() => copyToClipboard(contract.address)} />
+                <div class="w-full flex flex-row gap-1 items-center justify-between pb-1">
+                    <CopyableSpan text={contract.address} className="truncate text-sm" />
+                    <!-- <span class="truncate text-sm">{contract.address}</span> -->
+                    <!-- <CopyButton callback={() => copyToClipboard(contract.address)} /> -->
                 </div>
                 <!-- todo -->
                 <!-- <div class="flex flex-row gap-1 items-center">
@@ -61,12 +69,10 @@
         </div>
     </div>
     {#if expanded}
-        {#if contract.abi.length > 0}
+        {#if filteredAbi.length > 0}
             <div class="flex flex-col gap-1">
-                {#each contract.abi as func}
-                    {#if func.type == 'function'}
-                        <ContractFunction {func} onFunctionCall={_onFunctionCall} />
-                    {/if}
+                {#each filteredAbi as func}
+                    <ContractFunction {func} onFunctionCall={_onFunctionCall} />
                 {/each}
             </div>
         {/if}

@@ -37,8 +37,13 @@
     async function submit() {
         let _encodedInput: string;
         try {
-            // if isCalldata
-            _encodedInput = isConstructor ? inputRoot.encodedParameters() : inputRoot.calldata();
+            if (isCalldata) {
+                _encodedInput = inputRoot.rawCalldata();
+            } else if (isConstructor) {
+                _encodedInput = inputRoot.encodedParameters();
+            } else {
+                _encodedInput = inputRoot.calldata();
+            }
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
             const message = `Failed to encode input with error: ${errorMessage}`;
@@ -70,7 +75,11 @@
             <IconSpacer />
         {/if}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <vscode-button class="flex-1" on:click={submit}>{func.name}</vscode-button>
+        <vscode-button
+            class="flex-1"
+            on:click={submit}
+            appearance={isCalldata ? 'secondary' : 'primary'}>{func.name}</vscode-button
+        >
     </div>
     {#if inputRoot.hasInputs()}
         <div class="flex flex-1 flex-col gap-1 {expanded ? 'w-full' : ''}">

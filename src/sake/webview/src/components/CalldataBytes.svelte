@@ -39,4 +39,4 @@
     export let onFunctionCall: (calldata: string, func: ContractFunctionType) => void;
 </script>
 
-<ContractFunction {func} {onFunctionCall} isConstructor={true} />
+<ContractFunction {func} {onFunctionCall} isCalldata={true} />
