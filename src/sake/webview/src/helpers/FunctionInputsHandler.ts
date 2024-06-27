@@ -467,6 +467,8 @@ class MultiInputHandler extends InputHandler {
 
         const values = splitNestedLists(value);
 
+        console.log('multi-input values', values, this.children.length, this.children);
+
         if (values.length !== this.children.length) {
             throw new FunctionInputParseError('Invalid length of multi-input');
         }
