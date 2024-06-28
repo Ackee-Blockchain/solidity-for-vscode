@@ -200,6 +200,6 @@ Now:
     ✔ calldata fix @done(24-06-27 11:44)
     ✔ fix input issues @done(24-06-27 13:51)
         double check everything
-    ☐ calltrace parsing
+    ✔ calltrace parsing @done(24-06-28 08:57)
     fix css issues when windows is to onarrow
     ☐ welcome page

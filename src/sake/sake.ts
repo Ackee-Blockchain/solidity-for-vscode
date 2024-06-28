@@ -77,6 +77,16 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
         })
     );
 
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.open_walkthrough', () => {
+            vscode.commands.executeCommand(
+                `workbench.action.openWalkthrough`,
+                `ackeeblockchain.tools-for-solidity#tfs-walkthrough`,
+                false
+            );
+        })
+    );
+
     // @todo remove
     context.subscriptions.push(
         vscode.commands.registerCommand('sake.sampleDeploy', async () => {

@@ -540,6 +540,10 @@
                 "command": "Tools-for-Solidity.sake.show_history",
                 "title": "Sake: Show Transaction History",
                 "icon": "$(history)"
+            },
+            {
+                "command": "Tools-for-Solidity.sake.open_walkthrough",
+                "title": "Sake: Open Walkthrough"
             }
         ],
         "viewsContainers": {
@@ -758,6 +762,42 @@
                 "id": "tools-for-solidity.detections.group",
                 "label": "Group by",
                 "icon": "$(list-tree)"
+            }
+        ],
+        "walkthroughs": [
+            {
+                "id": "tfs-walkthrough",
+                "title": "Getting started with Tools for Solidity",
+                "description": "Discover the powerful features of the Tools for Solidity extension and learn how to set it up to enhance your development experience.",
+                "steps": [
+                    {
+                        "id": "rosetta-macos-native",
+                        "title": "Enable Rosetta",
+                        "description": "It looks like you are running on MacOS Native. To ensure full compatibility with our extension, please make sure you have Rosetta enabled.",
+                        "media": {
+                            "markdown": "./resources/walkthroughs/macos-native.md"
+                        },
+                        "when": "isMacNative"
+                    },
+                    {
+                        "id": "macos-native",
+                        "title": "Step 1 notmacos",
+                        "description": "Seems like you are not runnign Macos Native.",
+                        "media": {
+                            "markdown": "./resources/walkthrougs/macos-native.md"
+                        },
+                        "when": "!isMacNative"
+                    },
+                    {
+                        "id": "select-installation",
+                        "title": "Select your installation method",
+                        "description": "Running printers.",
+                        "media":{
+                            "image": "./resources/walkthrough/step2.gif",
+                            "altText": "Open a Solidity file."
+                        }
+                    }
+                ]
             }
         ]
     },
