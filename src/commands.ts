@@ -11,7 +11,6 @@ async function showDot(content: string, out?: vscode.OutputChannel) {
 
     vscode.workspace.openTextDocument({language: 'dot', content: content}).then(async doc => {
         await vscode.window.showTextDocument(doc);
-
         try {
             await vscode.commands.executeCommand('graphviz.previewToSide', doc.uri);
         } catch (e) {

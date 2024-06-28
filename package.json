@@ -533,8 +533,13 @@
                 "title": "◉ Confidence: All"
             },
             {
-                "command": "Tools-for-Solidity.sake.compile_current_file",
-                "title": "Sake: Compile Current File"
+                "command": "Tools-for-Solidity.sake.compile",
+                "title": "Sake: Compile"
+            },
+            {
+                "command": "Tools-for-Solidity.sake.show_history",
+                "title": "Sake: Show Transaction History",
+                "icon": "$(history)"
             }
         ],
         "viewsContainers": {
@@ -543,6 +548,18 @@
                     "id": "tools-for-solidity",
                     "title": "Tools for Solidity",
                     "icon": "resources/icons/activity_bar_wake.png"
+                },
+                {
+                    "id": "sake",
+                    "title": "Sake",
+                    "icon": "resources/icons/sake.png"
+                }
+            ],
+            "panel": [
+                {
+                    "id": "sake-output",
+                    "title": "Sake",
+                    "icon": ""
                 }
             ]
         },
@@ -555,6 +572,19 @@
                 {
                     "id": "solc-detections",
                     "name": "Compiler"
+                }
+            ],
+            "sake": [
+                {
+                    "type": "webview",
+                    "id": "sake",
+                    "name": "Sake"
+                }
+            ],
+            "sake-output": [
+                {
+                    "id": "sake-output",
+                    "name": "Output"
                 }
             ]
         },
@@ -579,6 +609,11 @@
                     "command": "Tools-for-Solidity.detections.force_recompile",
                     "when": "view == solc-detections",
                     "group": "navigation@3"
+                },
+                {
+                    "command": "Tools-for-Solidity.sake.show_history",
+                    "when": "view == sake-output",
+                    "group": "navigation"
                 }
             ],
             "view/item/context": [
@@ -724,6 +759,59 @@
                 "label": "Group by",
                 "icon": "$(list-tree)"
             }
+        ],
+        "walkthroughs": [
+            {
+                "id": "tfs-walkthrough",
+                "title": "Getting started with Tools for Solidity",
+                "description": "Discover the powerful features of the Tools for Solidity extension and learn how to set it up to enhance your development experience.",
+                "steps": [
+                    {
+                        "id": "rosetta-macos-native",
+                        "title": "Setup: Enable Rosetta",
+                        "description": "It looks like you are running on MacOS Native. To ensure full compatibility with our extension, please make sure you have Rosetta installed.",
+                        "media": {
+                            "markdown": "./resources/walkthrough/blank.md"
+                        },
+                        "when": "isMacNative"
+                    },
+                    {
+                        "id": "select-wake-installation",
+                        "title": "Setup: Select Wake installation method",
+                        "description": "Tools for Solidity needs to install [Wake](https://getwake.io/) to run. By default, Wake is installed using conda for best compatibility. You can change the installation method below.\n**Recommended**: Only change the installation method if necessary.\n[Select Installation Method](command:Tools-for-Solidity.select-installation-method)\n**Tip**: If installing using conda, [start the download now](command:Tools-for-Solidity.install.wake-conda).",
+                        "media": {
+                            "markdown": "./resources/walkthrough/blank.md"
+                        }
+                    },
+                    {
+                        "id": "detectors",
+                        "title": "Catch vulnerabilities with Detectors",
+                        "description": "See vulnerabilities and compiler warnings/errors of your code in real-time.",
+                        "media":{
+                            "markdown": "./resources/walkthrough/detectors.png"
+                        }
+                    },
+                    {
+                        "id": "graphs",
+                        "title": "Visualise relations in code",
+                        "description": "Different graph types can be generated to better visualize the relations in the code.",
+                        "media": {
+                            "image": "./resources/walkthrough/graphs.png",
+                            "altText": "Graphs"
+                        }
+                    },
+                    {
+                        "id": "sake",
+                        "title": "Use Sake to interact with Smart Contracts",
+                        "description": "Sake is a tool for interacting with smart contracts. It allows you to deploy, call, and test your contracts directly from VS Code.",
+                        "media": {
+                            "image": "./resources/walkthrough/sake.png",
+                            "altText": "Sake"
+                        }
+
+                    }
+                ]
+            }
         ]
     },
     "scripts": {
@@ -731,17 +819,25 @@
         "webpack": "webpack --mode development",
         "webpack-dev": "webpack --mode development --watch",
         "package": "webpack --mode production --devtool hidden-source-map",
-        "test-compile": "tsc -p ./"
+        "test-compile": "tsc -p ./",
+        "build": "concurrently \"npm run build.extension\" \"npm run build.webview\"",
+        "dev": "concurrently \"npm run build.extension.dev\" \"npm run build.webview.dev\"",
+        "build.extension": "webpack --mode development",
+        "build.extension.dev": "webpack --mode development --watch",
+        "build.webview": "cd src/sake/webview; npm run build",
+        "build.webview.dev": "cd src/sake/webview; npm run dev"
     },
     "devDependencies": {
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.1",
         "@types/node": "16.x",
         "@types/vscode": "^1.67.0",
+        "@types/vscode-webview": "^1.57.5",
         "@typescript-eslint/eslint-plugin": "^5.30.0",
         "@typescript-eslint/parser": "^5.30.0",
         "@vscode/test-electron": "^2.1.5",
         "@vscode/vsce": "^2.22.0",
+        "concurrently": "^8.2.2",
         "eslint": "^8.18.0",
         "glob": "^8.0.3",
         "mocha": "^10.0.0",
@@ -751,13 +847,16 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
+        "@estruyf/vscode": "^1.1.0",
         "@renovatebot/pep440": "^2.0.0",
         "@vscode/extension-telemetry": "^0.9.6",
         "execa": "^8.0.1",
         "get-port": "<6.0.0",
         "node-fetch": "^3.3.2",
         "vscode-languageclient": "^8.0.1",
-        "wait-port": "^0.3.0"
+        "wait-port": "^0.3.0",
+        "web3-eth-abi": "^4.2.2",
+        "web3-utils": "^4.3.0"
     },
     "extensionDependencies": [
         "EFanZh.graphviz-preview"

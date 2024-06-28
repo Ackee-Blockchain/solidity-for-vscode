@@ -1,0 +1,15 @@
+{
+    "extends": "@tsconfig/svelte/tsconfig.json",
+    "include": ["./**/*", "shared/*"],
+    "exclude": ["./node_modules/*"], // modified node modules from .. to .
+    "compilerOptions": {
+        "types": ["svelte"],
+        "strict": true,
+        "resolveJsonModule": true,
+        // TODO this wont work, something with the compilation
+        // "rootDirs": ["src"],
+        // "baseUrl": ".",
+
+    }
+}
+

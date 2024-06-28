@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as net from 'net';
-import { Analytics, EventType } from './Analytics'
+import { Analytics, EventType } from './Analytics';
 
 import {
     LanguageClient,
@@ -12,10 +12,20 @@ import {
     integer,
     Diagnostic,
     ProgressType,
-    ErrorHandler,
+    ErrorHandler
 } from 'vscode-languageclient/node';
 
-import { importFoundryRemappings, copyToClipboardHandler, generateCfgHandler, generateInheritanceGraphHandler, generateLinearizedInheritanceGraphHandler, generateImportsGraphHandler, executeReferencesHandler, newDetector, newPrinter } from './commands';
+import {
+    importFoundryRemappings,
+    copyToClipboardHandler,
+    generateCfgHandler,
+    generateInheritanceGraphHandler,
+    generateLinearizedInheritanceGraphHandler,
+    generateImportsGraphHandler,
+    executeReferencesHandler,
+    newDetector,
+    newPrinter
+} from './commands';
 import { hideCoverageCallback, initCoverage, showCoverageCallback } from './coverage';
 
 const path = require('node:path');
@@ -24,23 +34,23 @@ const fs = require('fs');
 import getPort = require('get-port');
 import waitPort = require('wait-port');
 import { compare } from '@renovatebot/pep440';
-import { GroupBy, Impact, Confidence } from "./detections/WakeTreeDataProvider";
+import { GroupBy, Impact, Confidence } from './detections/WakeTreeDataProvider';
 import { SolcTreeDataProvider } from './detections/SolcTreeDataProvider';
 import { WakeTreeDataProvider } from './detections/WakeTreeDataProvider';
 import { Detector, WakeDetection } from './detections/model/WakeDetection';
-import { convertDiagnostics } from './detections/util'
+import { convertDiagnostics } from './detections/util';
 import { DetectorItem } from './detections/model/DetectorItem';
 import { ClientMiddleware } from './ClientMiddleware';
 import { ClientErrorHandler } from './ClientErrorHandler';
 import { ExecaChildProcess, execa, execaSync } from 'execa';
-import { PrintersHandler } from './printers/PrintersHandler'
-
+import { PrintersHandler } from './printers/PrintersHandler';
+import { activateSake, deactivateSake } from './sake/sake';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ExecaChildProcess | undefined = undefined;
 let wakeProvider: WakeTreeDataProvider | undefined = undefined;
 let solcProvider: SolcTreeDataProvider | undefined = undefined;
-let diagnosticCollection: vscode.DiagnosticCollection
+let diagnosticCollection: vscode.DiagnosticCollection;
 let analytics: Analytics;
 let errorHandler: ClientErrorHandler;
 let printers: PrintersHandler;
@@ -50,55 +60,63 @@ let venvActivateCommand: string;
 
 //export let log: Log
 
-const WAKE_TARGET_VERSION = "4.9.0";
+const WAKE_TARGET_VERSION = '4.9.0';
 const WAKE_PRERELEASE = false;
 const CRASHLOG_LIMIT = 1000;
 
-interface DiagnosticNotification{
+interface DiagnosticNotification {
     uri: string;
-    diagnostics: Diagnostic[]
+    diagnostics: Diagnostic[];
 }
 
-function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification){
+function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification) {
     //outputChannel.appendLine(JSON.stringify(detection));
-    let diags = detection.diagnostics.map(it => convertDiagnostics(it)).filter(item => !item.data.ignored);
+    let diags = detection.diagnostics
+        .map((it) => convertDiagnostics(it))
+        .filter((item) => !item.data.ignored);
     diagnosticCollection.set(vscode.Uri.parse(detection.uri), diags);
 
     try {
         let uri = vscode.Uri.parse(detection.uri);
-        let wakeDetections = diags.filter( item => item.source == "Wake").map(it => new WakeDetection(uri, it))
+        let wakeDetections = diags
+            .filter((item) => item.source == 'Wake')
+            .map((it) => new WakeDetection(uri, it));
         wakeProvider?.add(uri, wakeDetections);
-        let solcDetections = diags.filter(item => item.source == "Wake(solc)").map(it => new WakeDetection(uri, it))
+        let solcDetections = diags
+            .filter((item) => item.source == 'Wake(solc)')
+            .map((it) => new WakeDetection(uri, it));
         solcProvider?.add(uri, solcDetections);
-
-    } catch(err) {
+    } catch (err) {
         if (err instanceof Error) {
             outputChannel.appendLine(err.toString());
         }
     }
 }
 
-async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<boolean> {
+async function installWake(
+    outputChannel: vscode.OutputChannel,
+    pythonExecutable: string
+): Promise<boolean> {
     // check if pip is available and install it if not
     try {
-        execaSync(pythonExecutable, ["-m", "pip", "--version"]);
-    } catch(err) {
+        execaSync(pythonExecutable, ['-m', 'pip', '--version']);
+    } catch (err) {
         try {
             outputChannel.appendLine(`Running '${pythonExecutable} -m ensurepip'`);
-            execaSync(pythonExecutable, ["-m", "ensurepip"]);
-        } catch(err) {
+            execaSync(pythonExecutable, ['-m', 'ensurepip']);
+        } catch (err) {
             if (err instanceof Error) {
-                outputChannel.appendLine("Failed to install pip:");
+                outputChannel.appendLine('Failed to install pip:');
                 outputChannel.appendLine(err.toString());
             }
             try {
                 outputChannel.appendLine(`Running '${pythonExecutable} -m ensurepip --user'`);
-                execaSync(pythonExecutable, ["-m", "ensurepip", "--user"]);
-            } catch(err) {
+                execaSync(pythonExecutable, ['-m', 'ensurepip', '--user']);
+            } catch (err) {
                 analytics.logCrash(EventType.ERROR_PIP_INSTALL, err);
 
                 if (err instanceof Error) {
-                    outputChannel.appendLine("Failed to install pip into user site-packages:");
+                    outputChannel.appendLine('Failed to install pip into user site-packages:');
                     outputChannel.appendLine(err.toString());
                     outputChannel.show(true);
                 }
@@ -111,32 +129,60 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
     try {
         let out;
         if (WAKE_PRERELEASE) {
-            outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --pre'`);
-            out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre"]).stdout;
+            outputChannel.appendLine(
+                `Running '${pythonExecutable} -m pip install eth-wake -U --pre'`
+            );
+            out = execaSync(pythonExecutable, [
+                '-m',
+                'pip',
+                'install',
+                'eth-wake',
+                '-U',
+                '--pre'
+            ]).stdout;
         } else {
             outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U'`);
-            out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U"]).stdout;
+            out = execaSync(pythonExecutable, ['-m', 'pip', 'install', 'eth-wake', '-U']).stdout;
         }
         outputChannel.appendLine(out);
         return true;
-    } catch(err) {
+    } catch (err) {
         if (err instanceof Error) {
-            outputChannel.appendLine("Failed to execute the previous command:");
+            outputChannel.appendLine('Failed to execute the previous command:');
             outputChannel.appendLine(err.toString());
         }
 
         try {
             let out;
             if (WAKE_PRERELEASE) {
-                outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --pre --user'`);
-                out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--pre", "--user"]).stdout;
+                outputChannel.appendLine(
+                    `Running '${pythonExecutable} -m pip install eth-wake -U --pre --user'`
+                );
+                out = execaSync(pythonExecutable, [
+                    '-m',
+                    'pip',
+                    'install',
+                    'eth-wake',
+                    '-U',
+                    '--pre',
+                    '--user'
+                ]).stdout;
             } else {
-                outputChannel.appendLine(`Running '${pythonExecutable} -m pip install eth-wake -U --user'`);
-                out = execaSync(pythonExecutable, ["-m", "pip", "install", "eth-wake", "-U", "--user"]).stdout;
+                outputChannel.appendLine(
+                    `Running '${pythonExecutable} -m pip install eth-wake -U --user'`
+                );
+                out = execaSync(pythonExecutable, [
+                    '-m',
+                    'pip',
+                    'install',
+                    'eth-wake',
+                    '-U',
+                    '--user'
+                ]).stdout;
             }
             outputChannel.appendLine(out);
             return true;
-        } catch(err) {
+        } catch (err) {
             if (err instanceof Error) {
                 outputChannel.appendLine("Failed to install PyPi package 'eth-wake':");
                 outputChannel.appendLine(err.toString());
@@ -145,24 +191,34 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
             try {
                 if (!fs.existsSync(venvPath)) {
                     outputChannel.appendLine(`Running '${pythonExecutable} -m venv ${venvPath}'`);
-                    execaSync(pythonExecutable, ["-m", "venv", venvPath]);
+                    execaSync(pythonExecutable, ['-m', 'venv', venvPath]);
                 }
 
                 let out;
                 if (WAKE_PRERELEASE) {
-                    outputChannel.appendLine(`Running '${venvActivateCommand} && pip install eth-wake -U --pre'`);
-                    out = execaSync(`${venvActivateCommand} && pip install eth-wake -U --pre`, { shell: true }).stdout;
+                    outputChannel.appendLine(
+                        `Running '${venvActivateCommand} && pip install eth-wake -U --pre'`
+                    );
+                    out = execaSync(`${venvActivateCommand} && pip install eth-wake -U --pre`, {
+                        shell: true
+                    }).stdout;
                 } else {
-                    outputChannel.appendLine(`Running '${venvActivateCommand} && pip install eth-wake -U'`);
-                    out = execaSync(`${venvActivateCommand} && pip install eth-wake -U`, { shell: true }).stdout;
+                    outputChannel.appendLine(
+                        `Running '${venvActivateCommand} && pip install eth-wake -U'`
+                    );
+                    out = execaSync(`${venvActivateCommand} && pip install eth-wake -U`, {
+                        shell: true
+                    }).stdout;
                 }
                 outputChannel.appendLine(out);
                 return true;
-            } catch(err) {
+            } catch (err) {
                 analytics.logCrash(EventType.ERROR_WAKE_INSTALL_PIP, err);
 
                 if (err instanceof Error) {
-                    outputChannel.appendLine("Failed to install PyPi package 'eth-wake' into venv:");
+                    outputChannel.appendLine(
+                        "Failed to install PyPi package 'eth-wake' into venv:"
+                    );
                     outputChannel.appendLine(err.toString());
                     outputChannel.show(true);
                 }
@@ -173,57 +229,77 @@ async function installWake(outputChannel: vscode.OutputChannel, pythonExecutable
     }
 }
 
-function getWakeVersion(pathToExecutable: string|null, venv: boolean, cwd?: string): string {
+function getWakeVersion(pathToExecutable: string | null, venv: boolean, cwd?: string): string {
     if (pathToExecutable) {
-        return execaSync(pathToExecutable, ["--version"]).stdout.trim();
+        return execaSync(pathToExecutable, ['--version']).stdout.trim();
     }
     if (venv) {
         return execaSync(`${venvActivateCommand} && wake --version`, { shell: true }).stdout.trim();
     }
     if (cwd === undefined) {
-        return execaSync("wake", ["--version"]).stdout.trim();
-    }
-    else {
-        return execaSync("./wake", ["--version"], {"cwd": cwd}).stdout.trim();
+        return execaSync('wake', ['--version']).stdout.trim();
+    } else {
+        return execaSync('./wake', ['--version'], { cwd: cwd }).stdout.trim();
     }
 }
 
-async function checkWakeInstalled(outputChannel: vscode.OutputChannel, venv: boolean, cwd?: string): Promise<boolean> {
+async function checkWakeInstalled(
+    outputChannel: vscode.OutputChannel,
+    venv: boolean,
+    cwd?: string
+): Promise<boolean> {
     try {
         const version: string = getWakeVersion(null, venv, cwd);
 
         if (compare(version, WAKE_TARGET_VERSION) < 0) {
             if (cwd === undefined) {
-                outputChannel.appendLine(`Found 'eth-wake' in version ${version} in PATH but the target minimal version is ${WAKE_TARGET_VERSION}.`);
+                outputChannel.appendLine(
+                    `Found 'eth-wake' in version ${version} in PATH but the target minimal version is ${WAKE_TARGET_VERSION}.`
+                );
             } else {
-                outputChannel.appendLine(`Found 'eth-wake' in version ${version} in '${cwd}' but the target minimal version is ${WAKE_TARGET_VERSION}.`);
+                outputChannel.appendLine(
+                    `Found 'eth-wake' in version ${version} in '${cwd}' but the target minimal version is ${WAKE_TARGET_VERSION}.`
+                );
             }
             return false;
         }
         return true;
-    } catch(err) {
+    } catch (err) {
         return false;
     }
 }
 
-async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable: string): Promise<[boolean, boolean, string|undefined]> {
+async function findWakeDir(
+    outputChannel: vscode.OutputChannel,
+    pythonExecutable: string
+): Promise<[boolean, boolean, string | undefined]> {
     let installed: boolean = await checkWakeInstalled(outputChannel, false);
     let venv: boolean = false;
-    let cwd: string|undefined = undefined;
+    let cwd: string | undefined = undefined;
 
     if (!installed) {
-        const globalPackages = execaSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts"))']).stdout.trim();
+        const globalPackages = execaSync(pythonExecutable, [
+            '-c',
+            'import os, sysconfig; print(sysconfig.get_path("scripts"))'
+        ]).stdout.trim();
         installed = await checkWakeInstalled(outputChannel, false, globalPackages);
         if (installed) {
-            outputChannel.appendLine(`Consider adding '${globalPackages}' to your PATH environment variable.`);
+            outputChannel.appendLine(
+                `Consider adding '${globalPackages}' to your PATH environment variable.`
+            );
             cwd = globalPackages;
         }
     }
     if (!installed) {
-        const userPackages = execaSync(pythonExecutable, ["-c", 'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))']).stdout.trim();
+        const userPackages = execaSync(pythonExecutable, [
+            '-c',
+            'import os, sysconfig; print(sysconfig.get_path("scripts",f"{os.name}_user"))'
+        ]).stdout.trim();
         installed = await checkWakeInstalled(outputChannel, false, userPackages);
         if (installed) {
-            outputChannel.appendLine(`Consider adding '${userPackages}' to your PATH environment variable.`);
+            outputChannel.appendLine(
+                `Consider adding '${userPackages}' to your PATH environment variable.`
+            );
             cwd = userPackages;
         }
     }
@@ -241,41 +317,57 @@ async function findWakeDir(outputChannel: vscode.OutputChannel, pythonExecutable
 
 function findPython(outputChannel: vscode.OutputChannel): string {
     try {
-        const pythonVersion = execaSync("python3", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).stdout.trim();
+        const pythonVersion = execaSync('python3', [
+            '-c',
+            'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")'
+        ]).stdout.trim();
 
-        if (compare(pythonVersion, "3.7.0") < 0) {
-            outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
-            throw new Error("Python version too old");
+        if (compare(pythonVersion, '3.7.0') < 0) {
+            outputChannel.appendLine(
+                `Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`
+            );
+            throw new Error('Python version too old');
         }
         outputChannel.appendLine(`Found Python in version ${pythonVersion}. Returning 'python3'.`);
-        outputChannel.appendLine(`Running 'which python3' returned ${execaSync("which", ["python3"]).stdout.trim()}`);
-        return "python3";
-    } catch(err) {
+        outputChannel.appendLine(
+            `Running 'which python3' returned ${execaSync('which', ['python3']).stdout.trim()}`
+        );
+        return 'python3';
+    } catch (err) {
         try {
-            const pythonVersion = execaSync("python", ["-c", 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")']).stdout.trim();
+            const pythonVersion = execaSync('python', [
+                '-c',
+                'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")'
+            ]).stdout.trim();
 
-            if (compare(pythonVersion, "3.7.0") < 0) {
-                outputChannel.appendLine(`Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`);
-                throw new Error("Python version too old");
+            if (compare(pythonVersion, '3.7.0') < 0) {
+                outputChannel.appendLine(
+                    `Found Python in version ${pythonVersion}. Python >=3.7 must be installed.`
+                );
+                throw new Error('Python version too old');
             }
-            outputChannel.appendLine(`Found Python in version ${pythonVersion}. Returning 'python'.`);
-            outputChannel.appendLine(`Running 'which python' returned ${execaSync("which", ["python"]).stdout.trim()}`);
-            return "python";
-        } catch(err) {
-            outputChannel.appendLine("Python >=3.7 must be installed.");
-            throw new Error("Python not found");
+            outputChannel.appendLine(
+                `Found Python in version ${pythonVersion}. Returning 'python'.`
+            );
+            outputChannel.appendLine(
+                `Running 'which python' returned ${execaSync('which', ['python']).stdout.trim()}`
+            );
+            return 'python';
+        } catch (err) {
+            outputChannel.appendLine('Python >=3.7 must be installed.');
+            throw new Error('Python not found');
         }
     }
 }
 
 async function pipxInstall(outputChannel: vscode.OutputChannel): Promise<void> {
-    let out: string = "";
+    let out: string = '';
     if (WAKE_PRERELEASE) {
         outputChannel.appendLine(`Running 'pipx install --pip-args=--pre eth-wake'`);
-        out = execaSync("pipx", ["install", "--pip-args=--pre", "eth-wake"]).stdout;
+        out = execaSync('pipx', ['install', '--pip-args=--pre', 'eth-wake']).stdout;
     } else {
         outputChannel.appendLine(`Running 'pipx install eth-wake'`);
-        out = execaSync("pipx", ["install", "eth-wake"]).stdout;
+        out = execaSync('pipx', ['install', 'eth-wake']).stdout;
     }
     if (out.trim().length > 0) {
         outputChannel.appendLine(out);
@@ -283,13 +375,13 @@ async function pipxInstall(outputChannel: vscode.OutputChannel): Promise<void> {
 }
 
 async function pipxUpgrade(outputChannel: vscode.OutputChannel): Promise<void> {
-    let out: string = "";
+    let out: string = '';
     if (WAKE_PRERELEASE) {
         outputChannel.appendLine(`Running 'pipx upgrade --pip-args=--pre eth-wake'`);
-        out = execaSync("pipx", ["upgrade", "--pip-args=--pre", "eth-wake"]).stdout;
+        out = execaSync('pipx', ['upgrade', '--pip-args=--pre', 'eth-wake']).stdout;
     } else {
         outputChannel.appendLine(`Running 'pipx upgrade eth-wake'`);
-        out = execaSync("pipx", ["upgrade", "eth-wake"]).stdout;
+        out = execaSync('pipx', ['upgrade', 'eth-wake']).stdout;
     }
     if (out.trim().length > 0) {
         outputChannel.appendLine(out);
@@ -300,61 +392,74 @@ async function pipxUpgrade(outputChannel: vscode.OutputChannel): Promise<void> {
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
     analytics = new Analytics(context);
-    const outputChannel = vscode.window.createOutputChannel("Tools for Solidity", "tools-for-solidity-output");
+    const outputChannel = vscode.window.createOutputChannel(
+        'Tools for Solidity',
+        'tools-for-solidity-output'
+    );
     outputChannel.show(true);
     errorHandler = new ClientErrorHandler(outputChannel, analytics);
-    venvPath = path.join(context.globalStorageUri.fsPath, "venv");
+    venvPath = path.join(context.globalStorageUri.fsPath, 'venv');
 
-    if (process.platform === "win32") {
-        venvActivateCommand = '"' + path.join(venvPath, "Scripts", "activate.bat") + '"';
+    if (process.platform === 'win32') {
+        venvActivateCommand = '"' + path.join(venvPath, 'Scripts', 'activate.bat') + '"';
     } else {
-        venvActivateCommand = '. "' + path.join(venvPath, "bin", "activate") + '"';
+        venvActivateCommand = '. "' + path.join(venvPath, 'bin', 'activate') + '"';
     }
 
     migrateConfig();
 
-    const extensionConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
+    const extensionConfig: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration('Tools-for-Solidity');
     const autoInstall: boolean = extensionConfig.get<boolean>('Wake.autoInstall', true);
     let usePipx: boolean = extensionConfig.get<boolean>('Wake.usePipx', true);
-    let pathToExecutable: string|null = extensionConfig.get<string | null>('Wake.pathToExecutable', null);
+    let pathToExecutable: string | null = extensionConfig.get<string | null>(
+        'Wake.pathToExecutable',
+        null
+    );
     if (pathToExecutable?.trim()?.length === 0) {
         pathToExecutable = null;
     }
-    let wakePort: number|undefined = extensionConfig.get('Wake.port', undefined);
+    let wakePort: number | undefined = extensionConfig.get('Wake.port', undefined);
     let installed: boolean = false;
     let venv: boolean = false;
-    let cwd: string|undefined = undefined;
+    let cwd: string | undefined = undefined;
 
-    let solcIgnoredWarnings = extensionConfig.get<Array<integer|string>>('Wake.compiler.solc.ignoredWarnings', []);
+    let solcIgnoredWarnings = extensionConfig.get<Array<integer | string>>(
+        'Wake.compiler.solc.ignoredWarnings',
+        []
+    );
 
     if (autoInstall && !pathToExecutable && !wakePort) {
         if (usePipx) {
             let pipxList;
             try {
-                pipxList = JSON.parse(execaSync("pipx", ["list", "--json"]).stdout.trim());
-            } catch(err) {
+                pipxList = JSON.parse(execaSync('pipx', ['list', '--json']).stdout.trim());
+            } catch (err) {
                 usePipx = false;
             }
 
             if (usePipx) {
                 try {
-                    if (!("eth-wake" in pipxList.venvs)) {
+                    if (!('eth-wake' in pipxList.venvs)) {
                         await pipxInstall(outputChannel);
-                        pipxList = JSON.parse(execaSync("pipx", ["list", "--json"]).stdout.trim());
+                        pipxList = JSON.parse(execaSync('pipx', ['list', '--json']).stdout.trim());
                     }
 
-                    for (const appPath of pipxList.venvs["eth-wake"].metadata.main_package.app_paths) {
-                        if (path.parse(appPath.__Path__).name === "wake") {
+                    for (const appPath of pipxList.venvs['eth-wake'].metadata.main_package
+                        .app_paths) {
+                        if (path.parse(appPath.__Path__).name === 'wake') {
                             pathToExecutable = appPath.__Path__;
                             break;
                         }
                     }
                     const version: string = getWakeVersion(pathToExecutable, false, cwd);
                     if (compare(version, WAKE_TARGET_VERSION) < 0) {
-                        outputChannel.appendLine(`Found 'eth-wake' in version ${version} in ${pathToExecutable} but the target minimal version is ${WAKE_TARGET_VERSION}.`);
+                        outputChannel.appendLine(
+                            `Found 'eth-wake' in version ${version} in ${pathToExecutable} but the target minimal version is ${WAKE_TARGET_VERSION}.`
+                        );
                         await pipxUpgrade(outputChannel);
                     }
-                } catch(err) {
+                } catch (err) {
                     analytics.logCrash(EventType.ERROR_WAKE_INSTALL_PIPX, err);
                     if (err instanceof Error) {
                         outputChannel.appendLine(err.toString());
@@ -377,7 +482,9 @@ export async function activate(context: vscode.ExtensionContext) {
                     [installed, venv, cwd] = await findWakeDir(outputChannel, pythonExecutable);
 
                     if (!installed) {
-                        outputChannel.appendLine("'eth-wake' installed but cannot be found in PATH or pip site-packages.");
+                        outputChannel.appendLine(
+                            "'eth-wake' installed but cannot be found in PATH or pip site-packages."
+                        );
                     }
                 }
             }
@@ -385,16 +492,18 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     if (!wakePort) {
-        let wakeVersion: string
+        let wakeVersion: string;
         try {
             wakeVersion = getWakeVersion(pathToExecutable, venv, cwd);
             if (compare(wakeVersion, WAKE_TARGET_VERSION) < 0) {
                 analytics.logEvent(EventType.ERROR_WAKE_VERSION);
-                outputChannel.appendLine(`PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`);
+                outputChannel.appendLine(
+                    `PyPi package 'eth-wake' in version ${wakeVersion} installed but the target minimal version is ${WAKE_TARGET_VERSION}. Exiting...`
+                );
                 outputChannel.show(true);
                 return;
             }
-        } catch(err) {
+        } catch (err) {
             analytics.logCrash(EventType.ERROR_WAKE_VERSION_UNKNOWN, err);
             if (err instanceof Error) {
                 outputChannel.appendLine(err.toString());
@@ -410,23 +519,41 @@ export async function activate(context: vscode.ExtensionContext) {
             cwd = path.dirname(pathToExecutable);
         }
 
-        const wakePath: string = cwd ? path.join(cwd, "wake") : "wake";
+        const wakePath: string = cwd ? path.join(cwd, 'wake') : 'wake';
 
         if (venv) {
-            outputChannel.appendLine(`Running '${venvActivateCommand} && wake lsp --port ${wakePort}' (v${wakeVersion})`);
-            wakeProcess = execa(`${venvActivateCommand} && wake lsp --port ${wakePort}`, { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
-        }
-        else if (cwd === undefined) {
-            outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (v${wakeVersion})`);
-            wakeProcess = execa('wake', ["lsp", "--port", String(wakePort)], { shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' } });
+            outputChannel.appendLine(
+                `Running '${venvActivateCommand} && wake lsp --port ${wakePort}' (v${wakeVersion})`
+            );
+            wakeProcess = execa(`${venvActivateCommand} && wake lsp --port ${wakePort}`, {
+                shell: true,
+                stdio: ['ignore', 'ignore', 'pipe'],
+                env: { ...process.env, PYTHONIOENCODING: 'utf8' }
+            });
+        } else if (cwd === undefined) {
+            outputChannel.appendLine(
+                `Running '${wakePath} lsp --port ${wakePort}' (v${wakeVersion})`
+            );
+            wakeProcess = execa('wake', ['lsp', '--port', String(wakePort)], {
+                shell: true,
+                stdio: ['ignore', 'ignore', 'pipe'],
+                env: { ...process.env, PYTHONIOENCODING: 'utf8' }
+            });
         } else {
-            outputChannel.appendLine(`Running '${wakePath} lsp --port ${wakePort}' (v${wakeVersion})`);
-            const cmd = process.platform === "win32" ? ".\\wake" : "./wake";
-            wakeProcess = execa(cmd, ["lsp", "--port", String(wakePort)], { cwd, shell: true, stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, PYTHONIOENCODING: 'utf8' }});
+            outputChannel.appendLine(
+                `Running '${wakePath} lsp --port ${wakePort}' (v${wakeVersion})`
+            );
+            const cmd = process.platform === 'win32' ? '.\\wake' : './wake';
+            wakeProcess = execa(cmd, ['lsp', '--port', String(wakePort)], {
+                cwd,
+                shell: true,
+                stdio: ['ignore', 'ignore', 'pipe'],
+                env: { ...process.env, PYTHONIOENCODING: 'utf8' }
+            });
         }
         wakeProcess.stderr?.on('data', (chunk) => {
             crashlog.push(chunk);
-            if (crashlog.length > CRASHLOG_LIMIT){
+            if (crashlog.length > CRASHLOG_LIMIT) {
                 crashlog.shift();
             }
         });
@@ -437,7 +564,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         });
         wakeProcess.on('exit', () => {
-            analytics.logCrash(EventType.ERROR_WAKE_CRASH, new Error(crashlog.join("\n")));
+            analytics.logCrash(EventType.ERROR_WAKE_CRASH, new Error(crashlog.join('\n')));
             printCrashlog(outputChannel);
             wakeProcess = undefined;
         });
@@ -445,18 +572,20 @@ export async function activate(context: vscode.ExtensionContext) {
         outputChannel.appendLine(`Connecting to running 'wake' server on port ${wakePort}`);
     }
 
-    if (!await waitPort({
-        host: "127.0.0.1",
-        port: wakePort,
-        timeout: 15000
-    })) {
+    if (
+        !(await waitPort({
+            host: '127.0.0.1',
+            port: wakePort,
+            timeout: 15000
+        }))
+    ) {
         outputChannel.appendLine(`Timed out waiting for port ${wakePort} to open.`);
     }
 
     const serverOptions: ServerOptions = async () => {
         let socket = net.connect({
             port: wakePort ?? 65432,
-            host: "127.0.0.1"
+            host: '127.0.0.1'
         });
         let result: StreamInfo = {
             writer: socket,
@@ -469,7 +598,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'solidity' }],
-        synchronize: { configurationSection: 'wake'},
+        synchronize: { configurationSection: 'wake' },
         outputChannel: outputChannel,
         initializationOptions: {
             toolsForSolidityVersion: context.extension.packageJSON.version
@@ -478,13 +607,18 @@ export async function activate(context: vscode.ExtensionContext) {
         errorHandler: errorHandler
     };
 
-    client = new LanguageClient("Tools-for-Solidity", "Tools for Solidity", serverOptions, clientOptions);
+    client = new LanguageClient(
+        'Tools-for-Solidity',
+        'Tools for Solidity',
+        serverOptions,
+        clientOptions
+    );
     errorHandler.setClient(client);
     printers = new PrintersHandler(client, context, outputChannel);
 
-    diagnosticCollection = vscode.languages.createDiagnosticCollection('Wake')
+    diagnosticCollection = vscode.languages.createDiagnosticCollection('Wake');
 
-    client.onNotification("textDocument/publishDiagnostics", (params) => {
+    client.onNotification('textDocument/publishDiagnostics', (params) => {
         //outputChannel.appendLine(JSON.stringify(params));
         let diag = params as DiagnosticNotification;
 
@@ -492,7 +626,7 @@ export async function activate(context: vscode.ExtensionContext) {
         diag.diagnostics = diag.diagnostics.filter((item) => {
             if (
                 item.code &&
-                item.source === "Wake(solc)" &&
+                item.source === 'Wake(solc)' &&
                 solcIgnoredWarnings.includes(Number.parseInt(item.code as string))
             ) {
                 return false;
@@ -502,8 +636,12 @@ export async function activate(context: vscode.ExtensionContext) {
         onNotification(outputChannel, diag);
     });
 
-    vscode.window.registerTreeDataProvider('wake-detections', wakeProvider);
-    vscode.window.registerTreeDataProvider('solc-detections', solcProvider);
+    context.subscriptions.push(
+        vscode.window.registerTreeDataProvider('wake-detections', wakeProvider)
+    );
+    context.subscriptions.push(
+        vscode.window.registerTreeDataProvider('solc-detections', solcProvider)
+    );
 
     registerCommands(outputChannel, context);
 
@@ -511,88 +649,275 @@ export async function activate(context: vscode.ExtensionContext) {
 
     client.start();
     analytics.logActivate();
+
+    // activate Sake
+    activateSake(context, client);
 }
 
-function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext){
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.control_flow_graph", async (documentUri, canonicalName) => await generateCfgHandler(outputChannel, documentUri, canonicalName)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.inheritance_graph", async (documentUri, canonicalName) => await generateInheritanceGraphHandler({ documentUri, canonicalName, out: outputChannel })));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.linearized_inheritance_graph", async (documentUri, canonicalName) => await generateLinearizedInheritanceGraphHandler(outputChannel, documentUri, canonicalName)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.copy_to_clipboard", async (text) => await copyToClipboardHandler(text)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.foundry.import_remappings", async () => await importFoundryRemappings(outputChannel)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.generate.imports_graph", async () => await generateImportsGraphHandler(outputChannel)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.execute.references", async (documentUri, position, declarationPositions) => await executeReferencesHandler(outputChannel, documentUri, position, declarationPositions)));
+function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext) {
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.generate.control_flow_graph',
+            async (documentUri, canonicalName) =>
+                await generateCfgHandler(outputChannel, documentUri, canonicalName)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.generate.inheritance_graph',
+            async (documentUri, canonicalName) =>
+                await generateInheritanceGraphHandler({
+                    documentUri,
+                    canonicalName,
+                    out: outputChannel
+                })
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.generate.linearized_inheritance_graph',
+            async (documentUri, canonicalName) =>
+                await generateLinearizedInheritanceGraphHandler(
+                    outputChannel,
+                    documentUri,
+                    canonicalName
+                )
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.copy_to_clipboard',
+            async (text) => await copyToClipboardHandler(text)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.foundry.import_remappings',
+            async () => await importFoundryRemappings(outputChannel)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.generate.imports_graph',
+            async () => await generateImportsGraphHandler(outputChannel)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.execute.references',
+            async (documentUri, position, declarationPositions) =>
+                await executeReferencesHandler(
+                    outputChannel,
+                    documentUri,
+                    position,
+                    declarationPositions
+                )
+        )
+    );
 
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.coverage.show", showCoverageCallback));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.coverage.hide", hideCoverageCallback));
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.coverage.show', showCoverageCallback)
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.coverage.hide', hideCoverageCallback)
+    );
 
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.open_file", async (uri, range) => openFile(uri, range)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.open_docs", async (item) => openWeb((item as DetectorItem).detector)));
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.open_file',
+            async (uri, range) => openFile(uri, range)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.detections.open_docs', async (item) =>
+            openWeb((item as DetectorItem).detector)
+        )
+    );
 
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.init.detector", async () => await newDetector(false)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.init.global_detector", async () => await newDetector(true)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.init.printer", async () => await newPrinter(false)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.init.global_printer", async () => await newPrinter(true)));
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.init.detector',
+            async () => await newDetector(false)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.init.global_detector',
+            async () => await newDetector(true)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.init.printer',
+            async () => await newPrinter(false)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.init.global_printer',
+            async () => await newPrinter(true)
+        )
+    );
 
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.impact", async () => wakeProvider?.setGroupBy(GroupBy.IMPACT)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.file", async () => wakeProvider?.setGroupBy(GroupBy.FILE)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.confidence", async () => wakeProvider?.setGroupBy(GroupBy.CONFIDENCE)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.group.detector", async () => wakeProvider?.setGroupBy(GroupBy.DETECTOR)));
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.detections.group.impact', async () =>
+            wakeProvider?.setGroupBy(GroupBy.IMPACT)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.detections.group.file', async () =>
+            wakeProvider?.setGroupBy(GroupBy.FILE)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.group.confidence',
+            async () => wakeProvider?.setGroupBy(GroupBy.CONFIDENCE)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.detections.group.detector', async () =>
+            wakeProvider?.setGroupBy(GroupBy.DETECTOR)
+        )
+    );
 
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.high", async () => wakeProvider?.setFilterImpact(Impact.HIGH)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.medium", async () => wakeProvider?.setFilterImpact(Impact.MEDIUM)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.low", async () => wakeProvider?.setFilterImpact(Impact.LOW)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.warning", async () => wakeProvider?.setFilterImpact(Impact.WARNING)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.impact.info", async () => wakeProvider?.setFilterImpact(Impact.INFO)));
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.filter.impact.high',
+            async () => wakeProvider?.setFilterImpact(Impact.HIGH)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.filter.impact.medium',
+            async () => wakeProvider?.setFilterImpact(Impact.MEDIUM)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.filter.impact.low',
+            async () => wakeProvider?.setFilterImpact(Impact.LOW)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.filter.impact.warning',
+            async () => wakeProvider?.setFilterImpact(Impact.WARNING)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.filter.impact.info',
+            async () => wakeProvider?.setFilterImpact(Impact.INFO)
+        )
+    );
 
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.confidence.high", async () => wakeProvider?.setFilterConfidence(Confidence.HIGH)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.confidence.medium", async () => wakeProvider?.setFilterConfidence(Confidence.MEDIUM)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.filter.confidence.low", async () => wakeProvider?.setFilterConfidence(Confidence.LOW)));
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.filter.confidence.high',
+            async () => wakeProvider?.setFilterConfidence(Confidence.HIGH)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.filter.confidence.medium',
+            async () => wakeProvider?.setFilterConfidence(Confidence.MEDIUM)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.filter.confidence.low',
+            async () => wakeProvider?.setFilterConfidence(Confidence.LOW)
+        )
+    );
 
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.force_rerun_detectors", async () => {
-        wakeProvider?.clear();
-        vscode.commands.executeCommand('wake.lsp.force_rerun_detectors');
-    }));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.detections.force_recompile", async () => {
-        solcProvider?.clear();
-        wakeProvider?.clear();
-        vscode.commands.executeCommand('wake.lsp.force_recompile');
-    }))
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.force_rerun_detectors',
+            async () => {
+                wakeProvider?.clear();
+                vscode.commands.executeCommand('wake.lsp.force_rerun_detectors');
+            }
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.detections.force_recompile',
+            async () => {
+                solcProvider?.clear();
+                wakeProvider?.clear();
+                vscode.commands.executeCommand('wake.lsp.force_recompile');
+            }
+        )
+    );
 
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.wake_callback", async (documentUri: vscode.Uri, callbackType: string, callbackId: string) => await vscode.commands.executeCommand('wake.callback', documentUri, callbackType, callbackId)));
-    context.subscriptions.push(vscode.commands.registerCommand("Tools-for-Solidity.sake.compile_current_file", async () => {
-        const editor = vscode.window.activeTextEditor;
-        if (editor?.document?.languageId !== 'solidity') {
-            outputChannel.appendLine("Failed to compile, no Solidity file opened");
-            return;
-        }
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.wake_callback',
+            async (documentUri: vscode.Uri, callbackType: string, callbackId: string) =>
+                await vscode.commands.executeCommand(
+                    'wake.callback',
+                    documentUri,
+                    callbackType,
+                    callbackId
+                )
+        )
+    );
 
-        if (client === undefined) {
-            outputChannel.appendLine("Failed to compile due to missing language client");
-        }
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.select-installation-method',
+            async () => {
+                const items: vscode.QuickPickItem[] = [
+                    { label: 'Install Wake using pipx' },
+                    { label: 'Install Wake using pip' },
+                    { label: 'Install Wake using conda' },
+                    { label: 'Manual install' }
+                ];
+                const selection = await vscode.window.showQuickPick(items, {
+                    title: 'Select the installation method for Wake'
+                });
+                // if (selection) {
+                //     if (selection.label === "Install 'eth-wake' using pipx") {
+                //         await pipxInstall(outputChannel);
+                //     } else {
+                //         const pythonExecutable = findPython(outputChannel);
+                //         await installWake(outputChannel, pythonExecutable);
+                //     }
+                // }
+            }
+        )
+    );
 
-        const out = await client?.sendRequest("wake/sake/compile");
-
-        outputChannel.appendLine(`Client response: ${out}`);
-        console.log(out);
-        // outputChannel.appendLine(`Running 'wake sake compile, opened file is ${editor.document.uri.fsPath}'`);
-    }));
-
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.install.wake-conda', async () =>
+            vscode.window.showInformationMessage('Not implemented yet.')
+        )
+    );
 }
 
-function openFile(uri : vscode.Uri, range : vscode.Range){
+function openFile(uri: vscode.Uri, range: vscode.Range) {
     vscode.workspace.openTextDocument(uri).then((file) => {
         vscode.window.showTextDocument(file).then(async (editor) => {
             if (vscode.window.activeTextEditor) {
-                const target = new vscode.Selection(range.start.line, range.start.character, range.end.line, range.end.character);
+                const target = new vscode.Selection(
+                    range.start.line,
+                    range.start.character,
+                    range.end.line,
+                    range.end.character
+                );
                 vscode.window.activeTextEditor.selection = target;
-                vscode.window.activeTextEditor.revealRange(target, vscode.TextEditorRevealType.InCenter);
+                vscode.window.activeTextEditor.revealRange(
+                    target,
+                    vscode.TextEditorRevealType.InCenter
+                );
             }
         });
     });
 }
 
-function openWeb(detector : Detector){
-    if(detector.docs != undefined){
+function openWeb(detector: Detector) {
+    if (detector.docs != undefined) {
         vscode.env.openExternal(detector.docs);
         //let panel = vscode.window.createWebviewPanel('detector-docs', "Detector Documentation (" + detector.id + ")", vscode.ViewColumn.Beside);
         //panel.webview.html = `<html><body>TODO</body></html>`;
@@ -606,64 +931,75 @@ export function deactivate() {
     }
     if (wakeProcess !== undefined) {
         if (!wakeProcess.kill()) {
-            wakeProcess.kill("SIGKILL");
+            wakeProcess.kill('SIGKILL');
         }
     }
+    deactivateSake();
 }
 
-function migrateConfig(){
-
-    if (vscode.workspace.getConfiguration("Tools-for-Solidity").has("Woke")){
+function migrateConfig() {
+    if (vscode.workspace.getConfiguration('Tools-for-Solidity').has('Woke')) {
         analytics.logMigrate();
-        let cfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Tools-for-Solidity");
-        migrateConfigKey(cfg, cfg, "Woke.trace.server", "Wake.trace.server");
-        migrateConfigKey(cfg, cfg, "Woke.autoInstall", "Wake.autoInstall");
-        migrateConfigKey(cfg, cfg, "Woke.pathToExecutable", "Wake.pathToExecutable");
-        migrateConfigKey(cfg, cfg, "Woke.port", "Wake.port");
+        let cfg: vscode.WorkspaceConfiguration =
+            vscode.workspace.getConfiguration('Tools-for-Solidity');
+        migrateConfigKey(cfg, cfg, 'Woke.trace.server', 'Wake.trace.server');
+        migrateConfigKey(cfg, cfg, 'Woke.autoInstall', 'Wake.autoInstall');
+        migrateConfigKey(cfg, cfg, 'Woke.pathToExecutable', 'Wake.pathToExecutable');
+        migrateConfigKey(cfg, cfg, 'Woke.port', 'Wake.port');
     }
 
-    if (vscode.workspace.getConfiguration().has("woke")){
-        let wokeCfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("woke");
-        let wakeCfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("wake");
+    if (vscode.workspace.getConfiguration().has('woke')) {
+        let wokeCfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('woke');
+        let wakeCfg: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('wake');
 
-        migrateConfigKey(wokeCfg, wakeCfg, "configuration.use_toml_if_present");
-        migrateConfigKey(wokeCfg, wakeCfg, "configuration.toml_path");
+        migrateConfigKey(wokeCfg, wakeCfg, 'configuration.use_toml_if_present');
+        migrateConfigKey(wokeCfg, wakeCfg, 'configuration.toml_path');
 
-        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.allow_paths");
-        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.evm_version");
-        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.ignore_paths", "compiler.solc.exclude_paths");
-        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.include_paths");
-        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.remappings");
-        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.target_version");
-        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.via_IR");
-        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.optimizer.enabled");
-        migrateConfigKey(wokeCfg, wakeCfg, "compiler.solc.optimizer.runs");
+        migrateConfigKey(wokeCfg, wakeCfg, 'compiler.solc.allow_paths');
+        migrateConfigKey(wokeCfg, wakeCfg, 'compiler.solc.evm_version');
+        migrateConfigKey(
+            wokeCfg,
+            wakeCfg,
+            'compiler.solc.ignore_paths',
+            'compiler.solc.exclude_paths'
+        );
+        migrateConfigKey(wokeCfg, wakeCfg, 'compiler.solc.include_paths');
+        migrateConfigKey(wokeCfg, wakeCfg, 'compiler.solc.remappings');
+        migrateConfigKey(wokeCfg, wakeCfg, 'compiler.solc.target_version');
+        migrateConfigKey(wokeCfg, wakeCfg, 'compiler.solc.via_IR');
+        migrateConfigKey(wokeCfg, wakeCfg, 'compiler.solc.optimizer.enabled');
+        migrateConfigKey(wokeCfg, wakeCfg, 'compiler.solc.optimizer.runs');
 
-        migrateConfigKey(wokeCfg, wakeCfg, "detectors.exclude");
-        migrateConfigKey(wokeCfg, wakeCfg, "detectors.only");
-        migrateConfigKey(wokeCfg, wakeCfg, "detectors.ignore_paths", "detectors.exclude_paths");
+        migrateConfigKey(wokeCfg, wakeCfg, 'detectors.exclude');
+        migrateConfigKey(wokeCfg, wakeCfg, 'detectors.only');
+        migrateConfigKey(wokeCfg, wakeCfg, 'detectors.ignore_paths', 'detectors.exclude_paths');
 
-        migrateConfigKey(wokeCfg, wakeCfg, "generator.control_flow_graph.direction");
-        migrateConfigKey(wokeCfg, wakeCfg, "generator.control_flow_graph.vscode_urls");
-        migrateConfigKey(wokeCfg, wakeCfg, "generator.imports_graph.direction");
-        migrateConfigKey(wokeCfg, wakeCfg, "generator.imports_graph.imports_direction");
-        migrateConfigKey(wokeCfg, wakeCfg, "generator.generator.imports_graph.vscode_urls");
-        migrateConfigKey(wokeCfg, wakeCfg, "generator.inheritance_graph.direction");
-        migrateConfigKey(wokeCfg, wakeCfg, "generator.inheritance_graph.vscode_urls");
-        migrateConfigKey(wokeCfg, wakeCfg, "generator.inheritance_graph_full.direction");
-        migrateConfigKey(wokeCfg, wakeCfg, "generator.inheritance_graph_full.vscode_urls");
+        migrateConfigKey(wokeCfg, wakeCfg, 'generator.control_flow_graph.direction');
+        migrateConfigKey(wokeCfg, wakeCfg, 'generator.control_flow_graph.vscode_urls');
+        migrateConfigKey(wokeCfg, wakeCfg, 'generator.imports_graph.direction');
+        migrateConfigKey(wokeCfg, wakeCfg, 'generator.imports_graph.imports_direction');
+        migrateConfigKey(wokeCfg, wakeCfg, 'generator.generator.imports_graph.vscode_urls');
+        migrateConfigKey(wokeCfg, wakeCfg, 'generator.inheritance_graph.direction');
+        migrateConfigKey(wokeCfg, wakeCfg, 'generator.inheritance_graph.vscode_urls');
+        migrateConfigKey(wokeCfg, wakeCfg, 'generator.inheritance_graph_full.direction');
+        migrateConfigKey(wokeCfg, wakeCfg, 'generator.inheritance_graph_full.vscode_urls');
 
-        migrateConfigKey(wokeCfg, wakeCfg, "lsp.compilation_delay");
-        migrateConfigKey(wokeCfg, wakeCfg, "lsp.code_lens.enable");
-        migrateConfigKey(wokeCfg, wakeCfg, "lsp.detectors.enable");
-        migrateConfigKey(wokeCfg, wakeCfg, "lsp.find_references.include_declarations");
+        migrateConfigKey(wokeCfg, wakeCfg, 'lsp.compilation_delay');
+        migrateConfigKey(wokeCfg, wakeCfg, 'lsp.code_lens.enable');
+        migrateConfigKey(wokeCfg, wakeCfg, 'lsp.detectors.enable');
+        migrateConfigKey(wokeCfg, wakeCfg, 'lsp.find_references.include_declarations');
     }
 }
 
-function migrateConfigKey(from: vscode.WorkspaceConfiguration, to: vscode.WorkspaceConfiguration, fromKey: string, toKey?: string | undefined){
+function migrateConfigKey(
+    from: vscode.WorkspaceConfiguration,
+    to: vscode.WorkspaceConfiguration,
+    fromKey: string,
+    toKey?: string | undefined
+) {
     let key = toKey == undefined ? fromKey : toKey;
     let value = from.inspect(fromKey);
-    if (value?.globalValue != undefined){
+    if (value?.globalValue != undefined) {
         to.update(key, value?.globalValue, vscode.ConfigurationTarget.Global);
         from.update(fromKey, undefined, vscode.ConfigurationTarget.Global);
     }
@@ -673,33 +1009,43 @@ function migrateConfigKey(from: vscode.WorkspaceConfiguration, to: vscode.Worksp
     }
 }
 
-function printCrashlog(outputChannel : vscode.OutputChannel){
-    outputChannel.appendLine("\n≡W≡W≡W≡[ Wake LSP Crashlog ]≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡\n")
-    crashlog.forEach(line => {
+function printCrashlog(outputChannel: vscode.OutputChannel) {
+    outputChannel.appendLine(
+        '\n≡W≡W≡W≡[ Wake LSP Crashlog ]≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡\n'
+    );
+    crashlog.forEach((line) => {
         outputChannel.appendLine(line);
     });
-    outputChannel.appendLine("\n≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡")
-    outputChannel.appendLine("|                                                                           |");
-    outputChannel.appendLine("|   Ooops! Wake LSP crashed, please report the issue to our GitHub:         |");
-    outputChannel.appendLine("|   https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/issues    |");
-    outputChannel.appendLine("|                                                                           |");
-    outputChannel.appendLine("≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡")
+    outputChannel.appendLine(
+        '\n≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡'
+    );
+    outputChannel.appendLine(
+        '|                                                                           |'
+    );
+    outputChannel.appendLine(
+        '|   Ooops! Wake LSP crashed, please report the issue to our GitHub:         |'
+    );
+    outputChannel.appendLine(
+        '|   https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/issues    |'
+    );
+    outputChannel.appendLine(
+        '|                                                                           |'
+    );
+    outputChannel.appendLine(
+        '≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡W≡'
+    );
 }
 
-export class Log{
+export class Log {
+    outputChannel: vscode.OutputChannel;
+    level: integer;
 
-    outputChannel : vscode.OutputChannel
-    level : integer;
-
-    constructor(outputChannel : vscode.OutputChannel, level : integer){
+    constructor(outputChannel: vscode.OutputChannel, level: integer) {
         this.outputChannel = outputChannel;
         this.level = level;
     }
 
-    d(message : string){
-        if(this.level >= 0)
-            this.outputChannel.appendLine(message)
+    d(message: string) {
+        if (this.level >= 0) this.outputChannel.appendLine(message);
     }
 }
-
-
