@@ -1,6 +1,6 @@
 # [Ackee Blockchain](https://ackee.xyz) Tools for Solidity ([Wake](https://getwake.io))
 
-Tools for Solidity is an extension for Visual Studio Code, powered by [Wake](https://getwake.io), that offers most of the language server features and displays real-time results of vulnerability detectors and compiler in custom UI. Different graph types can be generated to better visualize the relations in the code.
+Tools for Solidity is an extension for Visual Studio Code, powered by [Wake](https://getwake.io), that offers most of the language server features and displays real-time results of vulnerability detectors and compiler warnings/errors in custom UI. Different graph types can be generated to better visualize the relations in the code.
 
 **Features:**
 
@@ -8,7 +8,7 @@ Tools for Solidity is an extension for Visual Studio Code, powered by [Wake](htt
 - Go to Definition, Type Definition, Implementation
 - Find References
 - Type Hierarchy
-- Document Links, Document Symbols
+- Document Links, Document Symbols, Workspace Symbols
 - Hover
 - Code Lens
 - Rename
@@ -21,11 +21,9 @@ Tools for Solidity is an extension for Visual Studio Code, powered by [Wake](htt
 
 ## Dependencies
 
-The Tools for Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.7 or higher. Python 3.12 is experimentally supported.
+The Tools for Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.8 or higher. Python 3.12 is experimentally supported.
 
 Rosetta is required to be enabled on Apple Silicon (M1, M2 & M3) Macs.
-
-To display the generated graphs, Graphviz (DOT) extension must be installed e.g. [Graphviz Preview](https://marketplace.visualstudio.com/items?itemName=EFanZh.graphviz-preview).
 
 ## Installation
 
@@ -171,4 +169,5 @@ The extension relies on the `solc` compiler. For this reason, files containing c
 
 ## Acknowledgements
 
-We used [juanfranblanco/vscode-solidity](https://github.com/juanfranblanco/vscode-solidity/blob/master/syntaxes/solidity.json) as a base of our Solidity grammar.
+- [juanfranblanco/vscode-solidity](https://github.com/juanfranblanco/vscode-solidity/blob/master/syntaxes/solidity.json): a base of our Solidity grammar
+- [joaompinto/vscode-graphviz](https://github.com/joaompinto/vscode-graphviz): a base of our Graphviz integration

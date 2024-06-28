@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient/node';
-import { PrinterNotification, PeekLocationsCommand, GoToLocationsCommand, OpenCommand, CopyToClipboardCommand } from './PrinterNotification';
+import { PrinterNotification, PeekLocationsCommand, GoToLocationsCommand, OpenCommand, CopyToClipboardCommand, ShowMessageCommand, ShowDotCommand } from './PrinterNotification';
+import { GraphvizPreviewGenerator } from '../graphviz/GraphvizPreviewGenerator';
 
 export class PrintersHandler {
 
     context: vscode.ExtensionContext
     outputChannel: vscode.OutputChannel
 
-    constructor(client: LanguageClient, context: vscode.ExtensionContext, outputChannel: vscode.OutputChannel) {
+    constructor(client: LanguageClient, context: vscode.ExtensionContext, private graphvizGenerator: GraphvizPreviewGenerator, outputChannel: vscode.OutputChannel) {
         this.context = context;
         this.outputChannel = outputChannel;
 
@@ -66,6 +67,23 @@ export class PrintersHandler {
                 const copyParams = command as CopyToClipboardCommand;
 
                 await vscode.env.clipboard.writeText(copyParams.text);
+            } else if (command.command == "showMessage") {
+                const messageParams = command as ShowMessageCommand;
+
+                if (messageParams.kind === "info") {
+                    await vscode.window.showInformationMessage(messageParams.message);
+                } else if (messageParams.kind === "warning") {
+                    await vscode.window.showWarningMessage(messageParams.message);
+                } else if (messageParams.kind === "error") {
+                    await vscode.window.showErrorMessage(messageParams.message);
+                } else {
+                    throw new Error(`Unknown message kind: ${messageParams.kind}`);
+                }
+            } else if (command.command == "showDot") {
+                const dotParams = command as ShowDotCommand;
+
+                const preview = this.graphvizGenerator.createPreviewPanel(dotParams.dot, dotParams.title, vscode.ViewColumn.Beside);
+                await this.graphvizGenerator.updateContent(preview);
             }
         }
     }

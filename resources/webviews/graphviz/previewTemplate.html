@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="scaling.js"></script>
+    <script src="preview.js" defer></script>
+    <title>Graph preview</title>
+    <!-- CSP -->
+    <style>
+        .toolbarElement {
+            border-radius: 2px;
+            border: 1px solid var(--vscode-input-border, transparent);
+            background: var(--vscode-button-secondaryBackground);
+            height: 26px;
+            width: 26px;
+            color: var(--vscode-button-foreground);
+            cursor: pointer;
+        }
+
+        button {
+            padding:0;
+        }
+
+        button svg {
+            display: inline-block;
+            vertical-align: middle;
+            margin: auto;
+            height: 16px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .scale-percent-container {
+            border-radius: 2px;
+            border: 1px solid var(--vscode-input-border, transparent);
+            background: var(--vscode-button-secondaryBackground);
+            width: 68px;
+            display:flex;
+            align-items: center;
+            height:24px;
+        }
+
+        .scale-percent-container span {
+            font-size: 50%;
+            color: var(--vscode-button-foreground);
+        }
+
+        .scale-percent-container input {
+            padding:0px 4px;
+        }
+
+        .scale-percent-container .toolbarElement {
+            border:none;
+        }
+
+        input:focus, select:focus {
+            outline: 1px solid var(--vscode-focusBorder);
+        }
+
+        button:hover {
+            background: var(--vscode-button-secondaryHoverBackground);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 3px;
+            left: 5px;
+            font-size: 200%;
+            display:flex;
+            align-items:center;
+            gap:3px;
+        }
+
+        .spacer {
+            width:3px;
+        }
+    </style>
+</head>
+<body onload="initializeScale(1,false,false,'dot')">
+    <div class="controls">
+        <div class="scale-percent-container">
+            <input id="scalePercent" value="100"
+            style="width: 44px; height:23px;" type="number"
+            class="toolbarElement"/>
+            <span>%</span>
+         </div>
+        <select id="selLayout" onchange="setLayout(this.value)" style="width: 100px;" class="toolbarElement">
+            <option value="dot">dot</option>
+            <option value="circo">circo</option>
+            <option value="fdp">fdp</option>
+            <option value="neato">neato</option>
+            <option value="osage">osage</option>
+            <option value="patchwork">patchwork</option>
+            <option value="twopi">twopi</option>
+		    </select>
+
+        <div class="spacer"></div>
+
+        <button onclick="smaller()" title="Make the graph 50% smaller." class="toolbarElement">
+            <!-- from https://github.com/microsoft/vscode-codicons -->
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.027 6.149a5.52 5.52 0 0 1-1.27 3.908l4.26 4.26-.7.71-4.26-4.27a5.52 5.52 0 1 1 1.97-4.608zm-5.45 4.888a4.51 4.51 0 0 0 3.18-1.32l-.04.02a4.51 4.51 0 0 0 1.36-3.2 4.5 4.5 0 1 0-4.5 4.5zm-2.54-4.98h5v1h-5v-1z"/></svg>
+        </button>
+        <button onclick="larger()" title="Make the graph 50% larger." class="toolbarElement" >
+            <!-- from https://github.com/microsoft/vscode-codicons -->
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.027 6.149a5.52 5.52 0 0 1-1.27 3.908l4.26 4.26-.7.71-4.26-4.27a5.52 5.52 0 1 1 1.97-4.608zm-5.45 4.888a4.51 4.51 0 0 0 3.18-1.32l-.04.02a4.51 4.51 0 0 0 1.36-3.2 4.5 4.5 0 1 0-4.5 4.5zm2.44-4v-1h-2v-2h-1v2h-2v1h2v2h1v-2h2z"/></svg>
+        </button>
+        <button onclick="original()" title="Reset to 100% zoom." class="toolbarElement" style="width:36px;">
+            <!-- from https://github.com/microsoft/vscode-codicons -->
+            <!-- <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.5 2v3.5L4 6h3.5V5H4.979l.941-.941a3.552 3.552 0 1 1 5.023 5.023L5.746 14.28l.72.72 5.198-5.198A4.57 4.57 0 0 0 5.2 3.339l-.7.7V2h-1z"/></svg> -->
+            <span style="font-size: .75rem;">100%</span>
+        </button>
+
+        <div class="spacer"></div>
+
+        <button id="fitToWidth"
+            title="Fit to window width. Double-click to toggle it on permanently for dynamic graphs."
+            class="toolbarElement">
+            <!-- from https://github.com/microsoft/vscode-codicons -->
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M3 9l2.146 2.146-.707.708-3-3v-.708l3-3 .707.708L3 8h10l-2.146-2.146.707-.708 3 3v.708l-3 3-.707-.707L13 9H3z"/></svg>
+        </button>
+        <button id="fitToHeight"
+            title="Fit to window height. Double-click to toggle it on permanently for dynamic graphs."
+            class="toolbarElement">
+            <!-- rotated arrow-both from https://github.com/microsoft/vscode-codicons -->
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.5,3.5L5.4,5.6L4.6,4.9l3-3h0.7l3,3l-0.7,0.7L8.5,3.5v10l2.1-2.1l0.7,0.7l-3,3H7.6l-3-3l0.7-0.7l2.1,2.1V3.5z"/></svg>
+        </button>
+
+        <div class="spacer"></div>
+
+        <button id="download"
+            title="Export to a .svg file..."
+            class="toolbarElement">
+            <!-- from https://github.com/microsoft/vscode-codicons -->
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 15v-1c2 0 2-.6 2-1H1.5l-.5-.5v-10l.5-.5h13l.5.5v9.24l-1-1V3H2v9h5.73l-.5.5 2.5 2.5H4zm7.86 0l2.5-2.5-.71-.7L12 13.45V7h-1v6.44l-1.64-1.65-.71.71 2.5 2.5h.71z"/></svg>
+        </button>
+        <button id="openInBrowser"
+            title="Open in the default web browser"
+            class="toolbarElement">
+            <!-- from https://github.com/microsoft/vscode-codicons -->
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M1.5 1H6v1H2v12h12v-4h1v4.5l-.5.5h-13l-.5-.5v-13l.5-.5z"/><path d="M15 1.5V8h-1V2.707L7.243 9.465l-.707-.708L13.293 2H8V1h6.5l.5.5z"/></svg>
+        </button>
+    </div>
+
+    <div id="svg-target-container">
+        PLACEHOLDER
+    </div>
+</body>
+</html>

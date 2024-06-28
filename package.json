@@ -1,7 +1,7 @@
 {
     "name": "tools-for-solidity",
     "displayName": "Tools for Solidity (Wake)",
-    "version": "1.13.1",
+    "version": "1.14.0",
     "publisher": "ackeeblockchain",
     "description": "Advanced Solidity support and vulnerability detectors developed by Ackee Blockchain",
     "keywords": [
@@ -24,7 +24,7 @@
     },
     "icon": "images/icon.png",
     "engines": {
-        "vscode": "^1.67.0"
+        "vscode": "^1.75.0"
     },
     "categories": [
         "Linters",
@@ -69,23 +69,29 @@
                         "default": "off",
                         "description": "Traces the communication between VS Code and the language server."
                     },
-                    "Tools-for-Solidity.Wake.autoInstall": {
-                        "type": "boolean",
-                        "default": "true",
-                        "description": "Automatically install 'wake-eth' PyPi package needed by Tools for Solidity."
+                    "Tools-for-Solidity.Wake.installationMethod": {
+                        "type": "string",
+                        "enum": [
+                            "conda",
+                            "pipx",
+                            "pip",
+                            "manual"
+                        ],
+                        "default": "conda",
+                        "description": "Method used to install Wake language server."
                     },
-                    "Tools-for-Solidity.Wake.usePipx": {
+                    "Tools-for-Solidity.Wake.prerelease": {
                         "type": "boolean",
-                        "default": "true",
-                        "description": "Use pipx (if available) to install 'wake-eth' PyPi package if auto-install is enabled."
+                        "default": false,
+                        "description": "Install prerelease versions of Wake."
                     },
                     "Tools-for-Solidity.Wake.pathToExecutable": {
                         "type": "string",
-                        "description": "Path to Wake executable, overrides Tools-for-Solidity.Wake.autoInstall."
+                        "description": "Path to Wake executable, overrides Tools-for-Solidity.Wake.installationMethod."
                     },
                     "Tools-for-Solidity.Wake.port": {
                         "type": "integer",
-                        "description": "Port on which Wake is listening. Overrides both Tools-for-Solidity.Wake.autoInstall and Tools-for-Solidity.Wake.pathToExecutable."
+                        "description": "Port on which Wake is listening. Overrides both Tools-for-Solidity.Wake.installationMethod and Tools-for-Solidity.Wake.pathToExecutable."
                     },
                     "Tools-for-Solidity.Wake.compiler.solc.ignoredWarnings": {
                         "type": "array",
@@ -247,25 +253,31 @@
                 }
             },
             {
-                "title": "Graphs",
+                "title": "Printers",
                 "order": 2,
                 "properties": {
-                    "wake.generator.control_flow_graph.direction": {
-                        "type": "string",
-                        "enum": [
-                            "TB",
-                            "BT",
-                            "LR",
-                            "RL"
-                        ],
-                        "default": "TB",
-                        "markdownDescription": "The direction of the generated control flow graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))."
+                    "wake.printers.exclude": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "List of printers (identified by their string name) not to run in the LSP server."
                     },
-                    "wake.generator.control_flow_graph.vscode_urls": {
-                        "type": "boolean",
-                        "default": true,
-                        "description": "Generate vscode:// URLs in the generated control flow graph."
-                    },
+                    "wake.printers.only": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "List of printers (identified by their string name) to only run in the LSP server."
+                    }
+                }
+            },
+            {
+                "title": "Graphs",
+                "order": 3,
+                "properties": {
                     "wake.generator.imports_graph.direction": {
                         "type": "string",
                         "enum": [
@@ -291,22 +303,6 @@
                         "default": true,
                         "description": "Generate vscode:// URLs in the generated imports graph."
                     },
-                    "wake.generator.inheritance_graph.direction": {
-                        "type": "string",
-                        "enum": [
-                            "TB",
-                            "BT",
-                            "LR",
-                            "RL"
-                        ],
-                        "default": "BT",
-                        "markdownDescription": "The direction of the generated inheritance graph (see [Graphviz docs](https://graphviz.org/docs/attrs/rankdir/))."
-                    },
-                    "wake.generator.inheritance_graph.vscode_urls": {
-                        "type": "boolean",
-                        "default": true,
-                        "description": "Generate vscode:// URLs in the generated inheritance graph."
-                    },
                     "wake.generator.inheritance_graph_full.direction": {
                         "type": "string",
                         "enum": [
@@ -327,7 +323,7 @@
             },
             {
                 "title": "LSP",
-                "order": 3,
+                "order": 4,
                 "properties": {
                     "wake.lsp.compilation_delay": {
                         "type": "number",
@@ -337,7 +333,33 @@
                     "wake.lsp.code_lens.enable": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Enable code lens with number of references."
+                        "description": "Enable code lens."
+                    },
+                    "wake.lsp.code_lens.sort_tag_priority": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [
+                            "lsp-references",
+                            "lsp-selectors",
+                            "lsp-inheritance-graph",
+                            "lsp-linearized-inheritance-graph"
+                        ],
+                        "description": "Order of code lens with the same start and end position based on sort tags used in detectors/printers. Sort tags default to the printer/detector name."
+                    },
+                    "wake.lsp.inlay_hints.enable": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Enable inlay hints."
+                    },
+                    "wake.lsp.inlay_hints.sort_tag_priority": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Order of inlay hints with the same position based on sort tags used in detectors/printers. Sort tags default to the printer/detector name."
                     },
                     "wake.lsp.detectors.enable": {
                         "type": "boolean",
@@ -830,8 +852,9 @@
     "devDependencies": {
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.1",
-        "@types/node": "16.x",
-        "@types/vscode": "^1.67.0",
+        "@types/node": "^16.18.97",
+        "@types/tmp": "^0.2.6",
+        "@types/vscode": "^1.75.0",
         "@types/vscode-webview": "^1.57.5",
         "@typescript-eslint/eslint-plugin": "^5.30.0",
         "@typescript-eslint/parser": "^5.30.0",
@@ -847,18 +870,21 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
+        "@google-cloud/storage": "^7.11.2",
+        "@hpcc-js/wasm": "^2.1.0",
         "@estruyf/vscode": "^1.1.0",
         "@renovatebot/pep440": "^2.0.0",
-        "@vscode/extension-telemetry": "^0.9.6",
+        "applicationinsights": "^2.9.0",
         "execa": "^8.0.1",
         "get-port": "<6.0.0",
         "node-fetch": "^3.3.2",
+        "open": "^10.1.0",
+        "pidtree": "^0.6.0",
+        "tar": "^7.4.0",
+        "tmp": "^0.2.3",
         "vscode-languageclient": "^8.0.1",
         "wait-port": "^0.3.0",
         "web3-eth-abi": "^4.2.2",
         "web3-utils": "^4.3.0"
-    },
-    "extensionDependencies": [
-        "EFanZh.graphviz-preview"
-    ]
+    }
 }
