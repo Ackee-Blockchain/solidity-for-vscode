@@ -540,10 +540,6 @@
                 "command": "Tools-for-Solidity.sake.show_history",
                 "title": "Sake: Show Transaction History",
                 "icon": "$(history)"
-            },
-            {
-                "command": "Tools-for-Solidity.sake.open_walkthrough",
-                "title": "Sake: Open Walkthrough"
             }
         ],
         "viewsContainers": {
@@ -772,30 +768,47 @@
                 "steps": [
                     {
                         "id": "rosetta-macos-native",
-                        "title": "Enable Rosetta",
-                        "description": "It looks like you are running on MacOS Native. To ensure full compatibility with our extension, please make sure you have Rosetta enabled.",
+                        "title": "Setup: Enable Rosetta",
+                        "description": "It looks like you are running on MacOS Native. To ensure full compatibility with our extension, please make sure you have Rosetta installed.",
                         "media": {
-                            "markdown": "./resources/walkthroughs/macos-native.md"
+                            "markdown": "./resources/walkthrough/blank.md"
                         },
                         "when": "isMacNative"
                     },
                     {
-                        "id": "macos-native",
-                        "title": "Step 1 notmacos",
-                        "description": "Seems like you are not runnign Macos Native.",
+                        "id": "select-wake-installation",
+                        "title": "Setup: Select Wake installation method",
+                        "description": "Tools for Solidity needs to install [Wake](https://getwake.io/) to run. By default, Wake is installed using conda for best compatibility. You can change the installation method below.\n**Recommended**: Only change the installation method if necessary.\n[Select Installation Method](command:Tools-for-Solidity.select-installation-method)\n**Tip**: If installing using conda, [start the download now](command:Tools-for-Solidity.install.wake-conda).",
                         "media": {
-                            "markdown": "./resources/walkthrougs/macos-native.md"
-                        },
-                        "when": "!isMacNative"
+                            "markdown": "./resources/walkthrough/blank.md"
+                        }
                     },
                     {
-                        "id": "select-installation",
-                        "title": "Select your installation method",
-                        "description": "Running printers.",
+                        "id": "detectors",
+                        "title": "Catch vulnerabilities with Detectors",
+                        "description": "See vulnerabilities and compiler warnings/errors of your code in real-time.",
                         "media":{
-                            "image": "./resources/walkthrough/step2.gif",
-                            "altText": "Open a Solidity file."
+                            "markdown": "./resources/walkthrough/detectors.png"
                         }
+                    },
+                    {
+                        "id": "graphs",
+                        "title": "Visualise relations in code",
+                        "description": "Different graph types can be generated to better visualize the relations in the code.",
+                        "media": {
+                            "image": "./resources/walkthrough/graphs.png",
+                            "altText": "Graphs"
+                        }
+                    },
+                    {
+                        "id": "sake",
+                        "title": "Use Sake to interact with Smart Contracts",
+                        "description": "Sake is a tool for interacting with smart contracts. It allows you to deploy, call, and test your contracts directly from VS Code.",
+                        "media": {
+                            "image": "./resources/walkthrough/sake.png",
+                            "altText": "Sake"
+                        }
+
                     }
                 ]
             }
