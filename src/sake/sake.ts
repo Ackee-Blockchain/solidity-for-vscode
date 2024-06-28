@@ -23,7 +23,7 @@ import { LanguageClient } from 'vscode-languageclient/node';
 import { parseCompilationResult } from './utils/compilation';
 import { call, compile, deploy, getAccounts, getBalances, setBalances } from './api';
 import { AccountState } from './state/AccountState';
-import { SakeOutputTreeProvider } from './providers/OutputTreeProvider';
+import { OutputViewManager, SakeOutputTreeProvider } from './providers/OutputTreeProvider';
 import { TxHistoryState } from './state/TxHistoryState';
 import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
@@ -40,9 +40,14 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
     const sakeOutputProvider = new SakeOutputTreeProvider(context);
-    context.subscriptions.push(
-        vscode.window.registerTreeDataProvider('sake-output', sakeOutputProvider)
-    );
+    const treeView = vscode.window.createTreeView('sake-output', {
+        treeDataProvider: sakeOutputProvider
+    });
+    // context.subscriptions.push(
+    //     vscode.window.registerTreeDataProvider('sake-output', sakeOutputProvider)
+    // );
+
+    const outputViewManager = new OutputViewManager(sakeOutputProvider, treeView);
 
     // const sidebarDeployProvider = new DeployWebviewProvider(context.extensionUri);
     // context.subscriptions.push(
@@ -93,10 +98,10 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
         })
     );
 
-    // register status bar
-    const statusBarEnvironmentProvider = new StatusBarEnvironmentProvider();
-    context.subscriptions.push(statusBarEnvironmentProvider.registerCommand());
-    context.subscriptions.push(statusBarEnvironmentProvider.getStatusBarItem());
+    // // register status bar
+    // const statusBarEnvironmentProvider = new StatusBarEnvironmentProvider();
+    // context.subscriptions.push(statusBarEnvironmentProvider.registerCommand());
+    // context.subscriptions.push(statusBarEnvironmentProvider.getStatusBarItem());
 
     // register commands
     context.subscriptions.push(
@@ -124,12 +129,12 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
             await vscode.window.showInformationMessage(text);
         })
     );
-    context.subscriptions.push(
-        vscode.commands.registerCommand('sake.getSampleContract', async () => {
-            const sampleContractAbi = await loadSampleAbi();
-            return sampleContractAbi;
-        })
-    );
+    // context.subscriptions.push(
+    //     vscode.commands.registerCommand('sake.getSampleContract', async () => {
+    //         const sampleContractAbi = await loadSampleAbi();
+    //         return sampleContractAbi;
+    //     })
+    // );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.compile', () => compile(client))
@@ -138,7 +143,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.deploy',
-            (params: WakeDeploymentRequestParams) => deploy(params, client, sakeOutputProvider)
+            (params: WakeDeploymentRequestParams) => deploy(params, client, outputViewManager)
         )
     );
 
@@ -151,7 +156,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.call',
-            (params: FunctionCallPayload) => call(params, client, sakeOutputProvider)
+            (params: FunctionCallPayload) => call(params, client, outputViewManager)
         )
     );
 

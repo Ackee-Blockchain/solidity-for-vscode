@@ -23,7 +23,7 @@ import { getNameFromContractFqn, parseCompilationResult } from './utils/compilat
 import { DeploymentState } from './state/DeploymentState';
 import { AccountState } from './state/AccountState';
 import { decodeCallReturnValue } from './utils/call';
-import { SakeOutputTreeProvider } from './providers/OutputTreeProvider';
+import { OutputViewManager, SakeOutputTreeProvider } from './providers/OutputTreeProvider';
 import { TxHistoryState } from './state/TxHistoryState';
 
 const accountState = AccountState.getInstance();
@@ -186,7 +186,7 @@ export async function compile(client: LanguageClient | undefined) {
 export async function deploy(
     requestParams: WakeDeploymentRequestParams,
     client: LanguageClient | undefined,
-    outputTreeProvider: SakeOutputTreeProvider
+    output: OutputViewManager
 ) {
     try {
         if (client === undefined) {
@@ -235,7 +235,7 @@ export async function deploy(
         };
 
         txHistoryState.addTx(txOutput);
-        outputTreeProvider.set(txOutput);
+        output.set(txOutput);
         vscode.commands.executeCommand('sake-output.focus');
 
         vscode.window.showInformationMessage('Deployment was successful!');
@@ -251,7 +251,7 @@ export async function deploy(
 export async function call(
     callPayload: FunctionCallPayload,
     client: LanguageClient | undefined,
-    outputTreeProvider: SakeOutputTreeProvider
+    output: OutputViewManager
 ) {
     const { requestParams, func } = callPayload;
 
@@ -293,7 +293,7 @@ export async function call(
         };
 
         txHistoryState.addTx(txOutput);
-        outputTreeProvider.set(txOutput);
+        output.set(txOutput);
         vscode.commands.executeCommand('sake-output.focus');
 
         // vscode.window.showInformationMessage("Function call was successful!");
