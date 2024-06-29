@@ -545,23 +545,25 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
         vscode.commands.registerCommand(
             'Tools-for-Solidity.select-installation-method',
             async () => {
-                const items: vscode.QuickPickItem[] = [
-                    { label: 'Install Wake using pipx' },
-                    { label: 'Install Wake using pip' },
-                    { label: 'Install Wake using conda' },
-                    { label: 'Manual install' }
+                const items: any[] = [
+                    { label: 'Install Wake using pipx', setting: 'pipx' } as vscode.QuickPickItem,
+                    { label: 'Install Wake using pip', setting: 'pip' },
+                    { label: 'Install Wake using conda', setting: 'conda' },
+                    { label: 'Manual install', setting: 'manual' }
                 ];
                 const selection = await vscode.window.showQuickPick(items, {
                     title: 'Select the installation method for Wake'
                 });
-                // if (selection) {
-                //     if (selection.label === "Install 'eth-wake' using pipx") {
-                //         await pipxInstall(outputChannel);
-                //     } else {
-                //         const pythonExecutable = findPython(outputChannel);
-                //         await installWake(outputChannel, pythonExecutable);
-                //     }
-                // }
+
+                if (selection) {
+                    const cfg = vscode.workspace.getConfiguration('Tools-for-Solidity');
+                    cfg.update(
+                        'Wake.installationMethod',
+                        selection.setting,
+                        vscode.ConfigurationTarget.Global
+                    );
+                    console.log(`Selected installation method: ${selection.setting}`);
+                }
             }
         )
     );
