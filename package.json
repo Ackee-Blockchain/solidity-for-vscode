@@ -798,9 +798,18 @@
                         "when": "isMacNative"
                     },
                     {
+                        "id": "linux-arm",
+                        "title": "Setup: Linux on ARM64",
+                        "description": "You appear to be using Linux. In case you are running on ARM64, please note that this extension doesn't currently support this architecture.",
+                        "media": {
+                            "markdown": "./resources/walkthrough/blank.md"
+                        },
+                        "when": "isLinux"
+                    },
+                    {
                         "id": "select-wake-installation",
                         "title": "Setup: Select Wake installation method",
-                        "description": "Tools for Solidity needs to install [Wake](https://getwake.io/) to run. By default, Wake is installed using conda for best compatibility. You can change the installation method below.\n**Recommended**: Only change the installation method if necessary.\n[Select Installation Method](command:Tools-for-Solidity.select-installation-method)\n**Tip**: If installing using conda, [start the download now](command:Tools-for-Solidity.install.wake-conda).",
+                        "description": "Tools for Solidity needs to install [Wake](https://getwake.io/) to run. By default, Wake is installed using conda for best compatibility. You can change the installation method below.\n**Recommended**: Only change the installation method if necessary.\n[Change Installation Method](command:Tools-for-Solidity.select-installation-method)\n**Tip**: If installing using conda, [start the download now](command:Tools-for-Solidity.install.wake-conda).",
                         "media": {
                             "markdown": "./resources/walkthrough/blank.md"
                         }
@@ -810,8 +819,19 @@
                         "title": "Catch vulnerabilities with Detectors",
                         "description": "See vulnerabilities and compiler warnings/errors of your code in real-time.",
                         "media":{
-                            "markdown": "./resources/walkthrough/detectors.png"
+                            "image": "./resources/walkthrough/detectors.png",
+                            "altText": "Detectors"
                         }
+                    },
+                    {
+                        "id": "sake",
+                        "title": "Use Sake to interact with Smart Contracts",
+                        "description": "Sake is a tool for interacting with smart contracts. It allows you to deploy, call, and test your contracts directly from VS Code.",
+                        "media": {
+                            "image": "./resources/walkthrough/sake.png",
+                            "altText": "Sake"
+                        }
+
                     },
                     {
                         "id": "graphs",
@@ -823,12 +843,11 @@
                         }
                     },
                     {
-                        "id": "sake",
-                        "title": "Use Sake to interact with Smart Contracts",
-                        "description": "Sake is a tool for interacting with smart contracts. It allows you to deploy, call, and test your contracts directly from VS Code.",
+                        "id": "language-server",
+                        "title": "Speed up your workflow with language server features",
+                        "description": "Sake ships with a powerful language server which adds support for **CodeLens**, **Go to Definition**, **Find References**, and more. ",
                         "media": {
-                            "image": "./resources/walkthrough/sake.png",
-                            "altText": "Sake"
+                            "markdown": "./resources/walkthrough/blank.md"
                         }
 
                     }
