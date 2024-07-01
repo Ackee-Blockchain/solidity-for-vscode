@@ -847,7 +847,8 @@
                         "title": "Speed up your workflow with language server features",
                         "description": "Sake ships with a powerful language server which adds support for **CodeLens**, **Go to Definition**, **Find References**, and more. ",
                         "media": {
-                            "markdown": "./resources/walkthrough/blank.md"
+                            "image": "./resources/walkthrough/lsp.png",
+                            "altText": "LSP Server"
                         }
 
                     }
