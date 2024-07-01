@@ -329,8 +329,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     title: 'Set a contract nickname'
                 });
 
-                console.log('nick', !nick, nick);
-
                 if (nick === undefined) {
                     return;
                 }

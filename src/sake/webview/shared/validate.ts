@@ -2,16 +2,8 @@
 import { FunctionInputParseError } from './errors';
 import { toWei, type EtherUnits } from 'web3-utils';
 
-const denominations: { [key: string]: number } = {
-    ether: 1,
-    wei: 18,
-    gwei: 9
-};
-
 export function validateAndParseType(value: string, type: string): string {
     value = value.trim();
-
-    console.log('validateAndParseType', value, type);
 
     switch (type) {
         case 'string':
@@ -309,7 +301,6 @@ function _validateIntType(value: number, type: string): void {
  * @throws {FunctionInputParseError} If the value cannot be parsed as a complex integer.
  */
 export function parseComplexNumber(value: string): number {
-    console.log('parseComplexNumber', value);
     value = value.trim().replace('_', '');
 
     // return classic integer
@@ -320,7 +311,6 @@ export function parseComplexNumber(value: string): number {
             throw new FunctionInputParseError(`Cannot parse uint value "${match[1]}"`);
         }
 
-        console.log('parsing classic', parsedValue);
         return parsedValue;
     }
 
@@ -335,7 +325,6 @@ export function parseComplexNumber(value: string): number {
             throw new FunctionInputParseError(`Cannot parse uint value "${value}"`);
         }
 
-        console.log('parsing power', parsedBase, parsedPower, parsedBase ** parsedPower);
         return parsedBase ** parsedPower;
     }
 
@@ -347,11 +336,8 @@ export function parseComplexNumber(value: string): number {
             throw new FunctionInputParseError(`Cannot parse uint value "${match[1]}"`);
         }
 
-        console.log('parsing denominators', match[1], match[2]);
-
         const convertedValue = toWei(parsedValue, match[2] as EtherUnits);
 
-        console.log(convertedValue);
         const parsedConvertedValue = parseFloat(convertedValue);
         if (isNaN(parsedConvertedValue)) {
             throw new FunctionInputParseError(
@@ -359,7 +345,6 @@ export function parseComplexNumber(value: string): number {
             );
         }
 
-        console.log('parsing denominators', parsedConvertedValue);
         return parsedConvertedValue;
     }
 

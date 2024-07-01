@@ -4,6 +4,7 @@ import {
     Address,
     DeploymentStateData,
     FunctionCallPayload,
+    TxDecodedReturnValue,
     TxDeploymentOutput,
     TxFunctionCallOutput,
     TxOutput,
@@ -25,6 +26,7 @@ import { AccountState } from './state/AccountState';
 import { decodeCallReturnValue } from './utils/call';
 import { OutputViewManager, SakeOutputTreeProvider } from './providers/OutputTreeProvider';
 import { TxHistoryState } from './state/TxHistoryState';
+import { c } from 'tar';
 
 const accountState = AccountState.getInstance();
 const deploymentState = DeploymentState.getInstance();
@@ -125,8 +127,6 @@ export async function setBalances(
     requestParams: WakeSetBalancesRequestParams,
     client: LanguageClient | undefined
 ) {
-    console.log('API set balances', requestParams);
-
     try {
         if (client === undefined) {
             throw new Error('Missing language client');
@@ -137,8 +137,6 @@ export async function setBalances(
             requestParams
         );
 
-        console.log('API set balances result', result);
-
         if (result == null) {
             throw new Error('No result returned');
         }
@@ -146,7 +144,6 @@ export async function setBalances(
             throw new Error('Failed to set balances');
         }
 
-        console.log('API set balances going to update');
         // Update balances
         accountState.updateBalances(requestParams.balances);
     } catch (e) {
@@ -171,8 +168,6 @@ export async function compile(client: LanguageClient | undefined) {
             throw new Error('Compilation was unsuccessful');
         }
 
-        console.log('compilation result', result);
-
         // vscode.window.showInformationMessage('Compilation was successful!');
         const _parsedresult = parseCompilationResult(result.contracts);
         compilationState.setCompilation(_parsedresult);
@@ -195,14 +190,10 @@ export async function deploy(
             throw new Error('Missing language client');
         }
 
-        console.log('deployment params', requestParams);
-
         const result = await client?.sendRequest<WakeDeploymentResponse>(
             'wake/sake/deploy',
             requestParams
         );
-
-        console.log('deployment result', result);
 
         if (result == null) {
             throw new Error('No result returned');
@@ -240,7 +231,7 @@ export async function deploy(
         output.set(txOutput);
         vscode.commands.executeCommand('sake-output.focus');
 
-        vscode.window.showInformationMessage('Deployment was successful!');
+        // vscode.window.showInformationMessage('Deployment was successful!');
 
         return true;
     } catch (e) {
@@ -262,25 +253,24 @@ export async function call(
             throw new Error('Missing language client');
         }
 
-        console.log('call params', requestParams);
-
         const result = await client?.sendRequest<WakeFunctionCallResponse>(
             'wake/sake/call',
             requestParams
         );
-
-        console.log('call result', result);
 
         if (result == null) {
             throw new Error('No result returned');
         }
         // if (!result.success) { throw new Error("Function call was unsuccessful"); }
 
-        let decodedReturnValue;
+        let decodedReturnValue: TxDecodedReturnValue[] | undefined = undefined;
         if (result.success) {
             // parse result
-            decodedReturnValue = decodeCallReturnValue(result.returnValue, func);
-            console.log('decoded return value', decodedReturnValue);
+            try {
+                decodedReturnValue = decodeCallReturnValue(result.returnValue, func);
+            } catch (e) {
+                vscode.window.showErrorMessage('Failed to decode return value: ' + e);
+            }
         }
 
         const txOutput: TxFunctionCallOutput = {
@@ -289,7 +279,10 @@ export async function call(
             from: requestParams.sender,
             to: requestParams.contract_address,
             functionName: func.name,
-            returnValue: decodedReturnValue,
+            returnData: {
+                bytes: result.returnValue,
+                decoded: decodedReturnValue
+            },
             receipt: result.txReceipt,
             callTrace: result.callTrace
         };

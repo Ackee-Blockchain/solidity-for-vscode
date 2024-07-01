@@ -155,9 +155,6 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
     private _parseDeployment(data: TxDeploymentOutput): BaseOutputItem[] {
         const rootNodes: SakeOutputItem[] = [];
 
-        // parse contract name and address
-        console.log('parse deployment', data);
-
         // parse from
         if (data.receipt?.from !== undefined) {
             rootNodes.push(
@@ -182,6 +179,21 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             );
         }
 
+        // add calltrace
+        if (data.callTrace !== undefined) {
+            const _string = data.callTrace;
+            const callTraceNode = new SakeOutputItem(
+                'Call Trace',
+                undefined,
+                vscode.TreeItemCollapsibleState.Expanded,
+                'list-tree'
+            );
+            callTraceNode.tooltip = _string;
+            const callTraceChildren = [parseCallTrace(_string)];
+            callTraceNode.setChildren(callTraceChildren);
+            rootNodes.push(callTraceNode);
+        }
+
         // add receipt
         if (data.receipt !== undefined) {
             const receiptNode = new SakeOutputItem(
@@ -199,21 +211,6 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             });
             receiptNode.setChildren(receiptChildren);
             rootNodes.push(receiptNode);
-        }
-
-        // add calltrace
-        if (data.callTrace !== undefined) {
-            const _string = data.callTrace;
-            const callTraceNode = new SakeOutputItem(
-                'Call Trace',
-                undefined,
-                vscode.TreeItemCollapsibleState.Collapsed,
-                'list-tree'
-            );
-            callTraceNode.tooltip = _string;
-            const callTraceChildren = [parseCallTrace(_string)];
-            callTraceNode.setChildren(callTraceChildren);
-            rootNodes.push(callTraceNode);
         }
 
         return rootNodes as BaseOutputItem[];
@@ -245,6 +242,67 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             );
         }
 
+        // add return data
+        if (data.returnData !== undefined) {
+            const returnDataNode = new SakeOutputItem(
+                'Return Data',
+                undefined,
+                vscode.TreeItemCollapsibleState.Expanded,
+                'file-binary'
+            );
+            rootNodes.push(returnDataNode);
+
+            // bytes
+            if (data.returnData.bytes !== undefined) {
+                returnDataNode.setChildren([
+                    new SakeOutputItem(
+                        'Bytes',
+                        data.returnData.bytes,
+                        vscode.TreeItemCollapsibleState.None
+                    ) as BaseOutputItem
+                ]);
+            }
+
+            // decoded
+            if (data.returnData.decoded !== undefined) {
+                const returnDataDecodedNode = new SakeOutputItem(
+                    'Decoded',
+                    undefined,
+                    vscode.TreeItemCollapsibleState.Expanded
+                ) as BaseOutputItem;
+
+                returnDataNode.setChildren([...returnDataNode.children, returnDataDecodedNode]);
+
+                const decoded = data.returnData.decoded;
+
+                decoded.forEach((item) => {
+                    returnDataDecodedNode.setChildren([
+                        ...returnDataDecodedNode.children,
+                        new SakeOutputItem(
+                            item.name,
+                            item.value,
+                            vscode.TreeItemCollapsibleState.None
+                        ) as BaseOutputItem
+                    ]);
+                });
+            }
+        }
+
+        // add calltrace
+        if (data.callTrace !== undefined) {
+            const _string = data.callTrace;
+            const callTraceNode = new SakeOutputItem(
+                'Call Trace',
+                undefined,
+                vscode.TreeItemCollapsibleState.Expanded,
+                'list-tree'
+            );
+            callTraceNode.tooltip = _string;
+            const callTraceChildren = [parseCallTrace(_string)];
+            callTraceNode.setChildren(callTraceChildren);
+            rootNodes.push(callTraceNode);
+        }
+
         // add receipt
         if (data.receipt !== undefined) {
             const receiptNode = new SakeOutputItem(
@@ -262,21 +320,6 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             });
             receiptNode.setChildren(receiptChildren);
             rootNodes.push(receiptNode);
-        }
-
-        // add calltrace
-        if (data.callTrace !== undefined) {
-            const _string = data.callTrace;
-            const callTraceNode = new SakeOutputItem(
-                'Call Trace',
-                undefined,
-                vscode.TreeItemCollapsibleState.Collapsed,
-                'list-tree'
-            );
-            callTraceNode.tooltip = _string;
-            const callTraceChildren = [parseCallTrace(_string)];
-            callTraceNode.setChildren(callTraceChildren);
-            rootNodes.push(callTraceNode);
         }
 
         return rootNodes as BaseOutputItem[];
@@ -331,8 +374,6 @@ function parseCallTrace(callTrace: string): BaseOutputItem {
         const _isNewItem = _line.match(/[└├]+/g) !== null;
         const _string = _line.slice(4 * _level);
 
-        // console.log(_line, level, isNewItem, _temp, _line.match(/^[ └├│─]+/g));
-
         if (_level === 0) {
             continue;
         }
@@ -349,8 +390,6 @@ function parseCallTrace(callTrace: string): BaseOutputItem {
     }
 
     root.updateCollapsibleState();
-
-    console.log('root', root);
 
     return root as BaseOutputItem;
 }

@@ -29,7 +29,7 @@ export abstract class BaseState<T> {
     }
 
     private _sendUpdateMessage() {
-        console.log("state in " + this._stateId + " changed, calling subscribers", this.state)
+        // console.log("state in " + this._stateId + " changed, calling subscribers", this.state)
         this.subscriptions.forEach((provider) => {
             provider.postMessageToWebview({
                 command: WebviewMessage.getState,
@@ -41,6 +41,6 @@ export abstract class BaseState<T> {
 }
 
 /*
-* The state has
-* deployedcontracts, txhistory, compiler
-*/
+ * The state has
+ * deployedcontracts, txhistory, compiler
+ */

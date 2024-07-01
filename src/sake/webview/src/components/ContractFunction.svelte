@@ -39,10 +39,13 @@
         try {
             if (isCalldata) {
                 _encodedInput = inputRoot.rawCalldata();
+                // console.log('calldata', _encodedInput, func);
             } else if (isConstructor) {
                 _encodedInput = inputRoot.encodedParameters();
+                // console.log('constructor', _encodedInput, func);
             } else {
                 _encodedInput = inputRoot.calldata();
+                // console.log('function', _encodedInput, func);
             }
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
@@ -51,7 +54,6 @@
             return;
         }
 
-        console.log('encoded input', isConstructor, _encodedInput);
         onFunctionCall(_encodedInput, func);
     }
 

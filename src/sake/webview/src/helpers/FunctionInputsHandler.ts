@@ -2,7 +2,7 @@
 
 import type { ContractFunctionInput } from '../../shared/types';
 import type { AbiFunctionFragment } from 'web3-types';
-import { encodeFunctionCall, encodeParameters } from 'web3-eth-abi';
+import { encodeFunctionCall, encodeParameters, encodeFunctionSignature } from 'web3-eth-abi';
 import { FunctionInputBuildError, FunctionInputParseError } from '../../shared/errors';
 import { validateAndParseType } from '../../shared/validate';
 
@@ -197,18 +197,18 @@ export abstract class InputHandler extends InputHandlerInterface {
 
             return false;
         } finally {
-            console.log(
-                'value set',
-                this._value,
-                'in',
-                this.name,
-                this.internalType,
-                this.type,
-                'with state',
-                this.state,
-                'parent state',
-                this.parent?.state
-            );
+            // console.log(
+            //     'value set',
+            //     this._value,
+            //     'in',
+            //     this.name,
+            //     this.internalType,
+            //     this.type,
+            //     'with state',
+            //     this.state,
+            //     'parent state',
+            //     this.parent?.state
+            // );
             // @todo move state update here
         }
     }
@@ -292,7 +292,7 @@ export class RootInputHandler extends InputHandlerInterface {
      */
     public calldata(): string {
         if (!this.hasInputs()) {
-            return '';
+            return encodeFunctionSignature(this._correctedAbi).slice(2); // remove 0x
         }
 
         if (this.state !== InputState.VALID) {
@@ -321,7 +321,6 @@ export class RootInputHandler extends InputHandlerInterface {
         }
 
         const _calldata = this.getValues();
-        console.log('raw calldata', this.getValues(), this.getValues()[0]);
 
         if (!Array.isArray(_calldata) || _calldata.length !== 1) {
             throw new FunctionInputParseError('Invalid data for raw calldata');
@@ -473,7 +472,6 @@ class MultiInputHandler extends InputHandler {
         const _values = splitNestedLists(value);
 
         if (_values.length > this.children.length) {
-            console.log('throwing');
             throw new FunctionInputParseError('Invalid length of multi-input');
         }
 
@@ -581,7 +579,6 @@ class ComponentInputHandler extends InputHandler {
         const _values = splitNestedLists(value);
 
         if (_values.length > this.children.length) {
-            console.log('throwing');
             throw new FunctionInputParseError('Invalid length of multi-input');
         }
 

@@ -202,4 +202,11 @@ Now:
         double check everything
     ✔ calltrace parsing @done(24-06-28 08:57)
     fix css issues when windows is to onarrow
-    ☐ welcome page
+    ✔ welcome page @done(24-07-01 21:17)
+    fix types, use types from web3
+        but first fix web3 circ dep, or migrate to ethers
+    ✔ fixed output return parsing @done(24-07-01 22:36)
+        waht about nested return data, currently not really supported
+    be able to copy output data
+    automatically convert hex to integers
+

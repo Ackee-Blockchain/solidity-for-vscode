@@ -18672,7 +18672,6 @@ const sha3Raw = (data) => {
 // import assert from 'assert';
 function validateAndParseType(value, type) {
     value = value.trim();
-    console.log('validateAndParseType', value, type);
     switch (type) {
         case 'string':
             if ((value.startsWith('"') && value.endsWith('"')) ||
@@ -18944,7 +18943,6 @@ function _validateIntType(value, type) {
  * @throws {FunctionInputParseError} If the value cannot be parsed as a complex integer.
  */
 function parseComplexNumber(value) {
-    console.log('parseComplexNumber', value);
     value = value.trim().replace('_', '');
     // return classic integer
     let match = value.match(/^(\d+)$/);
@@ -18953,7 +18951,6 @@ function parseComplexNumber(value) {
         if (isNaN(parsedValue)) {
             throw new FunctionInputParseError(`Cannot parse uint value "${match[1]}"`);
         }
-        console.log('parsing classic', parsedValue);
         return parsedValue;
     }
     // check if it is a power operation
@@ -18965,7 +18962,6 @@ function parseComplexNumber(value) {
         if (isNaN(parsedBase) || isNaN(parsedPower)) {
             throw new FunctionInputParseError(`Cannot parse uint value "${value}"`);
         }
-        console.log('parsing power', parsedBase, parsedPower, parsedBase ** parsedPower);
         return parsedBase ** parsedPower;
     }
     // check if it is a value with string denominator
@@ -18975,14 +18971,11 @@ function parseComplexNumber(value) {
         if (isNaN(parsedValue)) {
             throw new FunctionInputParseError(`Cannot parse uint value "${match[1]}"`);
         }
-        console.log('parsing denominators', match[1], match[2]);
         const convertedValue = toWei(parsedValue, match[2]);
-        console.log(convertedValue);
         const parsedConvertedValue = parseFloat(convertedValue);
         if (isNaN(parsedConvertedValue)) {
             throw new FunctionInputParseError(`Cannot parse converted uint value "${convertedValue}"`);
         }
-        console.log('parsing denominators', parsedConvertedValue);
         return parsedConvertedValue;
     }
     throw new FunctionInputParseError(`Cannot parse uint value "${value}"`);
@@ -20166,12 +20159,6 @@ const compilationState = writable({
 async function setupStores() {
     setupListeners();
     await init();
-    selectedAccount.subscribe((value) => {
-        console.log('selected account set', value);
-    });
-    selectedValue.subscribe((value) => {
-        console.log('selected value set', value);
-    });
 }
 async function init() {
     await client.messageHandler.request(WebviewMessage.onGetAccounts);
@@ -20187,14 +20174,14 @@ function setupListeners() {
         switch (command) {
             case WebviewMessage.getState: {
                 if (stateId === StateId.DeployedContracts) {
-                    console.log('deployed contracts', payload);
+                    // console.log('deployed contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
                     deployedContracts.set(payload);
                 }
                 if (stateId === StateId.CompiledContracts) {
-                    console.log('compiled contracts', payload);
+                    // console.log('compiled contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
@@ -20202,7 +20189,7 @@ function setupListeners() {
                     return;
                 }
                 if (stateId === StateId.Accounts) {
-                    console.log('accounts', payload);
+                    // console.log('accounts', payload);
                     const _accounts = payload;
                     const _selectedAccount = get_store_value(selectedAccount);
                     // update accounts store
@@ -23686,7 +23673,6 @@ class InputHandler extends InputHandlerInterface {
      * @returns A boolean indicating whether the value was set successfully.
      */
     set(value) {
-        var _a;
         try {
             this._set(value);
             this._error = undefined;
@@ -23703,7 +23689,18 @@ class InputHandler extends InputHandlerInterface {
             return false;
         }
         finally {
-            console.log('value set', this._value, 'in', this.name, this.internalType, this.type, 'with state', this.state, 'parent state', (_a = this.parent) === null || _a === void 0 ? void 0 : _a.state);
+            // console.log(
+            //     'value set',
+            //     this._value,
+            //     'in',
+            //     this.name,
+            //     this.internalType,
+            //     this.type,
+            //     'with state',
+            //     this.state,
+            //     'parent state',
+            //     this.parent?.state
+            // );
             // @todo move state update here
         }
     }
@@ -23768,7 +23765,7 @@ class RootInputHandler extends InputHandlerInterface {
     calldata() {
         var _a;
         if (!this.hasInputs()) {
-            return '';
+            return encodeFunctionSignature(this._correctedAbi).slice(2); // remove 0x
         }
         if (this.state !== InputState.VALID) {
             throw new FunctionInputParseError('Input state is invalid');
@@ -23791,7 +23788,6 @@ class RootInputHandler extends InputHandlerInterface {
             throw new FunctionInputParseError('Input state is invalid');
         }
         const _calldata = this.getValues();
-        console.log('raw calldata', this.getValues(), this.getValues()[0]);
         if (!Array.isArray(_calldata) || _calldata.length !== 1) {
             throw new FunctionInputParseError('Invalid data for raw calldata');
         }
@@ -23910,7 +23906,6 @@ class MultiInputHandler extends InputHandler {
         }
         const _values = splitNestedLists(value);
         if (_values.length > this.children.length) {
-            console.log('throwing');
             throw new FunctionInputParseError('Invalid length of multi-input');
         }
         if (_values.length < this.children.length) {
@@ -23991,7 +23986,6 @@ class ComponentInputHandler extends InputHandler {
         }
         const _values = splitNestedLists(value);
         if (_values.length > this.children.length) {
-            console.log('throwing');
             throw new FunctionInputParseError('Invalid length of multi-input');
         }
         if (_values.length < this.children.length) {
@@ -24529,7 +24523,7 @@ class InputIssueIndicator extends SvelteComponentDev {
 
 /* src/components/ContractFunctionInput.svelte generated by Svelte v3.59.2 */
 
-const { console: console_1$2 } = globals;
+const { console: console_1 } = globals;
 const file$8 = "src/components/ContractFunctionInput.svelte";
 
 function get_each_context_1(ctx, list, i) {
@@ -24544,7 +24538,7 @@ function get_each_context$5(ctx, list, i) {
 	return child_ctx;
 }
 
-// (48:4) {#if expandable}
+// (45:4) {#if expandable}
 function create_if_block_4$1(ctx) {
 	let div;
 	let current_block_type_index;
@@ -24566,7 +24560,7 @@ function create_if_block_4$1(ctx) {
 			div = element("div");
 			if_block.c();
 			attr_dev(div, "class", "self-start");
-			add_location(div, file$8, 48, 8, 1784);
+			add_location(div, file$8, 45, 8, 1711);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -24619,14 +24613,14 @@ function create_if_block_4$1(ctx) {
 		block,
 		id: create_if_block_4$1.name,
 		type: "if",
-		source: "(48:4) {#if expandable}",
+		source: "(45:4) {#if expandable}",
 		ctx
 	});
 
 	return block;
 }
 
-// (52:12) {:else}
+// (49:12) {:else}
 function create_else_block_2(ctx) {
 	let expandbutton;
 	let updating_expanded;
@@ -24686,14 +24680,14 @@ function create_else_block_2(ctx) {
 		block,
 		id: create_else_block_2.name,
 		type: "else",
-		source: "(52:12) {:else}",
+		source: "(49:12) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (50:12) {#if input.internalType === InputTypesInternal.LEAF}
+// (47:12) {#if input.internalType === InputTypesInternal.LEAF}
 function create_if_block_5$1(ctx) {
 	let iconspacer;
 	let current;
@@ -24726,14 +24720,14 @@ function create_if_block_5$1(ctx) {
 		block,
 		id: create_if_block_5$1.name,
 		type: "if",
-		source: "(50:12) {#if input.internalType === InputTypesInternal.LEAF}",
+		source: "(47:12) {#if input.internalType === InputTypesInternal.LEAF}",
 		ctx
 	});
 
 	return block;
 }
 
-// (98:4) {:else}
+// (95:4) {:else}
 function create_else_block$4(ctx) {
 	let div1;
 	let vscode_text_field;
@@ -24772,13 +24766,13 @@ function create_else_block$4(ctx) {
 			if_block.c();
 			attr_dev(div0, "slot", "end");
 			attr_dev(div0, "class", "flex items-center");
-			add_location(div0, file$8, 105, 16, 4077);
+			add_location(div0, file$8, 102, 16, 4004);
 			set_custom_element_data(vscode_text_field, "class", vscode_text_field_class_value = "flex-1 w-full " + (/*input*/ ctx[0].isInvalid() ? 'border-red-500' : ''));
 			set_custom_element_data(vscode_text_field, "placeholder", vscode_text_field_placeholder_value = /*input*/ ctx[0].description);
 			set_custom_element_data(vscode_text_field, "value", vscode_text_field_value_value = /*input*/ ctx[0].getString());
-			add_location(vscode_text_field, file$8, 99, 12, 3816);
+			add_location(vscode_text_field, file$8, 96, 12, 3743);
 			attr_dev(div1, "class", "w-full flex flex-1 flex-row gap-1");
-			add_location(div1, file$8, 98, 8, 3756);
+			add_location(div1, file$8, 95, 8, 3683);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div1, anchor);
@@ -24852,14 +24846,14 @@ function create_else_block$4(ctx) {
 		block,
 		id: create_else_block$4.name,
 		type: "else",
-		source: "(98:4) {:else}",
+		source: "(95:4) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (59:4) {#if expandable && input.expanded}
+// (56:4) {#if expandable && input.expanded}
 function create_if_block$7(ctx) {
 	let div1;
 	let div0;
@@ -24884,11 +24878,11 @@ function create_if_block$7(ctx) {
 			t2 = space();
 			key_block.c();
 			attr_dev(p, "class", "text-md flex-1");
-			add_location(p, file$8, 61, 16, 2213);
+			add_location(p, file$8, 58, 16, 2140);
 			attr_dev(div0, "class", "h-[28px] flex items-center");
-			add_location(div0, file$8, 60, 12, 2156);
+			add_location(div0, file$8, 57, 12, 2083);
 			attr_dev(div1, "class", "flex flex-col flex-1 gap-1");
-			add_location(div1, file$8, 59, 8, 2103);
+			add_location(div1, file$8, 56, 8, 2030);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div1, anchor);
@@ -24961,14 +24955,14 @@ function create_if_block$7(ctx) {
 		block,
 		id: create_if_block$7.name,
 		type: "if",
-		source: "(59:4) {#if expandable && input.expanded}",
+		source: "(56:4) {#if expandable && input.expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (119:20) {:else}
+// (116:20) {:else}
 function create_else_block_1$1(ctx) {
 	let div;
 	let span;
@@ -24984,16 +24978,16 @@ function create_else_block_1$1(ctx) {
 			svg = svg_element("svg");
 			path = svg_element("path");
 			attr_dev(path, "d", "M10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0z");
-			add_location(path, file$8, 127, 37, 5336);
+			add_location(path, file$8, 124, 37, 5263);
 			attr_dev(svg, "width", "16");
 			attr_dev(svg, "height", "16");
 			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
 			attr_dev(svg, "fill", "currentColor");
-			add_location(svg, file$8, 122, 32, 5072);
+			add_location(svg, file$8, 119, 32, 4999);
 			attr_dev(span, "class", "cursor-pointer");
-			add_location(span, file$8, 121, 28, 4975);
+			add_location(span, file$8, 118, 28, 4902);
 			attr_dev(div, "class", "relative inline-block");
-			add_location(div, file$8, 119, 24, 4826);
+			add_location(div, file$8, 116, 24, 4753);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -25020,14 +25014,14 @@ function create_else_block_1$1(ctx) {
 		block,
 		id: create_else_block_1$1.name,
 		type: "else",
-		source: "(119:20) {:else}",
+		source: "(116:20) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (115:52) 
+// (112:52) 
 function create_if_block_3$1(ctx) {
 	let inputissueindicator;
 	let current;
@@ -25076,14 +25070,14 @@ function create_if_block_3$1(ctx) {
 		block,
 		id: create_if_block_3$1.name,
 		type: "if",
-		source: "(115:52) ",
+		source: "(112:52) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (107:20) {#if input.isInvalid()}
+// (104:20) {#if input.isInvalid()}
 function create_if_block_2$3(ctx) {
 	let inputissueindicator;
 	let current;
@@ -25132,14 +25126,14 @@ function create_if_block_2$3(ctx) {
 		block,
 		id: create_if_block_2$3.name,
 		type: "if",
-		source: "(107:20) {#if input.isInvalid()}",
+		source: "(104:20) {#if input.isInvalid()}",
 		ctx
 	});
 
 	return block;
 }
 
-// (116:24) <InputIssueIndicator type="warning">
+// (113:24) <InputIssueIndicator type="warning">
 function create_default_slot_1(ctx) {
 	let span;
 
@@ -25148,7 +25142,7 @@ function create_default_slot_1(ctx) {
 			span = element("span");
 			span.textContent = "Input is missing some data";
 			attr_dev(span, "class", "text-sm");
-			add_location(span, file$8, 116, 28, 4671);
+			add_location(span, file$8, 113, 28, 4598);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -25163,14 +25157,14 @@ function create_default_slot_1(ctx) {
 		block,
 		id: create_default_slot_1.name,
 		type: "slot",
-		source: "(116:24) <InputIssueIndicator type=\\\"warning\\\">",
+		source: "(113:24) <InputIssueIndicator type=\\\"warning\\\">",
 		ctx
 	});
 
 	return block;
 }
 
-// (110:32) {#each input.errors as error}
+// (107:32) {#each input.errors as error}
 function create_each_block_1(ctx) {
 	let span;
 	let t_value = /*error*/ ctx[12] + "";
@@ -25181,7 +25175,7 @@ function create_each_block_1(ctx) {
 			span = element("span");
 			t = text(t_value);
 			attr_dev(span, "class", "text-sm");
-			add_location(span, file$8, 110, 36, 4370);
+			add_location(span, file$8, 107, 36, 4297);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -25199,14 +25193,14 @@ function create_each_block_1(ctx) {
 		block,
 		id: create_each_block_1.name,
 		type: "each",
-		source: "(110:32) {#each input.errors as error}",
+		source: "(107:32) {#each input.errors as error}",
 		ctx
 	});
 
 	return block;
 }
 
-// (109:28) {#key input.errors}
+// (106:28) {#key input.errors}
 function create_key_block_1(ctx) {
 	let each_1_anchor;
 	let each_value_1 = /*input*/ ctx[0].errors;
@@ -25269,14 +25263,14 @@ function create_key_block_1(ctx) {
 		block,
 		id: create_key_block_1.name,
 		type: "key",
-		source: "(109:28) {#key input.errors}",
+		source: "(106:28) {#key input.errors}",
 		ctx
 	});
 
 	return block;
 }
 
-// (108:24) <InputIssueIndicator type="danger">
+// (105:24) <InputIssueIndicator type="danger">
 function create_default_slot$3(ctx) {
 	let previous_key = /*input*/ ctx[0].errors;
 	let key_block_anchor;
@@ -25311,14 +25305,14 @@ function create_default_slot$3(ctx) {
 		block,
 		id: create_default_slot$3.name,
 		type: "slot",
-		source: "(108:24) <InputIssueIndicator type=\\\"danger\\\">",
+		source: "(105:24) <InputIssueIndicator type=\\\"danger\\\">",
 		ctx
 	});
 
 	return block;
 }
 
-// (76:16) {#if input.internalType == InputTypesInternal.DYNAMIC_LIST}
+// (73:16) {#if input.internalType == InputTypesInternal.DYNAMIC_LIST}
 function create_if_block_1$4(ctx) {
 	let plusbutton;
 	let t;
@@ -25377,14 +25371,14 @@ function create_if_block_1$4(ctx) {
 		block,
 		id: create_if_block_1$4.name,
 		type: "if",
-		source: "(76:16) {#if input.internalType == InputTypesInternal.DYNAMIC_LIST}",
+		source: "(73:16) {#if input.internalType == InputTypesInternal.DYNAMIC_LIST}",
 		ctx
 	});
 
 	return block;
 }
 
-// (93:16) {#each input.children as child}
+// (90:16) {#each input.children as child}
 function create_each_block$5(ctx) {
 	let contractfunctioninput;
 	let current;
@@ -25429,14 +25423,14 @@ function create_each_block$5(ctx) {
 		block,
 		id: create_each_block$5.name,
 		type: "each",
-		source: "(93:16) {#each input.children as child}",
+		source: "(90:16) {#each input.children as child}",
 		ctx
 	});
 
 	return block;
 }
 
-// (92:12) {#key input.children}
+// (89:12) {#key input.children}
 function create_key_block(ctx) {
 	let each_1_anchor;
 	let current;
@@ -25527,7 +25521,7 @@ function create_key_block(ctx) {
 		block,
 		id: create_key_block.name,
 		type: "key",
-		source: "(92:12) {#key input.children}",
+		source: "(89:12) {#key input.children}",
 		ctx
 	});
 
@@ -25559,7 +25553,7 @@ function create_fragment$a(ctx) {
 			t = space();
 			if_block1.c();
 			attr_dev(div, "class", "flex flex-1 flex-row items-end gap-1");
-			add_location(div, file$8, 45, 0, 1678);
+			add_location(div, file$8, 42, 0, 1605);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -25669,10 +25663,6 @@ function instance$a($$self, $$props, $$invalidate) {
 		return input;
 	};
 
-	onMount(() => {
-		console.log('mounting', input.name, input.type);
-	});
-
 	const handleInput = e => {
 		const target = e.target;
 
@@ -25695,18 +25685,18 @@ function instance$a($$self, $$props, $$invalidate) {
 
 	$$self.$$.on_mount.push(function () {
 		if (input === undefined && !('input' in $$props || $$self.$$.bound[$$self.$$.props['input']])) {
-			console_1$2.warn("<ContractFunctionInput> was created without expected prop 'input'");
+			console_1.warn("<ContractFunctionInput> was created without expected prop 'input'");
 		}
 
 		if (onInputStateChange === undefined && !('onInputStateChange' in $$props || $$self.$$.bound[$$self.$$.props['onInputStateChange']])) {
-			console_1$2.warn("<ContractFunctionInput> was created without expected prop 'onInputStateChange'");
+			console_1.warn("<ContractFunctionInput> was created without expected prop 'onInputStateChange'");
 		}
 	});
 
 	const writable_props = ['input', 'onInputStateChange', 'expandable'];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$2.warn(`<ContractFunctionInput> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1.warn(`<ContractFunctionInput> was created with unknown prop '${key}'`);
 	});
 
 	function expandbutton_expanded_binding(value) {
@@ -25978,8 +25968,6 @@ class KebabButton extends SvelteComponentDev {
 }
 
 /* src/components/ContractFunction.svelte generated by Svelte v3.59.2 */
-
-const { console: console_1$1 } = globals;
 const file$6 = "src/components/ContractFunction.svelte";
 
 function get_each_context$4(ctx, list, i) {
@@ -25988,7 +25976,7 @@ function get_each_context$4(ctx, list, i) {
 	return child_ctx;
 }
 
-// (58:8) {:else}
+// (60:8) {:else}
 function create_else_block_1(ctx) {
 	let iconspacer;
 	let current;
@@ -26021,14 +26009,14 @@ function create_else_block_1(ctx) {
 		block,
 		id: create_else_block_1.name,
 		type: "else",
-		source: "(58:8) {:else}",
+		source: "(60:8) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (55:8) {#if inputRoot.hasInputs()}
+// (57:8) {#if inputRoot.hasInputs()}
 function create_if_block_2$2(ctx) {
 	let expandbutton;
 	let updating_expanded;
@@ -26088,14 +26076,14 @@ function create_if_block_2$2(ctx) {
 		block,
 		id: create_if_block_2$2.name,
 		type: "if",
-		source: "(55:8) {#if inputRoot.hasInputs()}",
+		source: "(57:8) {#if inputRoot.hasInputs()}",
 		ctx
 	});
 
 	return block;
 }
 
-// (68:4) {#if inputRoot.hasInputs()}
+// (70:4) {#if inputRoot.hasInputs()}
 function create_if_block$6(ctx) {
 	let div;
 	let show_if;
@@ -26121,7 +26109,7 @@ function create_if_block$6(ctx) {
 			div = element("div");
 			if_block.c();
 			attr_dev(div, "class", div_class_value = "flex flex-1 flex-col gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : ''));
-			add_location(div, file$6, 68, 8, 2528);
+			add_location(div, file$6, 70, 8, 2650);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -26178,14 +26166,14 @@ function create_if_block$6(ctx) {
 		block,
 		id: create_if_block$6.name,
 		type: "if",
-		source: "(68:4) {#if inputRoot.hasInputs()}",
+		source: "(70:4) {#if inputRoot.hasInputs()}",
 		ctx
 	});
 
 	return block;
 }
 
-// (81:12) {:else}
+// (83:12) {:else}
 function create_else_block$3(ctx) {
 	let contractfunctioninput;
 	let current;
@@ -26232,14 +26220,14 @@ function create_else_block$3(ctx) {
 		block,
 		id: create_else_block$3.name,
 		type: "else",
-		source: "(81:12) {:else}",
+		source: "(83:12) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (70:12) {#if inputRoot.isMultiInput() && expanded}
+// (72:12) {#if inputRoot.isMultiInput() && expanded}
 function create_if_block_1$3(ctx) {
 	let each_1_anchor;
 	let current;
@@ -26330,14 +26318,14 @@ function create_if_block_1$3(ctx) {
 		block,
 		id: create_if_block_1$3.name,
 		type: "if",
-		source: "(70:12) {#if inputRoot.isMultiInput() && expanded}",
+		source: "(72:12) {#if inputRoot.isMultiInput() && expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (72:16) {#each inputRoot.inputs.children as input}
+// (74:16) {#each inputRoot.inputs.children as input}
 function create_each_block$4(ctx) {
 	let contractfunctioninput;
 	let current;
@@ -26382,7 +26370,7 @@ function create_each_block$4(ctx) {
 		block,
 		id: create_each_block$4.name,
 		type: "each",
-		source: "(72:16) {#each inputRoot.inputs.children as input}",
+		source: "(74:16) {#each inputRoot.inputs.children as input}",
 		ctx
 	});
 
@@ -26433,11 +26421,11 @@ function create_fragment$8(ctx) {
 			if (if_block1) if_block1.c();
 			set_custom_element_data(vscode_button, "class", "flex-1");
 			set_custom_element_data(vscode_button, "appearance", vscode_button_appearance_value = /*isCalldata*/ ctx[1] ? 'secondary' : 'primary');
-			add_location(vscode_button, file$6, 61, 8, 2306);
+			add_location(vscode_button, file$6, 63, 8, 2428);
 			attr_dev(div0, "class", div0_class_value = "flex flex-1 gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : ''));
-			add_location(div0, file$6, 53, 4, 1991);
+			add_location(div0, file$6, 55, 4, 2113);
 			attr_dev(div1, "class", div1_class_value = "flex flex-1 w-full items-end gap-1 " + (/*expanded*/ ctx[2] ? 'flex-col' : 'flex-row'));
-			add_location(div1, file$6, 52, 0, 1901);
+			add_location(div1, file$6, 54, 0, 2023);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -26578,10 +26566,10 @@ function instance$8($$self, $$props, $$invalidate) {
 			if (isCalldata) {
 				_encodedInput = inputRoot.rawCalldata();
 			} else if (isConstructor) {
-				_encodedInput = inputRoot.encodedParameters();
+				_encodedInput = inputRoot.encodedParameters(); // console.log('calldata', _encodedInput, func);
 			} else {
-				_encodedInput = inputRoot.calldata();
-			}
+				_encodedInput = inputRoot.calldata(); // console.log('constructor', _encodedInput, func);
+			} // console.log('function', _encodedInput, func);
 		} catch(e) {
 			const errorMessage = typeof e === 'string' ? e : e.message;
 			const message = `Failed to encode input with error: ${errorMessage}`;
@@ -26589,7 +26577,6 @@ function instance$8($$self, $$props, $$invalidate) {
 			return;
 		}
 
-		console.log('encoded input', isConstructor, _encodedInput);
 		onFunctionCall(_encodedInput, func);
 	}
 
@@ -26602,18 +26589,18 @@ function instance$8($$self, $$props, $$invalidate) {
 
 	$$self.$$.on_mount.push(function () {
 		if (func === undefined && !('func' in $$props || $$self.$$.bound[$$self.$$.props['func']])) {
-			console_1$1.warn("<ContractFunction> was created without expected prop 'func'");
+			console.warn("<ContractFunction> was created without expected prop 'func'");
 		}
 
 		if (onFunctionCall === undefined && !('onFunctionCall' in $$props || $$self.$$.bound[$$self.$$.props['onFunctionCall']])) {
-			console_1$1.warn("<ContractFunction> was created without expected prop 'onFunctionCall'");
+			console.warn("<ContractFunction> was created without expected prop 'onFunctionCall'");
 		}
 	});
 
 	const writable_props = ['func', 'onFunctionCall', 'isConstructor', 'isCalldata'];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$1.warn(`<ContractFunction> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<ContractFunction> was created with unknown prop '${key}'`);
 	});
 
 	function expandbutton_expanded_binding(value) {
@@ -29472,8 +29459,6 @@ class Contract extends SvelteComponentDev {
 }
 
 /* src/pages/sake/Run.svelte generated by Svelte v3.59.2 */
-
-const { console: console_1 } = globals;
 const file$1 = "src/pages/sake/Run.svelte";
 
 function get_each_context$1(ctx, list, i) {
@@ -29483,7 +29468,7 @@ function get_each_context$1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (71:0) {:else}
+// (70:0) {:else}
 function create_else_block$1(ctx) {
 	let section;
 	let div;
@@ -29504,19 +29489,19 @@ function create_else_block$1(ctx) {
 			attr_dev(path, "fill-rule", "evenodd");
 			attr_dev(path, "clip-rule", "evenodd");
 			attr_dev(path, "d", "M14.491 1c-3.598.004-6.654 1.983-8.835 4H1.5l-.5.5v3l.147.354.991.991.001.009 4 4 .009.001.999.999L7.5 15h3l.5-.5v-4.154c2.019-2.178 3.996-5.233 3.992-8.846l-.501-.5zM2 6h2.643a23.828 23.828 0 0 0-2.225 2.71L2 8.294V6zm5.7 8l-.42-.423a23.59 23.59 0 0 0 2.715-2.216V14H7.7zm-1.143-1.144L3.136 9.437C4.128 8 8.379 2.355 13.978 2.016c-.326 5.612-5.987 9.853-7.421 10.84zM4 15v-1H2v-2H1v3h3zm6.748-7.667a1.5 1.5 0 1 0-2.496-1.666 1.5 1.5 0 0 0 2.495 1.666z");
-			add_location(path, file$1, 79, 17, 3357);
+			add_location(path, file$1, 78, 17, 3307);
 			attr_dev(svg, "width", "16");
 			attr_dev(svg, "height", "16");
 			attr_dev(svg, "viewBox", "0 0 16 16");
 			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
 			attr_dev(svg, "fill", "currentColor");
-			add_location(svg, file$1, 73, 12, 3157);
+			add_location(svg, file$1, 72, 12, 3107);
 			attr_dev(span, "class", "text-sm my-2 text-center text-secon");
-			add_location(span, file$1, 85, 12, 3970);
+			add_location(span, file$1, 84, 12, 3920);
 			attr_dev(div, "class", "flex flex-col gap-2 items-center");
-			add_location(div, file$1, 72, 8, 3098);
+			add_location(div, file$1, 71, 8, 3048);
 			attr_dev(section, "class", "h-full w-full flex flex-col items-center justify-center gap-3");
-			add_location(section, file$1, 71, 4, 3010);
+			add_location(section, file$1, 70, 4, 2960);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, section, anchor);
@@ -29538,14 +29523,14 @@ function create_else_block$1(ctx) {
 		block,
 		id: create_else_block$1.name,
 		type: "else",
-		source: "(71:0) {:else}",
+		source: "(70:0) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (39:0) {#if $deployedContracts.length > 0}
+// (38:0) {#if $deployedContracts.length > 0}
 function create_if_block$1(ctx) {
 	let section;
 	let div;
@@ -29572,9 +29557,9 @@ function create_if_block$1(ctx) {
 			}
 
 			attr_dev(div, "class", "flex flex-col gap-5");
-			add_location(div, file$1, 61, 8, 2707);
+			add_location(div, file$1, 60, 8, 2657);
 			attr_dev(section, "class", "w-full");
-			add_location(section, file$1, 39, 4, 1875);
+			add_location(section, file$1, 38, 4, 1825);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, section, anchor);
@@ -29645,14 +29630,14 @@ function create_if_block$1(ctx) {
 		block,
 		id: create_if_block$1.name,
 		type: "if",
-		source: "(39:0) {#if $deployedContracts.length > 0}",
+		source: "(38:0) {#if $deployedContracts.length > 0}",
 		ctx
 	});
 
 	return block;
 }
 
-// (63:12) {#each $deployedContracts as contract, i}
+// (62:12) {#each $deployedContracts as contract, i}
 function create_each_block$1(ctx) {
 	let contract;
 	let current;
@@ -29696,7 +29681,7 @@ function create_each_block$1(ctx) {
 		block,
 		id: create_each_block$1.name,
 		type: "each",
-		source: "(63:12) {#each $deployedContracts as contract, i}",
+		source: "(62:12) {#each $deployedContracts as contract, i}",
 		ctx
 	});
 
@@ -29823,7 +29808,6 @@ function instance$1($$self, $$props, $$invalidate) {
 			value: func.stateMutability === 'payable' ? _value : 0
 		};
 
-		console.log('request params', requestParams);
 		const payload = { func, requestParams };
 		functionCall(payload);
 	};
@@ -29831,7 +29815,7 @@ function instance$1($$self, $$props, $$invalidate) {
 	const writable_props = [];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1.warn(`<Run> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Run> was created with unknown prop '${key}'`);
 	});
 
 	$$self.$capture_state = () => ({

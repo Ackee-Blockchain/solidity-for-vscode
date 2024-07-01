@@ -34,12 +34,6 @@ export const compilationState = writable<CompilationStateData>({
 export async function setupStores() {
     setupListeners();
     await init();
-    selectedAccount.subscribe((value) => {
-        console.log('selected account set', value);
-    });
-    selectedValue.subscribe((value) => {
-        console.log('selected value set', value);
-    });
 }
 
 async function init() {
@@ -59,7 +53,7 @@ function setupListeners() {
         switch (command) {
             case WebviewMessage.getState: {
                 if (stateId === StateId.DeployedContracts) {
-                    console.log('deployed contracts', payload);
+                    // console.log('deployed contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
@@ -67,7 +61,7 @@ function setupListeners() {
                 }
 
                 if (stateId === StateId.CompiledContracts) {
-                    console.log('compiled contracts', payload);
+                    // console.log('compiled contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
@@ -76,7 +70,7 @@ function setupListeners() {
                 }
 
                 if (stateId === StateId.Accounts) {
-                    console.log('accounts', payload);
+                    // console.log('accounts', payload);
                     const _accounts = payload as AccountStateData[];
                     const _selectedAccount = get(selectedAccount);
 

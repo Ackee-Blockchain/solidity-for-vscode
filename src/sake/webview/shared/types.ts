@@ -19,7 +19,7 @@ export interface ContractFunction {
     type: string;
 
     // optional
-    outputs: Array<any> | undefined; // TODO
+    outputs: Array<ContractFunctionOutput> | undefined; // TODO
     name: string;
     // displayName: string | undefined;
 }
@@ -40,6 +40,16 @@ export interface ContractFunctionInput {
 
     // optional
     components: Array<ContractFunctionInput> | undefined;
+}
+
+export interface ContractFunctionOutput {
+    // required
+    internalType: string;
+    name: string;
+    type: string;
+
+    // optional
+    components: Array<ContractFunctionOutput> | undefined;
 }
 
 /*
@@ -119,6 +129,16 @@ export interface TxOutput {
     // also add input data and function name for ease of use in history
 }
 
+export interface TxDecodedReturnValue {
+    name: string;
+    value: string;
+}
+
+export interface TxReturnData {
+    bytes: string;
+    decoded: Array<TxDecodedReturnValue> | undefined; // TxDecodedReturnValue | undefined;
+}
+
 export interface TxDeploymentOutput extends TxOutput {
     contractName: string;
     contractAddress: string | null;
@@ -127,7 +147,7 @@ export interface TxDeploymentOutput extends TxOutput {
 export interface TxFunctionCallOutput extends TxOutput {
     to: string;
     functionName: string;
-    returnValue: any | undefined; // TOTO create a type for this
+    returnData: TxReturnData;
 }
 
 /*

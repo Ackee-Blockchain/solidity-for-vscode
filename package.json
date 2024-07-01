@@ -818,7 +818,7 @@
                         "id": "detectors",
                         "title": "Catch vulnerabilities with Detectors",
                         "description": "See vulnerabilities and compiler warnings/errors of your code in real-time inside your sidebar.",
-                        "media":{
+                        "media": {
                             "image": "./resources/walkthrough/detectors.png",
                             "altText": "Detectors"
                         }
@@ -888,9 +888,9 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
+        "@estruyf/vscode": "^1.1.0",
         "@google-cloud/storage": "^7.11.2",
         "@hpcc-js/wasm": "^2.1.0",
-        "@estruyf/vscode": "^1.1.0",
         "@renovatebot/pep440": "^2.0.0",
         "applicationinsights": "^2.9.0",
         "execa": "^8.0.1",

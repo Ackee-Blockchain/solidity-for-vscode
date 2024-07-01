@@ -39,10 +39,6 @@
         return input as DynamicListInputHandler;
     };
 
-    onMount(() => {
-        console.log('mounting', input.name, input.type);
-    });
-
     const handleInput = (e: Event) => {
         const target = e.target as HTMLInputElement;
         try {
