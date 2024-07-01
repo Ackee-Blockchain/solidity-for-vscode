@@ -791,7 +791,7 @@
                     {
                         "id": "rosetta-macos-native",
                         "title": "Setup: Enable Rosetta",
-                        "description": "It looks like you are running on MacOS Native. To ensure full compatibility with our extension, please make sure you have Rosetta installed.\n**Tip**: To install Rosetta, you can run [this command](command:Tools-for-Solidity.send-rosetta-command).",
+                        "description": "It looks like you are running on macOS Native. To ensure full compatibility with our extension, please make sure you have Rosetta installed.\n**Tip**: To install Rosetta, you can run [this command](command:Tools-for-Solidity.send-rosetta-command).",
                         "media": {
                             "markdown": "./resources/walkthrough/blank.md"
                         },
@@ -817,7 +817,7 @@
                     {
                         "id": "detectors",
                         "title": "Catch vulnerabilities with Detectors",
-                        "description": "See vulnerabilities and compiler warnings/errors of your code in real-time.",
+                        "description": "See vulnerabilities and compiler warnings/errors of your code in real-time inside your sidebar.",
                         "media":{
                             "image": "./resources/walkthrough/detectors.png",
                             "altText": "Detectors"
@@ -826,31 +826,29 @@
                     {
                         "id": "sake",
                         "title": "Use Sake to interact with Smart Contracts",
-                        "description": "Sake is a tool for interacting with smart contracts. It allows you to deploy, call, and test your contracts directly from VS Code.",
+                        "description": "Sake is a tool for interacting with smart contracts. It allows you to deploy, call, and test your contracts directly from VS Code. \n**Tip**: You can access Sake from the sidebar.",
                         "media": {
                             "image": "./resources/walkthrough/sake.png",
                             "altText": "Sake"
                         }
-
-                    },
-                    {
-                        "id": "graphs",
-                        "title": "Visualise relations in code",
-                        "description": "Different graph types can be generated to better visualize the relations in the code.",
-                        "media": {
-                            "image": "./resources/walkthrough/graphs.png",
-                            "altText": "Graphs"
-                        }
                     },
                     {
                         "id": "language-server",
-                        "title": "Speed up your workflow with language server features",
-                        "description": "Sake ships with a powerful language server which adds support for **CodeLens**, **Go to Definition**, **Find References**, and more. ",
+                        "title": "Speed up your workflow with LSP features",
+                        "description": "Sake ships with a powerful language server which adds support for **CodeLens**, **Go to Definition**, **Find References**, and more.",
                         "media": {
                             "image": "./resources/walkthrough/lsp.png",
                             "altText": "LSP Server"
                         }
-
+                    },
+                    {
+                        "id": "graphs",
+                        "title": "Visualize relations in code",
+                        "description": "Different graph types can be generated to better visualize the relations in the code.\n**Tip**: You can view graphs via hints displayed over contracts and functions.",
+                        "media": {
+                            "image": "./resources/walkthrough/graphs.png",
+                            "altText": "Graphs"
+                        }
                     }
                 ]
             }
