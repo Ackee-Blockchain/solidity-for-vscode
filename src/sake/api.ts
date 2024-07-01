@@ -171,7 +171,9 @@ export async function compile(client: LanguageClient | undefined) {
             throw new Error('Compilation was unsuccessful');
         }
 
-        vscode.window.showInformationMessage('Compilation was successful!');
+        console.log('compilation result', result);
+
+        // vscode.window.showInformationMessage('Compilation was successful!');
         const _parsedresult = parseCompilationResult(result.contracts);
         compilationState.setCompilation(_parsedresult);
 

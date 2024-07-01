@@ -21066,7 +21066,7 @@ function create_each_block$6(ctx) {
 			if (tab_header_slot) tab_header_slot.c();
 			t2 = space();
 			add_location(span, file$h, 27, 28, 1085);
-			attr_dev(a, "class", "monaco-button flex gap-2 svelte-hpivnc");
+			attr_dev(a, "class", "monaco-button flex gap-2 svelte-r1vdl4");
 			toggle_class(a, "active", /*activeTabId*/ ctx[1] === /*tab*/ ctx[7].id);
 			add_location(a, file$h, 22, 24, 838);
 			attr_dev(li, "class", "text-sm uppercase whitespace-nowrap flex items-center cursor-pointer");
@@ -21196,7 +21196,7 @@ function create_fragment$j(ctx) {
 			t2 = space();
 			div3 = element("div");
 			if (content_scrollable_slot) content_scrollable_slot.c();
-			attr_dev(ul, "class", "flex vscode-gap mb-4 monaco-nav svelte-hpivnc");
+			attr_dev(ul, "class", "flex vscode-gap mb-4 monaco-nav svelte-r1vdl4");
 			add_location(ul, file$h, 14, 12, 411);
 			attr_dev(div0, "class", "overflow-x-auto");
 			add_location(div0, file$h, 13, 8, 369);

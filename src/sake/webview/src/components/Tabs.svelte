@@ -54,9 +54,9 @@
         gap: calc(var(--design-unit) * 8px);
     }
 
-    .vscode-shadow {
+    /* .vscode-shadow {
         box-shadow: var(--vscode-panelStickyScroll-shadow) 0 6px 6px -6px inset;
-    }
+    } */
 
     .monaco-nav {
         padding: 0 calc(var(--design-unit) * 2px);
