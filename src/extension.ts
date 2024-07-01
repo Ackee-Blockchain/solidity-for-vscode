@@ -571,7 +571,7 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.send-rosetta-command', async () => {
             // command
-            const command = 'softwareupdate --install-rosetta';
+            const command = 'softwareupdate --install-rosetta --agree-to-license';
             // open terminal
             let terminal = vscode.window.createTerminal('rosetta');
             terminal.sendText(command, false);
