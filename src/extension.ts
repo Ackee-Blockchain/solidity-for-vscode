@@ -546,9 +546,9 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
             'Tools-for-Solidity.select-installation-method',
             async () => {
                 const items: any[] = [
-                    { label: 'Install Wake using pipx', setting: 'pipx' } as vscode.QuickPickItem,
-                    { label: 'Install Wake using pip', setting: 'pip' },
                     { label: 'Install Wake using conda', setting: 'conda' },
+                    { label: 'Install Wake using pipx', setting: 'pipx' },
+                    { label: 'Install Wake using pip', setting: 'pip' },
                     { label: 'Manual install', setting: 'manual' }
                 ];
                 const selection = await vscode.window.showQuickPick(items, {
