@@ -547,8 +547,8 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
             async () => {
                 const items: any[] = [
                     { label: 'Install Wake using conda', setting: 'conda' },
-                    { label: 'Install Wake using pipx', setting: 'pipx' },
                     { label: 'Install Wake using pip', setting: 'pip' },
+                    { label: 'Install Wake using pipx', setting: 'pipx' },
                     { label: 'Manual install', setting: 'manual' }
                 ];
                 const selection = await vscode.window.showQuickPick(items, {
