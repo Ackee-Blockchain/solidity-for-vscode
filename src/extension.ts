@@ -569,6 +569,17 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.send-rosetta-command', async () => {
+            // command
+            const command = 'softwareupdate --install-rosetta';
+            // open terminal
+            let terminal = vscode.window.createTerminal('rosetta');
+            terminal.sendText(command, false);
+            terminal.show();
+        })
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.install.wake-conda', async () =>
             vscode.window.showInformationMessage('Not implemented yet.')
         )
