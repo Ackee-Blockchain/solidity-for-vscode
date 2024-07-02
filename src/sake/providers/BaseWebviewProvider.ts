@@ -50,7 +50,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
-        const _sakePath = vscode.Uri.joinPath(this._extensionUri, 'src', 'sake');
+        const _sakePath = vscode.Uri.joinPath(this._extensionUri, 'dist', 'sake');
 
         const stylesResetUri = webview.asWebviewUri(
             vscode.Uri.joinPath(_sakePath, 'media', 'reset.css')
@@ -61,11 +61,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         );
 
         const webviewScriptUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(_sakePath, 'webview', 'dist', this._targetPath, 'webview.js')
+            vscode.Uri.joinPath(_sakePath, 'webview', this._targetPath, 'webview.js')
         );
 
         const webviewStylesUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(_sakePath, 'webview', 'dist', this._targetPath, 'bundle.css')
+            vscode.Uri.joinPath(_sakePath, 'webview', this._targetPath, 'bundle.css')
         );
 
         // Use a nonce to only allow a specific script to be run.

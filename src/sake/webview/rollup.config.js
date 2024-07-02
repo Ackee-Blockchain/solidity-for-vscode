@@ -40,26 +40,26 @@ const _defaultConfig = {
 };
 
 export default [
-    {
-        input: 'src/pages/run/run.ts',
-        output: {
-            sourcemap: true,
-            format: 'cjs',
-            name: 'app',
-            file: 'dist/run/webview.js'
-        },
-        ..._defaultConfig,
-    },
-    {
-        input: 'src/pages/compile-deploy/compile-deploy.ts',
-        output: {
-            sourcemap: true,
-            format: 'cjs',
-            name: 'app',
-            file: 'dist/compile-deploy/webview.js'
-        },
-        ..._defaultConfig,
-    },
+    // {
+    //     input: 'src/pages/run/run.ts',
+    //     output: {
+    //         sourcemap: true,
+    //         format: 'cjs',
+    //         name: 'app',
+    //         file: 'dist/run/webview.js'
+    //     },
+    //     ..._defaultConfig,
+    // },
+    // {
+    //     input: 'src/pages/compile-deploy/compile-deploy.ts',
+    //     output: {
+    //         sourcemap: true,
+    //         format: 'cjs',
+    //         name: 'app',
+    //         file: 'dist/compile-deploy/webview.js'
+    //     },
+    //     ..._defaultConfig,
+    // },
     {
         input: 'src/pages/sake/page.ts',
         output: {
