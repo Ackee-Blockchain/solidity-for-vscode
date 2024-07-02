@@ -2,8 +2,11 @@
 
 'use strict';
 
+import WatchExternalFilesPlugin from 'webpack-watch-files-plugin'
+const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
+
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -49,6 +52,34 @@ const config = {
         ]
       }
     ]
-  }
+  },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/sake/webvigiew/dist/sake/webview.js',
+          to: 'sake/webview/webview.js'
+        },
+        {
+          from: 'src/sake/webview/dist/sake/bundle.css',
+          to: 'sake/webview/bundle.css'
+        },
+        {
+            from: 'src/sake/media/reset.css',
+            to: 'sake/media/reset.css'
+        },
+        {
+            from: 'src/sake/media/vscode.css',
+            to: 'sake/media/vscode.css'
+        },
+      ],
+    }),
+    // new WatchExternalFilesPlugin({
+    //   files: [
+    //     './src/**/*.js',
+    //     '!./src/*.test.js'
+    //   ]
+    // })
+  ]
 };
 module.exports = config;
