@@ -241,8 +241,12 @@ export class CondaInstaller implements Installer {
             await this.condaUnpack();
             fs.writeFileSync(this.markerFile, latestVersion);
 
+            this.analytics.setWakeVersion(latestVersion);
+
             return;
         } else {
+            this.analytics.setWakeVersion(currentVersion);
+
             promise.then(([latestFile, latestVersion]) => {
                 if (latestFile === undefined || latestVersion === undefined) {
                     return;

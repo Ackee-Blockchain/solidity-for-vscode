@@ -101,6 +101,8 @@ export class ManualInstaller implements Installer {
             throw new Error("Wake not found");
         }
 
+        this.analytics.setWakeVersion(version);
+
         const env = { ...process.env, PYTHONIOENCODING: 'utf8' } as { [key: string]: string };
 
         let certifiPath = undefined;
