@@ -226,15 +226,15 @@ export class CondaInstaller implements Installer {
         if (currentVersion === undefined || compare(currentVersion, WAKE_MIN_VERSION) < 0) {
             if (currentVersion !== undefined) {
                 await vscode.window.showInformationMessage(
-                    `The conda environment in version ${currentVersion} installed but the minimal version is ${WAKE_MIN_VERSION}. Updating...`,
+                    `The Wake conda environment in version ${currentVersion} installed but the minimal version is ${WAKE_MIN_VERSION}. Updating...`,
                 );
             }
             let [latestFile, latestVersion] = await promise;
 
             // no conda environment installed yet
             if (latestFile === undefined || latestVersion === undefined) {
-                await vscode.window.showErrorMessage(`No conda environment found for platform ${process.platform} and architecture ${process.arch}`);
-                throw new Error(`No conda environment found for platform ${process.platform} and architecture ${process.arch}`);
+                await vscode.window.showErrorMessage(`No Wake conda environment found for platform ${process.platform} and architecture ${process.arch}`);
+                throw new Error(`No Wake conda environment found for platform ${process.platform} and architecture ${process.arch}`);
             }
 
             await this.verifyAndExtractArchive(extractPath, latestFile.name);
@@ -253,8 +253,7 @@ export class CondaInstaller implements Installer {
                 }
 
                 // offer an update
-                // TODO: better message
-                const message = `A new conda environment version is available. Would you like to update to version ${latestVersion}?`;
+                const message = `A new Wake conda environment version is available. Would you like to update to version ${latestVersion}?`;
 
                 vscode.window.showInformationMessage(message, 'Yes', 'No').then(async (update) => {
                     if (update === 'Yes') {
@@ -262,7 +261,7 @@ export class CondaInstaller implements Installer {
                         fs.writeFileSync(this.upgradeFile, latestVersion);
 
                         await vscode.window.showInformationMessage(
-                            `The conda environment will be updated to version ${latestVersion} after restarting VS Code.`,
+                            `The Wake conda environment will be updated to version ${latestVersion} after restarting VS Code.`,
                             'Restart Now'
                         ).then((restart) => {
                             if (restart === 'Restart Now') {
