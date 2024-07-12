@@ -584,6 +584,23 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
             vscode.window.showInformationMessage('Not implemented yet.')
         )
     );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.config.enable-prerelease', () => {
+            const cfg = vscode.workspace.getConfiguration('Tools-for-Solidity');
+            cfg.update('Wake.prerelease', true, vscode.ConfigurationTarget.Global);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.config.disable-prerelease',
+            async () => {
+                const cfg = vscode.workspace.getConfiguration('Tools-for-Solidity');
+                cfg.update('Wake.prerelease', false, vscode.ConfigurationTarget.Global);
+            }
+        )
+    );
 }
 
 function openFile(uri: vscode.Uri, range: vscode.Range) {

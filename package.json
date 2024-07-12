@@ -562,6 +562,16 @@
                 "command": "Tools-for-Solidity.sake.show_history",
                 "title": "Sake: Show Transaction History",
                 "icon": "$(history)"
+            },
+            {
+                "command": "Tools-for-Solidity.config.enable-prerelease",
+                "title": "Tools for Solidity: Enable Wake Prerelease",
+                "enablement": "!Tools-for-Solidity.Wake.prerelease"
+            },
+            {
+                "command": "Tools-for-Solidity.config.disable-prerelease",
+                "title": "Tools for Solidity:  Disable Wake Prerelease",
+                "enablement": "Tools-for-Solidity.Wake.prerelease"
             }
         ],
         "viewsContainers": {

@@ -210,3 +210,10 @@ Now:
     be able to copy output data
     automatically convert hex to integers
 
+
+Ideas after v0.1:
+    - playground mode - opens a single window with a contract
+        for example, i wanted to check if array overflow triggers an error
+        this way i could easily check
+
+
