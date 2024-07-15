@@ -216,6 +216,9 @@ export async function deploy(
 
         // Add deployment to state
 
+        console.log('callTrace: ', result.callTrace);
+        console.log('result:', result);
+
         // Add to tx history
         const txOutput: TxDeploymentOutput = {
             type: TxType.Deployment,

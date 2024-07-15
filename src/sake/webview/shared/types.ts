@@ -124,7 +124,7 @@ export interface TxOutput {
     // to: string;
     // returnValue: string;
     receipt: TxReceipt;
-    callTrace: string;
+    callTrace: CallTrace;
     // TODO remove to and returnValue and use TxDeploymentOutput and TxFunctionCallOutput
     // also add input data and function name for ease of use in history
 }
@@ -232,7 +232,7 @@ export interface WakeDeploymentResponse {
     success: boolean;
     contractAddress: string | null;
     txReceipt: TxReceipt;
-    callTrace: string;
+    callTrace: CallTrace;
 }
 
 export interface WakeDeploymentRequestParams {
@@ -273,4 +273,19 @@ export interface WakeSetBalancesRequestParams {
 
 export interface WakeSetBalancesResponse {
     success: boolean;
+}
+
+export interface CallTrace {
+    address: string | undefined;
+    arguments: string | undefined;
+    callType: 'Call' | 'DelegateCall' | 'StaticCall' | 'Callcode' | 'Create' | 'Create2' | null;
+    contractName: string | undefined;
+    error: string | undefined;
+    functionName: string | undefined;
+    gas: undefined | string;
+    returnValue: undefined | string;
+    sender: string | undefined;
+    status: string | undefined;
+    value: string | undefined;
+    subtraces: CallTrace[];
 }

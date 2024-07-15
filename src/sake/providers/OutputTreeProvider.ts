@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import {
+    CallTrace,
     TxDeploymentOutput,
     TxFunctionCallOutput,
     TxOutput,
@@ -181,16 +182,13 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
 
         // add calltrace
         if (data.callTrace !== undefined) {
-            const _string = data.callTrace;
             const callTraceNode = new SakeOutputItem(
                 'Call Trace',
                 undefined,
                 vscode.TreeItemCollapsibleState.Expanded,
                 'list-tree'
             );
-            callTraceNode.tooltip = _string;
-            const callTraceChildren = [parseCallTrace(_string)];
-            callTraceNode.setChildren(callTraceChildren);
+            callTraceNode.setChildren([parseCallTrace(data.callTrace)]);
             rootNodes.push(callTraceNode);
         }
 
@@ -290,16 +288,13 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
 
         // add calltrace
         if (data.callTrace !== undefined) {
-            const _string = data.callTrace;
             const callTraceNode = new SakeOutputItem(
                 'Call Trace',
                 undefined,
                 vscode.TreeItemCollapsibleState.Expanded,
                 'list-tree'
             );
-            callTraceNode.tooltip = _string;
-            const callTraceChildren = [parseCallTrace(_string)];
-            callTraceNode.setChildren(callTraceChildren);
+            callTraceNode.setChildren([parseCallTrace(data.callTrace)]);
             rootNodes.push(callTraceNode);
         }
 
@@ -360,7 +355,22 @@ class CallTraceItem extends BaseOutputItem {
     }
 }
 
-function parseCallTrace(callTrace: string): BaseOutputItem {
+/* Call Trace dict parser */
+function parseCallTrace(callTrace: CallTrace) {
+    const _string = `${callTrace.status} ${callTrace.contractName}.${callTrace.functionName}${
+        callTrace.arguments
+    } ${callTrace.error ?? ''}`;
+    const root = new CallTraceItem(_string);
+    if (callTrace.subtraces !== undefined) {
+        root.setChildren(callTrace.subtraces.map((subtrace) => parseCallTrace(subtrace)));
+    }
+    return root;
+}
+
+/*
+ * Call Trace string parser - Deprecated
+ */
+function parseCallTraceString(callTrace: string): BaseOutputItem {
     const lines = callTrace.split('\n');
     const root = new CallTraceItem(lines[0]);
     const mostRecentNodesPerLevel: { [level: number]: CallTraceItem } = { 0: root };
