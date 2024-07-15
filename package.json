@@ -803,7 +803,7 @@
                         "title": "Setup: Enable Rosetta",
                         "description": "It looks like you are running on macOS Native. To ensure full compatibility with our extension, please make sure you have Rosetta installed.\n**Tip**: To install Rosetta, you can run [this command](command:Tools-for-Solidity.send-rosetta-command).",
                         "media": {
-                            "markdown": "./resources/walkthrough/blank.md"
+                            "markdown": "./resources/walkthrough/test.md"
                         },
                         "when": "isMacNative"
                     },
