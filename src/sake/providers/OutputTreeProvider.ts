@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import {
     CallTrace,
     TxDeploymentOutput,
-    TxFunctionCallOutput,
+    TxCallOutput,
     TxOutput,
     TxType
 } from '../webview/shared/types';
@@ -46,7 +46,7 @@ export class OutputViewManager {
                     : (this.treeView.message = 'Deployment Failed');
                 break;
             case TxType.FunctionCall:
-                _data = data as TxFunctionCallOutput;
+                _data = data as TxCallOutput;
                 _data.success
                     ? (this.treeView.message = 'Function Call Successful')
                     : (this.treeView.message = 'Function Call Failed');
@@ -147,7 +147,7 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             case TxType.Deployment:
                 return this._parseDeployment(data as TxDeploymentOutput);
             case TxType.FunctionCall:
-                return this._parseFunctionCall(data as TxFunctionCallOutput);
+                return this._parseFunctionCall(data as TxCallOutput);
             default:
                 throw new Error('Invalid TxType');
         }
@@ -157,16 +157,16 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
         const rootNodes: SakeOutputItem[] = [];
 
         // parse from
-        if (data.receipt?.from !== undefined) {
-            rootNodes.push(
-                new SakeOutputItem(
-                    'From',
-                    data.receipt.from,
-                    vscode.TreeItemCollapsibleState.None,
-                    'arrow-small-left'
-                )
-            );
-        }
+        // if (data.receipt?.from !== undefined) {
+        //     rootNodes.push(
+        //         new SakeOutputItem(
+        //             'From',
+        //             data.receipt.from,
+        //             vscode.TreeItemCollapsibleState.None,
+        //             'arrow-small-left'
+        //         )
+        //     );
+        // }
 
         // parse contract name
         if (data.receipt?.contractAddress !== undefined) {
@@ -203,7 +203,7 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             const receiptChildren = Object.keys(data.receipt).map((key) => {
                 return new SakeOutputItem(
                     key,
-                    data.receipt[key],
+                    data.receipt![key],
                     vscode.TreeItemCollapsibleState.None
                 ) as BaseOutputItem;
             });
@@ -214,44 +214,25 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
         return rootNodes as BaseOutputItem[];
     }
 
-    private _parseFunctionCall(data: TxFunctionCallOutput): BaseOutputItem[] {
+    private _parseFunctionCall(data: TxCallOutput): BaseOutputItem[] {
         const rootNodes: SakeOutputItem[] = [];
-
-        // parse from and to
-        if (data.to !== undefined) {
-            rootNodes.push(
-                new SakeOutputItem(
-                    'From',
-                    data.from,
-                    vscode.TreeItemCollapsibleState.None,
-                    'arrow-small-left'
-                )
-            );
-        }
-
-        if (data.from !== undefined) {
-            rootNodes.push(
-                new SakeOutputItem(
-                    'To',
-                    data.to,
-                    vscode.TreeItemCollapsibleState.None,
-                    'arrow-small-right'
-                )
-            );
-        }
 
         // add return data
         if (data.returnData !== undefined) {
+            const hasReturnData = data.returnData.bytes !== '';
+
             const returnDataNode = new SakeOutputItem(
                 'Return Data',
-                undefined,
-                vscode.TreeItemCollapsibleState.Expanded,
+                hasReturnData ? undefined : 'null',
+                hasReturnData
+                    ? vscode.TreeItemCollapsibleState.Expanded
+                    : vscode.TreeItemCollapsibleState.None,
                 'file-binary'
             );
             rootNodes.push(returnDataNode);
 
             // bytes
-            if (data.returnData.bytes !== undefined) {
+            if (hasReturnData && data.returnData.bytes !== undefined) {
                 returnDataNode.setChildren([
                     new SakeOutputItem(
                         'Bytes',
@@ -262,7 +243,7 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             }
 
             // decoded
-            if (data.returnData.decoded !== undefined) {
+            if (hasReturnData && data.returnData.decoded !== undefined) {
                 const returnDataDecodedNode = new SakeOutputItem(
                     'Decoded',
                     undefined,
@@ -298,6 +279,29 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             rootNodes.push(callTraceNode);
         }
 
+        // parse from and to
+        // if (data.to !== undefined) {
+        //     rootNodes.push(
+        //         new SakeOutputItem(
+        //             'From',
+        //             data.from,
+        //             vscode.TreeItemCollapsibleState.None,
+        //             'arrow-small-left'
+        //         )
+        //     );
+        // }
+
+        // if (data.from !== undefined) {
+        //     rootNodes.push(
+        //         new SakeOutputItem(
+        //             'To',
+        //             data.to,
+        //             vscode.TreeItemCollapsibleState.None,
+        //             'arrow-small-right'
+        //         )
+        //     );
+        // }
+
         // add receipt
         if (data.receipt !== undefined) {
             const receiptNode = new SakeOutputItem(
@@ -309,7 +313,7 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             const receiptChildren = Object.keys(data.receipt).map((key) => {
                 return new SakeOutputItem(
                     key,
-                    data.receipt[key],
+                    data.receipt![key],
                     vscode.TreeItemCollapsibleState.None
                 ) as BaseOutputItem;
             });

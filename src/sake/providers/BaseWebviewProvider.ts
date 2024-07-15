@@ -10,7 +10,8 @@ import {
     WebviewMessageData,
     WebviewMessage,
     WakeDeploymentRequestParams,
-    DeploymentStateData
+    DeploymentStateData,
+    WakeSetLabelRequestParams
 } from '../webview/shared/types';
 import { CompilationState } from '../state/CompilationState';
 import { AccountState } from '../state/AccountState';
@@ -318,25 +319,43 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessage.onSetContractNick: {
+            case WebviewMessage.onsetLabel: {
                 if (!payload) {
                     console.error('No set contract nick params provided');
                     return;
                 }
 
                 const nick = await vscode.window.showInputBox({
-                    value: (payload as DeploymentStateData).nick,
+                    value: '',
                     title: 'Set a contract nickname'
                 });
 
+                console.log('nick', nick);
+
                 if (nick === undefined) {
+                    webviewView.webview.postMessage({
+                        command,
+                        requestId,
+                        payload: false
+                    } as MessageHandlerData<boolean>);
                     return;
                 }
 
+                vscode.commands.executeCommand('Tools-for-Solidity.sake.setLabel', {
+                    address: (payload as DeploymentStateData).address,
+                    label: nick ? nick : null
+                } as WakeSetLabelRequestParams);
+
                 this._getDeployedContracts().updateContract({
                     ...(payload as DeploymentStateData),
-                    nick: !nick ? undefined : nick
+                    nick: nick ? nick : null
                 });
+
+                webviewView.webview.postMessage({
+                    command,
+                    requestId,
+                    payload: true
+                } as MessageHandlerData<boolean>);
             }
 
             default: {

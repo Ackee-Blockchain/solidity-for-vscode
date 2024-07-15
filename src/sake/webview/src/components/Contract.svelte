@@ -12,12 +12,12 @@
     import {
         WebviewMessage,
         type Contract,
-        type WakeFunctionCallRequestParams,
+        type WakeCallRequestParams,
         type ContractFunction as ContractFunctionType,
         type DeploymentStateData
     } from '../../shared/types';
     import { messageHandler } from '@estruyf/vscode/dist/client';
-    import { copyToClipboard, removeContract, setContractNick } from '../helpers/api';
+    import { copyToClipboard, removeContract, setLabel } from '../helpers/api';
     import CalldataBytes from './CalldataBytes.svelte';
     import { filter } from '@renovatebot/pep440';
     import CopyableSpan from './CopyableSpan.svelte';
@@ -28,7 +28,7 @@
     export let contract: DeploymentStateData;
     export let onFunctionCall: (
         calldata: string,
-        contract_address: string,
+        contractAddress: string,
         func: ContractFunctionType
     ) => void;
     let expanded = false;
@@ -46,7 +46,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div class="w-full flex flex-row gap-1 items-center justify-between">
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <ClickableSpan callback={() => setContractNick(contract)}>
+                <ClickableSpan callback={() => setLabel(contract)}>
                     {contract.nick ? `${contract.nick} (${contract.name})` : contract.name}
                 </ClickableSpan>
                 <DeleteButton

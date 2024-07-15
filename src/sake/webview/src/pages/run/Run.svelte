@@ -14,8 +14,8 @@
     import {
         StateId,
         WebviewMessage,
-        type FunctionCallPayload,
-        type WakeFunctionCallRequestParams,
+        type CallPayload,
+        type WakeCallRequestParams,
         type ContractFunction as ContractFunctionType
     } from '../../../shared/types';
     import { onMount } from 'svelte';
@@ -57,7 +57,7 @@
     // @todo extract into a helper function
     const call = async function (
         calldata: string,
-        contract_address: string,
+        contractAddress: string,
         func: ContractFunctionType
     ) {
         const _sender: string | undefined = callSetup.getSelectedAccount()?.address;
@@ -68,15 +68,15 @@
 
         const _value: number = callSetup.getValue() ?? 0;
 
-        const requestParams: WakeFunctionCallRequestParams = {
-            contract_address: contract_address,
+        const requestParams: WakeCallRequestParams = {
+            contractAddress: contractAddress,
             sender: _sender,
             calldata: calldata,
             // @dev automatically set value to 0 if function is not payable
             value: func.stateMutability === 'payable' ? _value : 0
         };
 
-        const payload: FunctionCallPayload = {
+        const payload: CallPayload = {
             func: func,
             requestParams: requestParams
         };

@@ -2141,7 +2141,7 @@ class ViewTemplate {
     }
 }
 // Much thanks to LitHTML for working this out!
-const lastAttributeNameRegex = 
+const lastAttributeNameRegex =
 /* eslint-disable-next-line no-control-regex */
 /([ \x09\x0a\x0c\x0d])([^\0-\x1F\x7F-\x9F "'>=/]+)([ \x09\x0a\x0c\x0d]*=[ \x09\x0a\x0c\x0d]*(?:[^ \x09\x0a\x0c\x0d"'`<>=]*|"[^"]*|'[^']*))$/;
 /**
@@ -2224,7 +2224,7 @@ class ElementStyles {
 ElementStyles.create = (() => {
     if (DOM.supportsAdoptedStyleSheets) {
         const styleSheetCache = new Map();
-        return (styles) => 
+        return (styles) =>
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         new AdoptedStyleSheetsStyles(styles, styleSheetCache);
     }
@@ -4827,7 +4827,7 @@ function applyMixins(derivedCtor, ...baseCtors) {
     baseCtors.forEach(baseCtor => {
         Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
             if (name !== "constructor") {
-                Object.defineProperty(derivedCtor.prototype, name, 
+                Object.defineProperty(derivedCtor.prototype, name,
                 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
                 Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
             }
@@ -9844,18 +9844,18 @@ const vsCodeCheckbox = Checkbox.compose({
     template: checkboxTemplate,
     styles: checkboxStyles,
     checkedIndicator: `
-		<svg 
+		<svg
 			part="checked-indicator"
 			class="checked-indicator"
-			width="16" 
-			height="16" 
-			viewBox="0 0 16 16" 
-			xmlns="http://www.w3.org/2000/svg" 
+			width="16"
+			height="16"
+			viewBox="0 0 16 16"
+			xmlns="http://www.w3.org/2000/svg"
 			fill="currentColor"
 		>
-			<path 
-				fill-rule="evenodd" 
-				clip-rule="evenodd" 
+			<path
+				fill-rule="evenodd"
+				clip-rule="evenodd"
 				d="M14.431 3.323l-8.47 10-.79-.036-3.35-4.77.818-.574 2.978 4.24 8.051-9.506.764.646z"
 			/>
 		</svg>
@@ -10061,18 +10061,18 @@ const vsCodeDropdown = Dropdown.compose({
     template: selectTemplate,
     styles: dropdownStyles,
     indicator: `
-		<svg 
+		<svg
 			class="select-indicator"
 			part="select-indicator"
-			width="16" 
-			height="16" 
-			viewBox="0 0 16 16" 
-			xmlns="http://www.w3.org/2000/svg" 
+			width="16"
+			height="16"
+			viewBox="0 0 16 16"
+			xmlns="http://www.w3.org/2000/svg"
 			fill="currentColor"
 		>
-			<path 
-				fill-rule="evenodd" 
-				clip-rule="evenodd" 
+			<path
+				fill-rule="evenodd"
+				clip-rule="evenodd"
 				d="M7.976 10.072l4.357-4.357.62.618L8.284 11h-.618L3 6.333l.619-.618 4.357 4.357z"
 			/>
 		</svg>
@@ -10960,7 +10960,7 @@ function instance$i($$self, $$props, $$invalidate) {
 	validate_slots('PlusButton', slots, []);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -11114,7 +11114,7 @@ function instance$h($$self, $$props, $$invalidate) {
 	validate_slots('MinusButton', slots, []);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -12097,7 +12097,7 @@ version$3.default = _default;
 
 	var _parse = _interopRequireDefault(parse$5);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; } 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 } (commonjsBrowser));
 
 var Messenger$1 = {};
@@ -12248,7 +12248,7 @@ MessageHandler$1.messageHandler = MessageHandler.getInstance();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	__exportStar(MessageHandler$1, exports);
 	__exportStar(Messenger$1, exports);
-	
+
 } (webview));
 
 (function (exports) {
@@ -12264,7 +12264,7 @@ MessageHandler$1.messageHandler = MessageHandler.getInstance();
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	__exportStar(webview, exports);
-	
+
 } (client));
 
 function number(n) {
@@ -17157,7 +17157,7 @@ ZodReadonly.create = (type, params) => {
         ...processCreateParams(params),
     });
 };
-function custom(check, params = {}, 
+function custom(check, params = {},
 /**
  * @deprecated
  *
@@ -18304,7 +18304,7 @@ along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
 */
 // Explicitly check for the
 // eslint-disable-next-line @typescript-eslint/ban-types
-const isNullish$1 = (item) => 
+const isNullish$1 = (item) =>
 // Using "null" value intentionally for validation
 // eslint-disable-next-line no-null/no-null
 item === undefined || item === null;
@@ -21259,7 +21259,7 @@ var WebviewMessage;
     WebviewMessage["onGetAccounts"] = "onGetAccounts";
     WebviewMessage["onGetBalances"] = "onGetBalances";
     WebviewMessage["onSetBalances"] = "onSetBalances";
-    WebviewMessage["onSetContractNick"] = "onSetContractNick";
+    WebviewMessage["onsetLabel"] = "onsetLabel";
 })(WebviewMessage || (WebviewMessage = {}));
 /*
  *
@@ -22146,7 +22146,7 @@ function create_else_block_1$1(ctx) {
 	return block;
 }
 
-// (112:52) 
+// (112:52)
 function create_if_block_3(ctx) {
 	let inputissueindicator;
 	let current;
@@ -23044,7 +23044,7 @@ function instance$c($$self, $$props, $$invalidate) {
 	validate_slots('KebabButton', slots, []);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -23956,7 +23956,7 @@ function instance$a($$self, $$props, $$invalidate) {
 	validate_slots('IconButton', slots, ['default']);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -24113,7 +24113,7 @@ function instance$9($$self, $$props, $$invalidate) {
 	validate_slots('DeleteButton', slots, []);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -24236,7 +24236,7 @@ function instance$8($$self, $$props, $$invalidate) {
 	validate_slots('CopyButton', slots, []);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	function handleClick() {
@@ -24373,8 +24373,8 @@ async function removeContract(contract) {
     //     return state.filter((c) => c.address !== contract.address);
     // });
 }
-async function setContractNick(contract) {
-    return await client.messageHandler.request(WebviewMessage.onSetContractNick, contract);
+async function setLabel(contract) {
+    return await client.messageHandler.request(WebviewMessage.onsetLabel, contract);
 }
 
 /* src/components/CalldataBytes.svelte generated by Svelte v3.59.2 */
@@ -25561,7 +25561,7 @@ function get_each_context$2(ctx, list, i) {
 	return child_ctx;
 }
 
-// (31:16) <ClickableSpan callback={() => setContractNick(contract)}>
+// (31:16) <ClickableSpan callback={() => setLabel(contract)}>
 function create_default_slot$1(ctx) {
 	let t_value = (/*contract*/ ctx[0].nick
 	? `${/*contract*/ ctx[0].nick} (${/*contract*/ ctx[0].name})`
@@ -25590,7 +25590,7 @@ function create_default_slot$1(ctx) {
 		block,
 		id: create_default_slot$1.name,
 		type: "slot",
-		source: "(31:16) <ClickableSpan callback={() => setContractNick(contract)}>",
+		source: "(31:16) <ClickableSpan callback={() => setLabel(contract)}>",
 		ctx
 	});
 
@@ -26118,7 +26118,7 @@ function instance$4($$self, $$props, $$invalidate) {
 		$$invalidate(1, expanded);
 	}
 
-	const func = () => setContractNick(contract);
+	const func = () => setLabel(contract);
 
 	const func_1 = () => {
 		removeContract(contract);
@@ -26142,7 +26142,7 @@ function instance$4($$self, $$props, $$invalidate) {
 		messageHandler: client.messageHandler,
 		copyToClipboard,
 		removeContract,
-		setContractNick,
+		setLabel,
 		CalldataBytes,
 		filter: pep440.filter,
 		CopyableSpan,
@@ -27593,7 +27593,7 @@ function instance($$self, $$props, $$invalidate) {
 		const _value = callSetup.getValue();
 
 		const payload = {
-			contract_fqn: selectedContract.fqn,
+			contractFqn: selectedContract.fqn,
 			sender: _sender,
 			calldata,
 			value: _value !== null && _value !== void 0 ? _value : 0

@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
-import { TxHistoryState } from "../state/TxHistoryState";
+import { TxHistoryState } from '../state/TxHistoryState';
 import { SakeOutputTreeProvider } from '../providers/OutputTreeProvider';
-import { TxDeploymentOutput, TxFunctionCallOutput, TxType } from '../webview/shared/types';
+import { TxDeploymentOutput, TxCallOutput, TxType } from '../webview/shared/types';
 
 const txHistoryState = TxHistoryState.getInstance();
 
 export async function showTxFromHistory(outputTreeProvider: SakeOutputTreeProvider) {
     if (txHistoryState.state.length === 0) {
-        vscode.window.showInformationMessage("No transaction history available");
+        vscode.window.showInformationMessage('No transaction history available');
         return;
     }
 
@@ -19,12 +19,12 @@ export async function showTxFromHistory(outputTreeProvider: SakeOutputTreeProvid
                 return {
                     label: tx.contractName,
                     description: tx.type,
-                    detail: "$(indent) " + tx.contractAddress,
+                    detail: '$(indent) ' + tx.contractAddress,
                     tx: tx
                 };
             }
             case TxType.FunctionCall: {
-                const tx = _tx as TxFunctionCallOutput;
+                const tx = _tx as TxCallOutput;
                 return {
                     label: tx.functionName,
                     description: tx.type,
@@ -34,9 +34,9 @@ export async function showTxFromHistory(outputTreeProvider: SakeOutputTreeProvid
             }
             default: {
                 return {
-                    label: "Unknown",
-                    description: "Unknown",
-                    detail: "Unknown",
+                    label: 'Unknown',
+                    description: 'Unknown',
+                    detail: 'Unknown',
                     tx: _tx
                 };
             }
@@ -55,5 +55,5 @@ export async function showTxFromHistory(outputTreeProvider: SakeOutputTreeProvid
 
     // Show the pick in the output tree
     outputTreeProvider.set(pick.tx);
-    vscode.commands.executeCommand("sake-output.focus");
+    vscode.commands.executeCommand('sake-output.focus');
 }

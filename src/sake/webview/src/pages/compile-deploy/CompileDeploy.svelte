@@ -99,7 +99,7 @@
         const _value: number | undefined = callSetup.getValue();
 
         const payload: WakeDeploymentRequestParams = {
-            contract_fqn: selectedContract.fqn,
+            contractFqn: selectedContract.fqn,
             sender: _sender,
             calldata: calldata,
             value: _value ?? 0

@@ -2,7 +2,7 @@ import { messageHandler } from '@estruyf/vscode/dist/client';
 import {
     WebviewMessage,
     type DeploymentStateData,
-    type FunctionCallPayload,
+    type CallPayload,
     type WakeDeploymentRequestParams,
     type WakeSetBalancesRequestParams
 } from '../../shared/types';
@@ -24,7 +24,7 @@ export async function setBalance(address: string, balance: number): Promise<bool
     return success;
 }
 
-export function functionCall(payload: FunctionCallPayload) {
+export function functionCall(payload: CallPayload) {
     messageHandler.send(WebviewMessage.onContractFunctionCall, payload);
 }
 
@@ -35,7 +35,7 @@ export function deployContract(
     value: number = 0
 ) {
     const _pamars: WakeDeploymentRequestParams = {
-        contract_fqn: contractFqn,
+        contractFqn: contractFqn,
         sender: sender,
         calldata: calldata,
         value: value
@@ -73,6 +73,6 @@ export async function removeContract(contract: DeploymentStateData) {
     // });
 }
 
-export async function setContractNick(contract: DeploymentStateData) {
-    return await messageHandler.request<boolean>(WebviewMessage.onSetContractNick, contract);
+export async function setLabel(contract: DeploymentStateData) {
+    return await messageHandler.request<boolean>(WebviewMessage.onsetLabel, contract);
 }

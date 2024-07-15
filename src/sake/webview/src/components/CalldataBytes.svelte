@@ -12,7 +12,7 @@
     import {
         WebviewMessage,
         type Contract,
-        type WakeFunctionCallRequestParams,
+        type WakeCallRequestParams,
         type ContractFunction as ContractFunctionType,
         type DeploymentStateData
     } from '../../shared/types';

@@ -3,20 +3,24 @@ import {
     AccountStateData,
     Address,
     DeploymentStateData,
-    FunctionCallPayload,
+    CallPayload,
     TxDecodedReturnValue,
     TxDeploymentOutput,
-    TxFunctionCallOutput,
+    TxCallOutput,
     TxOutput,
     TxType,
+    WakeCompilationResponse,
     WakeDeploymentRequestParams,
     WakeDeploymentResponse,
-    WakeFunctionCallRequestParams,
-    WakeFunctionCallResponse,
+    WakeCallRequestParams,
+    WakeCallResponse,
     WakeGetBalancesRequestParams,
     WakeGetBalancesResponse,
     WakeSetBalancesRequestParams,
-    WakeSetBalancesResponse
+    WakeSetBalancesResponse,
+    CallType,
+    ContractFunction,
+    WakeSetLabelRequestParams
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { CompilationState } from './state/CompilationState';
@@ -26,7 +30,7 @@ import { AccountState } from './state/AccountState';
 import { decodeCallReturnValue } from './utils/call';
 import { OutputViewManager, SakeOutputTreeProvider } from './providers/OutputTreeProvider';
 import { TxHistoryState } from './state/TxHistoryState';
-import { c } from 'tar';
+import { validate } from './utils/validate';
 
 const accountState = AccountState.getInstance();
 const deploymentState = DeploymentState.getInstance();
@@ -45,7 +49,9 @@ export async function getAccounts(client: LanguageClient | undefined) {
             throw new Error('Missing language client');
         }
 
-        const result = await client?.sendRequest<Address[]>('wake/sake/getAccounts');
+        let result = await client?.sendRequest<Address[]>('wake/sake/getAccounts');
+
+        result = validate(result);
 
         if (result == null) {
             throw new Error('No result returned');
@@ -59,7 +65,7 @@ export async function getAccounts(client: LanguageClient | undefined) {
         const _accountStateData = result.map((address, i) => {
             return {
                 address: address,
-                balance: undefined,
+                balance: null,
                 nick: `Account ${i}`
             } as AccountStateData;
         });
@@ -93,10 +99,12 @@ export async function getBalances(
             throw new Error('Missing language client');
         }
 
-        const result = await client?.sendRequest<WakeGetBalancesResponse>(
+        let result = await client?.sendRequest<WakeGetBalancesResponse>(
             'wake/sake/getBalances',
             requestParams
         );
+
+        result = validate(result);
 
         if (result == null) {
             throw new Error('No result returned');
@@ -132,10 +140,12 @@ export async function setBalances(
             throw new Error('Missing language client');
         }
 
-        const result = await client?.sendRequest<WakeSetBalancesResponse>(
+        let result = await client?.sendRequest<WakeSetBalancesResponse>(
             'wake/sake/setBalances',
             requestParams
         );
+
+        result = validate(result);
 
         if (result == null) {
             throw new Error('No result returned');
@@ -159,7 +169,7 @@ export async function compile(client: LanguageClient | undefined) {
             throw new Error('Missing language client');
         }
 
-        const result = await client?.sendRequest<any>('wake/sake/compile');
+        let result = await client?.sendRequest<WakeCompilationResponse>('wake/sake/compile');
 
         if (result == null) {
             throw new Error('No result returned');
@@ -190,10 +200,12 @@ export async function deploy(
             throw new Error('Missing language client');
         }
 
-        const result = await client?.sendRequest<WakeDeploymentResponse>(
+        let result = await client?.sendRequest<WakeDeploymentResponse>(
             'wake/sake/deploy',
             requestParams
         );
+
+        result = validate(result);
 
         if (result == null) {
             throw new Error('No result returned');
@@ -202,13 +214,13 @@ export async function deploy(
 
         let _contractCompilationData;
         if (result.success) {
-            _contractCompilationData = compilationState.getDict()[requestParams.contract_fqn];
+            _contractCompilationData = compilationState.getDict()[requestParams.contractFqn];
             const _deploymentData: DeploymentStateData = {
                 name: _contractCompilationData.name,
                 address: result.contractAddress!,
                 abi: _contractCompilationData.abi,
-                balance: undefined,
-                nick: undefined
+                balance: null,
+                nick: null
             };
 
             deploymentState.deploy(_deploymentData);
@@ -225,7 +237,7 @@ export async function deploy(
             success: true, // TODO success will show true even on revert
             from: requestParams.sender,
             contractAddress: result.contractAddress,
-            contractName: getNameFromContractFqn(requestParams.contract_fqn),
+            contractName: getNameFromContractFqn(requestParams.contractFqn),
             receipt: result.txReceipt,
             callTrace: result.callTrace
         };
@@ -245,21 +257,28 @@ export async function deploy(
 }
 
 export async function call(
-    callPayload: FunctionCallPayload,
+    callPayload: CallPayload,
     client: LanguageClient | undefined,
     output: OutputViewManager
 ) {
     const { requestParams, func } = callPayload;
+
+    const callType = specifyCallType(func);
 
     try {
         if (client === undefined) {
             throw new Error('Missing language client');
         }
 
-        const result = await client?.sendRequest<WakeFunctionCallResponse>(
-            'wake/sake/call',
-            requestParams
-        );
+        console.log('calltype: ', callType);
+
+        const apiEndpoint =
+            callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
+        let result = await client?.sendRequest<WakeCallResponse>(apiEndpoint, requestParams);
+
+        console.log('result:', result);
+
+        result = validate(result);
 
         if (result == null) {
             throw new Error('No result returned');
@@ -276,11 +295,14 @@ export async function call(
             }
         }
 
-        const txOutput: TxFunctionCallOutput = {
+        console.log('result:', result);
+
+        const txOutput: TxCallOutput = {
+            callType: callType,
             type: TxType.FunctionCall,
             success: result.success, // TODO success will show true even on revert
             from: requestParams.sender,
-            to: requestParams.contract_address,
+            to: requestParams.contractAddress,
             functionName: func.name,
             returnData: {
                 bytes: result.returnValue,
@@ -299,7 +321,34 @@ export async function call(
         return true;
     } catch (e) {
         const message = typeof e === 'string' ? e : (e as Error).message;
-        vscode.window.showErrorMessage('Function call failed with error: ' + message);
+        vscode.window.showErrorMessage(
+            'Function call failed with error received from LSP server: ' + message
+        );
         return false;
     }
+}
+
+export async function setLabel(
+    requestParams: WakeSetLabelRequestParams,
+    client: LanguageClient | undefined
+) {
+    try {
+        if (client === undefined) {
+            throw new Error('Missing language client');
+        }
+
+        console.log('requestParams:', requestParams);
+
+        client?.sendRequest<WakeSetBalancesResponse>('wake/sake/setLabel', requestParams);
+    } catch (e) {
+        const message = typeof e === 'string' ? e : (e as Error).message;
+        vscode.window.showErrorMessage('Failed to set balances: ' + message);
+        return false;
+    }
+}
+
+function specifyCallType(func: ContractFunction): CallType {
+    return func.stateMutability === 'view' || func.stateMutability === 'pure'
+        ? CallType.Call
+        : CallType.Transact;
 }

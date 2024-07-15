@@ -216,4 +216,21 @@ Ideas after v0.1:
         for example, i wanted to check if array overflow triggers an error
         this way i could easily check
 
+    [] Implement calling a contract (address) through the interface (ABI) of another contract, e.g., calling functions of an implementation contract via a proxy
+    [] Propagate contract aliases into Wake to display them in call traces
+    [] Handle contracts that use libraries not compiled into the contract code, requiring pre-deployed libraries on the chain and filling in addresses in the bytecode (for deployment)
+    [] Revise the transaction output structure for clarity
+
+        •	Include the called function and parameters in the output
+        •	Display the decoded return value at the top
+        •	Use bold text to distinguish certain words
+    [] Resolve issues related to call traces
+    [] Research if VS Code can communicate with the MetaMask wallet in the browser for deployment purposes
+    [] snapshots
+    [] wake tests from history
+    [] add history page
+
+
+
+
 

@@ -14,7 +14,7 @@
     import {
         type ContractFunction as ContractFunctionType,
         type Contract,
-        type FunctionCallPayload,
+        type CallPayload,
         WebviewMessage
     } from '../../shared/types';
     import { children } from 'svelte/internal';
