@@ -214,7 +214,15 @@ export async function deploy(
 
         let _contractCompilationData;
         if (result.success) {
-            _contractCompilationData = compilationState.getDict()[requestParams.contractFqn];
+            _contractCompilationData = compilationState.getContract(requestParams.contractFqn);
+            if (_contractCompilationData == null) {
+                console.log('compilationState:', compilationState);
+                console.log('requestParams:', requestParams);
+                console.log('contractFqn:', requestParams.contractFqn);
+                throw new Error(
+                    'Contract compilation data not found for fqn: ' + requestParams.contractFqn
+                );
+            }
             const _deploymentData: DeploymentStateData = {
                 name: _contractCompilationData.name,
                 address: result.contractAddress!,
