@@ -192,6 +192,22 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             );
         }
 
+        // value
+        if (
+            data.callTrace.value != null &&
+            data.callTrace.value !== '0' &&
+            data.callTrace.value !== '0 wei'
+        ) {
+            rootNodes.push(
+                new SakeOutputItem(
+                    'Value',
+                    data.callTrace.value,
+                    vscode.TreeItemCollapsibleState.None,
+                    'squirrel'
+                )
+            );
+        }
+
         // add calltrace
         if (data.callTrace !== undefined) {
             const callTraceNode = new SakeOutputItem(
@@ -277,6 +293,22 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
                     ) as BaseOutputItem
                 ]);
             }
+        }
+
+        // value
+        if (
+            data.callTrace.value != null &&
+            data.callTrace.value !== '0' &&
+            data.callTrace.value !== '0 wei'
+        ) {
+            rootNodes.push(
+                new SakeOutputItem(
+                    'Value',
+                    data.callTrace.value,
+                    vscode.TreeItemCollapsibleState.None,
+                    'squirrel'
+                )
+            );
         }
 
         // add calltrace
