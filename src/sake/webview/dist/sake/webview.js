@@ -26329,8 +26329,8 @@ function create_if_block$6(ctx) {
 		c: function create() {
 			div = element("div");
 			if_block.c();
-			attr_dev(div, "class", div_class_value = "flex flex-1 flex-col gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : ''));
-			add_location(div, file$6, 64, 8, 2402);
+			attr_dev(div, "class", div_class_value = "flex flex-1 flex-col gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : '') + " overflow-hidden");
+			add_location(div, file$6, 64, 8, 2427);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -26364,7 +26364,7 @@ function create_if_block$6(ctx) {
 				if_block.m(div, null);
 			}
 
-			if (!current || dirty & /*expanded*/ 4 && div_class_value !== (div_class_value = "flex flex-1 flex-col gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : ''))) {
+			if (!current || dirty & /*expanded*/ 4 && div_class_value !== (div_class_value = "flex flex-1 flex-col gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : '') + " overflow-hidden")) {
 				attr_dev(div, "class", div_class_value);
 			}
 		},
@@ -26640,10 +26640,10 @@ function create_fragment$8(ctx) {
 			t1 = text(t1_value);
 			t2 = space();
 			if (if_block1) if_block1.c();
-			set_custom_element_data(vscode_button, "class", "flex-1");
+			set_custom_element_data(vscode_button, "class", "flex-1 truncate");
 			set_custom_element_data(vscode_button, "appearance", vscode_button_appearance_value = /*isCalldata*/ ctx[1] ? 'secondary' : 'primary');
-			add_location(vscode_button, file$6, 57, 8, 2180);
-			attr_dev(div0, "class", div0_class_value = "flex flex-1 gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : ''));
+			add_location(vscode_button, file$6, 57, 8, 2196);
+			attr_dev(div0, "class", div0_class_value = "flex flex-1 gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : '') + " overflow-hidden");
 			add_location(div0, file$6, 49, 4, 1865);
 			attr_dev(div1, "class", div1_class_value = "flex flex-1 w-full items-end gap-1 " + (/*expanded*/ ctx[2] ? 'flex-col' : 'flex-row'));
 			add_location(div1, file$6, 48, 0, 1775);
@@ -26700,7 +26700,7 @@ function create_fragment$8(ctx) {
 				set_custom_element_data(vscode_button, "appearance", vscode_button_appearance_value);
 			}
 
-			if (!current || dirty & /*expanded*/ 4 && div0_class_value !== (div0_class_value = "flex flex-1 gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : ''))) {
+			if (!current || dirty & /*expanded*/ 4 && div0_class_value !== (div0_class_value = "flex flex-1 gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : '') + " overflow-hidden")) {
 				attr_dev(div0, "class", div0_class_value);
 			}
 

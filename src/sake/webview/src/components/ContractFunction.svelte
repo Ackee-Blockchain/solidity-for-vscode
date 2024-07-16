@@ -59,7 +59,7 @@
 </script>
 
 <div class="flex flex-1 w-full items-end gap-1 {expanded ? 'flex-col' : 'flex-row'}">
-    <div class="flex flex-1 gap-1 {expanded ? 'w-full' : ''}">
+    <div class="flex flex-1 gap-1 {expanded ? 'w-full' : ''} overflow-hidden">
         {#if inputRoot.hasInputs()}
             <ExpandButton bind:expanded />
             <!-- {:else if !isConstructor} -->
@@ -68,13 +68,13 @@
         {/if}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <vscode-button
-            class="flex-1"
+            class="flex-1 truncate"
             on:click={submit}
             appearance={isCalldata ? 'secondary' : 'primary'}>{func.name}</vscode-button
         >
     </div>
     {#if inputRoot.hasInputs()}
-        <div class="flex flex-1 flex-col gap-1 {expanded ? 'w-full' : ''}">
+        <div class="flex flex-1 flex-col gap-1 {expanded ? 'w-full' : ''} overflow-hidden">
             {#if inputRoot.isMultiInput() && expanded}
                 <!-- TODO: add blank button spacer -->
                 {#each inputRoot.inputs.children as input}
