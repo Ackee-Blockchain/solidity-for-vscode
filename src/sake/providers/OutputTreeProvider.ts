@@ -37,23 +37,34 @@ export class OutputViewManager {
 
     private _setMessage(data: TxOutput): void {
         let _data;
+        let message = '';
 
         switch (data.type) {
             case TxType.Deployment:
                 _data = data as TxDeploymentOutput;
-                _data.success
-                    ? (this.treeView.message = 'Deployment Successful')
-                    : (this.treeView.message = 'Deployment Failed');
+                if (_data.success) {
+                    message = `✓ Successfully deployed ${_data.contractName}`;
+
+                    break;
+                }
+                message = `✗ Failed to deploy ${_data.contractName}`;
+
                 break;
+
             case TxType.FunctionCall:
                 _data = data as TxCallOutput;
-                _data.success
-                    ? (this.treeView.message = 'Function Call Successful')
-                    : (this.treeView.message = 'Function Call Failed');
+                if (_data.success) {
+                    message = `✓ Successfully called ${buildFunctionString(_data.callTrace)}`;
+                    break;
+                }
+                message = `✗ Failed to call ${buildFunctionString(_data.callTrace)}`;
                 break;
+
             default:
                 throw new Error('Invalid TxType');
         }
+
+        this.treeView.message = message;
     }
 }
 
@@ -361,9 +372,7 @@ class CallTraceItem extends BaseOutputItem {
 
 /* Call Trace dict parser */
 function parseCallTrace(callTrace: CallTrace) {
-    const _string = `${callTrace.status} ${callTrace.contractName}.${callTrace.functionName}${
-        callTrace.arguments
-    } ${callTrace.error ?? ''}`;
+    const _string = `${callTrace.status === '✗' ? '✗' : ''}  ${buildFunctionString(callTrace)}`;
     const root = new CallTraceItem(_string);
     if (callTrace.subtraces !== undefined) {
         root.setChildren(callTrace.subtraces.map((subtrace) => parseCallTrace(subtrace)));
@@ -406,4 +415,8 @@ function parseCallTraceString(callTrace: string): BaseOutputItem {
     root.updateCollapsibleState();
 
     return root as BaseOutputItem;
+}
+
+function buildFunctionString(callTrace: CallTrace) {
+    return `${callTrace.contractName}.${callTrace.functionName}${callTrace.arguments}`;
 }
