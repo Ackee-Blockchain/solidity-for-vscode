@@ -229,6 +229,12 @@ Ideas after v0.1:
     [] snapshots
     [] wake tests from history
     [] add history page
+    [] account management page
+        add new accounts
+        rename accounts
+        add nicks to accounts
+        topup accounts
+        add a save button which saves the accounts to the workspace
 
 
 
