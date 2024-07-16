@@ -294,23 +294,16 @@ export interface WakeSetLabelRequestParams {
 }
 
 export interface CallTrace {
-    address: string | undefined;
-    arguments: string | undefined;
-    callType:
-        | 'Call'
-        | 'DelegateCall'
-        | 'StaticCall'
-        | 'Callcode'
-        | 'Create'
-        | 'Create2'
-        | undefined;
-    contractName: string | undefined;
-    error: string | undefined;
-    functionName: string | undefined;
-    gas: undefined | string;
-    returnValue: undefined | string;
-    sender: string | undefined;
-    status: string | undefined;
-    value: string | undefined;
+    address: string | null;
+    arguments: string | null;
+    callType: 'Call' | 'DelegateCall' | 'StaticCall' | 'Callcode' | 'Create' | 'Create2' | null;
+    contractName: string | null;
+    error: string | null;
+    functionName: string | null;
+    gas: string | null;
+    returnValue: string | null;
+    sender: string | null;
+    status: string | null;
+    value: string | null;
     subtraces: CallTrace[];
 }

@@ -6,6 +6,7 @@ import {
     TxOutput,
     TxType
 } from '../webview/shared/types';
+import { r } from 'tar';
 
 // @dev class instead of interface so we can loop over its keys
 
@@ -196,7 +197,7 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             const callTraceNode = new SakeOutputItem(
                 'Call Trace',
                 undefined,
-                vscode.TreeItemCollapsibleState.Expanded,
+                vscode.TreeItemCollapsibleState.Collapsed,
                 'list-tree'
             );
             callTraceNode.setChildren([parseCallTrace(data.callTrace)]);
@@ -283,10 +284,11 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             const callTraceNode = new SakeOutputItem(
                 'Call Trace',
                 undefined,
-                vscode.TreeItemCollapsibleState.Expanded,
+                vscode.TreeItemCollapsibleState.Collapsed,
                 'list-tree'
             );
             callTraceNode.setChildren([parseCallTrace(data.callTrace)]);
+            console.log('callTraceNode', callTraceNode);
             rootNodes.push(callTraceNode);
         }
 
@@ -370,13 +372,20 @@ class CallTraceItem extends BaseOutputItem {
     }
 }
 
-/* Call Trace dict parser */
 function parseCallTrace(callTrace: CallTrace) {
-    const _string = `${callTrace.status === '✗' ? '✗' : ''}  ${buildFunctionString(callTrace)}`;
-    const root = new CallTraceItem(_string);
-    if (callTrace.subtraces !== undefined) {
-        root.setChildren(callTrace.subtraces.map((subtrace) => parseCallTrace(subtrace)));
-    }
+    const _parseCallTrace = (callTrace: CallTrace): CallTraceItem => {
+        const _string = `${callTrace.status === '✗' ? '✗' : ''}  ${buildFunctionString(callTrace)}`;
+        const root = new CallTraceItem(_string);
+        if (callTrace.error) {
+            root.setChildren([new CallTraceItem(callTrace.error)]);
+        } else if (callTrace.subtraces !== undefined) {
+            root.setChildren(callTrace.subtraces.map((subtrace) => _parseCallTrace(subtrace)));
+        }
+        return root;
+    };
+
+    const root = _parseCallTrace(callTrace);
+    root.updateCollapsibleState();
     return root;
 }
 
@@ -417,6 +426,8 @@ function parseCallTraceString(callTrace: string): BaseOutputItem {
     return root as BaseOutputItem;
 }
 
-function buildFunctionString(callTrace: CallTrace) {
-    return `${callTrace.contractName}.${callTrace.functionName}${callTrace.arguments}`;
+function buildFunctionString(callTrace: CallTrace, withoutArguments = false): string {
+    return `${callTrace.contractName}.${callTrace.functionName}${
+        withoutArguments ? '()' : callTrace.arguments
+    }`;
 }
