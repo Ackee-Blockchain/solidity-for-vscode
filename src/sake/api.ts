@@ -169,6 +169,8 @@ export async function compile(client: LanguageClient | undefined) {
 
         let result = await client?.sendRequest<WakeCompilationResponse>('wake/sake/compile');
 
+        console.log(result);
+
         if (result == null) {
             throw new Error('No result returned');
         }
@@ -177,8 +179,8 @@ export async function compile(client: LanguageClient | undefined) {
         }
 
         // vscode.window.showInformationMessage('Compilation was successful!');
-        const _parsedresult = parseCompilationResult(result.contracts);
-        compilationState.setCompilation(_parsedresult);
+        const _parsedResult = parseCompilationResult(result.contracts);
+        compilationState.setCompilation(_parsedResult);
 
         return result.success;
     } catch (e) {

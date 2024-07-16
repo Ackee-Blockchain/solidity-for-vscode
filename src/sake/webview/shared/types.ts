@@ -99,7 +99,7 @@ export interface CompiledContract {
     fqn: string;
     name: string;
     abi: ContractAbi;
-    bytecode: string;
+    isDeployable: boolean;
     // TODO join this type with contract
 }
 
@@ -203,7 +203,7 @@ export enum StateId {
 export interface WakeCompiledContract {
     [key: string]: {
         abi: ContractAbi;
-        bytecode: string;
+        isDeployable: boolean;
     };
 }
 

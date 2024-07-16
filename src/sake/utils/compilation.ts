@@ -16,11 +16,13 @@ export function parseCompilationResult(
         const contract: CompiledContract = {
             fqn: key,
             name: _contractName,
-            abi: compilationResult[key]['abi'],
-            bytecode: compilationResult[key]['bytecode']
+            abi: compilationResult[key].abi,
+            isDeployable: compilationResult[key].isDeployable
         };
 
-        if (contract.bytecode !== '' && contract.bytecode !== '0x') {
+        console.log('contract', contract.fqn, contract.isDeployable);
+
+        if (contract.isDeployable) {
             contracts.push(contract);
         }
     }
