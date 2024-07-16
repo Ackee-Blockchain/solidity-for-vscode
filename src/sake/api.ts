@@ -104,8 +104,6 @@ export async function getBalances(
             requestParams
         );
 
-        result = validate(result);
-
         if (result == null) {
             throw new Error('No result returned');
         }
@@ -232,6 +230,8 @@ export async function deploy(
             };
 
             deploymentState.deploy(_deploymentData);
+
+            // update calldata
         }
 
         // Add deployment to state
