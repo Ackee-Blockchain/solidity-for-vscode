@@ -1,7 +1,7 @@
 import { FunctionInputParseError } from './errors';
 
-export function displayEtherValue(value: number | undefined) {
-    if (value === undefined) {
+export function displayEtherValue(value: number | null) {
+    if (value === null) {
         return 'N/A';
     }
 

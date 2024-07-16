@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { writable, get, derived } from 'svelte/store';
 import {
     StateId,
     WebviewMessage,
@@ -8,13 +8,29 @@ import {
     type DeploymentStateData
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
+import { parseComplexNumber } from '../../shared/validate';
 
 /**
  * frontend svelte data
  */
 
-export const selectedAccount = writable<AccountStateData | undefined>(undefined);
-export const selectedValue = writable<number | undefined>(undefined);
+export const selectedAccount = writable<AccountStateData | null>(null);
+export const selectedValueString = writable<string | null>(null);
+// null indicated wrong stirng input
+export const selectedValue = derived(selectedValueString, ($selectedValueString) => {
+    console.log('selectedValueString', $selectedValueString);
+    if ($selectedValueString === null || $selectedValueString === '') {
+        console.log('return 0');
+        return 0;
+    }
+    try {
+        console.log('parseComplexNumber', parseComplexNumber($selectedValueString));
+        return parseComplexNumber($selectedValueString);
+    } catch (e) {
+        console.log('return null');
+        return null;
+    }
+});
 
 /**
  * backend data
@@ -79,14 +95,14 @@ function setupListeners() {
 
                     // if no accounts, reset selected account
                     if (_accounts.length === 0) {
-                        selectedAccount.set(undefined);
+                        selectedAccount.set(null);
                         return;
                     }
 
                     // check if selected account is still in the list, if not select the first account
                     if (
-                        _selectedAccount === undefined ||
-                        (_selectedAccount !== undefined &&
+                        _selectedAccount === null ||
+                        (_selectedAccount !== null &&
                             !_accounts.some(
                                 (account) => account.address === _selectedAccount.address
                             ))
@@ -97,9 +113,13 @@ function setupListeners() {
 
                     // if selectedAccount is in payload, update selectedAccount
                     // @dev accounts.find should not return undefined, since checked above
-                    selectedAccount.set(
-                        _accounts.find((account) => account.address === _selectedAccount.address)
-                    );
+                    if (_selectedAccount !== null) {
+                        selectedAccount.set(
+                            _accounts.find(
+                                (account) => account.address === _selectedAccount.address
+                            ) ?? null
+                        );
+                    }
 
                     return;
                 }

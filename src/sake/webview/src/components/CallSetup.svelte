@@ -10,10 +10,16 @@
     import ClickableSpan from './ClickableSpan.svelte';
     import { parseComplexNumber } from '../../shared/validate';
     import { displayEtherValue } from '../../shared/ether';
+    import InputIssueIndicator from './InputIssueIndicator.svelte';
 
     provideVSCodeDesignSystem().register(vsCodeDropdown(), vsCodeOption(), vsCodeTextField());
 
-    import { selectedValue, selectedAccount, accounts } from '../helpers/store';
+    import {
+        selectedValue,
+        selectedValueString,
+        selectedAccount,
+        accounts
+    } from '../helpers/store';
     import {
         copyToClipboard,
         getInputFromTopBar,
@@ -30,7 +36,7 @@
             _selectedAccountIndex < 0 ||
             _selectedAccountIndex >= $accounts.length
         ) {
-            selectedAccount.set(undefined);
+            selectedAccount.set(null);
             return;
         }
 
@@ -40,16 +46,7 @@
     function handleValueChange(event: any) {
         // const _value = parseInt(event.target.value);
         const _value = event.target.value;
-        if (_value === '' || _value === undefined) {
-            selectedValue.set(undefined);
-            return;
-        }
-        try {
-            selectedValue.set(parseComplexNumber(_value));
-        } catch (e) {
-            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
-            showErrorMessage('Value could not be parsed: ' + errorMessage);
-        }
+        selectedValueString.set(_value ?? null);
     }
 
     async function topUp() {
@@ -58,7 +55,7 @@
         }
 
         const topUpValue = await getInputFromTopBar(
-            $selectedAccount.balance?.toString(),
+            $selectedAccount!.balance?.toString(),
             'Update balance of account'
         );
 
@@ -75,7 +72,7 @@
             return;
         }
 
-        setBalance($selectedAccount.address, parsedTopUpValue);
+        setBalance($selectedAccount!.address, parsedTopUpValue);
     }
 </script>
 
@@ -94,7 +91,7 @@
                 </span>
             </vscode-dropdown>
 
-            {#if $selectedAccount !== undefined}
+            {#if $selectedAccount !== null}
                 <div class="w-full px-1 mb-3">
                     <div class="w-full flex flex-row gap-1 items-center h-[20px]">
                         <!-- <span class="flex-1 truncate text-sm">{$selectedAccount.address}</span> -->
@@ -120,10 +117,18 @@
             <vscode-text-field
                 placeholder="Value"
                 class="w-full"
-                value={$selectedValue}
+                value={$selectedValueString}
                 on:change={handleValueChange}
             >
-                <span slot="end" class="flex justify-center align-middle leading-5">Ξ</span>
+                <div slot="end" class="flex items-center">
+                    {#if $selectedValue === null}
+                        <InputIssueIndicator type="danger">
+                            <span class="text-sm">Value could not be parsed</span>
+                        </InputIssueIndicator>
+                    {:else}
+                        <span slot="end" class="flex justify-center align-middle leading-5">Ξ</span>
+                    {/if}
+                </div>
             </vscode-text-field>
         </div>
     </section>

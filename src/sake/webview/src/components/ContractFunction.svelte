@@ -56,16 +56,6 @@
 
         onFunctionCall(_encodedInput, func);
     }
-
-    // TODO rename
-    const openFullTextInputEditor = async function () {
-        const newValue = await messageHandler.request<string>(
-            WebviewMessage.getTextFromInputBox,
-            inputRoot.getString()
-        );
-        newValue && inputRoot.set(newValue);
-        inputRoot = inputRoot;
-    };
 </script>
 
 <div class="flex flex-1 w-full items-end gap-1 {expanded ? 'flex-col' : 'flex-row'}">
