@@ -273,9 +273,9 @@ export async function call(
         }
 
         // TODO fix when fixed in wake
-        // const apiEndpoint =
-        //     callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
-        const apiEndpoint = 'wake/sake/transact';
+        const apiEndpoint =
+            callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
+        // const apiEndpoint = 'wake/sake/transact';
         let result = await client?.sendRequest<WakeCallResponse>(apiEndpoint, requestParams);
 
         result = validate(result);
