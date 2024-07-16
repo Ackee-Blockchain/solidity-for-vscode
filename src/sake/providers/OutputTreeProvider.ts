@@ -243,17 +243,6 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
             );
             rootNodes.push(returnDataNode);
 
-            // bytes
-            if (hasReturnData && data.returnData.bytes !== undefined) {
-                returnDataNode.setChildren([
-                    new SakeOutputItem(
-                        'Bytes',
-                        data.returnData.bytes,
-                        vscode.TreeItemCollapsibleState.None
-                    ) as BaseOutputItem
-                ]);
-            }
-
             // decoded
             if (hasReturnData && data.returnData.decoded !== undefined) {
                 const returnDataDecodedNode = new SakeOutputItem(
@@ -276,6 +265,17 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
                         ) as BaseOutputItem
                     ]);
                 });
+            }
+
+            // bytes
+            if (hasReturnData && data.returnData.bytes !== undefined) {
+                returnDataNode.setChildren([
+                    new SakeOutputItem(
+                        'Bytes',
+                        data.returnData.bytes,
+                        vscode.TreeItemCollapsibleState.None
+                    ) as BaseOutputItem
+                ]);
             }
         }
 
