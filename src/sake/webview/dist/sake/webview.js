@@ -20573,17 +20573,13 @@ const selectedAccount = writable(null);
 const selectedValueString = writable(null);
 // null indicated wrong stirng input
 const selectedValue = derived(selectedValueString, ($selectedValueString) => {
-    console.log('selectedValueString', $selectedValueString);
     if ($selectedValueString === null || $selectedValueString === '') {
-        console.log('return 0');
         return 0;
     }
     try {
-        console.log('parseComplexNumber', parseComplexNumber($selectedValueString));
         return parseComplexNumber($selectedValueString);
     }
     catch (e) {
-        console.log('return null');
         return null;
     }
 });

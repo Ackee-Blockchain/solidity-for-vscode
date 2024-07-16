@@ -214,9 +214,6 @@ export async function deploy(
         if (result.success) {
             _contractCompilationData = compilationState.getContract(requestParams.contractFqn);
             if (_contractCompilationData == null) {
-                console.log('compilationState:', compilationState);
-                console.log('requestParams:', requestParams);
-                console.log('contractFqn:', requestParams.contractFqn);
                 throw new Error(
                     'Contract compilation data not found for fqn: ' + requestParams.contractFqn
                 );
@@ -233,11 +230,6 @@ export async function deploy(
 
             // update calldata
         }
-
-        // Add deployment to state
-
-        console.log('callTrace: ', result.callTrace);
-        console.log('result:', result);
 
         // Add to tx history
         const txOutput: TxDeploymentOutput = {
@@ -278,15 +270,11 @@ export async function call(
             throw new Error('Missing language client');
         }
 
-        console.log('calltype: ', callType);
-
         // TODO fix when fixed in wake
         // const apiEndpoint =
         //     callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
         const apiEndpoint = 'wake/sake/transact';
         let result = await client?.sendRequest<WakeCallResponse>(apiEndpoint, requestParams);
-
-        console.log('result:', result);
 
         result = validate(result);
 
@@ -304,8 +292,6 @@ export async function call(
                 vscode.window.showErrorMessage('Failed to decode return value: ' + e);
             }
         }
-
-        console.log('result:', result);
 
         const txOutput: TxCallOutput = {
             callType: callType,
@@ -346,8 +332,6 @@ export async function setLabel(
         if (client === undefined) {
             throw new Error('Missing language client');
         }
-
-        console.log('requestParams:', requestParams);
 
         client?.sendRequest<WakeSetBalancesResponse>('wake/sake/setLabel', requestParams);
     } catch (e) {

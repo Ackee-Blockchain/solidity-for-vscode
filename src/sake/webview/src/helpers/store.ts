@@ -18,16 +18,12 @@ export const selectedAccount = writable<AccountStateData | null>(null);
 export const selectedValueString = writable<string | null>(null);
 // null indicated wrong stirng input
 export const selectedValue = derived(selectedValueString, ($selectedValueString) => {
-    console.log('selectedValueString', $selectedValueString);
     if ($selectedValueString === null || $selectedValueString === '') {
-        console.log('return 0');
         return 0;
     }
     try {
-        console.log('parseComplexNumber', parseComplexNumber($selectedValueString));
         return parseComplexNumber($selectedValueString);
     } catch (e) {
-        console.log('return null');
         return null;
     }
 });
