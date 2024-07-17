@@ -21,7 +21,7 @@ import {
     WakeSetLabelRequestParams
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
-import { parseCompilationResult } from './utils/compilation';
+import { parseCompiledContracts } from './utils/compilation';
 import { call, compile, deploy, getAccounts, getBalances, setBalances, setLabel } from './api';
 import { AccountState } from './state/AccountState';
 import { OutputViewManager, SakeOutputTreeProvider } from './providers/OutputTreeProvider';

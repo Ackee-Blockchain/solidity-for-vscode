@@ -6,9 +6,6 @@ import {
     TxOutput,
     TxType
 } from '../webview/shared/types';
-import { r } from 'tar';
-
-// @dev class instead of interface so we can loop over its keys
 
 class BaseOutputItem extends vscode.TreeItem {
     children: BaseOutputItem[] = [];

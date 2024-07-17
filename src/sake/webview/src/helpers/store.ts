@@ -36,6 +36,7 @@ export const accounts = writable<AccountStateData[]>([]);
 export const deployedContracts = writable<DeploymentStateData[]>([]);
 export const compilationState = writable<CompilationStateData>({
     contracts: [],
+    errors: [],
     dirty: true
 });
 

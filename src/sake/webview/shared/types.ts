@@ -95,6 +95,11 @@ export enum WebviewMessage {
  *
  */
 
+export interface CompilationError {
+    fqn: string;
+    errors: string[];
+}
+
 export interface CompiledContract {
     fqn: string;
     name: string;
@@ -175,6 +180,7 @@ export interface DeploymentStateData {
 
 export interface CompilationStateData {
     contracts: Array<CompiledContract>;
+    errors: CompilationError[];
     dirty: boolean;
     // TODO add isDirty
 }
@@ -207,12 +213,15 @@ export interface WakeCompiledContract {
     };
 }
 
+export type WakeCompilationErrors = { [key: string]: string[] };
+
 export interface TxReceipt {
     [key: string]: any;
 }
 
 export interface WakeCompilationResponse {
     contracts: WakeCompiledContract;
+    errors: { [key: string]: string[] };
     success: boolean;
     // TODO add error message
 }

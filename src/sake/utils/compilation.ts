@@ -1,6 +1,11 @@
-import { CompiledContract, WakeCompiledContract } from '../webview/shared/types';
+import {
+    CompilationError,
+    CompiledContract,
+    WakeCompilationErrors,
+    WakeCompiledContract
+} from '../webview/shared/types';
 
-export function parseCompilationResult(
+export function parseCompiledContracts(
     compilationResult: WakeCompiledContract
 ): Array<CompiledContract> {
     // Wake returns an object with a key "fqn:contractName" and value contractAbi
@@ -20,7 +25,7 @@ export function parseCompilationResult(
             isDeployable: compilationResult[key].isDeployable
         };
 
-        console.log('contract', contract.fqn, contract.isDeployable);
+        // console.log('contract', contract.fqn, contract.isDeployable);
 
         if (contract.isDeployable) {
             contracts.push(contract);
@@ -31,6 +36,23 @@ export function parseCompilationResult(
     contracts = contracts.filter((contract) => contract.abi.length > 0);
 
     return contracts;
+}
+export function parseCompilationErrors(
+    compilationErrors: WakeCompilationErrors
+): CompilationError[] {
+    const errors: CompilationError[] = [];
+
+    let key: keyof WakeCompiledContract;
+    for (key in compilationErrors) {
+        const error: CompilationError = {
+            fqn: key,
+            errors: compilationErrors[key]
+        };
+
+        errors.push(error);
+    }
+
+    return errors;
 }
 
 export function getNameFromContractFqn(fqn: string): string {

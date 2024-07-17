@@ -1,4 +1,5 @@
 import {
+    CompilationError,
     CompilationStateData,
     CompiledContract,
     ContractAbi,
@@ -12,6 +13,7 @@ export class CompilationState extends BaseState<CompilationStateData> {
     private constructor() {
         super(StateId.CompiledContracts, {
             contracts: [],
+            errors: [],
             dirty: true
         });
     }
@@ -30,10 +32,26 @@ export class CompilationState extends BaseState<CompilationStateData> {
         };
     }
 
-    public setCompilation(contracts: Array<CompiledContract>): void {
+    public set(contracts: CompiledContract[], errors: CompilationError[]) {
         this.state = {
             contracts: contracts,
+            errors: errors,
             dirty: false
+        };
+    }
+
+    public setCompilation(contracts: Array<CompiledContract>): void {
+        this.state = {
+            ...this.state,
+            contracts: contracts,
+            dirty: false
+        };
+    }
+
+    public setErrors(errors: CompilationError[]): void {
+        this.state = {
+            ...this.state,
+            errors: errors
         };
     }
 

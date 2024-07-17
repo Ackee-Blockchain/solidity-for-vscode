@@ -1,12 +1,14 @@
 <script lang="ts">
     export let danger: boolean = false;
     export let warning: boolean = false;
+    export let classList: string = '';
 </script>
 
 <div
     class="vscode-text-container
     {danger ? 'vscode-text-container--danger' : ''}
-    {warning ? 'vscode-text-container--warning' : ''}"
+    {warning ? 'vscode-text-container--warning' : ''}
+    {classList}"
 >
     <slot></slot>
 </div>

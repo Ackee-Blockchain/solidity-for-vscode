@@ -60,7 +60,7 @@
 <div class="flex flex-1 flex-row items-end gap-1">
     <!-- Start of row -->
     {#if expandable}
-        <div class="self-start">
+        <div class="self-start w-[26px]">
             {#if input.internalType === InputTypesInternal.LEAF}
                 <IconSpacer />
             {:else}

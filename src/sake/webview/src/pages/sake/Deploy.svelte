@@ -13,6 +13,9 @@
     import { selectedAccount, selectedValue, compilationState } from '../../helpers/store';
     import { deployContract, showErrorMessage } from '../../helpers/api';
     import TextContainerDark from '../../components/TextContainerDark.svelte';
+    import CompilationError from '../../components/CompilationError.svelte';
+    import Spacer from '../../components/Spacer.svelte';
+    import Divider from '../../components/Divider.svelte';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -26,6 +29,9 @@
     let filterString: string = '';
     $: filteredContracts = $compilationState.contracts.filter((contract) =>
         contract.fqn.toLowerCase().includes(filterString.toLowerCase())
+    );
+    $: filteredErrors = $compilationState.errors.filter((error) =>
+        error.fqn.toLowerCase().includes(filterString.toLowerCase())
     );
 
     const deploy = async function (contract: CompiledContract, calldata: string) {
@@ -46,7 +52,7 @@
     };
 </script>
 
-{#if $compilationState.contracts.length > 0}
+{#if $compilationState.contracts.length > 0 || $compilationState.errors.length > 0}
     <section class="w-full">
         <vscode-text-field
             class="w-full mb-2"
@@ -80,6 +86,12 @@
                     name={contract.name}
                     onDeploy={(calldata) => deploy(contract, calldata)}
                 />
+            {/each}
+
+            <Divider className="my-2" />
+
+            {#each filteredErrors as error, i}
+                <CompilationError {error} />
             {/each}
         </div>
     </section>

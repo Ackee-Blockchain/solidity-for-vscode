@@ -24,7 +24,11 @@ import {
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { CompilationState } from './state/CompilationState';
-import { getNameFromContractFqn, parseCompilationResult } from './utils/compilation';
+import {
+    getNameFromContractFqn,
+    parseCompilationErrors,
+    parseCompiledContracts
+} from './utils/compilation';
 import { DeploymentState } from './state/DeploymentState';
 import { AccountState } from './state/AccountState';
 import { decodeCallReturnValue } from './utils/call';
@@ -179,8 +183,9 @@ export async function compile(client: LanguageClient | undefined) {
         }
 
         // vscode.window.showInformationMessage('Compilation was successful!');
-        const _parsedResult = parseCompilationResult(result.contracts);
-        compilationState.setCompilation(_parsedResult);
+        const parsedContracts = parseCompiledContracts(result.contracts);
+        const parsedErrors = parseCompilationErrors(result.errors);
+        compilationState.set(parsedContracts, parsedErrors);
 
         return result.success;
     } catch (e) {
