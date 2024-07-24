@@ -1,7 +1,9 @@
 import {
     CompilationError,
+    CompilationErrorType,
     CompiledContract,
     WakeCompilationErrors,
+    WakeCompilationSkipped,
     WakeCompiledContract
 } from '../webview/shared/types';
 
@@ -45,8 +47,28 @@ export function parseCompilationErrors(
     let key: keyof WakeCompiledContract;
     for (key in compilationErrors) {
         const error: CompilationError = {
+            type: CompilationErrorType.Error,
             fqn: key,
             errors: compilationErrors[key]
+        };
+
+        errors.push(error);
+    }
+
+    return errors;
+}
+
+export function parseCompilationSkipped(
+    compilationSkipped: WakeCompilationSkipped
+): CompilationError[] {
+    const errors: CompilationError[] = [];
+
+    let key: keyof WakeCompiledContract;
+    for (key in compilationSkipped) {
+        const error: CompilationError = {
+            type: CompilationErrorType.Skipped,
+            fqn: key,
+            errors: [compilationSkipped[key]]
         };
 
         errors.push(error);

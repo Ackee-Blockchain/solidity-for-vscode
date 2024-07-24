@@ -16,6 +16,7 @@
         ContractAbi,
         ContractFunction as ContractFunctionType
     } from '../../shared/types';
+    import { CompilationErrorType } from '../../shared/types';
     import ContractFunction from './ContractFunction.svelte';
     import TextContainer from './TextContainer.svelte';
 
@@ -34,7 +35,11 @@
     {/if}
     <TextContainer classList="w-full flex flex-col gap-3 overflow-hidden">
         <div class="w-full flex flex-row gap-2 items-center">
-            <span class="text-vscodeError">
+            <span
+                class="cursor-pointer"
+                class:text-vscodeError={error.type === CompilationErrorType.Error}
+                class:text-vscodeWarning={error.type === CompilationErrorType.Skipped}
+            >
                 <svg
                     width="16"
                     height="16"
@@ -48,6 +53,7 @@
                     /></svg
                 >
             </span>
+
             <span>{error.fqn}</span>
         </div>
         {#if expanded}

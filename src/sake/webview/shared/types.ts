@@ -95,7 +95,13 @@ export enum WebviewMessage {
  *
  */
 
+export enum CompilationErrorType {
+    Error = 'Error',
+    Skipped = 'Skipped'
+}
+
 export interface CompilationError {
+    type: CompilationErrorType;
     fqn: string;
     errors: string[];
 }
@@ -214,6 +220,7 @@ export interface WakeCompiledContract {
 }
 
 export type WakeCompilationErrors = { [key: string]: string[] };
+export type WakeCompilationSkipped = { [key: string]: string };
 
 export interface TxReceipt {
     [key: string]: any;
@@ -221,7 +228,8 @@ export interface TxReceipt {
 
 export interface WakeCompilationResponse {
     contracts: WakeCompiledContract;
-    errors: { [key: string]: string[] };
+    errors: WakeCompilationErrors;
+    skipped: WakeCompilationSkipped;
     success: boolean;
     // TODO add error message
 }

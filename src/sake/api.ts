@@ -27,6 +27,7 @@ import { CompilationState } from './state/CompilationState';
 import {
     getNameFromContractFqn,
     parseCompilationErrors,
+    parseCompilationSkipped,
     parseCompiledContracts
 } from './utils/compilation';
 import { DeploymentState } from './state/DeploymentState';
@@ -185,6 +186,7 @@ export async function compile(client: LanguageClient | undefined) {
         // vscode.window.showInformationMessage('Compilation was successful!');
         const parsedContracts = parseCompiledContracts(result.contracts);
         const parsedErrors = parseCompilationErrors(result.errors);
+        const parsedSkipped = parseCompilationSkipped(result.skipped);
         compilationState.set(parsedContracts, parsedErrors);
 
         return result.success;
