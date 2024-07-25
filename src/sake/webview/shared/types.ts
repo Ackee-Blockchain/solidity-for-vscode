@@ -206,6 +206,10 @@ export enum StateId {
     TxHistory = 'txHistory'
 }
 
+export interface TxReceipt {
+    [key: string]: any;
+}
+
 /*
  *
  * API to Wake
@@ -219,12 +223,15 @@ export interface WakeCompiledContract {
     };
 }
 
-export type WakeCompilationErrors = { [key: string]: string[] };
-export type WakeCompilationSkipped = { [key: string]: string };
+export type WakeErrorInfo = {
+    message: string;
+    path: string;
+    startOffset: number;
+    endOffset: number;
+};
 
-export interface TxReceipt {
-    [key: string]: any;
-}
+export type WakeCompilationErrors = { [key: string]: WakeErrorInfo[] };
+export type WakeCompilationSkipped = { [key: string]: string };
 
 export interface WakeCompilationResponse {
     contracts: WakeCompiledContract;
