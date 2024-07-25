@@ -24787,12 +24787,12 @@ function get_each_context$6(ctx, list, i) {
 }
 
 // (45:4) {#if expandable}
-function create_if_block_4$1(ctx) {
+function create_if_block_4$2(ctx) {
 	let div;
 	let current_block_type_index;
 	let if_block;
 	let current;
-	const if_block_creators = [create_if_block_5$1, create_else_block_2];
+	const if_block_creators = [create_if_block_5$2, create_else_block_2];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -24859,7 +24859,7 @@ function create_if_block_4$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4$1.name,
+		id: create_if_block_4$2.name,
 		type: "if",
 		source: "(45:4) {#if expandable}",
 		ctx
@@ -24936,7 +24936,7 @@ function create_else_block_2(ctx) {
 }
 
 // (47:12) {#if input.internalType === InputTypesInternal.LEAF}
-function create_if_block_5$1(ctx) {
+function create_if_block_5$2(ctx) {
 	let iconspacer;
 	let current;
 	iconspacer = new IconSpacer({ $$inline: true });
@@ -24966,7 +24966,7 @@ function create_if_block_5$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_5$1.name,
+		id: create_if_block_5$2.name,
 		type: "if",
 		source: "(47:12) {#if input.internalType === InputTypesInternal.LEAF}",
 		ctx
@@ -25782,7 +25782,7 @@ function create_fragment$c(ctx) {
 	let current_block_type_index;
 	let if_block1;
 	let current;
-	let if_block0 = /*expandable*/ ctx[2] && create_if_block_4$1(ctx);
+	let if_block0 = /*expandable*/ ctx[2] && create_if_block_4$2(ctx);
 	const if_block_creators = [create_if_block$8, create_else_block$5];
 	const if_blocks = [];
 
@@ -25822,7 +25822,7 @@ function create_fragment$c(ctx) {
 						transition_in(if_block0, 1);
 					}
 				} else {
-					if_block0 = create_if_block_4$1(ctx);
+					if_block0 = create_if_block_4$2(ctx);
 					if_block0.c();
 					transition_in(if_block0, 1);
 					if_block0.m(div, t);
@@ -27633,7 +27633,7 @@ function create_else_block_1(ctx) {
 }
 
 // (25:4) {#if expandable}
-function create_if_block_3$1(ctx) {
+function create_if_block_5$1(ctx) {
 	let expandbutton;
 	let updating_expanded;
 	let current;
@@ -27690,9 +27690,85 @@ function create_if_block_3$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3$1.name,
+		id: create_if_block_5$1.name,
 		type: "if",
 		source: "(25:4) {#if expandable}",
+		ctx
+	});
+
+	return block;
+}
+
+// (49:66) 
+function create_if_block_4$1(ctx) {
+	let span;
+	let t0_value = /*error*/ ctx[0].fqn + "";
+	let t0;
+	let t1;
+
+	const block = {
+		c: function create() {
+			span = element("span");
+			t0 = text(t0_value);
+			t1 = text(" (Skipped)");
+			add_location(span, file$5, 49, 16, 2166);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, span, anchor);
+			append_dev(span, t0);
+			append_dev(span, t1);
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*error*/ 1 && t0_value !== (t0_value = /*error*/ ctx[0].fqn + "")) set_data_dev(t0, t0_value);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(span);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_4$1.name,
+		type: "if",
+		source: "(49:66) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (47:12) {#if error.type === CompilationErrorType.Error}
+function create_if_block_3$1(ctx) {
+	let span;
+	let t0_value = /*error*/ ctx[0].fqn + "";
+	let t0;
+	let t1;
+
+	const block = {
+		c: function create() {
+			span = element("span");
+			t0 = text(t0_value);
+			t1 = text(" (Errors)");
+			add_location(span, file$5, 47, 16, 2049);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, span, anchor);
+			append_dev(span, t0);
+			append_dev(span, t1);
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*error*/ 1 && t0_value !== (t0_value = /*error*/ ctx[0].fqn + "")) set_data_dev(t0, t0_value);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(span);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_3$1.name,
+		type: "if",
+		source: "(47:12) {#if error.type === CompilationErrorType.Error}",
 		ctx
 	});
 
@@ -27703,13 +27779,13 @@ function create_if_block_3$1(ctx) {
 function create_if_block$4(ctx) {
 	let if_block_anchor;
 
-	function select_block_type_1(ctx, dirty) {
+	function select_block_type_2(ctx, dirty) {
 		if (/*error*/ ctx[0].type === CompilationErrorType.Error) return create_if_block_1$3;
 		if (/*error*/ ctx[0].type === CompilationErrorType.Skipped) return create_if_block_2$2;
 		return create_else_block$3;
 	}
 
-	let current_block_type = select_block_type_1(ctx);
+	let current_block_type = select_block_type_2(ctx);
 	let if_block = current_block_type(ctx);
 
 	const block = {
@@ -27722,7 +27798,7 @@ function create_if_block$4(ctx) {
 			insert_dev(target, if_block_anchor, anchor);
 		},
 		p: function update(ctx, dirty) {
-			if (current_block_type === (current_block_type = select_block_type_1(ctx)) && if_block) {
+			if (current_block_type === (current_block_type = select_block_type_2(ctx)) && if_block) {
 				if_block.p(ctx, dirty);
 			} else {
 				if_block.d(1);
@@ -27751,7 +27827,7 @@ function create_if_block$4(ctx) {
 	return block;
 }
 
-// (67:12) {:else}
+// (68:12) {:else}
 function create_else_block$3(ctx) {
 	let span;
 
@@ -27759,7 +27835,7 @@ function create_else_block$3(ctx) {
 		c: function create() {
 			span = element("span");
 			span.textContent = "pipi";
-			add_location(span, file$5, 67, 16, 2984);
+			add_location(span, file$5, 68, 16, 3041);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -27774,14 +27850,14 @@ function create_else_block$3(ctx) {
 		block,
 		id: create_else_block$3.name,
 		type: "else",
-		source: "(67:12) {:else}",
+		source: "(68:12) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (64:66) 
+// (65:66) 
 function create_if_block_2$2(ctx) {
 	let span;
 	let t_value = /*asString*/ ctx[4](/*error*/ ctx[0].errors) + "";
@@ -27791,7 +27867,7 @@ function create_if_block_2$2(ctx) {
 		c: function create() {
 			span = element("span");
 			t = text(t_value);
-			add_location(span, file$5, 64, 16, 2879);
+			add_location(span, file$5, 65, 16, 2936);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -27809,7 +27885,7 @@ function create_if_block_2$2(ctx) {
 		block,
 		id: create_if_block_2$2.name,
 		type: "if",
-		source: "(64:66) ",
+		source: "(65:66) ",
 		ctx
 	});
 
@@ -27836,7 +27912,7 @@ function create_if_block_1$3(ctx) {
 			}
 
 			attr_dev(div, "class", "flex flex-col gap-2 text-sm");
-			add_location(div, file$5, 54, 16, 2321);
+			add_location(div, file$5, 54, 16, 2333);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -27905,8 +27981,8 @@ function create_each_block$4(ctx) {
 		c: function create() {
 			span = element("span");
 			t = text(t_value);
-			attr_dev(span, "class", "cursor-pointer");
-			add_location(span, file$5, 57, 24, 2525);
+			attr_dev(span, "class", "cursor-pointer hover:underline");
+			add_location(span, file$5, 57, 24, 2537);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -27942,88 +28018,95 @@ function create_each_block$4(ctx) {
 // (30:4) <TextContainer classList="w-full flex flex-col gap-3 overflow-hidden">
 function create_default_slot$2(ctx) {
 	let div;
-	let span0;
+	let span;
 	let svg;
 	let path;
 	let t0;
-	let span1;
-	let t1_value = /*error*/ ctx[0].fqn + "";
 	let t1;
-	let t2;
-	let if_block_anchor;
-	let if_block = /*expanded*/ ctx[1] && create_if_block$4(ctx);
+	let if_block1_anchor;
+
+	function select_block_type_1(ctx, dirty) {
+		if (/*error*/ ctx[0].type === CompilationErrorType.Error) return create_if_block_3$1;
+		if (/*error*/ ctx[0].type === CompilationErrorType.Skipped) return create_if_block_4$1;
+	}
+
+	let current_block_type = select_block_type_1(ctx);
+	let if_block0 = current_block_type && current_block_type(ctx);
+	let if_block1 = /*expanded*/ ctx[1] && create_if_block$4(ctx);
 
 	const block = {
 		c: function create() {
 			div = element("div");
-			span0 = element("span");
+			span = element("span");
 			svg = svg_element("svg");
 			path = svg_element("path");
 			t0 = space();
-			span1 = element("span");
-			t1 = text(t1_value);
-			t2 = space();
-			if (if_block) if_block.c();
-			if_block_anchor = empty();
+			if (if_block0) if_block0.c();
+			t1 = space();
+			if (if_block1) if_block1.c();
+			if_block1_anchor = empty();
 			attr_dev(path, "fill-rule", "evenodd");
 			attr_dev(path, "clip-rule", "evenodd");
 			attr_dev(path, "d", "M7.56 1h.88l6.54 12.26-.44.74H1.44L1 13.26 7.56 1zM8 2.28L2.28 13H13.7L8 2.28zM8.625 12v-1h-1.25v1h1.25zm-1.25-2V6h1.25v4h-1.25z");
-			add_location(path, file$5, 42, 21, 1852);
+			add_location(path, file$5, 38, 21, 1655);
 			attr_dev(svg, "width", "16");
 			attr_dev(svg, "height", "16");
 			attr_dev(svg, "viewBox", "0 0 16 16");
 			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
 			attr_dev(svg, "fill", "currentColor");
-			add_location(svg, file$5, 36, 16, 1628);
-			attr_dev(span0, "class", "cursor-pointer");
-			toggle_class(span0, "text-vscodeError", /*error*/ ctx[0].type === CompilationErrorType.Error);
-			toggle_class(span0, "text-vscodeWarning", /*error*/ ctx[0].type === CompilationErrorType.Skipped);
-			add_location(span0, file$5, 31, 12, 1383);
-			add_location(span1, file$5, 50, 12, 2182);
+			add_location(svg, file$5, 32, 16, 1431);
+			attr_dev(span, "class", "text-vscodeError");
+			add_location(span, file$5, 31, 12, 1383);
 			attr_dev(div, "class", "w-full flex flex-row gap-2 items-center");
 			add_location(div, file$5, 30, 8, 1317);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
-			append_dev(div, span0);
-			append_dev(span0, svg);
+			append_dev(div, span);
+			append_dev(span, svg);
 			append_dev(svg, path);
 			append_dev(div, t0);
-			append_dev(div, span1);
-			append_dev(span1, t1);
-			insert_dev(target, t2, anchor);
-			if (if_block) if_block.m(target, anchor);
-			insert_dev(target, if_block_anchor, anchor);
+			if (if_block0) if_block0.m(div, null);
+			insert_dev(target, t1, anchor);
+			if (if_block1) if_block1.m(target, anchor);
+			insert_dev(target, if_block1_anchor, anchor);
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*error, CompilationErrorType*/ 1) {
-				toggle_class(span0, "text-vscodeError", /*error*/ ctx[0].type === CompilationErrorType.Error);
-			}
+			if (current_block_type === (current_block_type = select_block_type_1(ctx)) && if_block0) {
+				if_block0.p(ctx, dirty);
+			} else {
+				if (if_block0) if_block0.d(1);
+				if_block0 = current_block_type && current_block_type(ctx);
 
-			if (dirty & /*error, CompilationErrorType*/ 1) {
-				toggle_class(span0, "text-vscodeWarning", /*error*/ ctx[0].type === CompilationErrorType.Skipped);
+				if (if_block0) {
+					if_block0.c();
+					if_block0.m(div, null);
+				}
 			}
-
-			if (dirty & /*error*/ 1 && t1_value !== (t1_value = /*error*/ ctx[0].fqn + "")) set_data_dev(t1, t1_value);
 
 			if (/*expanded*/ ctx[1]) {
-				if (if_block) {
-					if_block.p(ctx, dirty);
+				if (if_block1) {
+					if_block1.p(ctx, dirty);
 				} else {
-					if_block = create_if_block$4(ctx);
-					if_block.c();
-					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+					if_block1 = create_if_block$4(ctx);
+					if_block1.c();
+					if_block1.m(if_block1_anchor.parentNode, if_block1_anchor);
 				}
-			} else if (if_block) {
-				if_block.d(1);
-				if_block = null;
+			} else if (if_block1) {
+				if_block1.d(1);
+				if_block1 = null;
 			}
 		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(div);
-			if (detaching) detach_dev(t2);
-			if (if_block) if_block.d(detaching);
-			if (detaching) detach_dev(if_block_anchor);
+
+			if (if_block0) {
+				if_block0.d();
+			}
+
+			if (detaching) detach_dev(t1);
+			if (if_block1) if_block1.d(detaching);
+			if (detaching) detach_dev(if_block1_anchor);
 		}
 	};
 
@@ -28045,7 +28128,7 @@ function create_fragment$6(ctx) {
 	let t;
 	let textcontainer;
 	let current;
-	const if_block_creators = [create_if_block_3$1, create_else_block_1];
+	const if_block_creators = [create_if_block_5$1, create_else_block_1];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {

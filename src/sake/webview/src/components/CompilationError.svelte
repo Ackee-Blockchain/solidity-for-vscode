@@ -45,11 +45,7 @@
     {/if}
     <TextContainer classList="w-full flex flex-col gap-3 overflow-hidden">
         <div class="w-full flex flex-row gap-2 items-center">
-            <span
-                class="cursor-pointer"
-                class:text-vscodeError={error.type === CompilationErrorType.Error}
-                class:text-vscodeWarning={error.type === CompilationErrorType.Skipped}
-            >
+            <span class="text-vscodeError">
                 <svg
                     width="16"
                     height="16"
@@ -64,7 +60,11 @@
                 >
             </span>
 
-            <span>{error.fqn}</span>
+            {#if error.type === CompilationErrorType.Error}
+                <span>{error.fqn} (Errors)</span>
+            {:else if error.type === CompilationErrorType.Skipped}
+                <span>{error.fqn} (Skipped)</span>
+            {/if}
         </div>
         {#if expanded}
             {#if error.type === CompilationErrorType.Error}
@@ -73,7 +73,8 @@
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <span
                             on:click={() => navigateToFile(asWakeErrorInfo(errorMessage))}
-                            class="cursor-pointer">{asWakeErrorInfo(errorMessage).message}</span
+                            class="cursor-pointer hover:underline"
+                            >{asWakeErrorInfo(errorMessage).message}</span
                         >
                     {/each}
                 </div>
