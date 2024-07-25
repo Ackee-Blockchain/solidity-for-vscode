@@ -84,7 +84,8 @@ export enum WebviewMessage {
     onGetAccounts = 'onGetAccounts',
     onGetBalances = 'onGetBalances', // @ todo rename, probably dony use 'on' everywhere
     onSetBalances = 'onSetBalances',
-    onsetLabel = 'onsetLabel'
+    onsetLabel = 'onsetLabel',
+    onNavigate = 'onNavigate'
 }
 
 // TODO create pairs of WebviewMessage and WebviewInput and WebviewOutput
@@ -103,7 +104,7 @@ export enum CompilationErrorType {
 export interface CompilationError {
     type: CompilationErrorType;
     fqn: string;
-    errors: string[];
+    errors: WakeErrorInfo[] | string;
 }
 
 export interface CompiledContract {

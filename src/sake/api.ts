@@ -187,7 +187,7 @@ export async function compile(client: LanguageClient | undefined) {
         const parsedContracts = parseCompiledContracts(result.contracts);
         const parsedErrors = parseCompilationErrors(result.errors);
         const parsedSkipped = parseCompilationSkipped(result.skipped);
-        compilationState.set(parsedContracts, parsedErrors);
+        compilationState.set(parsedContracts, [...parsedErrors, ...parsedSkipped]);
 
         return result.success;
     } catch (e) {

@@ -76,3 +76,7 @@ export async function removeContract(contract: DeploymentStateData) {
 export async function setLabel(contract: DeploymentStateData) {
     return await messageHandler.request<boolean>(WebviewMessage.onsetLabel, contract);
 }
+
+export async function navigateTo(path: string, startOffset: number, endOffset: number) {
+    messageHandler.send(WebviewMessage.onNavigate, { path, startOffset, endOffset });
+}

@@ -14,17 +14,27 @@
         CompilationError,
         Contract,
         ContractAbi,
-        ContractFunction as ContractFunctionType
+        ContractFunction as ContractFunctionType,
+        WakeErrorInfo
     } from '../../shared/types';
     import { CompilationErrorType } from '../../shared/types';
     import ContractFunction from './ContractFunction.svelte';
     import TextContainer from './TextContainer.svelte';
+    import { navigateTo } from '../helpers/api';
 
     provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
     export let error: CompilationError;
     let expanded: boolean = false;
     $: expandable = error.errors.length > 0;
+
+    const asWakeErrorInfo = (error: any) => error as WakeErrorInfo;
+    const asString = (error: any) => error as string;
+
+    const navigateToFile = (_error: WakeErrorInfo) => {
+        const errorMessage = asWakeErrorInfo(error.errors[0]);
+        navigateTo(_error.path, _error.startOffset, _error.endOffset);
+    };
 </script>
 
 <div class="w-full flex flex-row items-start flex-1 gap-1">
@@ -57,11 +67,22 @@
             <span>{error.fqn}</span>
         </div>
         {#if expanded}
-            <div class="flex flex-col gap-2 text-sm">
-                {#each error.errors as errorMessage}
-                    <span>{errorMessage}</span>
-                {/each}
-            </div>
+            {#if error.type === CompilationErrorType.Error}
+                <div class="flex flex-col gap-2 text-sm">
+                    {#each error.errors as errorMessage}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <span
+                            on:click={() => navigateToFile(asWakeErrorInfo(errorMessage))}
+                            class="cursor-pointer">{asWakeErrorInfo(errorMessage).message}</span
+                        >
+                    {/each}
+                </div>
+            {:else if error.type === CompilationErrorType.Skipped}
+                <span>{asString(error.errors)}</span>
+                <!-- {/if} -->
+            {:else}
+                <span>pipi</span>
+            {/if}
         {/if}
     </TextContainer>
 </div>

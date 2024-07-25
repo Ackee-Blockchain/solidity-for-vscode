@@ -358,6 +358,44 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 } as MessageHandlerData<boolean>);
             }
 
+            case WebviewMessage.onNavigate: {
+                if (!payload) {
+                    console.error('No navigate params provided');
+                    return;
+                }
+
+                const uri = vscode.Uri.parse(payload.path);
+
+                const doc = await vscode.workspace.openTextDocument(uri);
+                if (!doc) {
+                    return;
+                }
+
+                const editor = vscode.window.showTextDocument(doc);
+                if (!editor) {
+                    return;
+                }
+
+                const startPosition = doc.positionAt(payload.startOffset);
+                const endPosition = doc.positionAt(payload.endOffset);
+
+                const range = new vscode.Range(startPosition, endPosition);
+
+                if (vscode.window.activeTextEditor) {
+                    const target = new vscode.Selection(
+                        range.start.line,
+                        range.start.character,
+                        range.end.line,
+                        range.end.character
+                    );
+                    vscode.window.activeTextEditor.selection = target;
+                    vscode.window.activeTextEditor.revealRange(
+                        target,
+                        vscode.TextEditorRevealType.InCenter
+                    );
+                }
+            }
+
             default: {
                 // Pass the message to the inheriting class
                 this._onDidReceiveMessage(message);

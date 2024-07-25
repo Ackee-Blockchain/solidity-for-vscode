@@ -8,7 +8,7 @@
         vsCodeCheckbox,
         vsCodeTextField
     } from '@vscode/webview-ui-toolkit';
-    import { type CompiledContract } from '../../../shared/types';
+    import { CompilationErrorType, type CompiledContract } from '../../../shared/types';
     import Constructor from '../../components/Constructor.svelte';
     import { selectedAccount, selectedValue, compilationState } from '../../helpers/store';
     import { deployContract, showErrorMessage } from '../../helpers/api';
@@ -90,7 +90,7 @@
 
             <Divider className="my-2" />
 
-            {#each filteredErrors as error, i}
+            {#each filteredErrors as error}
                 <CompilationError {error} />
             {/each}
         </div>

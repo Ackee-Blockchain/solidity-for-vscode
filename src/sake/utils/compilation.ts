@@ -68,7 +68,7 @@ export function parseCompilationSkipped(
         const error: CompilationError = {
             type: CompilationErrorType.Skipped,
             fqn: key,
-            errors: [compilationSkipped[key]]
+            errors: compilationSkipped[key]
         };
 
         errors.push(error);
