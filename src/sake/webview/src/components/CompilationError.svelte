@@ -21,12 +21,15 @@
     import ContractFunction from './ContractFunction.svelte';
     import TextContainer from './TextContainer.svelte';
     import { navigateTo } from '../helpers/api';
+    import ErrorIcon from './icons/ErrorIcon.svelte';
+    import WarningIcon from './icons/WarningIcon.svelte';
 
     provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
     export let error: CompilationError;
     let expanded: boolean = false;
     $: expandable = error.errors.length > 0;
+    $: fileName = error.fqn.split('/').pop();
 
     const asWakeErrorInfo = (error: any) => error as WakeErrorInfo;
     const asString = (error: any) => error as string;
@@ -45,28 +48,25 @@
     {/if}
     <TextContainer classList="w-full flex flex-col gap-3 overflow-hidden">
         <div class="w-full flex flex-row gap-2 items-center">
-            <span class="text-vscodeError">
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    ><path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M7.56 1h.88l6.54 12.26-.44.74H1.44L1 13.26 7.56 1zM8 2.28L2.28 13H13.7L8 2.28zM8.625 12v-1h-1.25v1h1.25zm-1.25-2V6h1.25v4h-1.25z"
-                    /></svg
-                >
-            </span>
-
             {#if error.type === CompilationErrorType.Error}
-                <span>{error.fqn} (Errors)</span>
+                <ErrorIcon />
             {:else if error.type === CompilationErrorType.Skipped}
-                <span>{error.fqn} (Skipped)</span>
+                <WarningIcon />
             {/if}
+
+            <div class="flex col gap-1">
+                {#if error.type === CompilationErrorType.Error}
+                    <span>Errors in {fileName ? fileName : error.fqn}</span>
+                {:else if error.type === CompilationErrorType.Skipped}
+                    <span>Skipped {fileName ? fileName : error.fqn}</span>
+                {/if}
+            </div>
         </div>
         {#if expanded}
+            {#if fileName}
+                <span class="mb-2">{error.fqn}</span>
+            {/if}
+
             {#if error.type === CompilationErrorType.Error}
                 <div class="flex flex-col gap-2 text-sm">
                     {#each error.errors as errorMessage}

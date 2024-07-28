@@ -39,6 +39,7 @@ export function parseCompiledContracts(
 
     return contracts;
 }
+
 export function parseCompilationErrors(
     compilationErrors: WakeCompilationErrors
 ): CompilationError[] {

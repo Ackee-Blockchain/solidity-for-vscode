@@ -90,7 +90,7 @@
 
             <Divider className="my-2" />
 
-            {#each filteredErrors as error}
+            {#each filteredErrors as error (error.fqn + error.type)}
                 <CompilationError {error} />
             {/each}
         </div>
