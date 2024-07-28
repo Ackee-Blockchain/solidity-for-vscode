@@ -77,6 +77,10 @@ export async function setLabel(contract: DeploymentStateData) {
     return await messageHandler.request<boolean>(WebviewMessage.onsetLabel, contract);
 }
 
-export async function navigateTo(path: string, startOffset: number, endOffset: number) {
+export async function navigateTo(
+    path: string,
+    startOffset: number | undefined,
+    endOffset: number | undefined
+) {
     messageHandler.send(WebviewMessage.onNavigate, { path, startOffset, endOffset });
 }

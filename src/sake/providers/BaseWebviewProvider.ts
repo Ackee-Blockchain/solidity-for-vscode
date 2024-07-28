@@ -376,6 +376,10 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     return;
                 }
 
+                if (!payload.startOffset || !payload.endOffset) {
+                    return;
+                }
+
                 const startPosition = doc.positionAt(payload.startOffset);
                 const endPosition = doc.positionAt(payload.endOffset);
 

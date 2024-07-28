@@ -96,15 +96,22 @@ export enum WebviewMessage {
  *
  */
 
-export enum CompilationErrorType {
+export enum CompilationIssueType {
     Error = 'Error',
     Skipped = 'Skipped'
 }
 
-export interface CompilationError {
-    type: CompilationErrorType;
+export interface CompilationErrorSpecific {
+    message: string;
+    path: string;
+    startOffset?: number;
+    endOffset?: number;
+}
+
+export interface CompilationIssue {
+    type: CompilationIssueType;
     fqn: string;
-    errors: WakeErrorInfo[] | string;
+    errors: CompilationErrorSpecific[];
 }
 
 export interface CompiledContract {
@@ -187,7 +194,7 @@ export interface DeploymentStateData {
 
 export interface CompilationStateData {
     contracts: Array<CompiledContract>;
-    errors: CompilationError[];
+    errors: CompilationIssue[];
     dirty: boolean;
     // TODO add isDirty
 }
@@ -231,8 +238,13 @@ export type WakeErrorInfo = {
     endOffset: number;
 };
 
+export type WakeSkippedInfo = {
+    message: string;
+    path: string;
+};
+
 export type WakeCompilationErrors = { [key: string]: WakeErrorInfo[] };
-export type WakeCompilationSkipped = { [key: string]: string };
+export type WakeCompilationSkipped = { [key: string]: WakeSkippedInfo };
 
 export interface WakeCompilationResponse {
     contracts: WakeCompiledContract;

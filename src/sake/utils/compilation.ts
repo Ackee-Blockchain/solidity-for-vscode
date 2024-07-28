@@ -1,6 +1,6 @@
 import {
-    CompilationError,
-    CompilationErrorType,
+    CompilationIssue,
+    CompilationIssueType,
     CompiledContract,
     WakeCompilationErrors,
     WakeCompilationSkipped,
@@ -40,15 +40,15 @@ export function parseCompiledContracts(
     return contracts;
 }
 
-export function parseCompilationErrors(
+export function parseCompilationIssues(
     compilationErrors: WakeCompilationErrors
-): CompilationError[] {
-    const errors: CompilationError[] = [];
+): CompilationIssue[] {
+    const errors: CompilationIssue[] = [];
 
     let key: keyof WakeCompiledContract;
     for (key in compilationErrors) {
-        const error: CompilationError = {
-            type: CompilationErrorType.Error,
+        const error: CompilationIssue = {
+            type: CompilationIssueType.Error,
             fqn: key,
             errors: compilationErrors[key]
         };
@@ -61,15 +61,15 @@ export function parseCompilationErrors(
 
 export function parseCompilationSkipped(
     compilationSkipped: WakeCompilationSkipped
-): CompilationError[] {
-    const errors: CompilationError[] = [];
+): CompilationIssue[] {
+    const errors: CompilationIssue[] = [];
 
     let key: keyof WakeCompiledContract;
     for (key in compilationSkipped) {
-        const error: CompilationError = {
-            type: CompilationErrorType.Skipped,
+        const error: CompilationIssue = {
+            type: CompilationIssueType.Skipped,
             fqn: key,
-            errors: compilationSkipped[key]
+            errors: [compilationSkipped[key]]
         };
 
         errors.push(error);

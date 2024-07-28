@@ -19615,11 +19615,11 @@ var WebviewMessage;
  * Payloads
  *
  */
-var CompilationErrorType;
-(function (CompilationErrorType) {
-    CompilationErrorType["Error"] = "Error";
-    CompilationErrorType["Skipped"] = "Skipped";
-})(CompilationErrorType || (CompilationErrorType = {}));
+var CompilationIssueType;
+(function (CompilationIssueType) {
+    CompilationIssueType["Error"] = "Error";
+    CompilationIssueType["Skipped"] = "Skipped";
+})(CompilationIssueType || (CompilationIssueType = {}));
 var CallType;
 (function (CallType) {
     CallType["Call"] = "Call";
@@ -25083,7 +25083,7 @@ function create_else_block$5(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block_2$4, create_if_block_3$2, create_else_block_1$2];
+	const if_block_creators = [create_if_block_2$4, create_if_block_3$2, create_else_block_1$1];
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
@@ -25304,7 +25304,7 @@ function create_if_block$8(ctx) {
 }
 
 // (116:20) {:else}
-function create_else_block_1$2(ctx) {
+function create_else_block_1$1(ctx) {
 	let div;
 	let span;
 	let svg;
@@ -25353,7 +25353,7 @@ function create_else_block_1$2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block_1$2.name,
+		id: create_else_block_1$1.name,
 		type: "else",
 		source: "(116:20) {:else}",
 		ctx
@@ -26318,7 +26318,7 @@ function get_each_context$5(ctx, list, i) {
 }
 
 // (54:8) {:else}
-function create_else_block_1$1(ctx) {
+function create_else_block_1(ctx) {
 	let iconspacer;
 	let current;
 	iconspacer = new IconSpacer({ $$inline: true });
@@ -26348,7 +26348,7 @@ function create_else_block_1$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block_1$1.name,
+		id: create_else_block_1.name,
 		type: "else",
 		source: "(54:8) {:else}",
 		ctx
@@ -26736,7 +26736,7 @@ function create_fragment$c(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block_2$3, create_else_block_1$1];
+	const if_block_creators = [create_if_block_2$3, create_else_block_1];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -27833,12 +27833,12 @@ const file$5 = "src/components/CompilationError.svelte";
 
 function get_each_context$4(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[9] = list[i];
+	child_ctx[8] = list[i];
 	return child_ctx;
 }
 
-// (30:4) {:else}
-function create_else_block_1(ctx) {
+// (27:4) {:else}
+function create_else_block$3(ctx) {
 	let iconspacer;
 	let current;
 	iconspacer = new IconSpacer({ $$inline: true });
@@ -27868,23 +27868,23 @@ function create_else_block_1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block_1.name,
+		id: create_else_block$3.name,
 		type: "else",
-		source: "(30:4) {:else}",
+		source: "(27:4) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (28:4) {#if expandable}
+// (25:4) {#if expandable}
 function create_if_block_8(ctx) {
 	let expandbutton;
 	let updating_expanded;
 	let current;
 
 	function expandbutton_expanded_binding(value) {
-		/*expandbutton_expanded_binding*/ ctx[7](value);
+		/*expandbutton_expanded_binding*/ ctx[5](value);
 	}
 
 	let expandbutton_props = {};
@@ -27937,14 +27937,14 @@ function create_if_block_8(ctx) {
 		block,
 		id: create_if_block_8.name,
 		type: "if",
-		source: "(28:4) {#if expandable}",
+		source: "(25:4) {#if expandable}",
 		ctx
 	});
 
 	return block;
 }
 
-// (37:66) 
+// (34:66) 
 function create_if_block_7$1(ctx) {
 	let warningicon;
 	let current;
@@ -27976,14 +27976,14 @@ function create_if_block_7$1(ctx) {
 		block,
 		id: create_if_block_7$1.name,
 		type: "if",
-		source: "(37:66) ",
+		source: "(34:66) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (35:12) {#if error.type === CompilationErrorType.Error}
+// (32:12) {#if issue.type === CompilationIssueType.Error}
 function create_if_block_6$1(ctx) {
 	let erroricon;
 	let current;
@@ -28015,21 +28015,21 @@ function create_if_block_6$1(ctx) {
 		block,
 		id: create_if_block_6$1.name,
 		type: "if",
-		source: "(35:12) {#if error.type === CompilationErrorType.Error}",
+		source: "(32:12) {#if issue.type === CompilationIssueType.Error}",
 		ctx
 	});
 
 	return block;
 }
 
-// (44:70) 
+// (41:70) 
 function create_if_block_5$1(ctx) {
 	let span;
 	let t0;
 
 	let t1_value = (/*fileName*/ ctx[2]
 	? /*fileName*/ ctx[2]
-	: /*error*/ ctx[0].fqn) + "";
+	: /*issue*/ ctx[0].fqn) + "";
 
 	let t1;
 
@@ -28038,7 +28038,7 @@ function create_if_block_5$1(ctx) {
 			span = element("span");
 			t0 = text("Skipped ");
 			t1 = text(t1_value);
-			add_location(span, file$5, 44, 20, 1998);
+			add_location(span, file$5, 41, 20, 1858);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -28046,9 +28046,9 @@ function create_if_block_5$1(ctx) {
 			append_dev(span, t1);
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*fileName, error*/ 5 && t1_value !== (t1_value = (/*fileName*/ ctx[2]
+			if (dirty & /*fileName, issue*/ 5 && t1_value !== (t1_value = (/*fileName*/ ctx[2]
 			? /*fileName*/ ctx[2]
-			: /*error*/ ctx[0].fqn) + "")) set_data_dev(t1, t1_value);
+			: /*issue*/ ctx[0].fqn) + "")) set_data_dev(t1, t1_value);
 		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(span);
@@ -28059,21 +28059,21 @@ function create_if_block_5$1(ctx) {
 		block,
 		id: create_if_block_5$1.name,
 		type: "if",
-		source: "(44:70) ",
+		source: "(41:70) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (42:16) {#if error.type === CompilationErrorType.Error}
+// (39:16) {#if issue.type === CompilationIssueType.Error}
 function create_if_block_4$1(ctx) {
 	let span;
 	let t0;
 
 	let t1_value = (/*fileName*/ ctx[2]
 	? /*fileName*/ ctx[2]
-	: /*error*/ ctx[0].fqn) + "";
+	: /*issue*/ ctx[0].fqn) + "";
 
 	let t1;
 
@@ -28082,7 +28082,7 @@ function create_if_block_4$1(ctx) {
 			span = element("span");
 			t0 = text("Errors in ");
 			t1 = text(t1_value);
-			add_location(span, file$5, 42, 20, 1850);
+			add_location(span, file$5, 39, 20, 1710);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -28090,9 +28090,9 @@ function create_if_block_4$1(ctx) {
 			append_dev(span, t1);
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*fileName, error*/ 5 && t1_value !== (t1_value = (/*fileName*/ ctx[2]
+			if (dirty & /*fileName, issue*/ 5 && t1_value !== (t1_value = (/*fileName*/ ctx[2]
 			? /*fileName*/ ctx[2]
-			: /*error*/ ctx[0].fqn) + "")) set_data_dev(t1, t1_value);
+			: /*issue*/ ctx[0].fqn) + "")) set_data_dev(t1, t1_value);
 		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(span);
@@ -28103,39 +28103,38 @@ function create_if_block_4$1(ctx) {
 		block,
 		id: create_if_block_4$1.name,
 		type: "if",
-		source: "(42:16) {#if error.type === CompilationErrorType.Error}",
+		source: "(39:16) {#if issue.type === CompilationIssueType.Error}",
 		ctx
 	});
 
 	return block;
 }
 
-// (49:8) {#if expanded}
+// (46:8) {#if expanded}
 function create_if_block$4(ctx) {
 	let t;
 	let if_block1_anchor;
 	let if_block0 = /*fileName*/ ctx[2] && create_if_block_3$1(ctx);
 
 	function select_block_type_3(ctx, dirty) {
-		if (/*error*/ ctx[0].type === CompilationErrorType.Error) return create_if_block_1$3;
-		if (/*error*/ ctx[0].type === CompilationErrorType.Skipped) return create_if_block_2$2;
-		return create_else_block$3;
+		if (/*issue*/ ctx[0].type === CompilationIssueType.Error) return create_if_block_1$3;
+		if (/*issue*/ ctx[0].type === CompilationIssueType.Skipped) return create_if_block_2$2;
 	}
 
 	let current_block_type = select_block_type_3(ctx);
-	let if_block1 = current_block_type(ctx);
+	let if_block1 = current_block_type && current_block_type(ctx);
 
 	const block = {
 		c: function create() {
 			if (if_block0) if_block0.c();
 			t = space();
-			if_block1.c();
+			if (if_block1) if_block1.c();
 			if_block1_anchor = empty();
 		},
 		m: function mount(target, anchor) {
 			if (if_block0) if_block0.m(target, anchor);
 			insert_dev(target, t, anchor);
-			if_block1.m(target, anchor);
+			if (if_block1) if_block1.m(target, anchor);
 			insert_dev(target, if_block1_anchor, anchor);
 		},
 		p: function update(ctx, dirty) {
@@ -28155,8 +28154,8 @@ function create_if_block$4(ctx) {
 			if (current_block_type === (current_block_type = select_block_type_3(ctx)) && if_block1) {
 				if_block1.p(ctx, dirty);
 			} else {
-				if_block1.d(1);
-				if_block1 = current_block_type(ctx);
+				if (if_block1) if_block1.d(1);
+				if_block1 = current_block_type && current_block_type(ctx);
 
 				if (if_block1) {
 					if_block1.c();
@@ -28167,7 +28166,11 @@ function create_if_block$4(ctx) {
 		d: function destroy(detaching) {
 			if (if_block0) if_block0.d(detaching);
 			if (detaching) detach_dev(t);
-			if_block1.d(detaching);
+
+			if (if_block1) {
+				if_block1.d(detaching);
+			}
+
 			if (detaching) detach_dev(if_block1_anchor);
 		}
 	};
@@ -28176,17 +28179,17 @@ function create_if_block$4(ctx) {
 		block,
 		id: create_if_block$4.name,
 		type: "if",
-		source: "(49:8) {#if expanded}",
+		source: "(46:8) {#if expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (50:12) {#if fileName}
+// (47:12) {#if fileName}
 function create_if_block_3$1(ctx) {
 	let span;
-	let t_value = /*error*/ ctx[0].fqn + "";
+	let t_value = /*issue*/ ctx[0].fqn + "";
 	let t;
 
 	const block = {
@@ -28194,14 +28197,14 @@ function create_if_block_3$1(ctx) {
 			span = element("span");
 			t = text(t_value);
 			attr_dev(span, "class", "mb-2");
-			add_location(span, file$5, 50, 16, 2175);
+			add_location(span, file$5, 47, 16, 2035);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
 			append_dev(span, t);
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*error*/ 1 && t_value !== (t_value = /*error*/ ctx[0].fqn + "")) set_data_dev(t, t_value);
+			if (dirty & /*issue*/ 1 && t_value !== (t_value = /*issue*/ ctx[0].fqn + "")) set_data_dev(t, t_value);
 		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(span);
@@ -28212,64 +28215,44 @@ function create_if_block_3$1(ctx) {
 		block,
 		id: create_if_block_3$1.name,
 		type: "if",
-		source: "(50:12) {#if fileName}",
+		source: "(47:12) {#if fileName}",
 		ctx
 	});
 
 	return block;
 }
 
-// (68:12) {:else}
-function create_else_block$3(ctx) {
-	let span;
-
-	const block = {
-		c: function create() {
-			span = element("span");
-			span.textContent = "pipi";
-			add_location(span, file$5, 68, 16, 3016);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, span, anchor);
-		},
-		p: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(span);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_else_block$3.name,
-		type: "else",
-		source: "(68:12) {:else}",
-		ctx
-	});
-
-	return block;
-}
-
-// (65:66) 
+// (61:66) 
 function create_if_block_2$2(ctx) {
 	let span;
-	let t_value = /*asString*/ ctx[5](/*error*/ ctx[0].errors) + "";
+	let t_value = /*issue*/ ctx[0].errors[0].message + "";
 	let t;
+	let mounted;
+	let dispose;
 
 	const block = {
 		c: function create() {
 			span = element("span");
 			t = text(t_value);
-			add_location(span, file$5, 65, 16, 2911);
+			attr_dev(span, "class", "cursor-pointer hover:underline");
+			add_location(span, file$5, 62, 16, 2760);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
 			append_dev(span, t);
+
+			if (!mounted) {
+				dispose = listen_dev(span, "click", /*click_handler_1*/ ctx[7], false, false, false, false);
+				mounted = true;
+			}
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*error*/ 1 && t_value !== (t_value = /*asString*/ ctx[5](/*error*/ ctx[0].errors) + "")) set_data_dev(t, t_value);
+			if (dirty & /*issue*/ 1 && t_value !== (t_value = /*issue*/ ctx[0].errors[0].message + "")) set_data_dev(t, t_value);
 		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(span);
+			mounted = false;
+			dispose();
 		}
 	};
 
@@ -28277,17 +28260,17 @@ function create_if_block_2$2(ctx) {
 		block,
 		id: create_if_block_2$2.name,
 		type: "if",
-		source: "(65:66) ",
+		source: "(61:66) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (54:12) {#if error.type === CompilationErrorType.Error}
+// (51:12) {#if issue.type === CompilationIssueType.Error}
 function create_if_block_1$3(ctx) {
 	let div;
-	let each_value = /*error*/ ctx[0].errors;
+	let each_value = /*issue*/ ctx[0].errors;
 	validate_each_argument(each_value);
 	let each_blocks = [];
 
@@ -28304,7 +28287,7 @@ function create_if_block_1$3(ctx) {
 			}
 
 			attr_dev(div, "class", "flex flex-col gap-2 text-sm");
-			add_location(div, file$5, 54, 16, 2308);
+			add_location(div, file$5, 51, 16, 2168);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -28316,8 +28299,8 @@ function create_if_block_1$3(ctx) {
 			}
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*navigateToFile, asWakeErrorInfo, error*/ 81) {
-				each_value = /*error*/ ctx[0].errors;
+			if (dirty & /*navigateToFile, issue*/ 17) {
+				each_value = /*issue*/ ctx[0].errors;
 				validate_each_argument(each_value);
 				let i;
 
@@ -28350,23 +28333,23 @@ function create_if_block_1$3(ctx) {
 		block,
 		id: create_if_block_1$3.name,
 		type: "if",
-		source: "(54:12) {#if error.type === CompilationErrorType.Error}",
+		source: "(51:12) {#if issue.type === CompilationIssueType.Error}",
 		ctx
 	});
 
 	return block;
 }
 
-// (56:20) {#each error.errors as errorMessage}
+// (53:20) {#each issue.errors as error}
 function create_each_block$4(ctx) {
 	let span;
-	let t_value = /*asWakeErrorInfo*/ ctx[4](/*errorMessage*/ ctx[9]).message + "";
+	let t_value = /*error*/ ctx[8].message + "";
 	let t;
 	let mounted;
 	let dispose;
 
 	function click_handler() {
-		return /*click_handler*/ ctx[8](/*errorMessage*/ ctx[9]);
+		return /*click_handler*/ ctx[6](/*error*/ ctx[8]);
 	}
 
 	const block = {
@@ -28374,7 +28357,7 @@ function create_each_block$4(ctx) {
 			span = element("span");
 			t = text(t_value);
 			attr_dev(span, "class", "cursor-pointer hover:underline");
-			add_location(span, file$5, 57, 24, 2512);
+			add_location(span, file$5, 54, 24, 2365);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -28387,7 +28370,7 @@ function create_each_block$4(ctx) {
 		},
 		p: function update(new_ctx, dirty) {
 			ctx = new_ctx;
-			if (dirty & /*error*/ 1 && t_value !== (t_value = /*asWakeErrorInfo*/ ctx[4](/*errorMessage*/ ctx[9]).message + "")) set_data_dev(t, t_value);
+			if (dirty & /*issue*/ 1 && t_value !== (t_value = /*error*/ ctx[8].message + "")) set_data_dev(t, t_value);
 		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(span);
@@ -28400,14 +28383,14 @@ function create_each_block$4(ctx) {
 		block,
 		id: create_each_block$4.name,
 		type: "each",
-		source: "(56:20) {#each error.errors as errorMessage}",
+		source: "(53:20) {#each issue.errors as error}",
 		ctx
 	});
 
 	return block;
 }
 
-// (33:4) <TextContainer classList="w-full flex flex-col gap-3 overflow-hidden">
+// (30:4) <TextContainer classList="w-full flex flex-col gap-3 overflow-hidden">
 function create_default_slot$2(ctx) {
 	let div1;
 	let current_block_type_index;
@@ -28421,8 +28404,8 @@ function create_default_slot$2(ctx) {
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
-		if (/*error*/ ctx[0].type === CompilationErrorType.Error) return 0;
-		if (/*error*/ ctx[0].type === CompilationErrorType.Skipped) return 1;
+		if (/*issue*/ ctx[0].type === CompilationIssueType.Error) return 0;
+		if (/*issue*/ ctx[0].type === CompilationIssueType.Skipped) return 1;
 		return -1;
 	}
 
@@ -28431,8 +28414,8 @@ function create_default_slot$2(ctx) {
 	}
 
 	function select_block_type_2(ctx, dirty) {
-		if (/*error*/ ctx[0].type === CompilationErrorType.Error) return create_if_block_4$1;
-		if (/*error*/ ctx[0].type === CompilationErrorType.Skipped) return create_if_block_5$1;
+		if (/*issue*/ ctx[0].type === CompilationIssueType.Error) return create_if_block_4$1;
+		if (/*issue*/ ctx[0].type === CompilationIssueType.Skipped) return create_if_block_5$1;
 	}
 
 	let current_block_type = select_block_type_2(ctx);
@@ -28450,9 +28433,9 @@ function create_default_slot$2(ctx) {
 			if (if_block2) if_block2.c();
 			if_block2_anchor = empty();
 			attr_dev(div0, "class", "flex col gap-1");
-			add_location(div0, file$5, 40, 12, 1737);
+			add_location(div0, file$5, 37, 12, 1597);
 			attr_dev(div1, "class", "w-full flex flex-row gap-2 items-center");
-			add_location(div1, file$5, 33, 8, 1463);
+			add_location(div1, file$5, 30, 8, 1323);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div1, anchor);
@@ -28554,7 +28537,7 @@ function create_default_slot$2(ctx) {
 		block,
 		id: create_default_slot$2.name,
 		type: "slot",
-		source: "(33:4) <TextContainer classList=\\\"w-full flex flex-col gap-3 overflow-hidden\\\">",
+		source: "(30:4) <TextContainer classList=\\\"w-full flex flex-col gap-3 overflow-hidden\\\">",
 		ctx
 	});
 
@@ -28568,7 +28551,7 @@ function create_fragment$6(ctx) {
 	let t;
 	let textcontainer;
 	let current;
-	const if_block_creators = [create_if_block_8, create_else_block_1];
+	const if_block_creators = [create_if_block_8, create_else_block$3];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -28595,7 +28578,7 @@ function create_fragment$6(ctx) {
 			t = space();
 			create_component(textcontainer.$$.fragment);
 			attr_dev(div, "class", "w-full flex flex-row items-start flex-1 gap-1");
-			add_location(div, file$5, 26, 0, 1215);
+			add_location(div, file$5, 23, 0, 1075);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -28636,7 +28619,7 @@ function create_fragment$6(ctx) {
 
 			const textcontainer_changes = {};
 
-			if (dirty & /*$$scope, error, fileName, expanded*/ 4103) {
+			if (dirty & /*$$scope, issue, fileName, expanded*/ 2055) {
 				textcontainer_changes.$$scope = { dirty, ctx };
 			}
 
@@ -28677,23 +28660,20 @@ function instance$6($$self, $$props, $$invalidate) {
 	let { $$slots: slots = {}, $$scope } = $$props;
 	validate_slots('CompilationError', slots, []);
 	provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
-	let { error } = $$props;
+	let { issue } = $$props;
 	let expanded = false;
-	const asWakeErrorInfo = error => error;
-	const asString = error => error;
 
-	const navigateToFile = _error => {
-		asWakeErrorInfo(error.errors[0]);
-		navigateTo(_error.path, _error.startOffset, _error.endOffset);
+	const navigateToFile = error => {
+		navigateTo(error.path, error.startOffset, error.endOffset);
 	};
 
 	$$self.$$.on_mount.push(function () {
-		if (error === undefined && !('error' in $$props || $$self.$$.bound[$$self.$$.props['error']])) {
-			console.warn("<CompilationError> was created without expected prop 'error'");
+		if (issue === undefined && !('issue' in $$props || $$self.$$.bound[$$self.$$.props['issue']])) {
+			console.warn("<CompilationError> was created without expected prop 'issue'");
 		}
 	});
 
-	const writable_props = ['error'];
+	const writable_props = ['issue'];
 
 	Object.keys($$props).forEach(key => {
 		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<CompilationError> was created with unknown prop '${key}'`);
@@ -28704,10 +28684,11 @@ function instance$6($$self, $$props, $$invalidate) {
 		$$invalidate(1, expanded);
 	}
 
-	const click_handler = errorMessage => navigateToFile(asWakeErrorInfo(errorMessage));
+	const click_handler = error => navigateToFile(error);
+	const click_handler_1 = () => navigateToFile(issue.errors[0]);
 
 	$$self.$$set = $$props => {
-		if ('error' in $$props) $$invalidate(0, error = $$props.error);
+		if ('issue' in $$props) $$invalidate(0, issue = $$props.issue);
 	};
 
 	$$self.$capture_state = () => ({
@@ -28720,23 +28701,21 @@ function instance$6($$self, $$props, $$invalidate) {
 		DeleteButton,
 		CopyButton,
 		InputIssueIndicator,
-		CompilationErrorType,
+		CompilationIssueType,
 		ContractFunction,
 		TextContainer,
 		navigateTo,
 		ErrorIcon,
 		WarningIcon,
-		error,
+		issue,
 		expanded,
-		asWakeErrorInfo,
-		asString,
 		navigateToFile,
 		fileName,
 		expandable
 	});
 
 	$$self.$inject_state = $$props => {
-		if ('error' in $$props) $$invalidate(0, error = $$props.error);
+		if ('issue' in $$props) $$invalidate(0, issue = $$props.issue);
 		if ('expanded' in $$props) $$invalidate(1, expanded = $$props.expanded);
 		if ('fileName' in $$props) $$invalidate(2, fileName = $$props.fileName);
 		if ('expandable' in $$props) $$invalidate(3, expandable = $$props.expandable);
@@ -28747,32 +28726,31 @@ function instance$6($$self, $$props, $$invalidate) {
 	}
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*error*/ 1) {
-			$$invalidate(3, expandable = error.errors.length > 0);
+		if ($$self.$$.dirty & /*issue*/ 1) {
+			$$invalidate(3, expandable = issue.errors.length > 0);
 		}
 
-		if ($$self.$$.dirty & /*error*/ 1) {
-			$$invalidate(2, fileName = error.fqn.split('/').pop());
+		if ($$self.$$.dirty & /*issue*/ 1) {
+			$$invalidate(2, fileName = issue.fqn.split('/').pop());
 		}
 	};
 
 	return [
-		error,
+		issue,
 		expanded,
 		fileName,
 		expandable,
-		asWakeErrorInfo,
-		asString,
 		navigateToFile,
 		expandbutton_expanded_binding,
-		click_handler
+		click_handler,
+		click_handler_1
 	];
 }
 
 class CompilationError extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$6, create_fragment$6, safe_not_equal, { error: 0 });
+		init$1(this, options, instance$6, create_fragment$6, safe_not_equal, { issue: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -28782,11 +28760,11 @@ class CompilationError extends SvelteComponentDev {
 		});
 	}
 
-	get error() {
+	get issue() {
 		throw new Error("<CompilationError>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 
-	set error(value) {
+	set issue(value) {
 		throw new Error("<CompilationError>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 }
@@ -29510,7 +29488,7 @@ function instance$4($$self, $$props, $$invalidate) {
 		vsCodeDivider,
 		vsCodeCheckbox,
 		vsCodeTextField,
-		CompilationErrorType,
+		CompilationIssueType,
 		Constructor,
 		selectedAccount,
 		selectedValue,

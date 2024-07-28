@@ -8,7 +8,7 @@
         vsCodeCheckbox,
         vsCodeTextField
     } from '@vscode/webview-ui-toolkit';
-    import { CompilationErrorType, type CompiledContract } from '../../../shared/types';
+    import { CompilationIssueType, type CompiledContract } from '../../../shared/types';
     import Constructor from '../../components/Constructor.svelte';
     import { selectedAccount, selectedValue, compilationState } from '../../helpers/store';
     import { deployContract, showErrorMessage } from '../../helpers/api';

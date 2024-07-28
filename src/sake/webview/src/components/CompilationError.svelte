@@ -11,13 +11,13 @@
     import CopyButton from './icons/CopyButton.svelte';
     import InputIssueIndicator from './InputIssueIndicator.svelte';
     import type {
-        CompilationError,
+        CompilationIssue,
         Contract,
         ContractAbi,
         ContractFunction as ContractFunctionType,
-        WakeErrorInfo
+        CompilationErrorSpecific
     } from '../../shared/types';
-    import { CompilationErrorType } from '../../shared/types';
+    import { CompilationIssueType } from '../../shared/types';
     import ContractFunction from './ContractFunction.svelte';
     import TextContainer from './TextContainer.svelte';
     import { navigateTo } from '../helpers/api';
@@ -26,17 +26,13 @@
 
     provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
-    export let error: CompilationError;
+    export let issue: CompilationIssue;
     let expanded: boolean = false;
-    $: expandable = error.errors.length > 0;
-    $: fileName = error.fqn.split('/').pop();
+    $: expandable = issue.errors.length > 0;
+    $: fileName = issue.fqn.split('/').pop();
 
-    const asWakeErrorInfo = (error: any) => error as WakeErrorInfo;
-    const asString = (error: any) => error as string;
-
-    const navigateToFile = (_error: WakeErrorInfo) => {
-        const errorMessage = asWakeErrorInfo(error.errors[0]);
-        navigateTo(_error.path, _error.startOffset, _error.endOffset);
+    const navigateToFile = (error: CompilationErrorSpecific) => {
+        navigateTo(error.path, error.startOffset, error.endOffset);
     };
 </script>
 
@@ -48,41 +44,41 @@
     {/if}
     <TextContainer classList="w-full flex flex-col gap-3 overflow-hidden">
         <div class="w-full flex flex-row gap-2 items-center">
-            {#if error.type === CompilationErrorType.Error}
+            {#if issue.type === CompilationIssueType.Error}
                 <ErrorIcon />
-            {:else if error.type === CompilationErrorType.Skipped}
+            {:else if issue.type === CompilationIssueType.Skipped}
                 <WarningIcon />
             {/if}
 
             <div class="flex col gap-1">
-                {#if error.type === CompilationErrorType.Error}
-                    <span>Errors in {fileName ? fileName : error.fqn}</span>
-                {:else if error.type === CompilationErrorType.Skipped}
-                    <span>Skipped {fileName ? fileName : error.fqn}</span>
+                {#if issue.type === CompilationIssueType.Error}
+                    <span>Errors in {fileName ? fileName : issue.fqn}</span>
+                {:else if issue.type === CompilationIssueType.Skipped}
+                    <span>Skipped {fileName ? fileName : issue.fqn}</span>
                 {/if}
             </div>
         </div>
         {#if expanded}
             {#if fileName}
-                <span class="mb-2">{error.fqn}</span>
+                <span class="mb-2">{issue.fqn}</span>
             {/if}
 
-            {#if error.type === CompilationErrorType.Error}
+            {#if issue.type === CompilationIssueType.Error}
                 <div class="flex flex-col gap-2 text-sm">
-                    {#each error.errors as errorMessage}
+                    {#each issue.errors as error}
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <span
-                            on:click={() => navigateToFile(asWakeErrorInfo(errorMessage))}
-                            class="cursor-pointer hover:underline"
-                            >{asWakeErrorInfo(errorMessage).message}</span
+                            on:click={() => navigateToFile(error)}
+                            class="cursor-pointer hover:underline">{error.message}</span
                         >
                     {/each}
                 </div>
-            {:else if error.type === CompilationErrorType.Skipped}
-                <span>{asString(error.errors)}</span>
-                <!-- {/if} -->
-            {:else}
-                <span>pipi</span>
+            {:else if issue.type === CompilationIssueType.Skipped}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <span
+                    on:click={() => navigateToFile(issue.errors[0])}
+                    class="cursor-pointer hover:underline">{issue.errors[0].message}</span
+                >
             {/if}
         {/if}
     </TextContainer>

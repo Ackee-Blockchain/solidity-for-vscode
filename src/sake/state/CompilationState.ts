@@ -1,5 +1,5 @@
 import {
-    CompilationError,
+    CompilationIssue,
     CompilationStateData,
     CompiledContract,
     ContractAbi,
@@ -32,7 +32,7 @@ export class CompilationState extends BaseState<CompilationStateData> {
         };
     }
 
-    public set(contracts: CompiledContract[], errors: CompilationError[]) {
+    public set(contracts: CompiledContract[], errors: CompilationIssue[]) {
         this.state = {
             contracts: contracts,
             errors: errors,
@@ -48,7 +48,7 @@ export class CompilationState extends BaseState<CompilationStateData> {
         };
     }
 
-    public setErrors(errors: CompilationError[]): void {
+    public setErrors(errors: CompilationIssue[]): void {
         this.state = {
             ...this.state,
             errors: errors
