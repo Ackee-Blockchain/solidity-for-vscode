@@ -4,14 +4,4 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<span class="clickable {className}" on:click={callback}><slot /></span>
-
-<style>
-    .clickable {
-        cursor: pointer;
-    }
-
-    .clickable:hover {
-        text-decoration: underline;
-    }
-</style>
+<span class="cursor-pointer hover:underline {className}" on:click={callback}><slot /></span>

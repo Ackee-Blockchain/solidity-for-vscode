@@ -23,6 +23,7 @@
     import { navigateTo } from '../helpers/api';
     import ErrorIcon from './icons/ErrorIcon.svelte';
     import WarningIcon from './icons/WarningIcon.svelte';
+    import ClickableSpan from './ClickableSpan.svelte';
 
     provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
@@ -31,8 +32,12 @@
     $: expandable = issue.errors.length > 0;
     $: fileName = issue.fqn.split('/').pop();
 
-    const navigateToFile = (error: CompilationErrorSpecific) => {
-        navigateTo(error.path, error.startOffset, error.endOffset);
+    const navigateToFile = (error: CompilationErrorSpecific, justToFile = false) => {
+        navigateTo(
+            error.path,
+            justToFile ? undefined : error.startOffset,
+            justToFile ? undefined : error.endOffset
+        );
     };
 </script>
 
@@ -51,11 +56,14 @@
             {/if}
 
             <div class="flex col gap-1">
-                {#if issue.type === CompilationIssueType.Error}
-                    <span>Errors in {fileName ? fileName : issue.fqn}</span>
-                {:else if issue.type === CompilationIssueType.Skipped}
-                    <span>Skipped {fileName ? fileName : issue.fqn}</span>
-                {/if}
+                <span>
+                    {issue.type === CompilationIssueType.Error ? 'Errors in' : 'Skipped'}
+                    <ClickableSpan
+                        callback={() => {
+                            navigateToFile(issue.errors[0], true);
+                        }}>{fileName ? fileName : issue.fqn}</ClickableSpan
+                    >
+                </span>
             </div>
         </div>
         {#if expanded}
@@ -67,17 +75,15 @@
                 <div class="flex flex-col gap-2 text-sm">
                     {#each issue.errors as error}
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <span
-                            on:click={() => navigateToFile(error)}
-                            class="cursor-pointer hover:underline">{error.message}</span
+                        <ClickableSpan callback={() => navigateToFile(error)}
+                            >{error.message}</ClickableSpan
                         >
                     {/each}
                 </div>
             {:else if issue.type === CompilationIssueType.Skipped}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <span
-                    on:click={() => navigateToFile(issue.errors[0])}
-                    class="cursor-pointer hover:underline">{issue.errors[0].message}</span
+                <ClickableSpan callback={() => navigateToFile(issue.errors[0])}
+                    >{issue.errors[0].message}</ClickableSpan
                 >
             {/if}
         {/if}

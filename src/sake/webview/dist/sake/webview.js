@@ -11754,7 +11754,7 @@ function create_fragment$r(ctx) {
 		c: function create() {
 			span = element("span");
 			if (default_slot) default_slot.c();
-			attr_dev(span, "class", span_class_value = "clickable " + /*className*/ ctx[0] + " svelte-9vowqo");
+			attr_dev(span, "class", span_class_value = "cursor-pointer hover:underline " + /*className*/ ctx[0]);
 			add_location(span, file$p, 5, 0, 134);
 		},
 		l: function claim(nodes) {
@@ -11803,7 +11803,7 @@ function create_fragment$r(ctx) {
 				}
 			}
 
-			if (!current || dirty & /*className*/ 1 && span_class_value !== (span_class_value = "clickable " + /*className*/ ctx[0] + " svelte-9vowqo")) {
+			if (!current || dirty & /*className*/ 1 && span_class_value !== (span_class_value = "cursor-pointer hover:underline " + /*className*/ ctx[0])) {
 				attr_dev(span, "class", span_class_value);
 			}
 		},
@@ -21238,7 +21238,7 @@ function create_if_block_2$5(ctx) {
 			props: {
 				className: "text-sm flex-1",
 				callback: /*topUp*/ ctx[6],
-				$$slots: { default: [create_default_slot_1$1] },
+				$$slots: { default: [create_default_slot_1$2] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -21310,7 +21310,7 @@ function create_if_block_2$5(ctx) {
 }
 
 // (76:24) <ClickableSpan className="text-sm flex-1" callback={topUp}>
-function create_default_slot_1$1(ctx) {
+function create_default_slot_1$2(ctx) {
 	let t_value = displayEtherValue(/*$selectedAccount*/ ctx[0].balance) + "";
 	let t;
 
@@ -21331,7 +21331,7 @@ function create_default_slot_1$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot_1$1.name,
+		id: create_default_slot_1$2.name,
 		type: "slot",
 		source: "(76:24) <ClickableSpan className=\\\"text-sm flex-1\\\" callback={topUp}>",
 		ctx
@@ -25370,7 +25370,7 @@ function create_if_block_3$2(ctx) {
 	inputissueindicator = new InputIssueIndicator({
 			props: {
 				type: "warning",
-				$$slots: { default: [create_default_slot_1] },
+				$$slots: { default: [create_default_slot_1$1] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -25475,7 +25475,7 @@ function create_if_block_2$4(ctx) {
 }
 
 // (113:24) <InputIssueIndicator type="warning">
-function create_default_slot_1(ctx) {
+function create_default_slot_1$1(ctx) {
 	let span;
 
 	const block = {
@@ -25496,7 +25496,7 @@ function create_default_slot_1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot_1.name,
+		id: create_default_slot_1$1.name,
 		type: "slot",
 		source: "(113:24) <InputIssueIndicator type=\\\"warning\\\">",
 		ctx
@@ -27833,11 +27833,11 @@ const file$5 = "src/components/CompilationError.svelte";
 
 function get_each_context$4(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[8] = list[i];
+	child_ctx[9] = list[i];
 	return child_ctx;
 }
 
-// (27:4) {:else}
+// (28:4) {:else}
 function create_else_block$3(ctx) {
 	let iconspacer;
 	let current;
@@ -27870,15 +27870,15 @@ function create_else_block$3(ctx) {
 		block,
 		id: create_else_block$3.name,
 		type: "else",
-		source: "(27:4) {:else}",
+		source: "(28:4) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (25:4) {#if expandable}
-function create_if_block_7$1(ctx) {
+// (26:4) {#if expandable}
+function create_if_block_5$1(ctx) {
 	let expandbutton;
 	let updating_expanded;
 	let current;
@@ -27935,17 +27935,17 @@ function create_if_block_7$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_7$1.name,
+		id: create_if_block_5$1.name,
 		type: "if",
-		source: "(25:4) {#if expandable}",
+		source: "(26:4) {#if expandable}",
 		ctx
 	});
 
 	return block;
 }
 
-// (34:66) 
-function create_if_block_6$1(ctx) {
+// (35:66) 
+function create_if_block_4$1(ctx) {
 	let warningicon;
 	let current;
 	warningicon = new WarningIcon({ $$inline: true });
@@ -27974,17 +27974,17 @@ function create_if_block_6$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_6$1.name,
+		id: create_if_block_4$1.name,
 		type: "if",
-		source: "(34:66) ",
+		source: "(35:66) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (32:12) {#if issue.type === CompilationIssueType.Error}
-function create_if_block_5$1(ctx) {
+// (33:12) {#if issue.type === CompilationIssueType.Error}
+function create_if_block_3$1(ctx) {
 	let erroricon;
 	let current;
 	erroricon = new ErrorIcon({ $$inline: true });
@@ -28013,114 +28013,69 @@ function create_if_block_5$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_5$1.name,
-		type: "if",
-		source: "(32:12) {#if issue.type === CompilationIssueType.Error}",
-		ctx
-	});
-
-	return block;
-}
-
-// (41:70) 
-function create_if_block_4$1(ctx) {
-	let span;
-	let t0;
-
-	let t1_value = (/*fileName*/ ctx[2]
-	? /*fileName*/ ctx[2]
-	: /*issue*/ ctx[0].fqn) + "";
-
-	let t1;
-
-	const block = {
-		c: function create() {
-			span = element("span");
-			t0 = text("Skipped ");
-			t1 = text(t1_value);
-			add_location(span, file$5, 41, 20, 1858);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, span, anchor);
-			append_dev(span, t0);
-			append_dev(span, t1);
-		},
-		p: function update(ctx, dirty) {
-			if (dirty & /*fileName, issue*/ 5 && t1_value !== (t1_value = (/*fileName*/ ctx[2]
-			? /*fileName*/ ctx[2]
-			: /*issue*/ ctx[0].fqn) + "")) set_data_dev(t1, t1_value);
-		},
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(span);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_4$1.name,
-		type: "if",
-		source: "(41:70) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (39:16) {#if issue.type === CompilationIssueType.Error}
-function create_if_block_3$1(ctx) {
-	let span;
-	let t0;
-
-	let t1_value = (/*fileName*/ ctx[2]
-	? /*fileName*/ ctx[2]
-	: /*issue*/ ctx[0].fqn) + "";
-
-	let t1;
-
-	const block = {
-		c: function create() {
-			span = element("span");
-			t0 = text("Errors in ");
-			t1 = text(t1_value);
-			add_location(span, file$5, 39, 20, 1710);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, span, anchor);
-			append_dev(span, t0);
-			append_dev(span, t1);
-		},
-		p: function update(ctx, dirty) {
-			if (dirty & /*fileName, issue*/ 5 && t1_value !== (t1_value = (/*fileName*/ ctx[2]
-			? /*fileName*/ ctx[2]
-			: /*issue*/ ctx[0].fqn) + "")) set_data_dev(t1, t1_value);
-		},
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(span);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
 		id: create_if_block_3$1.name,
 		type: "if",
-		source: "(39:16) {#if issue.type === CompilationIssueType.Error}",
+		source: "(33:12) {#if issue.type === CompilationIssueType.Error}",
 		ctx
 	});
 
 	return block;
 }
 
-// (46:8) {#if expanded}
-function create_if_block$4(ctx) {
-	let if_block_anchor;
+// (42:20) <ClickableSpan                         callback={() => {                             navigateToFile(issue.errors[0], true);                         }}>
+function create_default_slot_3(ctx) {
+	let t_value = (/*fileName*/ ctx[2]
+	? /*fileName*/ ctx[2]
+	: /*issue*/ ctx[0].fqn) + "";
 
-	function select_block_type_3(ctx, dirty) {
-		if (/*issue*/ ctx[0].type === CompilationIssueType.Error) return create_if_block_1$3;
-		if (/*issue*/ ctx[0].type === CompilationIssueType.Skipped) return create_if_block_2$2;
+	let t;
+
+	const block = {
+		c: function create() {
+			t = text(t_value);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, t, anchor);
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*fileName, issue*/ 5 && t_value !== (t_value = (/*fileName*/ ctx[2]
+			? /*fileName*/ ctx[2]
+			: /*issue*/ ctx[0].fqn) + "")) set_data_dev(t, t_value);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(t);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_default_slot_3.name,
+		type: "slot",
+		source: "(42:20) <ClickableSpan                         callback={() => {                             navigateToFile(issue.errors[0], true);                         }}>",
+		ctx
+	});
+
+	return block;
+}
+
+// (50:8) {#if expanded}
+function create_if_block$4(ctx) {
+	let current_block_type_index;
+	let if_block;
+	let if_block_anchor;
+	let current;
+	const if_block_creators = [create_if_block_1$3, create_if_block_2$2];
+	const if_blocks = [];
+
+	function select_block_type_2(ctx, dirty) {
+		if (/*issue*/ ctx[0].type === CompilationIssueType.Error) return 0;
+		if (/*issue*/ ctx[0].type === CompilationIssueType.Skipped) return 1;
+		return -1;
 	}
 
-	let current_block_type = select_block_type_3(ctx);
-	let if_block = current_block_type && current_block_type(ctx);
+	if (~(current_block_type_index = select_block_type_2(ctx))) {
+		if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+	}
 
 	const block = {
 		c: function create() {
@@ -28128,25 +28083,61 @@ function create_if_block$4(ctx) {
 			if_block_anchor = empty();
 		},
 		m: function mount(target, anchor) {
-			if (if_block) if_block.m(target, anchor);
+			if (~current_block_type_index) {
+				if_blocks[current_block_type_index].m(target, anchor);
+			}
+
 			insert_dev(target, if_block_anchor, anchor);
+			current = true;
 		},
 		p: function update(ctx, dirty) {
-			if (current_block_type === (current_block_type = select_block_type_3(ctx)) && if_block) {
-				if_block.p(ctx, dirty);
-			} else {
-				if (if_block) if_block.d(1);
-				if_block = current_block_type && current_block_type(ctx);
+			let previous_block_index = current_block_type_index;
+			current_block_type_index = select_block_type_2(ctx);
 
+			if (current_block_type_index === previous_block_index) {
+				if (~current_block_type_index) {
+					if_blocks[current_block_type_index].p(ctx, dirty);
+				}
+			} else {
 				if (if_block) {
-					if_block.c();
+					group_outros();
+
+					transition_out(if_blocks[previous_block_index], 1, 1, () => {
+						if_blocks[previous_block_index] = null;
+					});
+
+					check_outros();
+				}
+
+				if (~current_block_type_index) {
+					if_block = if_blocks[current_block_type_index];
+
+					if (!if_block) {
+						if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+						if_block.c();
+					} else {
+						if_block.p(ctx, dirty);
+					}
+
+					transition_in(if_block, 1);
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				} else {
+					if_block = null;
 				}
 			}
 		},
+		i: function intro(local) {
+			if (current) return;
+			transition_in(if_block);
+			current = true;
+		},
+		o: function outro(local) {
+			transition_out(if_block);
+			current = false;
+		},
 		d: function destroy(detaching) {
-			if (if_block) {
-				if_block.d(detaching);
+			if (~current_block_type_index) {
+				if_blocks[current_block_type_index].d(detaching);
 			}
 
 			if (detaching) detach_dev(if_block_anchor);
@@ -28157,44 +28148,56 @@ function create_if_block$4(ctx) {
 		block,
 		id: create_if_block$4.name,
 		type: "if",
-		source: "(46:8) {#if expanded}",
+		source: "(50:8) {#if expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (61:66) 
+// (64:66) 
 function create_if_block_2$2(ctx) {
-	let span;
-	let t_value = /*issue*/ ctx[0].errors[0].message + "";
-	let t;
-	let mounted;
-	let dispose;
+	let clickablespan;
+	let current;
+
+	clickablespan = new ClickableSpan({
+			props: {
+				callback: /*func_2*/ ctx[8],
+				$$slots: { default: [create_default_slot_2] },
+				$$scope: { ctx }
+			},
+			$$inline: true
+		});
 
 	const block = {
 		c: function create() {
-			span = element("span");
-			t = text(t_value);
-			attr_dev(span, "class", "cursor-pointer hover:underline");
-			add_location(span, file$5, 62, 16, 2769);
+			create_component(clickablespan.$$.fragment);
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, span, anchor);
-			append_dev(span, t);
-
-			if (!mounted) {
-				dispose = listen_dev(span, "click", /*click_handler_1*/ ctx[7], false, false, false, false);
-				mounted = true;
-			}
+			mount_component(clickablespan, target, anchor);
+			current = true;
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*issue*/ 1 && t_value !== (t_value = /*issue*/ ctx[0].errors[0].message + "")) set_data_dev(t, t_value);
+			const clickablespan_changes = {};
+			if (dirty & /*issue*/ 1) clickablespan_changes.callback = /*func_2*/ ctx[8];
+
+			if (dirty & /*$$scope, issue*/ 4097) {
+				clickablespan_changes.$$scope = { dirty, ctx };
+			}
+
+			clickablespan.$set(clickablespan_changes);
+		},
+		i: function intro(local) {
+			if (current) return;
+			transition_in(clickablespan.$$.fragment, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transition_out(clickablespan.$$.fragment, local);
+			current = false;
 		},
 		d: function destroy(detaching) {
-			if (detaching) detach_dev(span);
-			mounted = false;
-			dispose();
+			destroy_component(clickablespan, detaching);
 		}
 	};
 
@@ -28202,16 +28205,17 @@ function create_if_block_2$2(ctx) {
 		block,
 		id: create_if_block_2$2.name,
 		type: "if",
-		source: "(61:66) ",
+		source: "(64:66) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (51:12) {#if issue.type === CompilationIssueType.Error}
+// (55:12) {#if issue.type === CompilationIssueType.Error}
 function create_if_block_1$3(ctx) {
 	let div;
+	let current;
 	let each_value = /*issue*/ ctx[0].errors;
 	validate_each_argument(each_value);
 	let each_blocks = [];
@@ -28219,6 +28223,10 @@ function create_if_block_1$3(ctx) {
 	for (let i = 0; i < each_value.length; i += 1) {
 		each_blocks[i] = create_each_block$4(get_each_context$4(ctx, each_value, i));
 	}
+
+	const out = i => transition_out(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
 
 	const block = {
 		c: function create() {
@@ -28229,7 +28237,7 @@ function create_if_block_1$3(ctx) {
 			}
 
 			attr_dev(div, "class", "flex flex-col gap-2 text-sm");
-			add_location(div, file$5, 51, 16, 2177);
+			add_location(div, file$5, 55, 16, 2369);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -28239,6 +28247,8 @@ function create_if_block_1$3(ctx) {
 					each_blocks[i].m(div, null);
 				}
 			}
+
+			current = true;
 		},
 		p: function update(ctx, dirty) {
 			if (dirty & /*navigateToFile, issue*/ 17) {
@@ -28251,19 +28261,41 @@ function create_if_block_1$3(ctx) {
 
 					if (each_blocks[i]) {
 						each_blocks[i].p(child_ctx, dirty);
+						transition_in(each_blocks[i], 1);
 					} else {
 						each_blocks[i] = create_each_block$4(child_ctx);
 						each_blocks[i].c();
+						transition_in(each_blocks[i], 1);
 						each_blocks[i].m(div, null);
 					}
 				}
 
-				for (; i < each_blocks.length; i += 1) {
-					each_blocks[i].d(1);
+				group_outros();
+
+				for (i = each_value.length; i < each_blocks.length; i += 1) {
+					out(i);
 				}
 
-				each_blocks.length = each_value.length;
+				check_outros();
 			}
+		},
+		i: function intro(local) {
+			if (current) return;
+
+			for (let i = 0; i < each_value.length; i += 1) {
+				transition_in(each_blocks[i]);
+			}
+
+			current = true;
+		},
+		o: function outro(local) {
+			each_blocks = each_blocks.filter(Boolean);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				transition_out(each_blocks[i]);
+			}
+
+			current = false;
 		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(div);
@@ -28275,49 +28307,123 @@ function create_if_block_1$3(ctx) {
 		block,
 		id: create_if_block_1$3.name,
 		type: "if",
-		source: "(51:12) {#if issue.type === CompilationIssueType.Error}",
+		source: "(55:12) {#if issue.type === CompilationIssueType.Error}",
 		ctx
 	});
 
 	return block;
 }
 
-// (53:20) {#each issue.errors as error}
-function create_each_block$4(ctx) {
-	let span;
-	let t_value = /*error*/ ctx[8].message + "";
+// (66:16) <ClickableSpan callback={() => navigateToFile(issue.errors[0])}                     >
+function create_default_slot_2(ctx) {
+	let t_value = /*issue*/ ctx[0].errors[0].message + "";
 	let t;
-	let mounted;
-	let dispose;
-
-	function click_handler() {
-		return /*click_handler*/ ctx[6](/*error*/ ctx[8]);
-	}
 
 	const block = {
 		c: function create() {
-			span = element("span");
 			t = text(t_value);
-			attr_dev(span, "class", "cursor-pointer hover:underline");
-			add_location(span, file$5, 54, 24, 2374);
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, span, anchor);
-			append_dev(span, t);
+			insert_dev(target, t, anchor);
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*issue*/ 1 && t_value !== (t_value = /*issue*/ ctx[0].errors[0].message + "")) set_data_dev(t, t_value);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(t);
+		}
+	};
 
-			if (!mounted) {
-				dispose = listen_dev(span, "click", click_handler, false, false, false, false);
-				mounted = true;
-			}
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_default_slot_2.name,
+		type: "slot",
+		source: "(66:16) <ClickableSpan callback={() => navigateToFile(issue.errors[0])}                     >",
+		ctx
+	});
+
+	return block;
+}
+
+// (59:24) <ClickableSpan callback={() => navigateToFile(error)}                             >
+function create_default_slot_1(ctx) {
+	let t_value = /*error*/ ctx[9].message + "";
+	let t;
+
+	const block = {
+		c: function create() {
+			t = text(t_value);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, t, anchor);
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*issue*/ 1 && t_value !== (t_value = /*error*/ ctx[9].message + "")) set_data_dev(t, t_value);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(t);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_default_slot_1.name,
+		type: "slot",
+		source: "(59:24) <ClickableSpan callback={() => navigateToFile(error)}                             >",
+		ctx
+	});
+
+	return block;
+}
+
+// (57:20) {#each issue.errors as error}
+function create_each_block$4(ctx) {
+	let clickablespan;
+	let current;
+
+	function func_1() {
+		return /*func_1*/ ctx[7](/*error*/ ctx[9]);
+	}
+
+	clickablespan = new ClickableSpan({
+			props: {
+				callback: func_1,
+				$$slots: { default: [create_default_slot_1] },
+				$$scope: { ctx }
+			},
+			$$inline: true
+		});
+
+	const block = {
+		c: function create() {
+			create_component(clickablespan.$$.fragment);
+		},
+		m: function mount(target, anchor) {
+			mount_component(clickablespan, target, anchor);
+			current = true;
 		},
 		p: function update(new_ctx, dirty) {
 			ctx = new_ctx;
-			if (dirty & /*issue*/ 1 && t_value !== (t_value = /*error*/ ctx[8].message + "")) set_data_dev(t, t_value);
+			const clickablespan_changes = {};
+			if (dirty & /*issue*/ 1) clickablespan_changes.callback = func_1;
+
+			if (dirty & /*$$scope, issue*/ 4097) {
+				clickablespan_changes.$$scope = { dirty, ctx };
+			}
+
+			clickablespan.$set(clickablespan_changes);
+		},
+		i: function intro(local) {
+			if (current) return;
+			transition_in(clickablespan.$$.fragment, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transition_out(clickablespan.$$.fragment, local);
+			current = false;
 		},
 		d: function destroy(detaching) {
-			if (detaching) detach_dev(span);
-			mounted = false;
-			dispose();
+			destroy_component(clickablespan, detaching);
 		}
 	};
 
@@ -28325,24 +28431,33 @@ function create_each_block$4(ctx) {
 		block,
 		id: create_each_block$4.name,
 		type: "each",
-		source: "(53:20) {#each issue.errors as error}",
+		source: "(57:20) {#each issue.errors as error}",
 		ctx
 	});
 
 	return block;
 }
 
-// (30:4) <TextContainer classList="w-full flex flex-col gap-3 overflow-hidden">
+// (31:4) <TextContainer classList="w-full flex flex-col gap-3 overflow-hidden">
 function create_default_slot$2(ctx) {
 	let div1;
 	let current_block_type_index;
 	let if_block0;
 	let t0;
 	let div0;
+	let span;
+
+	let t1_value = (/*issue*/ ctx[0].type === CompilationIssueType.Error
+	? 'Errors in'
+	: 'Skipped') + "";
+
 	let t1;
-	let if_block2_anchor;
+	let t2;
+	let clickablespan;
+	let t3;
+	let if_block1_anchor;
 	let current;
-	const if_block_creators = [create_if_block_5$1, create_if_block_6$1];
+	const if_block_creators = [create_if_block_3$1, create_if_block_4$1];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
@@ -28355,14 +28470,16 @@ function create_default_slot$2(ctx) {
 		if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 	}
 
-	function select_block_type_2(ctx, dirty) {
-		if (/*issue*/ ctx[0].type === CompilationIssueType.Error) return create_if_block_3$1;
-		if (/*issue*/ ctx[0].type === CompilationIssueType.Skipped) return create_if_block_4$1;
-	}
+	clickablespan = new ClickableSpan({
+			props: {
+				callback: /*func*/ ctx[6],
+				$$slots: { default: [create_default_slot_3] },
+				$$scope: { ctx }
+			},
+			$$inline: true
+		});
 
-	let current_block_type = select_block_type_2(ctx);
-	let if_block1 = current_block_type && current_block_type(ctx);
-	let if_block2 = /*expanded*/ ctx[1] && create_if_block$4(ctx);
+	let if_block1 = /*expanded*/ ctx[1] && create_if_block$4(ctx);
 
 	const block = {
 		c: function create() {
@@ -28370,14 +28487,18 @@ function create_default_slot$2(ctx) {
 			if (if_block0) if_block0.c();
 			t0 = space();
 			div0 = element("div");
+			span = element("span");
+			t1 = text(t1_value);
+			t2 = space();
+			create_component(clickablespan.$$.fragment);
+			t3 = space();
 			if (if_block1) if_block1.c();
-			t1 = space();
-			if (if_block2) if_block2.c();
-			if_block2_anchor = empty();
+			if_block1_anchor = empty();
+			add_location(span, file$5, 39, 16, 1764);
 			attr_dev(div0, "class", "flex col gap-1");
-			add_location(div0, file$5, 37, 12, 1597);
+			add_location(div0, file$5, 38, 12, 1719);
 			attr_dev(div1, "class", "w-full flex flex-row gap-2 items-center");
-			add_location(div1, file$5, 30, 8, 1323);
+			add_location(div1, file$5, 31, 8, 1445);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div1, anchor);
@@ -28388,10 +28509,13 @@ function create_default_slot$2(ctx) {
 
 			append_dev(div1, t0);
 			append_dev(div1, div0);
-			if (if_block1) if_block1.m(div0, null);
-			insert_dev(target, t1, anchor);
-			if (if_block2) if_block2.m(target, anchor);
-			insert_dev(target, if_block2_anchor, anchor);
+			append_dev(div0, span);
+			append_dev(span, t1);
+			append_dev(span, t2);
+			mount_component(clickablespan, span, null);
+			insert_dev(target, t3, anchor);
+			if (if_block1) if_block1.m(target, anchor);
+			insert_dev(target, if_block1_anchor, anchor);
 			current = true;
 		},
 		p: function update(ctx, dirty) {
@@ -28424,38 +28548,53 @@ function create_default_slot$2(ctx) {
 				}
 			}
 
-			if (current_block_type === (current_block_type = select_block_type_2(ctx)) && if_block1) {
-				if_block1.p(ctx, dirty);
-			} else {
-				if (if_block1) if_block1.d(1);
-				if_block1 = current_block_type && current_block_type(ctx);
+			if ((!current || dirty & /*issue*/ 1) && t1_value !== (t1_value = (/*issue*/ ctx[0].type === CompilationIssueType.Error
+			? 'Errors in'
+			: 'Skipped') + "")) set_data_dev(t1, t1_value);
 
-				if (if_block1) {
-					if_block1.c();
-					if_block1.m(div0, null);
-				}
+			const clickablespan_changes = {};
+			if (dirty & /*issue*/ 1) clickablespan_changes.callback = /*func*/ ctx[6];
+
+			if (dirty & /*$$scope, fileName, issue*/ 4101) {
+				clickablespan_changes.$$scope = { dirty, ctx };
 			}
 
+			clickablespan.$set(clickablespan_changes);
+
 			if (/*expanded*/ ctx[1]) {
-				if (if_block2) {
-					if_block2.p(ctx, dirty);
+				if (if_block1) {
+					if_block1.p(ctx, dirty);
+
+					if (dirty & /*expanded*/ 2) {
+						transition_in(if_block1, 1);
+					}
 				} else {
-					if_block2 = create_if_block$4(ctx);
-					if_block2.c();
-					if_block2.m(if_block2_anchor.parentNode, if_block2_anchor);
+					if_block1 = create_if_block$4(ctx);
+					if_block1.c();
+					transition_in(if_block1, 1);
+					if_block1.m(if_block1_anchor.parentNode, if_block1_anchor);
 				}
-			} else if (if_block2) {
-				if_block2.d(1);
-				if_block2 = null;
+			} else if (if_block1) {
+				group_outros();
+
+				transition_out(if_block1, 1, 1, () => {
+					if_block1 = null;
+				});
+
+				check_outros();
 			}
 		},
 		i: function intro(local) {
 			if (current) return;
 			transition_in(if_block0);
+			transition_in(clickablespan.$$.fragment, local);
+			transition_in(if_block1);
 			current = true;
 		},
 		o: function outro(local) {
 			transition_out(if_block0);
+			transition_out(clickablespan.$$.fragment, local);
+			transition_out(if_block1);
 			current = false;
 		},
 		d: function destroy(detaching) {
@@ -28465,13 +28604,10 @@ function create_default_slot$2(ctx) {
 				if_blocks[current_block_type_index].d();
 			}
 
-			if (if_block1) {
-				if_block1.d();
-			}
-
-			if (detaching) detach_dev(t1);
-			if (if_block2) if_block2.d(detaching);
-			if (detaching) detach_dev(if_block2_anchor);
+			destroy_component(clickablespan);
+			if (detaching) detach_dev(t3);
+			if (if_block1) if_block1.d(detaching);
+			if (detaching) detach_dev(if_block1_anchor);
 		}
 	};
 
@@ -28479,7 +28615,7 @@ function create_default_slot$2(ctx) {
 		block,
 		id: create_default_slot$2.name,
 		type: "slot",
-		source: "(30:4) <TextContainer classList=\\\"w-full flex flex-col gap-3 overflow-hidden\\\">",
+		source: "(31:4) <TextContainer classList=\\\"w-full flex flex-col gap-3 overflow-hidden\\\">",
 		ctx
 	});
 
@@ -28493,7 +28629,7 @@ function create_fragment$6(ctx) {
 	let t;
 	let textcontainer;
 	let current;
-	const if_block_creators = [create_if_block_7$1, create_else_block$3];
+	const if_block_creators = [create_if_block_5$1, create_else_block$3];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -28520,7 +28656,7 @@ function create_fragment$6(ctx) {
 			t = space();
 			create_component(textcontainer.$$.fragment);
 			attr_dev(div, "class", "w-full flex flex-row items-start flex-1 gap-1");
-			add_location(div, file$5, 23, 0, 1075);
+			add_location(div, file$5, 24, 0, 1197);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -28561,7 +28697,7 @@ function create_fragment$6(ctx) {
 
 			const textcontainer_changes = {};
 
-			if (dirty & /*$$scope, issue, expanded, fileName*/ 2055) {
+			if (dirty & /*$$scope, issue, expanded, fileName*/ 4103) {
 				textcontainer_changes.$$scope = { dirty, ctx };
 			}
 
@@ -28605,8 +28741,8 @@ function instance$6($$self, $$props, $$invalidate) {
 	let { issue } = $$props;
 	let expanded = false;
 
-	const navigateToFile = error => {
-		navigateTo(error.path, error.startOffset, error.endOffset);
+	const navigateToFile = (error, justToFile = false) => {
+		navigateTo(error.path, justToFile ? undefined : error.startOffset, justToFile ? undefined : error.endOffset);
 	};
 
 	$$self.$$.on_mount.push(function () {
@@ -28626,8 +28762,12 @@ function instance$6($$self, $$props, $$invalidate) {
 		$$invalidate(1, expanded);
 	}
 
-	const click_handler = error => navigateToFile(error);
-	const click_handler_1 = () => navigateToFile(issue.errors[0]);
+	const func = () => {
+		navigateToFile(issue.errors[0], true);
+	};
+
+	const func_1 = error => navigateToFile(error);
+	const func_2 = () => navigateToFile(issue.errors[0]);
 
 	$$self.$$set = $$props => {
 		if ('issue' in $$props) $$invalidate(0, issue = $$props.issue);
@@ -28649,6 +28789,7 @@ function instance$6($$self, $$props, $$invalidate) {
 		navigateTo,
 		ErrorIcon,
 		WarningIcon,
+		ClickableSpan,
 		issue,
 		expanded,
 		navigateToFile,
@@ -28684,8 +28825,9 @@ function instance$6($$self, $$props, $$invalidate) {
 		expandable,
 		navigateToFile,
 		expandbutton_expanded_binding,
-		click_handler,
-		click_handler_1
+		func,
+		func_1,
+		func_2
 	];
 }
 
