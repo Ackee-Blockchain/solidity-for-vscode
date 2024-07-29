@@ -28948,7 +28948,7 @@ function create_if_block$3(ctx) {
 
 	let each_value = /*filteredErrors*/ ctx[2];
 	validate_each_argument(each_value);
-	const get_key = ctx => /*error*/ ctx[9].fqn + /*error*/ ctx[9].type;
+	const get_key = ctx => /*issue*/ ctx[9].fqn + /*issue*/ ctx[9].type;
 	validate_each_keys(ctx, each_value, get_each_context$3, get_key);
 
 	for (let i = 0; i < each_value.length; i += 1) {
@@ -29292,14 +29292,14 @@ function create_each_block_1(ctx) {
 	return block;
 }
 
-// (68:12) {#each filteredErrors as error (error.fqn + error.type)}
+// (68:12) {#each filteredErrors as issue (issue.fqn + issue.type)}
 function create_each_block$3(key_1, ctx) {
 	let first;
 	let compilationerror;
 	let current;
 
 	compilationerror = new CompilationError({
-			props: { error: /*error*/ ctx[9] },
+			props: { issue: /*issue*/ ctx[9] },
 			$$inline: true
 		});
 
@@ -29319,7 +29319,7 @@ function create_each_block$3(key_1, ctx) {
 		p: function update(new_ctx, dirty) {
 			ctx = new_ctx;
 			const compilationerror_changes = {};
-			if (dirty & /*filteredErrors*/ 4) compilationerror_changes.error = /*error*/ ctx[9];
+			if (dirty & /*filteredErrors*/ 4) compilationerror_changes.issue = /*issue*/ ctx[9];
 			compilationerror.$set(compilationerror_changes);
 		},
 		i: function intro(local) {
@@ -29341,7 +29341,7 @@ function create_each_block$3(key_1, ctx) {
 		block,
 		id: create_each_block$3.name,
 		type: "each",
-		source: "(68:12) {#each filteredErrors as error (error.fqn + error.type)}",
+		source: "(68:12) {#each filteredErrors as issue (issue.fqn + issue.type)}",
 		ctx
 	});
 
