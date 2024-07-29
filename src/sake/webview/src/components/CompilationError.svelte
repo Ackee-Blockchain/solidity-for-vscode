@@ -59,9 +59,9 @@
             </div>
         </div>
         {#if expanded}
-            {#if fileName}
+            <!-- {#if fileName}
                 <span class="mb-2">{issue.fqn}</span>
-            {/if}
+            {/if} -->
 
             {#if issue.type === CompilationIssueType.Error}
                 <div class="flex flex-col gap-2 text-sm">

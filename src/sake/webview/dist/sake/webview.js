@@ -27878,7 +27878,7 @@ function create_else_block$3(ctx) {
 }
 
 // (25:4) {#if expandable}
-function create_if_block_8(ctx) {
+function create_if_block_7$1(ctx) {
 	let expandbutton;
 	let updating_expanded;
 	let current;
@@ -27935,7 +27935,7 @@ function create_if_block_8(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_8.name,
+		id: create_if_block_7$1.name,
 		type: "if",
 		source: "(25:4) {#if expandable}",
 		ctx
@@ -27945,7 +27945,7 @@ function create_if_block_8(ctx) {
 }
 
 // (34:66) 
-function create_if_block_7$1(ctx) {
+function create_if_block_6$1(ctx) {
 	let warningicon;
 	let current;
 	warningicon = new WarningIcon({ $$inline: true });
@@ -27974,7 +27974,7 @@ function create_if_block_7$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_7$1.name,
+		id: create_if_block_6$1.name,
 		type: "if",
 		source: "(34:66) ",
 		ctx
@@ -27984,7 +27984,7 @@ function create_if_block_7$1(ctx) {
 }
 
 // (32:12) {#if issue.type === CompilationIssueType.Error}
-function create_if_block_6$1(ctx) {
+function create_if_block_5$1(ctx) {
 	let erroricon;
 	let current;
 	erroricon = new ErrorIcon({ $$inline: true });
@@ -28013,7 +28013,7 @@ function create_if_block_6$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_6$1.name,
+		id: create_if_block_5$1.name,
 		type: "if",
 		source: "(32:12) {#if issue.type === CompilationIssueType.Error}",
 		ctx
@@ -28023,7 +28023,7 @@ function create_if_block_6$1(ctx) {
 }
 
 // (41:70) 
-function create_if_block_5$1(ctx) {
+function create_if_block_4$1(ctx) {
 	let span;
 	let t0;
 
@@ -28057,7 +28057,7 @@ function create_if_block_5$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_5$1.name,
+		id: create_if_block_4$1.name,
 		type: "if",
 		source: "(41:70) ",
 		ctx
@@ -28067,7 +28067,7 @@ function create_if_block_5$1(ctx) {
 }
 
 // (39:16) {#if issue.type === CompilationIssueType.Error}
-function create_if_block_4$1(ctx) {
+function create_if_block_3$1(ctx) {
 	let span;
 	let t0;
 
@@ -28101,7 +28101,7 @@ function create_if_block_4$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4$1.name,
+		id: create_if_block_3$1.name,
 		type: "if",
 		source: "(39:16) {#if issue.type === CompilationIssueType.Error}",
 		ctx
@@ -28112,9 +28112,7 @@ function create_if_block_4$1(ctx) {
 
 // (46:8) {#if expanded}
 function create_if_block$4(ctx) {
-	let t;
-	let if_block1_anchor;
-	let if_block0 = /*fileName*/ ctx[2] && create_if_block_3$1(ctx);
+	let if_block_anchor;
 
 	function select_block_type_3(ctx, dirty) {
 		if (/*issue*/ ctx[0].type === CompilationIssueType.Error) return create_if_block_1$3;
@@ -28122,56 +28120,36 @@ function create_if_block$4(ctx) {
 	}
 
 	let current_block_type = select_block_type_3(ctx);
-	let if_block1 = current_block_type && current_block_type(ctx);
+	let if_block = current_block_type && current_block_type(ctx);
 
 	const block = {
 		c: function create() {
-			if (if_block0) if_block0.c();
-			t = space();
-			if (if_block1) if_block1.c();
-			if_block1_anchor = empty();
+			if (if_block) if_block.c();
+			if_block_anchor = empty();
 		},
 		m: function mount(target, anchor) {
-			if (if_block0) if_block0.m(target, anchor);
-			insert_dev(target, t, anchor);
-			if (if_block1) if_block1.m(target, anchor);
-			insert_dev(target, if_block1_anchor, anchor);
+			if (if_block) if_block.m(target, anchor);
+			insert_dev(target, if_block_anchor, anchor);
 		},
 		p: function update(ctx, dirty) {
-			if (/*fileName*/ ctx[2]) {
-				if (if_block0) {
-					if_block0.p(ctx, dirty);
-				} else {
-					if_block0 = create_if_block_3$1(ctx);
-					if_block0.c();
-					if_block0.m(t.parentNode, t);
-				}
-			} else if (if_block0) {
-				if_block0.d(1);
-				if_block0 = null;
-			}
-
-			if (current_block_type === (current_block_type = select_block_type_3(ctx)) && if_block1) {
-				if_block1.p(ctx, dirty);
+			if (current_block_type === (current_block_type = select_block_type_3(ctx)) && if_block) {
+				if_block.p(ctx, dirty);
 			} else {
-				if (if_block1) if_block1.d(1);
-				if_block1 = current_block_type && current_block_type(ctx);
+				if (if_block) if_block.d(1);
+				if_block = current_block_type && current_block_type(ctx);
 
-				if (if_block1) {
-					if_block1.c();
-					if_block1.m(if_block1_anchor.parentNode, if_block1_anchor);
+				if (if_block) {
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
 			}
 		},
 		d: function destroy(detaching) {
-			if (if_block0) if_block0.d(detaching);
-			if (detaching) detach_dev(t);
-
-			if (if_block1) {
-				if_block1.d(detaching);
+			if (if_block) {
+				if_block.d(detaching);
 			}
 
-			if (detaching) detach_dev(if_block1_anchor);
+			if (detaching) detach_dev(if_block_anchor);
 		}
 	};
 
@@ -28180,42 +28158,6 @@ function create_if_block$4(ctx) {
 		id: create_if_block$4.name,
 		type: "if",
 		source: "(46:8) {#if expanded}",
-		ctx
-	});
-
-	return block;
-}
-
-// (47:12) {#if fileName}
-function create_if_block_3$1(ctx) {
-	let span;
-	let t_value = /*issue*/ ctx[0].fqn + "";
-	let t;
-
-	const block = {
-		c: function create() {
-			span = element("span");
-			t = text(t_value);
-			attr_dev(span, "class", "mb-2");
-			add_location(span, file$5, 47, 16, 2035);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, span, anchor);
-			append_dev(span, t);
-		},
-		p: function update(ctx, dirty) {
-			if (dirty & /*issue*/ 1 && t_value !== (t_value = /*issue*/ ctx[0].fqn + "")) set_data_dev(t, t_value);
-		},
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(span);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_3$1.name,
-		type: "if",
-		source: "(47:12) {#if fileName}",
 		ctx
 	});
 
@@ -28235,7 +28177,7 @@ function create_if_block_2$2(ctx) {
 			span = element("span");
 			t = text(t_value);
 			attr_dev(span, "class", "cursor-pointer hover:underline");
-			add_location(span, file$5, 62, 16, 2760);
+			add_location(span, file$5, 62, 16, 2769);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -28287,7 +28229,7 @@ function create_if_block_1$3(ctx) {
 			}
 
 			attr_dev(div, "class", "flex flex-col gap-2 text-sm");
-			add_location(div, file$5, 51, 16, 2168);
+			add_location(div, file$5, 51, 16, 2177);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -28357,7 +28299,7 @@ function create_each_block$4(ctx) {
 			span = element("span");
 			t = text(t_value);
 			attr_dev(span, "class", "cursor-pointer hover:underline");
-			add_location(span, file$5, 54, 24, 2365);
+			add_location(span, file$5, 54, 24, 2374);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -28400,7 +28342,7 @@ function create_default_slot$2(ctx) {
 	let t1;
 	let if_block2_anchor;
 	let current;
-	const if_block_creators = [create_if_block_6$1, create_if_block_7$1];
+	const if_block_creators = [create_if_block_5$1, create_if_block_6$1];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
@@ -28414,8 +28356,8 @@ function create_default_slot$2(ctx) {
 	}
 
 	function select_block_type_2(ctx, dirty) {
-		if (/*issue*/ ctx[0].type === CompilationIssueType.Error) return create_if_block_4$1;
-		if (/*issue*/ ctx[0].type === CompilationIssueType.Skipped) return create_if_block_5$1;
+		if (/*issue*/ ctx[0].type === CompilationIssueType.Error) return create_if_block_3$1;
+		if (/*issue*/ ctx[0].type === CompilationIssueType.Skipped) return create_if_block_4$1;
 	}
 
 	let current_block_type = select_block_type_2(ctx);
@@ -28551,7 +28493,7 @@ function create_fragment$6(ctx) {
 	let t;
 	let textcontainer;
 	let current;
-	const if_block_creators = [create_if_block_8, create_else_block$3];
+	const if_block_creators = [create_if_block_7$1, create_else_block$3];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -28619,7 +28561,7 @@ function create_fragment$6(ctx) {
 
 			const textcontainer_changes = {};
 
-			if (dirty & /*$$scope, issue, fileName, expanded*/ 2055) {
+			if (dirty & /*$$scope, issue, expanded, fileName*/ 2055) {
 				textcontainer_changes.$$scope = { dirty, ctx };
 			}
 
