@@ -556,11 +556,11 @@
             },
             {
                 "command": "Tools-for-Solidity.sake.compile",
-                "title": "Sake: Compile"
+                "title": "Tools for Solidity Deploy & Interact: Compile"
             },
             {
                 "command": "Tools-for-Solidity.sake.show_history",
-                "title": "Sake: Show Transaction History",
+                "title": "Tools for Solidity Deploy & Interact: Show Transaction History",
                 "icon": "$(history)"
             },
             {
@@ -583,14 +583,14 @@
                 },
                 {
                     "id": "sake",
-                    "title": "Sake",
+                    "title": "Deploy & Interact",
                     "icon": "resources/icons/sake.png"
                 }
             ],
             "panel": [
                 {
                     "id": "sake-output",
-                    "title": "Sake",
+                    "title": "Deploy & Interact",
                     "icon": ""
                 }
             ]
@@ -610,7 +610,7 @@
                 {
                     "type": "webview",
                     "id": "sake",
-                    "name": "Sake"
+                    "name": "Deploy & Interact"
                 }
             ],
             "sake-output": [
@@ -819,7 +819,7 @@
                     {
                         "id": "select-wake-installation",
                         "title": "Setup: Select Wake installation method",
-                        "description": "Tools for Solidity needs to install [Wake](https://getwake.io/) to run. By default, Wake is installed using conda for best compatibility. You can change the installation method below.\n**Recommended**: Only change the installation method if necessary.\n[Change Installation Method](command:Tools-for-Solidity.select-installation-method)\n**Tip**: If installing using conda, [start the download now](command:Tools-for-Solidity.install.wake-conda).",
+                        "description": "Tools for Solidity needs to install [Wake](https://getwake.io/) to run. By default, Wake is installed using conda for best compatibility. You can change the installation method below.\n**Recommended**: Only change the installation method if necessary.\n[Change Installation Method](command:Tools-for-Solidity.select-installation-method)",
                         "media": {
                             "markdown": "./resources/walkthrough/blank.md"
                         }
@@ -835,17 +835,17 @@
                     },
                     {
                         "id": "sake",
-                        "title": "Use Sake to interact with Smart Contracts",
-                        "description": "Sake is a tool for interacting with smart contracts. It allows you to deploy, call, and test your contracts directly from VS Code. \n**Tip**: You can access Sake from the sidebar.",
+                        "title": "Deploy & Interact with Smart Contracts",
+                        "description": "Deploy & Interact view allows you to deploy, call, and test your contracts directly from VS Code. \n**Tip**: You can access Deploy & Interact from the sidebar.",
                         "media": {
                             "image": "./resources/walkthrough/sake.png",
-                            "altText": "Sake"
+                            "altText": "Deploy & Interact"
                         }
                     },
                     {
                         "id": "language-server",
                         "title": "Speed up your workflow with LSP features",
-                        "description": "Sake ships with a powerful language server which adds support for **CodeLens**, **Go to Definition**, **Find References**, and more.",
+                        "description": "Tools for Solidity ships with a powerful language server which adds support for **CodeLens**, **Go to Definition**, **Find References**, and more.",
                         "media": {
                             "image": "./resources/walkthrough/lsp.png",
                             "altText": "LSP Server"
