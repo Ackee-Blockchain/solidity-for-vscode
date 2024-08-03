@@ -3,6 +3,8 @@
 import * as vscode from 'vscode';
 import * as net from 'net';
 import { Analytics, EventType } from './Analytics';
+import * as path from 'path';
+import * as os from 'os';
 
 import {
     LanguageClient,
@@ -145,14 +147,15 @@ export async function activate(context: vscode.ExtensionContext) {
         []
     );
 
-    let folders: string[] = vscode.workspace.getConfiguration('python').get('venvPath', []);
+    let folders: string[] = vscode.workspace.getConfiguration('python').get('venvFolders', []);
+    let relativeGlobalStorage = path.relative(os.homedir(), context.globalStorageUri.fsPath);
 
-    if (!folders.includes(context.globalStorageUri.fsPath)) {
+    if (!folders.includes(relativeGlobalStorage)) {
         vscode.workspace
             .getConfiguration('python')
             .update(
-                'venvPath',
-                folders.concat(context.globalStorageUri.fsPath),
+                'venvFolders',
+                folders.concat(relativeGlobalStorage),
                 vscode.ConfigurationTarget.Global
             );
     }
