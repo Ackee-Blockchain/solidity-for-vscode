@@ -579,12 +579,12 @@
                 {
                     "id": "tools-for-solidity",
                     "title": "Tools for Solidity",
-                    "icon": "resources/icons/activity_bar_wake.png"
+                    "icon": "resources/icons/activity_bar_solidity.png"
                 },
                 {
                     "id": "sake",
                     "title": "Deploy & Interact",
-                    "icon": "resources/icons/sake.png"
+                    "icon": "resources/icons/activity_bar_deploy_interact.png"
                 }
             ],
             "panel": [
@@ -796,7 +796,7 @@
             {
                 "id": "tfs-walkthrough",
                 "title": "Getting started with Tools for Solidity",
-                "description": "Discover the powerful features of the Tools for Solidity extension and learn how to set it up to enhance your development experience.",
+                "description": "Discover powerful features of Tools for Solidity and learn how to enhance your development experience.",
                 "steps": [
                     {
                         "id": "rosetta-macos-native",
