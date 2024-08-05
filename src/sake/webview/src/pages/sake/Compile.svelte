@@ -20,6 +20,8 @@
     import { onMount } from 'svelte';
     import Constructor from '../../components/Constructor.svelte';
     import { compilationState } from '../../helpers/store';
+    import TextContainer from '../../components/TextContainer.svelte';
+    import WarningIcon from '../../components/icons/WarningIcon.svelte';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -55,12 +57,13 @@
         {compiling ? 'Compiling...' : 'Compile all'}
     </vscode-button>
     {#if $compilationState.dirty}
-        <div
+        <TextContainer classList="w-full mt-1">
+            <p class="text-center text-sm">Some files were changed since last compilation</p>
+        </TextContainer>
+        <!-- <div
             class="text-sm px-2 py-1 bg-gray-800 rounded relative top--2 text-center pt-2 pb-1"
             style="z-index:0;"
-        >
-            Some files were changed since last compilation
-        </div>
+        ></div> -->
     {/if}
 </section>
 

@@ -158,14 +158,6 @@ function set_custom_element_data(node, prop, value) {
 function children(element) {
     return Array.from(element.childNodes);
 }
-function set_style(node, key, value, important) {
-    if (value == null) {
-        node.style.removeProperty(key);
-    }
-    else {
-        node.style.setProperty(key, value, important ? 'important' : '');
-    }
-}
 function toggle_class(element, name, toggle) {
     element.classList[toggle ? 'add' : 'remove'](name);
 }
@@ -19260,7 +19252,7 @@ class TextContainer extends SvelteComponentDev {
 const file$n = "src/components/InputIssueIndicator.svelte";
 
 // (29:8) <TextContainer danger={type === 'danger'} warning={type === 'warning'}>
-function create_default_slot$a(ctx) {
+function create_default_slot$b(ctx) {
 	let div;
 	let current;
 	const default_slot_template = /*#slots*/ ctx[1].default;
@@ -19315,7 +19307,7 @@ function create_default_slot$a(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot$a.name,
+		id: create_default_slot$b.name,
 		type: "slot",
 		source: "(29:8) <TextContainer danger={type === 'danger'} warning={type === 'warning'}>",
 		ctx
@@ -19338,7 +19330,7 @@ function create_fragment$p(ctx) {
 			props: {
 				danger: /*type*/ ctx[0] === 'danger',
 				warning: /*type*/ ctx[0] === 'warning',
-				$$slots: { default: [create_default_slot$a] },
+				$$slots: { default: [create_default_slot$b] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -21381,7 +21373,7 @@ function create_if_block_1$6(ctx) {
 	inputissueindicator = new InputIssueIndicator({
 			props: {
 				type: "danger",
-				$$slots: { default: [create_default_slot$9] },
+				$$slots: { default: [create_default_slot$a] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -21421,7 +21413,7 @@ function create_if_block_1$6(ctx) {
 }
 
 // (95:24) <InputIssueIndicator type="danger">
-function create_default_slot$9(ctx) {
+function create_default_slot$a(ctx) {
 	let span;
 
 	const block = {
@@ -21442,7 +21434,7 @@ function create_default_slot$9(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot$9.name,
+		id: create_default_slot$a.name,
 		type: "slot",
 		source: "(95:24) <InputIssueIndicator type=\\\"danger\\\">",
 		ctx
@@ -21635,7 +21627,7 @@ function create_fragment$m(ctx) {
 	const block = {
 		c: function create() {
 			hr = element("hr");
-			attr_dev(hr, "class", hr_class_value = "" + (null_to_empty(/*className*/ ctx[0] ?? 'my-3') + " svelte-xiwgfc"));
+			attr_dev(hr, "class", hr_class_value = "" + (null_to_empty(/*className*/ ctx[0] ?? 'my-3') + " svelte-5y63m0"));
 			add_location(hr, file$k, 3, 0, 63);
 		},
 		l: function claim(nodes) {
@@ -21645,7 +21637,7 @@ function create_fragment$m(ctx) {
 			insert_dev(target, hr, anchor);
 		},
 		p: function update(ctx, [dirty]) {
-			if (dirty & /*className*/ 1 && hr_class_value !== (hr_class_value = "" + (null_to_empty(/*className*/ ctx[0] ?? 'my-3') + " svelte-xiwgfc"))) {
+			if (dirty & /*className*/ 1 && hr_class_value !== (hr_class_value = "" + (null_to_empty(/*className*/ ctx[0] ?? 'my-3') + " svelte-5y63m0"))) {
 				attr_dev(hr, "class", hr_class_value);
 			}
 		},
@@ -21761,7 +21753,7 @@ function create_each_block$7(ctx) {
 			if (tab_header_slot) tab_header_slot.c();
 			t2 = space();
 			add_location(span, file$j, 27, 28, 1085);
-			attr_dev(a, "class", "monaco-button flex gap-2 svelte-r1vdl4");
+			attr_dev(a, "class", "monaco-button flex gap-2 svelte-1c9mddl");
 			toggle_class(a, "active", /*activeTabId*/ ctx[1] === /*tab*/ ctx[7].id);
 			add_location(a, file$j, 22, 24, 838);
 			attr_dev(li, "class", "text-sm uppercase whitespace-nowrap flex items-center cursor-pointer");
@@ -21891,7 +21883,7 @@ function create_fragment$l(ctx) {
 			t2 = space();
 			div3 = element("div");
 			if (content_scrollable_slot) content_scrollable_slot.c();
-			attr_dev(ul, "class", "flex vscode-gap mb-4 monaco-nav svelte-r1vdl4");
+			attr_dev(ul, "class", "flex vscode-gap mb-4 monaco-nav svelte-1c9mddl");
 			add_location(ul, file$j, 14, 12, 411);
 			attr_dev(div0, "class", "overflow-x-auto");
 			add_location(div0, file$j, 13, 8, 369);
@@ -22372,7 +22364,7 @@ function create_if_block$9(ctx) {
 }
 
 // (5:0) <DefaultButton     callback={() => {         expanded = !expanded;     }} >
-function create_default_slot$8(ctx) {
+function create_default_slot$9(ctx) {
 	let if_block_anchor;
 
 	function select_block_type(ctx, dirty) {
@@ -22411,7 +22403,7 @@ function create_default_slot$8(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot$8.name,
+		id: create_default_slot$9.name,
 		type: "slot",
 		source: "(5:0) <DefaultButton     callback={() => {         expanded = !expanded;     }} >",
 		ctx
@@ -22427,7 +22419,7 @@ function create_fragment$j(ctx) {
 	defaultbutton = new DefaultButton({
 			props: {
 				callback: /*func*/ ctx[1],
-				$$slots: { default: [create_default_slot$8] },
+				$$slots: { default: [create_default_slot$9] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -22543,7 +22535,7 @@ class ExpandButton extends SvelteComponentDev {
 const file$g = "src/components/icons/DeleteButton.svelte";
 
 // (5:0) <DefaultButton {callback}>
-function create_default_slot$7(ctx) {
+function create_default_slot$8(ctx) {
 	let svg;
 	let path;
 
@@ -22574,7 +22566,7 @@ function create_default_slot$7(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot$7.name,
+		id: create_default_slot$8.name,
 		type: "slot",
 		source: "(5:0) <DefaultButton {callback}>",
 		ctx
@@ -22590,7 +22582,7 @@ function create_fragment$i(ctx) {
 	defaultbutton = new DefaultButton({
 			props: {
 				callback: /*callback*/ ctx[0],
-				$$slots: { default: [create_default_slot$7] },
+				$$slots: { default: [create_default_slot$8] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -22699,7 +22691,7 @@ class DeleteButton extends SvelteComponentDev {
 const file$f = "src/components/icons/PlusButton.svelte";
 
 // (5:0) <DefaultButton {callback}>
-function create_default_slot$6(ctx) {
+function create_default_slot$7(ctx) {
 	let svg;
 	let path;
 
@@ -22728,7 +22720,7 @@ function create_default_slot$6(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot$6.name,
+		id: create_default_slot$7.name,
 		type: "slot",
 		source: "(5:0) <DefaultButton {callback}>",
 		ctx
@@ -22744,7 +22736,7 @@ function create_fragment$h(ctx) {
 	defaultbutton = new DefaultButton({
 			props: {
 				callback: /*callback*/ ctx[0],
-				$$slots: { default: [create_default_slot$6] },
+				$$slots: { default: [create_default_slot$7] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -22853,7 +22845,7 @@ class PlusButton extends SvelteComponentDev {
 const file$e = "src/components/icons/MinusButton.svelte";
 
 // (5:0) <DefaultButton {callback}>
-function create_default_slot$5(ctx) {
+function create_default_slot$6(ctx) {
 	let svg;
 	let path;
 
@@ -22882,7 +22874,7 @@ function create_default_slot$5(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot$5.name,
+		id: create_default_slot$6.name,
 		type: "slot",
 		source: "(5:0) <DefaultButton {callback}>",
 		ctx
@@ -22898,7 +22890,7 @@ function create_fragment$g(ctx) {
 	defaultbutton = new DefaultButton({
 			props: {
 				callback: /*callback*/ ctx[0],
-				$$slots: { default: [create_default_slot$5] },
+				$$slots: { default: [create_default_slot$6] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -25426,7 +25418,7 @@ function create_if_block_2$4(ctx) {
 	inputissueindicator = new InputIssueIndicator({
 			props: {
 				type: "danger",
-				$$slots: { default: [create_default_slot$4] },
+				$$slots: { default: [create_default_slot$5] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -25612,7 +25604,7 @@ function create_key_block_1(ctx) {
 }
 
 // (105:24) <InputIssueIndicator type="danger">
-function create_default_slot$4(ctx) {
+function create_default_slot$5(ctx) {
 	let previous_key = /*input*/ ctx[0].errors;
 	let key_block_anchor;
 	let key_block = create_key_block_1(ctx);
@@ -25644,7 +25636,7 @@ function create_default_slot$4(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot$4.name,
+		id: create_default_slot$5.name,
 		type: "slot",
 		source: "(105:24) <InputIssueIndicator type=\\\"danger\\\">",
 		ctx
@@ -26157,7 +26149,7 @@ class ContractFunctionInput extends SvelteComponentDev {
 const file$b = "src/components/icons/KebabButton.svelte";
 
 // (5:0) <DefaultButton {callback}>
-function create_default_slot$3(ctx) {
+function create_default_slot$4(ctx) {
 	let svg;
 	let path;
 
@@ -26187,7 +26179,7 @@ function create_default_slot$3(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot$3.name,
+		id: create_default_slot$4.name,
 		type: "slot",
 		source: "(5:0) <DefaultButton {callback}>",
 		ctx
@@ -26203,7 +26195,7 @@ function create_fragment$d(ctx) {
 	defaultbutton = new DefaultButton({
 			props: {
 				callback: /*callback*/ ctx[0],
-				$$slots: { default: [create_default_slot$3] },
+				$$slots: { default: [create_default_slot$4] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -27345,26 +27337,118 @@ class Constructor extends SvelteComponentDev {
 	}
 }
 
-/* src/pages/sake/Compile.svelte generated by Svelte v3.59.2 */
-const file$9 = "src/pages/sake/Compile.svelte";
+/* src/components/icons/WarningIcon.svelte generated by Svelte v3.59.2 */
 
-// (32:4) {#if $compilationState.dirty}
-function create_if_block$5(ctx) {
-	let div;
+const file$9 = "src/components/icons/WarningIcon.svelte";
+
+function create_fragment$a(ctx) {
+	let svg;
+	let path;
 
 	const block = {
 		c: function create() {
-			div = element("div");
-			div.textContent = "Some files were changed since last compilation";
-			attr_dev(div, "class", "text-sm px-2 py-1 bg-gray-800 rounded relative top--2 text-center pt-2 pb-1");
-			set_style(div, "z-index", "0");
-			add_location(div, file$9, 32, 8, 1390);
+			svg = svg_element("svg");
+			path = svg_element("path");
+			attr_dev(path, "fill-rule", "evenodd");
+			attr_dev(path, "clip-rule", "evenodd");
+			attr_dev(path, "d", "M7.56 1h.88l6.54 12.26-.44.74H1.44L1 13.26 7.56 1zM8 2.28L2.28 13H13.7L8 2.28zM8.625 12v-1h-1.25v1h1.25zm-1.25-2V6h1.25v4h-1.25z");
+			add_location(path, file$9, 7, 5, 159);
+			attr_dev(svg, "width", "16");
+			attr_dev(svg, "height", "16");
+			attr_dev(svg, "viewBox", "0 0 16 16");
+			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
+			attr_dev(svg, "fill", "currentColor");
+			attr_dev(svg, "class", "text-vscodeWarning");
+			add_location(svg, file$9, 0, 0, 0);
+		},
+		l: function claim(nodes) {
+			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
+			insert_dev(target, svg, anchor);
+			append_dev(svg, path);
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(svg);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_fragment$a.name,
+		type: "component",
+		source: "",
+		ctx
+	});
+
+	return block;
+}
+
+function instance$a($$self, $$props) {
+	let { $$slots: slots = {}, $$scope } = $$props;
+	validate_slots('WarningIcon', slots, []);
+	const writable_props = [];
+
+	Object.keys($$props).forEach(key => {
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<WarningIcon> was created with unknown prop '${key}'`);
+	});
+
+	return [];
+}
+
+class WarningIcon extends SvelteComponentDev {
+	constructor(options) {
+		super(options);
+		init$1(this, options, instance$a, create_fragment$a, safe_not_equal, {});
+
+		dispatch_dev("SvelteRegisterComponent", {
+			component: this,
+			tagName: "WarningIcon",
+			options,
+			id: create_fragment$a.name
+		});
+	}
+}
+
+/* src/pages/sake/Compile.svelte generated by Svelte v3.59.2 */
+const file$8 = "src/pages/sake/Compile.svelte";
+
+// (34:4) {#if $compilationState.dirty}
+function create_if_block$5(ctx) {
+	let textcontainer;
+	let current;
+
+	textcontainer = new TextContainer({
+			props: {
+				classList: "w-full mt-1",
+				$$slots: { default: [create_default_slot$3] },
+				$$scope: { ctx }
+			},
+			$$inline: true
+		});
+
+	const block = {
+		c: function create() {
+			create_component(textcontainer.$$.fragment);
+		},
+		m: function mount(target, anchor) {
+			mount_component(textcontainer, target, anchor);
+			current = true;
+		},
+		i: function intro(local) {
+			if (current) return;
+			transition_in(textcontainer.$$.fragment, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transition_out(textcontainer.$$.fragment, local);
+			current = false;
 		},
 		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
+			destroy_component(textcontainer, detaching);
 		}
 	};
 
@@ -27372,20 +27456,52 @@ function create_if_block$5(ctx) {
 		block,
 		id: create_if_block$5.name,
 		type: "if",
-		source: "(32:4) {#if $compilationState.dirty}",
+		source: "(34:4) {#if $compilationState.dirty}",
 		ctx
 	});
 
 	return block;
 }
 
-function create_fragment$a(ctx) {
+// (35:8) <TextContainer classList="w-full mt-1">
+function create_default_slot$3(ctx) {
+	let p;
+
+	const block = {
+		c: function create() {
+			p = element("p");
+			p.textContent = "Some files were changed since last compilation";
+			attr_dev(p, "class", "text-center text-sm");
+			add_location(p, file$8, 35, 12, 1578);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, p, anchor);
+		},
+		p: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(p);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_default_slot$3.name,
+		type: "slot",
+		source: "(35:8) <TextContainer classList=\\\"w-full mt-1\\\">",
+		ctx
+	});
+
+	return block;
+}
+
+function create_fragment$9(ctx) {
 	let section;
 	let vscode_button;
 	let t0_value = (/*compiling*/ ctx[0] ? 'Compiling...' : 'Compile all') + "";
 	let t0;
 	let vscode_button_appearence_value;
 	let t1;
+	let current;
 	let mounted;
 	let dispose;
 	let if_block = /*$compilationState*/ ctx[1].dirty && create_if_block$5(ctx);
@@ -27404,8 +27520,8 @@ function create_fragment$a(ctx) {
 			: 'secondary');
 
 			set_custom_element_data(vscode_button, "disabled", /*compiling*/ ctx[0]);
-			add_location(vscode_button, file$9, 23, 4, 1103);
-			add_location(section, file$9, 16, 0, 835);
+			add_location(vscode_button, file$8, 25, 4, 1239);
+			add_location(section, file$8, 18, 0, 971);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -27416,6 +27532,7 @@ function create_fragment$a(ctx) {
 			append_dev(vscode_button, t0);
 			append_dev(section, t1);
 			if (if_block) if_block.m(section, null);
+			current = true;
 
 			if (!mounted) {
 				dispose = listen_dev(vscode_button, "click", /*compile*/ ctx[2], false, false, false, false);
@@ -27423,31 +27540,48 @@ function create_fragment$a(ctx) {
 			}
 		},
 		p: function update(ctx, [dirty]) {
-			if (dirty & /*compiling*/ 1 && t0_value !== (t0_value = (/*compiling*/ ctx[0] ? 'Compiling...' : 'Compile all') + "")) set_data_dev(t0, t0_value);
+			if ((!current || dirty & /*compiling*/ 1) && t0_value !== (t0_value = (/*compiling*/ ctx[0] ? 'Compiling...' : 'Compile all') + "")) set_data_dev(t0, t0_value);
 
-			if (dirty & /*$compilationState*/ 2 && vscode_button_appearence_value !== (vscode_button_appearence_value = /*$compilationState*/ ctx[1].dirty
+			if (!current || dirty & /*$compilationState*/ 2 && vscode_button_appearence_value !== (vscode_button_appearence_value = /*$compilationState*/ ctx[1].dirty
 			? 'primary'
 			: 'secondary')) {
 				set_custom_element_data(vscode_button, "appearence", vscode_button_appearence_value);
 			}
 
-			if (dirty & /*compiling*/ 1) {
+			if (!current || dirty & /*compiling*/ 1) {
 				set_custom_element_data(vscode_button, "disabled", /*compiling*/ ctx[0]);
 			}
 
 			if (/*$compilationState*/ ctx[1].dirty) {
-				if (if_block) ; else {
+				if (if_block) {
+					if (dirty & /*$compilationState*/ 2) {
+						transition_in(if_block, 1);
+					}
+				} else {
 					if_block = create_if_block$5(ctx);
 					if_block.c();
+					transition_in(if_block, 1);
 					if_block.m(section, null);
 				}
 			} else if (if_block) {
-				if_block.d(1);
-				if_block = null;
+				group_outros();
+
+				transition_out(if_block, 1, 1, () => {
+					if_block = null;
+				});
+
+				check_outros();
 			}
 		},
-		i: noop,
-		o: noop,
+		i: function intro(local) {
+			if (current) return;
+			transition_in(if_block);
+			current = true;
+		},
+		o: function outro(local) {
+			transition_out(if_block);
+			current = false;
+		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(section);
 			if (if_block) if_block.d();
@@ -27458,7 +27592,7 @@ function create_fragment$a(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_fragment$a.name,
+		id: create_fragment$9.name,
 		type: "component",
 		source: "",
 		ctx
@@ -27467,7 +27601,7 @@ function create_fragment$a(ctx) {
 	return block;
 }
 
-function instance$a($$self, $$props, $$invalidate) {
+function instance$9($$self, $$props, $$invalidate) {
 	let $compilationState;
 	validate_store(compilationState, 'compilationState');
 	component_subscribe($$self, compilationState, $$value => $$invalidate(1, $compilationState = $$value));
@@ -27503,6 +27637,8 @@ function instance$a($$self, $$props, $$invalidate) {
 		onMount,
 		Constructor,
 		compilationState,
+		TextContainer,
+		WarningIcon,
 		compiling,
 		compile,
 		$compilationState
@@ -27522,22 +27658,22 @@ function instance$a($$self, $$props, $$invalidate) {
 class Compile extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$a, create_fragment$a, safe_not_equal, {});
+		init$1(this, options, instance$9, create_fragment$9, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
 			tagName: "Compile",
 			options,
-			id: create_fragment$a.name
+			id: create_fragment$9.name
 		});
 	}
 }
 
 /* src/components/TextContainerDark.svelte generated by Svelte v3.59.2 */
 
-const file$8 = "src/components/TextContainerDark.svelte";
+const file$7 = "src/components/TextContainerDark.svelte";
 
-function create_fragment$9(ctx) {
+function create_fragment$8(ctx) {
 	let div;
 	let div_class_value;
 	let current;
@@ -27553,7 +27689,7 @@ function create_fragment$9(ctx) {
 			? 'vscode-text-container--warning'
 			: '') + " " + (/*className*/ ctx[1] ?? '') + " svelte-12jd2je");
 
-			add_location(div, file$8, 4, 0, 91);
+			add_location(div, file$7, 4, 0, 91);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -27606,7 +27742,7 @@ function create_fragment$9(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_fragment$9.name,
+		id: create_fragment$8.name,
 		type: "component",
 		source: "",
 		ctx
@@ -27615,7 +27751,7 @@ function create_fragment$9(ctx) {
 	return block;
 }
 
-function instance$9($$self, $$props, $$invalidate) {
+function instance$8($$self, $$props, $$invalidate) {
 	let { $$slots: slots = {}, $$scope } = $$props;
 	validate_slots('TextContainerDark', slots, ['default']);
 	let { warning = false } = $$props;
@@ -27649,13 +27785,13 @@ function instance$9($$self, $$props, $$invalidate) {
 class TextContainerDark extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$9, create_fragment$9, safe_not_equal, { warning: 0, className: 1 });
+		init$1(this, options, instance$8, create_fragment$8, safe_not_equal, { warning: 0, className: 1 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
 			tagName: "TextContainerDark",
 			options,
-			id: create_fragment$9.name
+			id: create_fragment$8.name
 		});
 	}
 
@@ -27678,83 +27814,7 @@ class TextContainerDark extends SvelteComponentDev {
 
 /* src/components/icons/ErrorIcon.svelte generated by Svelte v3.59.2 */
 
-const file$7 = "src/components/icons/ErrorIcon.svelte";
-
-function create_fragment$8(ctx) {
-	let svg;
-	let path;
-
-	const block = {
-		c: function create() {
-			svg = svg_element("svg");
-			path = svg_element("path");
-			attr_dev(path, "fill-rule", "evenodd");
-			attr_dev(path, "clip-rule", "evenodd");
-			attr_dev(path, "d", "M8.6 1c1.6.1 3.1.9 4.2 2 1.3 1.4 2 3.1 2 5.1 0 1.6-.6 3.1-1.6 4.4-1 1.2-2.4 2.1-4 2.4-1.6.3-3.2.1-4.6-.7-1.4-.8-2.5-2-3.1-3.5C.9 9.2.8 7.5 1.3 6c.5-1.6 1.4-2.9 2.8-3.8C5.4 1.3 7 .9 8.6 1zm.5 12.9c1.3-.3 2.5-1 3.4-2.1.8-1.1 1.3-2.4 1.2-3.8 0-1.6-.6-3.2-1.7-4.3-1-1-2.2-1.6-3.6-1.7-1.3-.1-2.7.2-3.8 1-1.1.8-1.9 1.9-2.3 3.3-.4 1.3-.4 2.7.2 4 .6 1.3 1.5 2.3 2.7 3 1.2.7 2.6.9 3.9.6zM7.9 7.5L10.3 5l.7.7-2.4 2.5 2.4 2.5-.7.7-2.4-2.5-2.4 2.5-.7-.7 2.4-2.5-2.4-2.5.7-.7 2.4 2.5z");
-			add_location(path, file$7, 7, 5, 157);
-			attr_dev(svg, "width", "16");
-			attr_dev(svg, "height", "16");
-			attr_dev(svg, "viewBox", "0 0 16 16");
-			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
-			attr_dev(svg, "fill", "currentColor");
-			attr_dev(svg, "class", "text-vscodeError");
-			add_location(svg, file$7, 0, 0, 0);
-		},
-		l: function claim(nodes) {
-			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, svg, anchor);
-			append_dev(svg, path);
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(svg);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_fragment$8.name,
-		type: "component",
-		source: "",
-		ctx
-	});
-
-	return block;
-}
-
-function instance$8($$self, $$props) {
-	let { $$slots: slots = {}, $$scope } = $$props;
-	validate_slots('ErrorIcon', slots, []);
-	const writable_props = [];
-
-	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<ErrorIcon> was created with unknown prop '${key}'`);
-	});
-
-	return [];
-}
-
-class ErrorIcon extends SvelteComponentDev {
-	constructor(options) {
-		super(options);
-		init$1(this, options, instance$8, create_fragment$8, safe_not_equal, {});
-
-		dispatch_dev("SvelteRegisterComponent", {
-			component: this,
-			tagName: "ErrorIcon",
-			options,
-			id: create_fragment$8.name
-		});
-	}
-}
-
-/* src/components/icons/WarningIcon.svelte generated by Svelte v3.59.2 */
-
-const file$6 = "src/components/icons/WarningIcon.svelte";
+const file$6 = "src/components/icons/ErrorIcon.svelte";
 
 function create_fragment$7(ctx) {
 	let svg;
@@ -27766,14 +27826,14 @@ function create_fragment$7(ctx) {
 			path = svg_element("path");
 			attr_dev(path, "fill-rule", "evenodd");
 			attr_dev(path, "clip-rule", "evenodd");
-			attr_dev(path, "d", "M7.56 1h.88l6.54 12.26-.44.74H1.44L1 13.26 7.56 1zM8 2.28L2.28 13H13.7L8 2.28zM8.625 12v-1h-1.25v1h1.25zm-1.25-2V6h1.25v4h-1.25z");
-			add_location(path, file$6, 7, 5, 159);
+			attr_dev(path, "d", "M8.6 1c1.6.1 3.1.9 4.2 2 1.3 1.4 2 3.1 2 5.1 0 1.6-.6 3.1-1.6 4.4-1 1.2-2.4 2.1-4 2.4-1.6.3-3.2.1-4.6-.7-1.4-.8-2.5-2-3.1-3.5C.9 9.2.8 7.5 1.3 6c.5-1.6 1.4-2.9 2.8-3.8C5.4 1.3 7 .9 8.6 1zm.5 12.9c1.3-.3 2.5-1 3.4-2.1.8-1.1 1.3-2.4 1.2-3.8 0-1.6-.6-3.2-1.7-4.3-1-1-2.2-1.6-3.6-1.7-1.3-.1-2.7.2-3.8 1-1.1.8-1.9 1.9-2.3 3.3-.4 1.3-.4 2.7.2 4 .6 1.3 1.5 2.3 2.7 3 1.2.7 2.6.9 3.9.6zM7.9 7.5L10.3 5l.7.7-2.4 2.5 2.4 2.5-.7.7-2.4-2.5-2.4 2.5-.7-.7 2.4-2.5-2.4-2.5.7-.7 2.4 2.5z");
+			add_location(path, file$6, 7, 5, 157);
 			attr_dev(svg, "width", "16");
 			attr_dev(svg, "height", "16");
 			attr_dev(svg, "viewBox", "0 0 16 16");
 			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
 			attr_dev(svg, "fill", "currentColor");
-			attr_dev(svg, "class", "text-vscodeWarning");
+			attr_dev(svg, "class", "text-vscodeError");
 			add_location(svg, file$6, 0, 0, 0);
 		},
 		l: function claim(nodes) {
@@ -27804,24 +27864,24 @@ function create_fragment$7(ctx) {
 
 function instance$7($$self, $$props) {
 	let { $$slots: slots = {}, $$scope } = $$props;
-	validate_slots('WarningIcon', slots, []);
+	validate_slots('ErrorIcon', slots, []);
 	const writable_props = [];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<WarningIcon> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<ErrorIcon> was created with unknown prop '${key}'`);
 	});
 
 	return [];
 }
 
-class WarningIcon extends SvelteComponentDev {
+class ErrorIcon extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
 		init$1(this, options, instance$7, create_fragment$7, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
-			tagName: "WarningIcon",
+			tagName: "ErrorIcon",
 			options,
 			id: create_fragment$7.name
 		});

@@ -63,16 +63,16 @@
     }
 
     .monaco-button {
-        color: rgb(157, 157, 157);
+        color: var(--vscode-breadcrumb-foreground);
         padding: 4px 2px;
     }
 
     .monaco-button:hover {
-        color: rgb(204, 204, 204);
+        color: var(--vscode-icon-foreground);
     }
 
     .monaco-button.active {
-        color: rgb(204, 204, 204);
-        border-bottom: 1px solid rgb(0, 120, 212);
+        color: var(--vscode-icon-foreground);
+        border-bottom: 1px solid var(--vscode-panelTitle-activeBorder);
     }
 </style>

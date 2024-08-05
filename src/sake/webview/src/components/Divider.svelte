@@ -7,6 +7,6 @@
 <style>
     hr {
         border: 0;
-        border-top: 1px solid #3c3c3c;
+        border-top: 1px solid var(--vscode-sideBar-dropBackground);
     }
 </style>
