@@ -661,7 +661,7 @@
                 },
                 {
                     "command": "Tools-for-Solidity.sake.copyFromResults",
-                    "when": "view == sake-output",
+                    "when": "view == sake-output && viewItem == copyable",
                     "group": "inline"
                 }
             ],

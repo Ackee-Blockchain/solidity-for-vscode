@@ -87,6 +87,8 @@ export class SakeOutputItem extends vscode.TreeItem {
             this.iconPath = new vscode.ThemeIcon(icon);
         }
 
+        this.contextValue = this.value === undefined ? undefined : 'copyable';
+
         // this._setIcon();
     }
 
