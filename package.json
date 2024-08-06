@@ -974,6 +974,24 @@
                     }
                 ]
             }
+        ],
+        "viewsWelcome": [
+            {
+                "view": "wake-detections",
+                "contents": "Open a workspace with Solidity files to start detecting vulnerabilities."
+            },
+            {
+                "view": "solc-detections",
+                "contents": "Open a workspace with Solidity files to start detecting vulnerabilities."
+            },
+            {
+                "view": "sake",
+                "contents": "",
+            },
+            {
+                "view": "sake-output",
+                "contents": "Transactions from the Deploy & Interact view will be displayed here."
+            }
         ]
     },
     "scripts": {
