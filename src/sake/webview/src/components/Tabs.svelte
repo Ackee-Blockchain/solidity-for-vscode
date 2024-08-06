@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <Divider className="my-2" />
+    <Divider className="" />
 
     <div class="w-full flex-1 overflow-y-auto overflow-x-hidden p-[10px]">
         <slot name="content-scrollable" tabId={activeTabId}></slot>

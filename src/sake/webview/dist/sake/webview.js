@@ -21855,12 +21855,7 @@ function create_fragment$l(ctx) {
 
 	const content_fixed_slot_template = /*#slots*/ ctx[4]["content-fixed"];
 	const content_fixed_slot = create_slot(content_fixed_slot_template, ctx, /*$$scope*/ ctx[3], get_content_fixed_slot_context);
-
-	divider = new Divider({
-			props: { className: "my-2" },
-			$$inline: true
-		});
-
+	divider = new Divider({ props: { className: "" }, $$inline: true });
 	const content_scrollable_slot_template = /*#slots*/ ctx[4]["content-scrollable"];
 	const content_scrollable_slot = create_slot(content_scrollable_slot_template, ctx, /*$$scope*/ ctx[3], get_content_scrollable_slot_context);
 
@@ -21892,7 +21887,7 @@ function create_fragment$l(ctx) {
 			attr_dev(div2, "class", "w-full");
 			add_location(div2, file$j, 12, 4, 340);
 			attr_dev(div3, "class", "w-full flex-1 overflow-y-auto overflow-x-hidden p-[10px]");
-			add_location(div3, file$j, 42, 4, 1524);
+			add_location(div3, file$j, 42, 4, 1520);
 			attr_dev(div4, "class", "flex flex-col h-full w-full");
 			add_location(div4, file$j, 11, 0, 294);
 		},
