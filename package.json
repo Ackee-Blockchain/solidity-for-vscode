@@ -28,7 +28,9 @@
     },
     "categories": [
         "Linters",
-        "Programming Languages"
+        "Programming Languages",
+        "Visualization",
+        "Testing"
     ],
     "activationEvents": [
         "onLanguage:solidity",
