@@ -788,6 +788,108 @@
                     "group": "group@4",
                     "when": "detections.group == 'DETECTOR'"
                 }
+            ],
+            "commandPalette": [
+                {
+                    "command": "Tools-for-Solidity.detections.group.file",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.impact",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.confidence",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.detector",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.file_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.impact_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.confidence_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.group.detector_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.high",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.medium",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.low",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.warning",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.info",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.high_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.medium_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.low_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.warning_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.impact.info_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.high",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.medium",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.low",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.high_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.medium_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.filter.confidence.low_selected",
+                    "when": "false"
+                },
+                {
+                    "command": "Tools-for-Solidity.sake.copyFromResults",
+                    "when": "false"
+                }
             ]
         },
         "submenus": [
