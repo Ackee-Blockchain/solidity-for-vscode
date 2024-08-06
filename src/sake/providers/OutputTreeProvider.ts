@@ -66,7 +66,7 @@ export class OutputViewManager {
     }
 }
 
-class SakeOutputItem extends vscode.TreeItem {
+export class SakeOutputItem extends vscode.TreeItem {
     children: BaseOutputItem[] = [];
     key: string;
     value: string | undefined;

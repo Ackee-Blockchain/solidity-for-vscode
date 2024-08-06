@@ -572,6 +572,11 @@
                 "command": "Tools-for-Solidity.config.disable-prerelease",
                 "title": "Tools for Solidity:  Disable Wake Prerelease",
                 "enablement": "Tools-for-Solidity.Wake.prerelease"
+            },
+            {
+                "command": "Tools-for-Solidity.sake.copyFromResults",
+                "title": "Tools for Solidity: Copy From Results",
+                "icon": "$(copy)"
             }
         ],
         "viewsContainers": {
@@ -652,6 +657,11 @@
                 {
                     "command": "Tools-for-Solidity.detections.open_docs",
                     "when": "view == wake-detections && viewItem == DETECTOR",
+                    "group": "inline"
+                },
+                {
+                    "command": "Tools-for-Solidity.sake.copyFromResults",
+                    "when": "view == sake-output",
                     "group": "inline"
                 }
             ],

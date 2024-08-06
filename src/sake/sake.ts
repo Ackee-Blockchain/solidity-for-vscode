@@ -24,7 +24,11 @@ import { LanguageClient } from 'vscode-languageclient/node';
 import { parseCompiledContracts } from './utils/compilation';
 import { call, compile, deploy, getAccounts, getBalances, setBalances, setLabel } from './api';
 import { AccountState } from './state/AccountState';
-import { OutputViewManager, SakeOutputTreeProvider } from './providers/OutputTreeProvider';
+import {
+    OutputViewManager,
+    SakeOutputItem,
+    SakeOutputTreeProvider
+} from './providers/OutputTreeProvider';
 import { TxHistoryState } from './state/TxHistoryState';
 import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
@@ -173,6 +177,13 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.setLabel',
             (params: WakeSetLabelRequestParams) => setLabel(params, client)
+        )
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.sake.copyFromResults',
+            (context: SakeOutputItem) => copyToClipboard(context.value)
         )
     );
 
