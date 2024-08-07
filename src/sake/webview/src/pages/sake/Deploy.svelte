@@ -8,14 +8,11 @@
         vsCodeCheckbox,
         vsCodeTextField
     } from '@vscode/webview-ui-toolkit';
-    import { CompilationIssueType, type CompiledContract } from '../../../shared/types';
+    import { type CompiledContract } from '../../../shared/types';
     import Constructor from '../../components/Constructor.svelte';
     import { selectedAccount, selectedValue, compilationState } from '../../helpers/store';
     import { deployContract, showErrorMessage } from '../../helpers/api';
     import TextContainerDark from '../../components/TextContainerDark.svelte';
-    import CompilationError from '../../components/CompilationError.svelte';
-    import Spacer from '../../components/Spacer.svelte';
-    import Divider from '../../components/Divider.svelte';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -29,9 +26,6 @@
     let filterString: string = '';
     $: filteredContracts = $compilationState.contracts.filter((contract) =>
         contract.fqn.toLowerCase().includes(filterString.toLowerCase())
-    );
-    $: filteredErrors = $compilationState.errors.filter((error) =>
-        error.fqn.toLowerCase().includes(filterString.toLowerCase())
     );
 
     const deploy = async function (contract: CompiledContract, calldata: string) {
@@ -80,18 +74,12 @@
                 <TextContainerDark>No contracts found</TextContainerDark>
             {/if}
 
-            {#each filteredContracts as contract, i}
+            {#each filteredContracts as contract (contract.name)}
                 <Constructor
                     abi={contract.abi}
                     name={contract.name}
                     onDeploy={(calldata) => deploy(contract, calldata)}
                 />
-            {/each}
-
-            <Divider className="my-2" />
-
-            {#each filteredErrors as issue (issue.fqn + issue.type)}
-                <CompilationError {issue} />
             {/each}
         </div>
     </section>

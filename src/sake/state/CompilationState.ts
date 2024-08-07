@@ -13,7 +13,7 @@ export class CompilationState extends BaseState<CompilationStateData> {
     private constructor() {
         super(StateId.CompiledContracts, {
             contracts: [],
-            errors: [],
+            issues: [],
             dirty: true
         });
     }
