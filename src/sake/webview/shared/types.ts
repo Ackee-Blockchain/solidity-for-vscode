@@ -194,7 +194,7 @@ export interface DeploymentStateData {
 
 export interface CompilationStateData {
     contracts: Array<CompiledContract>;
-    errors: CompilationIssue[];
+    issues: CompilationIssue[];
     dirty: boolean;
     // TODO add isDirty
 }

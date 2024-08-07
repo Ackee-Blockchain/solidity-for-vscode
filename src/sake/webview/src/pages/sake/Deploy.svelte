@@ -42,11 +42,10 @@
 
     const handleFilter = function (e: any) {
         filterString = e.target?.value;
-        // console.log("filter string", _filterString);
     };
 </script>
 
-{#if $compilationState.contracts.length > 0 || $compilationState.errors.length > 0}
+{#if $compilationState.contracts.length > 0 || $compilationState.issues.length > 0}
     <section class="w-full">
         <vscode-text-field
             class="w-full mb-2"
@@ -74,7 +73,7 @@
                 <TextContainerDark>No contracts found</TextContainerDark>
             {/if}
 
-            {#each filteredContracts as contract (contract.name)}
+            {#each filteredContracts as contract (contract.fqn)}
                 <Constructor
                     abi={contract.abi}
                     name={contract.name}

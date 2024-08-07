@@ -50,8 +50,8 @@
     <TextContainer
         classList="w-full flex flex-col gap-2 overflow-hidden {expanded ? '' : 'h-[26px]'}"
     >
-        <div class="flex gap-1">
-            <span class="w-[22px]">
+        <div class="flex gap-2">
+            <span class="w-[16px]">
                 {#if issue.type === CompilationIssueType.Error}
                     <ErrorIcon />
                 {:else if issue.type === CompilationIssueType.Skipped}

@@ -21,10 +21,10 @@
     );
 </script>
 
-{#if $compilationState.errors.length > 0}
+{#if $compilationState.issues.length > 0}
     <section class="w-full">
         <div class="flex flex-col gap-2">
-            {#each $compilationState.errors as issue (issue.fqn + issue.type)}
+            {#each $compilationState.issues as issue (issue.fqn + issue.type)}
                 <CompilationError {issue} />
             {/each}
         </div>

@@ -32,10 +32,10 @@ export class CompilationState extends BaseState<CompilationStateData> {
         };
     }
 
-    public set(contracts: CompiledContract[], errors: CompilationIssue[]) {
+    public set(contracts: CompiledContract[], issues: CompilationIssue[]) {
         this.state = {
             contracts: contracts,
-            errors: errors,
+            issues: issues,
             dirty: false
         };
     }
@@ -48,10 +48,10 @@ export class CompilationState extends BaseState<CompilationStateData> {
         };
     }
 
-    public setErrors(errors: CompilationIssue[]): void {
+    public setIssues(issues: CompilationIssue[]): void {
         this.state = {
             ...this.state,
-            errors: errors
+            issues: issues
         };
     }
 

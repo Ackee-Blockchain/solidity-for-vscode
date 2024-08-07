@@ -21,6 +21,7 @@ module.exports = {
             darkBackground: 'var(--vscode-editorWidget-background)',
             vscodeButtonPrimary: 'var(--button-primary-background);',
             vscodeButtonSecondary: 'var(--button-secondary-background);',
+
         },
         colors: {
             vscodeForeground: 'var(--vscode-editor-foreground)',
