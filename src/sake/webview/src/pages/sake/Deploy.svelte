@@ -115,9 +115,3 @@
     </section>
     <!-- <p class="text-center">No contracts are compiled</p> -->
 {/if}
-
-<style global>
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-</style>

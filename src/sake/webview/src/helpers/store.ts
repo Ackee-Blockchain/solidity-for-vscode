@@ -27,6 +27,8 @@ export const selectedValue = derived(selectedValueString, ($selectedValueString)
         return null;
     }
 });
+export const compilationIssuesVisible = writable<boolean>(false);
+export const activeTab = writable<number>();
 
 /**
  * backend data

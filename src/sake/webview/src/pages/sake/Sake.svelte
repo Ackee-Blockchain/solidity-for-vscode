@@ -16,10 +16,18 @@
     import CallSetup from '../../components/CallSetup.svelte';
     import { onMount } from 'svelte';
     import Tabs from '../../components/Tabs.svelte';
-    import { deployedContracts, setupStores } from '../../helpers/store';
+    import {
+        deployedContracts,
+        setupStores,
+        compilationIssuesVisible,
+        activeTab
+    } from '../../helpers/store';
     import Compile from './Compile.svelte';
     import Deploy from './Deploy.svelte';
     import Run from './Run.svelte';
+    import BlankIcon from '../../components/icons/BlankIcon.svelte';
+    import BackIcon from '../../components/icons/BackIcon.svelte';
+    import CompilationIssues from './CompilationIssues.svelte';
     // import '../../../shared/types'; // Importing types to avoid TS error
 
     provideVSCodeDesignSystem().register(
@@ -38,18 +46,9 @@
 
     let initLoading = true;
 
-    onMount(async () => {
-        await setupStores();
-        initLoading = false;
-    });
-
-    // @todo extract into a helper function
-
     enum TabId {
         CompileDeploy = 0,
-        DeployedContracts = 1,
-        Mimi = 2,
-        Mimi2 = 3
+        DeployedContracts = 1
     }
 
     let tabs: { id: any; label: string }[] = [
@@ -62,6 +61,12 @@
             label: 'Deployed contracts'
         }
     ];
+
+    onMount(async () => {
+        await setupStores();
+        initLoading = false;
+        activeTab.set(tabs[0].id);
+    });
 </script>
 
 <main class="h-full my-0 overflow-hidden">
@@ -80,27 +85,36 @@
                     </vscode-badge>
                 {/if}
             </svelte:fragment>
-            <svelte:fragment slot="content-fixed" let:tabId>
-                {#if tabId == TabId.CompileDeploy}
+            <svelte:fragment slot="content-fixed">
+                {#if $activeTab == TabId.CompileDeploy}
                     <CallSetup />
                     <Compile />
-                {:else if tabId == TabId.DeployedContracts}
-                    <CallSetup />
-                {:else if tabId == TabId.Mimi}
+                {:else if $activeTab == TabId.DeployedContracts}
                     <CallSetup />
                 {/if}
             </svelte:fragment>
-            <svelte:fragment slot="content-scrollable" let:tabId>
-                {#if tabId == TabId.CompileDeploy}
-                    <Deploy />
-                {:else if tabId == TabId.DeployedContracts}
+            <svelte:fragment slot="content-scrollable">
+                {#if $activeTab == TabId.CompileDeploy}
+                    {#if $compilationIssuesVisible}
+                        <CompilationIssues />
+                    {:else}
+                        <Deploy />
+                    {/if}
+                {:else if $activeTab == TabId.DeployedContracts}
                     <Run />
-                {:else if tabId == TabId.Mimi}
-                    <ul>
-                        {#each { length: 200 } as _, i}
-                            <li>{i + 1}</li>
-                        {/each}
-                    </ul>
+                {/if}
+            </svelte:fragment>
+            <svelte:fragment slot="content-header">
+                {#if $compilationIssuesVisible && $activeTab === TabId.CompileDeploy}
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-missing-attribute -->
+                    <a
+                        on:click={() => compilationIssuesVisible.set(false)}
+                        class="flex gap-1 cursor-pointer items-center"
+                    >
+                        <BackIcon />
+                        <span>Compilation issues</span>
+                    </a>
                 {/if}
             </svelte:fragment>
         </Tabs>

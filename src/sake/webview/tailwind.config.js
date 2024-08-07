@@ -20,6 +20,7 @@ module.exports = {
             vscodeInputBackground: 'var(--vscode-input-background)',
             darkBackground: 'var(--vscode-editorWidget-background)',
             vscodeButtonPrimary: 'var(--button-primary-background);',
+            vscodeButtonSecondary: 'var(--button-secondary-background);',
         },
         colors: {
             vscodeForeground: 'var(--vscode-editor-foreground)',
@@ -29,6 +30,7 @@ module.exports = {
             vscodeBorder: 'var(--vscode-editorWidget-border)',
             vscodeError: 'var(--vscode-editorError-foreground)',
             vscodeButtonPrimary: 'var(--button-primary-background);',
+            vscodeButtonSecondary: 'var(---vscode-button-secondaryForeground);',
             vscodeWarning: 'var(--vscode-editorWarning-foreground)',
             vscodeWidgetBorder: 'var(--vscode-widget-border)'
         },

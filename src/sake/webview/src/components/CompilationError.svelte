@@ -47,45 +47,47 @@
     {:else}
         <IconSpacer />
     {/if}
-    <TextContainer classList="w-full flex flex-col gap-3 overflow-hidden">
-        <div class="w-full flex flex-row gap-2 items-center">
-            {#if issue.type === CompilationIssueType.Error}
-                <ErrorIcon />
-            {:else if issue.type === CompilationIssueType.Skipped}
-                <WarningIcon />
-            {/if}
-
-            <div class="flex col gap-1">
-                <span>
-                    {issue.type === CompilationIssueType.Error ? 'Errors in' : 'Skipped'}
-                    <ClickableSpan
-                        callback={() => {
-                            navigateToFile(issue.errors[0], true);
-                        }}>{fileName ? fileName : issue.fqn}</ClickableSpan
-                    >
-                </span>
-            </div>
+    <TextContainer
+        classList="w-full flex flex-col gap-2 overflow-hidden {expanded ? '' : 'h-[26px]'}"
+    >
+        <div class="flex gap-1">
+            <span class="w-[22px]">
+                {#if issue.type === CompilationIssueType.Error}
+                    <ErrorIcon />
+                {:else if issue.type === CompilationIssueType.Skipped}
+                    <WarningIcon />
+                {/if}
+            </span>
+            <p class="relative top-[-2px] {expanded ? '' : 'truncate'}">
+                {issue.type === CompilationIssueType.Error ? 'Errors in' : 'Skipped'}
+                <ClickableSpan
+                    callback={() => {
+                        navigateToFile(issue.errors[0], true);
+                    }}>{fileName ? fileName : issue.fqn}</ClickableSpan
+                >
+            </p>
         </div>
+
         {#if expanded}
             <!-- {#if fileName}
                 <span class="mb-2">{issue.fqn}</span>
             {/if} -->
-
-            {#if issue.type === CompilationIssueType.Error}
-                <div class="flex flex-col gap-2 text-sm">
+            <div class="flex flex-col gap-2 text-sm">
+                {#if issue.type === CompilationIssueType.Error}
                     {#each issue.errors as error}
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <ClickableSpan callback={() => navigateToFile(error)}
                             >{error.message}</ClickableSpan
                         >
                     {/each}
-                </div>
-            {:else if issue.type === CompilationIssueType.Skipped}
-                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <ClickableSpan callback={() => navigateToFile(issue.errors[0])}
-                    >{issue.errors[0].message}</ClickableSpan
-                >
-            {/if}
+                {:else if issue.type === CompilationIssueType.Skipped}
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+
+                    <ClickableSpan callback={() => navigateToFile(issue.errors[0])}
+                        >{issue.errors[0].message}</ClickableSpan
+                    >
+                {/if}
+            </div>
         {/if}
     </TextContainer>
 </div>

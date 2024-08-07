@@ -1,16 +1,7 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte';
-    import Divider from './Divider.svelte';
-
-    const dispatch = createEventDispatcher();
+    import { activeTab } from '../helpers/store';
 
     export let tabs: { id: any; label: string }[];
-    $: activeTabId = tabs[0].id;
-
-    function selectTab(tabId: string) {
-        activeTabId = tabId;
-        dispatch('tabChange', tabId);
-    }
 </script>
 
 <div class="flex flex-col h-full w-full">
@@ -26,8 +17,8 @@
                         <!-- svelte-ignore a11y-missing-attribute -->
                         <a
                             class="monaco-button flex gap-2"
-                            class:active={activeTabId === tab.id}
-                            on:click={() => selectTab(tab.id)}
+                            class:active={$activeTab === tab.id}
+                            on:click={() => activeTab.set(tab.id)}
                         >
                             <span>{tab.label}</span>
                             <slot name="tab-header" tabId={tab.id} class="ms-1" />
@@ -36,20 +27,44 @@
                 {/each}
             </ul>
         </div>
-        <!-- <Divider /> -->
         <div class="w-full p-[10px] flex flex-col gap-4">
-            <slot name="content-fixed" tabId={activeTabId}></slot>
+            <slot name="content-fixed" />
         </div>
     </div>
 
-    <Divider className="" />
+    {#if $$slots['content-header']}
+        <div class="w-full mr-[1px] flex content-header">
+            <slot name="content-header" />
+        </div>
+    {/if}
 
     <div class="w-full flex-1 overflow-y-auto overflow-x-hidden p-[10px]">
-        <slot name="content-scrollable" tabId={activeTabId}></slot>
+        <slot name="content-scrollable" />
     </div>
 </div>
 
 <style>
+    .content-header {
+        background: var(--vscode-sideBarSectionHeader-background);
+        line-height: 22px;
+        height: 22px;
+        overflow: hidden;
+        font-weight: 700;
+        font-size: 11px;
+        min-width: 3ch;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-transform: uppercase;
+        color: var(--vscode-sideBarSectionHeader-foreground);
+        padding: 0 2px;
+        border-top: 1px solid var(--vscode-sideBar-dropBackground);
+    }
+
+    .content-header:empty {
+        height: 1px;
+    }
+
     .vscode-gap {
         gap: calc(var(--design-unit) * 8px);
     }
