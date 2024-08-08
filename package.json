@@ -945,7 +945,8 @@
                         "media": {
                             "image": "./resources/walkthrough/detectors.png",
                             "altText": "Detectors"
-                        }
+                        },
+                        "completionEvents": ["onCommand:Tools-for-Solidity.open-detections-ui"]
                     },
                     {
                         "id": "sake",
@@ -954,7 +955,8 @@
                         "media": {
                             "image": "./resources/walkthrough/sake.png",
                             "altText": "Deploy & Interact"
-                        }
+                        },
+                        "completionEvents": ["onCommand:Tools-for-Solidity.open-sake-ui"]
                     },
                     {
                         "id": "language-server",
