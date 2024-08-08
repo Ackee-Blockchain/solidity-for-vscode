@@ -604,6 +604,18 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
             }
         )
     );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.open-detections-ui', async () => {
+            vscode.commands.executeCommand('workbench.view.extension.tools-for-solidity');
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.open-sake-ui', async () => {
+            vscode.commands.executeCommand('workbench.view.extension.sake');
+        })
+    );
 }
 
 function openFile(uri: vscode.Uri, range: vscode.Range) {

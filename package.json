@@ -913,6 +913,14 @@
                 "description": "Discover powerful features of Tools for Solidity and learn how to enhance your development experience.",
                 "steps": [
                     {
+                        "id": "select-wake-installation",
+                        "title": "Setup: Select Wake installation method",
+                        "description": "Tools for Solidity needs to install [Wake](https://getwake.io/) to run. By default, Wake is installed using conda for best compatibility. You can change the installation method below.\n**Recommended**: Only change the installation method if necessary.\n[Change Installation Method](command:Tools-for-Solidity.select-installation-method)",
+                        "media": {
+                            "markdown": "./resources/walkthrough/blank.md"
+                        }
+                    },
+                    {
                         "id": "rosetta-macos-native",
                         "title": "Setup: Enable Rosetta",
                         "description": "It looks like you are running on macOS Native. To ensure full compatibility with our extension, please make sure you have Rosetta installed.\n**Tip**: To install Rosetta, you can run [this command](command:Tools-for-Solidity.send-rosetta-command).",
@@ -931,17 +939,9 @@
                         "when": "isLinux"
                     },
                     {
-                        "id": "select-wake-installation",
-                        "title": "Setup: Select Wake installation method",
-                        "description": "Tools for Solidity needs to install [Wake](https://getwake.io/) to run. By default, Wake is installed using conda for best compatibility. You can change the installation method below.\n**Recommended**: Only change the installation method if necessary.\n[Change Installation Method](command:Tools-for-Solidity.select-installation-method)",
-                        "media": {
-                            "markdown": "./resources/walkthrough/blank.md"
-                        }
-                    },
-                    {
                         "id": "detectors",
                         "title": "Catch vulnerabilities with Detectors",
-                        "description": "See vulnerabilities and compiler warnings/errors of your code in real-time inside your sidebar.",
+                        "description": "See vulnerabilities and compiler warnings/errors of your code in real-time inside your sidebar.\n[See Detections](command:Tools-for-Solidity.open-detections-ui)",
                         "media": {
                             "image": "./resources/walkthrough/detectors.png",
                             "altText": "Detectors"
@@ -950,7 +950,7 @@
                     {
                         "id": "sake",
                         "title": "Deploy & Interact with Smart Contracts",
-                        "description": "Deploy & Interact view allows you to deploy, call, and test your contracts directly from VS Code. \n**Tip**: You can access Deploy & Interact from the sidebar.",
+                        "description": "Deploy & Interact view allows you to deploy, call, and test your contracts directly from VS Code.\n[Open Deploy and Interact](command:Tools-for-Solidity.open-sake-ui)",
                         "media": {
                             "image": "./resources/walkthrough/sake.png",
                             "altText": "Deploy & Interact"
