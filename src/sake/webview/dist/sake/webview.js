@@ -20709,14 +20709,12 @@ function setupListeners() {
         switch (command) {
             case WebviewMessage.getState: {
                 if (stateId === StateId.DeployedContracts) {
-                    // console.log('deployed contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
                     deployedContracts.set(payload);
                 }
                 if (stateId === StateId.CompiledContracts) {
-                    // console.log('compiled contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
@@ -20724,7 +20722,6 @@ function setupListeners() {
                     return;
                 }
                 if (stateId === StateId.Accounts) {
-                    // console.log('accounts', payload);
                     const _accounts = payload;
                     const _selectedAccount = get_store_value(selectedAccount);
                     // update accounts store
@@ -20752,7 +20749,6 @@ function setupListeners() {
                     if (payload === undefined) {
                         return;
                     }
-                    // console.log('wake state', payload);
                     wakeState.set(payload);
                     return;
                 }

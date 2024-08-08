@@ -72,7 +72,6 @@ function setupListeners() {
         switch (command) {
             case WebviewMessage.getState: {
                 if (stateId === StateId.DeployedContracts) {
-                    // console.log('deployed contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
@@ -80,7 +79,6 @@ function setupListeners() {
                 }
 
                 if (stateId === StateId.CompiledContracts) {
-                    // console.log('compiled contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
@@ -89,7 +87,6 @@ function setupListeners() {
                 }
 
                 if (stateId === StateId.Accounts) {
-                    // console.log('accounts', payload);
                     const _accounts = payload as AccountStateData[];
                     const _selectedAccount = get(selectedAccount);
 
@@ -131,7 +128,6 @@ function setupListeners() {
                     if (payload === undefined) {
                         return;
                     }
-                    // console.log('wake state', payload);
                     wakeState.set(payload);
                     return;
                 }

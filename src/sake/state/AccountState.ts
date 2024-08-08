@@ -31,7 +31,6 @@ export class AccountState extends BaseState<AccountStateData[]> {
     }
 
     public updateBalances(balances: { [key: string]: number }) {
-        // console.log('updating balances', balances);
         const _modifiedAccounts = Object.keys(balances);
         this.state = this.state.map((account) => {
             if (_modifiedAccounts.includes(account.address)) {

@@ -178,8 +178,6 @@ export async function compile(client: LanguageClient | undefined) {
 
         let result = await sendWakeRequest<WakeCompilationResponse>(client, 'wake/sake/compile');
 
-        console.log(result);
-
         if (result == null) {
             throw new Error('No result returned');
         }
