@@ -87,8 +87,9 @@
             <h3 class="uppercase font-bold text-base">Anvil not installed</h3>
             <span
                 >To use the <span class="italic">Deploy and Interact UI</span>, Froundry's Anvil is
-                required to be installed on your device in order to start a local chain.</span
-            >
+                required to be installed on your device in order to start a local chain. Please
+                install Anvil and restart VS Code.
+            </span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <vscode-button appearance="primary" on:click={installAnvil}>
                 Visit Anvil Installation Page
