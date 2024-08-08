@@ -43,25 +43,22 @@ export const compilationState = writable<CompilationStateData>({
     dirty: true
 });
 export const wakeState = writable<WakeStateData>({
-    isAnvilInstalled: undefined
+    isAnvilInstalled: undefined,
+    isServerRunning: undefined
 });
 
 /**
  * setup stores
  */
 
-export async function setupStores() {
-    setupListeners();
-    await init();
-}
-
-async function init() {
-    await messageHandler.request(WebviewMessage.onGetAccounts);
+export async function requestState() {
+    const a = await messageHandler.request(WebviewMessage.onGetAccounts);
+    console.log('response from get accs', a);
     await messageHandler.request(WebviewMessage.getState, StateId.DeployedContracts);
     await messageHandler.request(WebviewMessage.getState, StateId.CompiledContracts);
 }
 
-function setupListeners() {
+export function setupListeners() {
     window.addEventListener('message', (event) => {
         if (!event.data.command) {
             return;

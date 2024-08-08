@@ -20,7 +20,7 @@ import {
     DeploymentStateData,
     WakeSetLabelRequestParams
 } from './webview/shared/types';
-import { LanguageClient } from 'vscode-languageclient/node';
+import { LanguageClient, State } from 'vscode-languageclient/node';
 import { parseCompiledContracts } from './utils/compilation';
 import { call, compile, deploy, getAccounts, getBalances, setBalances, setLabel } from './api';
 import { AccountState } from './state/AccountState';
@@ -34,15 +34,6 @@ import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
 
 export function activateSake(context: vscode.ExtensionContext, client: LanguageClient | undefined) {
-    // const sidebarCompilerProvider = new CompilerWebviewProvider(context.extensionUri);
-
-    // context.subscriptions.push(
-    //     vscode.window.registerWebviewViewProvider(
-    //     "sake-compile-deploy",
-    //     sidebarCompilerProvider
-    //     )
-    // );
-
     // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
     const sakeOutputProvider = new SakeOutputTreeProvider(context);
     const treeView = vscode.window.createTreeView('sake-output', {

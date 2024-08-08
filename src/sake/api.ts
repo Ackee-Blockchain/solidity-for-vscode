@@ -370,13 +370,12 @@ async function sendWakeRequest<T>(
 
     try {
         const response = await client.sendRequest<T>(method, params);
-        wakeState.set(true);
+        wakeState.setIsAnvilInstalled(true);
         return response;
     } catch (e) {
-        console.error(e);
         const message = typeof e === 'string' ? e : (e as Error).message;
         if (message == 'Anvil executable not found') {
-            wakeState.set(false);
+            wakeState.setIsAnvilInstalled(false);
         }
         throw Error(message);
     }

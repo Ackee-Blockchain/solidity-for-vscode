@@ -491,7 +491,7 @@ function make_dirty(component, i) {
     }
     component.$$.dirty[(i / 31) | 0] |= (1 << (i % 31));
 }
-function init$1(component, options, instance, create_fragment, not_equal, props, append_styles, dirty = [-1]) {
+function init(component, options, instance, create_fragment, not_equal, props, append_styles, dirty = [-1]) {
     const parent_component = current_component;
     set_current_component(component);
     const $$ = component.$$ = {
@@ -11562,7 +11562,7 @@ function instance$v($$self, $$props, $$invalidate) {
 class IconButton extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$v, create_fragment$v, safe_not_equal, { callback: 0 });
+		init(this, options, instance$v, create_fragment$v, safe_not_equal, { callback: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -11689,7 +11689,7 @@ function instance$u($$self, $$props, $$invalidate) {
 class CopyButton extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$u, create_fragment$u, safe_not_equal, { callback: 1 });
+		init(this, options, instance$u, create_fragment$u, safe_not_equal, { callback: 1 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -11847,7 +11847,7 @@ function instance$t($$self, $$props, $$invalidate) {
 class ClickableSpan extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$t, create_fragment$t, safe_not_equal, { className: 0, callback: 1 });
+		init(this, options, instance$t, create_fragment$t, safe_not_equal, { className: 0, callback: 1 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -19192,7 +19192,7 @@ function instance$s($$self, $$props, $$invalidate) {
 class TextContainer extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$s, create_fragment$s, safe_not_equal, { danger: 0, warning: 1, classList: 2 });
+		init(this, options, instance$s, create_fragment$s, safe_not_equal, { danger: 0, warning: 1, classList: 2 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -19432,7 +19432,7 @@ function instance$r($$self, $$props, $$invalidate) {
 class InputIssueIndicator extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$r, create_fragment$r, safe_not_equal, { type: 0 });
+		init(this, options, instance$r, create_fragment$r, safe_not_equal, { type: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -20685,17 +20685,15 @@ const compilationState = writable({
     dirty: true
 });
 const wakeState = writable({
-    isAnvilInstalled: undefined
+    isAnvilInstalled: undefined,
+    isServerRunning: undefined
 });
 /**
  * setup stores
  */
-async function setupStores() {
-    setupListeners();
-    await init();
-}
-async function init() {
-    await client.messageHandler.request(WebviewMessage.onGetAccounts);
+async function requestState() {
+    const a = await client.messageHandler.request(WebviewMessage.onGetAccounts);
+    console.log('response from get accs', a);
     await client.messageHandler.request(WebviewMessage.getState, StateId.DeployedContracts);
     await client.messageHandler.request(WebviewMessage.getState, StateId.CompiledContracts);
 }
@@ -20908,7 +20906,7 @@ function instance$q($$self, $$props, $$invalidate) {
 class CopyableSpan extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$q, create_fragment$q, safe_not_equal, { className: 0, text: 1 });
+		init(this, options, instance$q, create_fragment$q, safe_not_equal, { className: 0, text: 1 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -21601,7 +21599,7 @@ function instance$p($$self, $$props, $$invalidate) {
 class CallSetup extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$p, create_fragment$p, safe_not_equal, {});
+		init(this, options, instance$p, create_fragment$p, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -22064,7 +22062,7 @@ function instance$o($$self, $$props, $$invalidate) {
 class Tabs extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$o, create_fragment$o, safe_not_equal, { tabs: 0 });
+		init(this, options, instance$o, create_fragment$o, safe_not_equal, { tabs: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -22222,7 +22220,7 @@ function instance$n($$self, $$props, $$invalidate) {
 class DefaultButton extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$n, create_fragment$n, safe_not_equal, { callback: 0, className: 1 });
+		init(this, options, instance$n, create_fragment$n, safe_not_equal, { callback: 0, className: 1 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -22483,7 +22481,7 @@ function instance$m($$self, $$props, $$invalidate) {
 class ExpandButton extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$m, create_fragment$m, safe_not_equal, { expanded: 0 });
+		init(this, options, instance$m, create_fragment$m, safe_not_equal, { expanded: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -22639,7 +22637,7 @@ function instance$l($$self, $$props, $$invalidate) {
 class DeleteButton extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$l, create_fragment$l, safe_not_equal, { callback: 0 });
+		init(this, options, instance$l, create_fragment$l, safe_not_equal, { callback: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -22793,7 +22791,7 @@ function instance$k($$self, $$props, $$invalidate) {
 class PlusButton extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$k, create_fragment$k, safe_not_equal, { callback: 0 });
+		init(this, options, instance$k, create_fragment$k, safe_not_equal, { callback: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -22947,7 +22945,7 @@ function instance$j($$self, $$props, $$invalidate) {
 class MinusButton extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$j, create_fragment$j, safe_not_equal, { callback: 0 });
+		init(this, options, instance$j, create_fragment$j, safe_not_equal, { callback: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -23019,7 +23017,7 @@ function instance$i($$self, $$props) {
 class IconSpacer extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$i, create_fragment$i, safe_not_equal, {});
+		init(this, options, instance$i, create_fragment$i, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -24827,7 +24825,7 @@ function splitNestedLists(input) {
 
 /* src/components/ContractFunctionInput.svelte generated by Svelte v3.59.2 */
 
-const { console: console_1$1 } = globals;
+const { console: console_1$2 } = globals;
 const file$f = "src/components/ContractFunctionInput.svelte";
 
 function get_each_context_1(ctx, list, i) {
@@ -25989,18 +25987,18 @@ function instance$h($$self, $$props, $$invalidate) {
 
 	$$self.$$.on_mount.push(function () {
 		if (input === undefined && !('input' in $$props || $$self.$$.bound[$$self.$$.props['input']])) {
-			console_1$1.warn("<ContractFunctionInput> was created without expected prop 'input'");
+			console_1$2.warn("<ContractFunctionInput> was created without expected prop 'input'");
 		}
 
 		if (onInputStateChange === undefined && !('onInputStateChange' in $$props || $$self.$$.bound[$$self.$$.props['onInputStateChange']])) {
-			console_1$1.warn("<ContractFunctionInput> was created without expected prop 'onInputStateChange'");
+			console_1$2.warn("<ContractFunctionInput> was created without expected prop 'onInputStateChange'");
 		}
 	});
 
 	const writable_props = ['input', 'onInputStateChange', 'expandable'];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$1.warn(`<ContractFunctionInput> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$2.warn(`<ContractFunctionInput> was created with unknown prop '${key}'`);
 	});
 
 	function expandbutton_expanded_binding(value) {
@@ -26077,7 +26075,7 @@ class ContractFunctionInput extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
 
-		init$1(this, options, instance$h, create_fragment$h, safe_not_equal, {
+		init(this, options, instance$h, create_fragment$h, safe_not_equal, {
 			input: 0,
 			onInputStateChange: 1,
 			expandable: 2
@@ -26252,7 +26250,7 @@ function instance$g($$self, $$props, $$invalidate) {
 class KebabButton extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$g, create_fragment$g, safe_not_equal, { callback: 0 });
+		init(this, options, instance$g, create_fragment$g, safe_not_equal, { callback: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -26981,7 +26979,7 @@ class ContractFunction extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
 
-		init$1(this, options, instance$f, create_fragment$f, safe_not_equal, {
+		init(this, options, instance$f, create_fragment$f, safe_not_equal, {
 			func: 0,
 			onFunctionCall: 5,
 			isConstructor: 6,
@@ -27273,7 +27271,7 @@ function instance$e($$self, $$props, $$invalidate) {
 class Constructor extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$e, create_fragment$e, safe_not_equal, { abi: 3, onDeploy: 0, name: 4 });
+		init(this, options, instance$e, create_fragment$e, safe_not_equal, { abi: 3, onDeploy: 0, name: 4 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -27373,7 +27371,7 @@ function instance$d($$self, $$props) {
 class WarningIcon extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$d, create_fragment$d, safe_not_equal, {});
+		init(this, options, instance$d, create_fragment$d, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -27449,7 +27447,7 @@ function instance$c($$self, $$props) {
 class ErrorIcon extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$c, create_fragment$c, safe_not_equal, {});
+		init(this, options, instance$c, create_fragment$c, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -27576,7 +27574,7 @@ function instance$b($$self, $$props, $$invalidate) {
 class TextContainerDark extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$b, create_fragment$b, safe_not_equal, { warning: 0, className: 1 });
+		init(this, options, instance$b, create_fragment$b, safe_not_equal, { warning: 0, className: 1 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -28143,7 +28141,7 @@ function instance$a($$self, $$props, $$invalidate) {
 class Compile extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$a, create_fragment$a, safe_not_equal, {});
+		init(this, options, instance$a, create_fragment$a, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -28708,7 +28706,7 @@ function instance$9($$self, $$props, $$invalidate) {
 class Deploy extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$9, create_fragment$9, safe_not_equal, {});
+		init(this, options, instance$9, create_fragment$9, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -28848,7 +28846,7 @@ function instance$8($$self, $$props, $$invalidate) {
 class CalldataBytes extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$8, create_fragment$8, safe_not_equal, { func: 0, onFunctionCall: 1 });
+		init(this, options, instance$8, create_fragment$8, safe_not_equal, { func: 0, onFunctionCall: 1 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -30237,7 +30235,7 @@ function instance$7($$self, $$props, $$invalidate) {
 class Contract extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$7, create_fragment$7, safe_not_equal, { contract: 0, onFunctionCall: 4 });
+		init(this, options, instance$7, create_fragment$7, safe_not_equal, { contract: 0, onFunctionCall: 4 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -30337,7 +30335,7 @@ function instance$6($$self, $$props, $$invalidate) {
 class Divider extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$6, create_fragment$6, safe_not_equal, { className: 0 });
+		init(this, options, instance$6, create_fragment$6, safe_not_equal, { className: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -30358,7 +30356,7 @@ class Divider extends SvelteComponentDev {
 
 /* src/pages/sake/Run.svelte generated by Svelte v3.59.2 */
 
-const { console: console_1 } = globals;
+const { console: console_1$1 } = globals;
 const file$5 = "src/pages/sake/Run.svelte";
 
 function get_each_context$2(ctx, list, i) {
@@ -30716,7 +30714,7 @@ function instance$5($$self, $$props, $$invalidate) {
 	const writable_props = [];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1.warn(`<Run> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$1.warn(`<Run> was created with unknown prop '${key}'`);
 	});
 
 	$$self.$capture_state = () => ({
@@ -30747,7 +30745,7 @@ function instance$5($$self, $$props, $$invalidate) {
 class Run extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$5, create_fragment$5, safe_not_equal, {});
+		init(this, options, instance$5, create_fragment$5, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -30815,7 +30813,7 @@ function instance$4($$self, $$props) {
 class BlankIcon extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$4, create_fragment$4, safe_not_equal, {});
+		init(this, options, instance$4, create_fragment$4, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -30888,7 +30886,7 @@ function instance$3($$self, $$props) {
 class BackIcon extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$3, create_fragment$3, safe_not_equal, {});
+		init(this, options, instance$3, create_fragment$3, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -31911,7 +31909,7 @@ function instance$2($$self, $$props, $$invalidate) {
 class CompilationError extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$2, create_fragment$2, safe_not_equal, { issue: 0 });
+		init(this, options, instance$2, create_fragment$2, safe_not_equal, { issue: 0 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -32262,7 +32260,7 @@ function instance$1($$self, $$props, $$invalidate) {
 class CompilationIssues extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance$1, create_fragment$1, safe_not_equal, {});
+		init(this, options, instance$1, create_fragment$1, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -32274,9 +32272,11 @@ class CompilationIssues extends SvelteComponentDev {
 }
 
 /* src/pages/sake/Sake.svelte generated by Svelte v3.59.2 */
+
+const { console: console_1 } = globals;
 const file = "src/pages/sake/Sake.svelte";
 
-// (60:4) {:else}
+// (92:4) {:else}
 function create_else_block(ctx) {
 	let tabs_1;
 	let current;
@@ -32290,8 +32290,8 @@ function create_else_block(ctx) {
 					"content-fixed": [create_content_fixed_slot],
 					"tab-header": [
 						create_tab_header_slot,
-						({ tabId }) => ({ 9: tabId }),
-						({ tabId }) => tabId ? 512 : 0
+						({ tabId }) => ({ 11: tabId }),
+						({ tabId }) => tabId ? 2048 : 0
 					]
 				},
 				$$scope: { ctx }
@@ -32310,7 +32310,7 @@ function create_else_block(ctx) {
 		p: function update(ctx, dirty) {
 			const tabs_1_changes = {};
 
-			if (dirty & /*$$scope, $compilationIssuesVisible, $activeTab, TabId, $deployedContracts, tabId*/ 1594) {
+			if (dirty & /*$$scope, $compilationIssuesVisible, $activeTab, TabId, $deployedContracts, tabId*/ 6202) {
 				tabs_1_changes.$$scope = { dirty, ctx };
 			}
 
@@ -32334,15 +32334,15 @@ function create_else_block(ctx) {
 		block,
 		id: create_else_block.name,
 		type: "else",
-		source: "(60:4) {:else}",
+		source: "(92:4) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (47:88) 
-function create_if_block_1(ctx) {
+// (79:43) 
+function create_if_block_2(ctx) {
 	let div;
 	let h3;
 	let t1;
@@ -32359,7 +32359,7 @@ function create_if_block_1(ctx) {
 		c: function create() {
 			div = element("div");
 			h3 = element("h3");
-			h3.textContent = "Anvil not installed";
+			h3.textContent = "Anvil is not installed";
 			t1 = space();
 			span1 = element("span");
 			t2 = text("To use the ");
@@ -32370,14 +32370,14 @@ function create_if_block_1(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Visit Anvil Installation Page";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 48, 12, 2197);
+			add_location(h3, file, 80, 12, 3327);
 			attr_dev(span0, "class", "italic");
-			add_location(span0, file, 50, 28, 2310);
-			add_location(span1, file, 49, 12, 2276);
+			add_location(span0, file, 82, 28, 3443);
+			add_location(span1, file, 81, 12, 3409);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 55, 12, 2630);
+			add_location(vscode_button, file, 87, 12, 3763);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 47, 8, 2133);
+			add_location(div, file, 79, 8, 3263);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -32391,7 +32391,71 @@ function create_if_block_1(ctx) {
 			append_dev(div, vscode_button);
 
 			if (!mounted) {
-				dispose = listen_dev(vscode_button, "click", /*installAnvil*/ ctx[7], false, false, false, false);
+				dispose = listen_dev(vscode_button, "click", /*installAnvil*/ ctx[8], false, false, false, false);
+				mounted = true;
+			}
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+			mounted = false;
+			dispose();
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_2.name,
+		type: "if",
+		source: "(79:43) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (67:51) 
+function create_if_block_1(ctx) {
+	let div;
+	let h3;
+	let t1;
+	let span;
+	let t3;
+	let vscode_button;
+	let mounted;
+	let dispose;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			h3 = element("h3");
+			h3.textContent = "Wake Server is not running";
+			t1 = space();
+			span = element("span");
+			span.textContent = "The Wake LSP server does not seem to be running. Please make sure that you have a\n                workspace with Solidity files open.";
+			t3 = space();
+			vscode_button = element("vscode-button");
+			vscode_button.textContent = "Restart Connection";
+			attr_dev(h3, "class", "uppercase font-bold text-base");
+			add_location(h3, file, 68, 12, 2728);
+			add_location(span, file, 69, 12, 2814);
+			set_custom_element_data(vscode_button, "appearance", "primary");
+			add_location(vscode_button, file, 74, 12, 3072);
+			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
+			add_location(div, file, 67, 8, 2664);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, h3);
+			append_dev(div, t1);
+			append_dev(div, span);
+			append_dev(div, t3);
+			append_dev(div, vscode_button);
+
+			if (!mounted) {
+				dispose = listen_dev(vscode_button, "click", /*startServer*/ ctx[7], false, false, false, false);
 				mounted = true;
 			}
 		},
@@ -32409,14 +32473,14 @@ function create_if_block_1(ctx) {
 		block,
 		id: create_if_block_1.name,
 		type: "if",
-		source: "(47:88) ",
+		source: "(67:51) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (42:4) {#if initLoading}
+// (62:4) {#if initLoading}
 function create_if_block(ctx) {
 	let div;
 	let vscode_progress_ring;
@@ -32430,10 +32494,10 @@ function create_if_block(ctx) {
 			t0 = space();
 			span = element("span");
 			span.textContent = "Connecting with Wake...";
-			add_location(vscode_progress_ring, file, 43, 12, 1947);
-			add_location(span, file, 44, 12, 1984);
+			add_location(vscode_progress_ring, file, 63, 12, 2515);
+			add_location(span, file, 64, 12, 2552);
 			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 42, 8, 1859);
+			add_location(div, file, 62, 8, 2427);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -32453,15 +32517,15 @@ function create_if_block(ctx) {
 		block,
 		id: create_if_block.name,
 		type: "if",
-		source: "(42:4) {#if initLoading}",
+		source: "(62:4) {#if initLoading}",
 		ctx
 	});
 
 	return block;
 }
 
-// (63:16) {#if tabId == TabId.DeployedContracts}
-function create_if_block_8(ctx) {
+// (95:16) {#if tabId == TabId.DeployedContracts}
+function create_if_block_9(ctx) {
 	let vscode_badge;
 	let t_value = /*$deployedContracts*/ ctx[5].length + "";
 	let t;
@@ -32471,7 +32535,7 @@ function create_if_block_8(ctx) {
 			vscode_badge = element("vscode-badge");
 			t = text(t_value);
 			set_custom_element_data(vscode_badge, "appearance", "secondary");
-			add_location(vscode_badge, file, 63, 20, 2948);
+			add_location(vscode_badge, file, 95, 20, 4081);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, vscode_badge, anchor);
@@ -32487,19 +32551,19 @@ function create_if_block_8(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_8.name,
+		id: create_if_block_9.name,
 		type: "if",
-		source: "(63:16) {#if tabId == TabId.DeployedContracts}",
+		source: "(95:16) {#if tabId == TabId.DeployedContracts}",
 		ctx
 	});
 
 	return block;
 }
 
-// (62:12) <svelte:fragment slot="tab-header" let:tabId>
+// (94:12) <svelte:fragment slot="tab-header" let:tabId>
 function create_tab_header_slot(ctx) {
 	let if_block_anchor;
-	let if_block = /*tabId*/ ctx[9] == /*TabId*/ ctx[1].DeployedContracts && create_if_block_8(ctx);
+	let if_block = /*tabId*/ ctx[11] == /*TabId*/ ctx[1].DeployedContracts && create_if_block_9(ctx);
 
 	const block = {
 		c: function create() {
@@ -32511,11 +32575,11 @@ function create_tab_header_slot(ctx) {
 			insert_dev(target, if_block_anchor, anchor);
 		},
 		p: function update(ctx, dirty) {
-			if (/*tabId*/ ctx[9] == /*TabId*/ ctx[1].DeployedContracts) {
+			if (/*tabId*/ ctx[11] == /*TabId*/ ctx[1].DeployedContracts) {
 				if (if_block) {
 					if_block.p(ctx, dirty);
 				} else {
-					if_block = create_if_block_8(ctx);
+					if_block = create_if_block_9(ctx);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -32534,15 +32598,15 @@ function create_tab_header_slot(ctx) {
 		block,
 		id: create_tab_header_slot.name,
 		type: "slot",
-		source: "(62:12) <svelte:fragment slot=\\\"tab-header\\\" let:tabId>",
+		source: "(94:12) <svelte:fragment slot=\\\"tab-header\\\" let:tabId>",
 		ctx
 	});
 
 	return block;
 }
 
-// (74:64) 
-function create_if_block_7(ctx) {
+// (106:64) 
+function create_if_block_8(ctx) {
 	let callsetup;
 	let current;
 	callsetup = new CallSetup({ $$inline: true });
@@ -32571,17 +32635,17 @@ function create_if_block_7(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_7.name,
+		id: create_if_block_8.name,
 		type: "if",
-		source: "(74:64) ",
+		source: "(106:64) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (71:16) {#if $activeTab == TabId.CompileDeploy}
-function create_if_block_6(ctx) {
+// (103:16) {#if $activeTab == TabId.CompileDeploy}
+function create_if_block_7(ctx) {
 	let callsetup;
 	let t;
 	let compile;
@@ -32621,22 +32685,22 @@ function create_if_block_6(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_6.name,
+		id: create_if_block_7.name,
 		type: "if",
-		source: "(71:16) {#if $activeTab == TabId.CompileDeploy}",
+		source: "(103:16) {#if $activeTab == TabId.CompileDeploy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (70:12) <svelte:fragment slot="content-fixed">
+// (102:12) <svelte:fragment slot="content-fixed">
 function create_content_fixed_slot(ctx) {
 	let current_block_type_index;
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block_6, create_if_block_7];
+	const if_block_creators = [create_if_block_7, create_if_block_8];
 	const if_blocks = [];
 
 	function select_block_type_3(ctx, dirty) {
@@ -32714,15 +32778,15 @@ function create_content_fixed_slot(ctx) {
 		block,
 		id: create_content_fixed_slot.name,
 		type: "slot",
-		source: "(70:12) <svelte:fragment slot=\\\"content-fixed\\\">",
+		source: "(102:12) <svelte:fragment slot=\\\"content-fixed\\\">",
 		ctx
 	});
 
 	return block;
 }
 
-// (85:64) 
-function create_if_block_5(ctx) {
+// (117:64) 
+function create_if_block_6(ctx) {
 	let run_1;
 	let current;
 	run_1 = new Run({ $$inline: true });
@@ -32752,22 +32816,22 @@ function create_if_block_5(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_5.name,
+		id: create_if_block_6.name,
 		type: "if",
-		source: "(85:64) ",
+		source: "(117:64) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (79:16) {#if $activeTab == TabId.CompileDeploy}
-function create_if_block_3(ctx) {
+// (111:16) {#if $activeTab == TabId.CompileDeploy}
+function create_if_block_4(ctx) {
 	let current_block_type_index;
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block_4, create_else_block_1];
+	const if_block_creators = [create_if_block_5, create_else_block_1];
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
@@ -32828,16 +32892,16 @@ function create_if_block_3(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3.name,
+		id: create_if_block_4.name,
 		type: "if",
-		source: "(79:16) {#if $activeTab == TabId.CompileDeploy}",
+		source: "(111:16) {#if $activeTab == TabId.CompileDeploy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (82:20) {:else}
+// (114:20) {:else}
 function create_else_block_1(ctx) {
 	let deploy;
 	let current;
@@ -32869,15 +32933,15 @@ function create_else_block_1(ctx) {
 		block,
 		id: create_else_block_1.name,
 		type: "else",
-		source: "(82:20) {:else}",
+		source: "(114:20) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (80:20) {#if $compilationIssuesVisible}
-function create_if_block_4(ctx) {
+// (112:20) {#if $compilationIssuesVisible}
+function create_if_block_5(ctx) {
 	let compilationissues;
 	let current;
 	compilationissues = new CompilationIssues({ $$inline: true });
@@ -32906,22 +32970,22 @@ function create_if_block_4(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4.name,
+		id: create_if_block_5.name,
 		type: "if",
-		source: "(80:20) {#if $compilationIssuesVisible}",
+		source: "(112:20) {#if $compilationIssuesVisible}",
 		ctx
 	});
 
 	return block;
 }
 
-// (78:12) <svelte:fragment slot="content-scrollable">
+// (110:12) <svelte:fragment slot="content-scrollable">
 function create_content_scrollable_slot(ctx) {
 	let current_block_type_index;
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block_3, create_if_block_5];
+	const if_block_creators = [create_if_block_4, create_if_block_6];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
@@ -33005,15 +33069,15 @@ function create_content_scrollable_slot(ctx) {
 		block,
 		id: create_content_scrollable_slot.name,
 		type: "slot",
-		source: "(78:12) <svelte:fragment slot=\\\"content-scrollable\\\">",
+		source: "(110:12) <svelte:fragment slot=\\\"content-scrollable\\\">",
 		ctx
 	});
 
 	return block;
 }
 
-// (90:16) {#if $compilationIssuesVisible && $activeTab === TabId.CompileDeploy}
-function create_if_block_2(ctx) {
+// (122:16) {#if $compilationIssuesVisible && $activeTab === TabId.CompileDeploy}
+function create_if_block_3(ctx) {
 	let a;
 	let backicon;
 	let t0;
@@ -33030,9 +33094,9 @@ function create_if_block_2(ctx) {
 			t0 = space();
 			span = element("span");
 			span.textContent = "Compilation issues";
-			add_location(span, file, 97, 24, 4490);
+			add_location(span, file, 129, 24, 5623);
 			attr_dev(a, "class", "flex gap-1 cursor-pointer items-center");
-			add_location(a, file, 92, 20, 4256);
+			add_location(a, file, 124, 20, 5389);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, a, anchor);
@@ -33042,7 +33106,7 @@ function create_if_block_2(ctx) {
 			current = true;
 
 			if (!mounted) {
-				dispose = listen_dev(a, "click", /*click_handler*/ ctx[8], false, false, false, false);
+				dispose = listen_dev(a, "click", /*click_handler*/ ctx[9], false, false, false, false);
 				mounted = true;
 			}
 		},
@@ -33066,20 +33130,20 @@ function create_if_block_2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_2.name,
+		id: create_if_block_3.name,
 		type: "if",
-		source: "(90:16) {#if $compilationIssuesVisible && $activeTab === TabId.CompileDeploy}",
+		source: "(122:16) {#if $compilationIssuesVisible && $activeTab === TabId.CompileDeploy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (89:12) <svelte:fragment slot="content-header">
+// (121:12) <svelte:fragment slot="content-header">
 function create_content_header_slot(ctx) {
 	let if_block_anchor;
 	let current;
-	let if_block = /*$compilationIssuesVisible*/ ctx[3] && /*$activeTab*/ ctx[4] === /*TabId*/ ctx[1].CompileDeploy && create_if_block_2(ctx);
+	let if_block = /*$compilationIssuesVisible*/ ctx[3] && /*$activeTab*/ ctx[4] === /*TabId*/ ctx[1].CompileDeploy && create_if_block_3(ctx);
 
 	const block = {
 		c: function create() {
@@ -33100,7 +33164,7 @@ function create_content_header_slot(ctx) {
 						transition_in(if_block, 1);
 					}
 				} else {
-					if_block = create_if_block_2(ctx);
+					if_block = create_if_block_3(ctx);
 					if_block.c();
 					transition_in(if_block, 1);
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
@@ -33134,7 +33198,7 @@ function create_content_header_slot(ctx) {
 		block,
 		id: create_content_header_slot.name,
 		type: "slot",
-		source: "(89:12) <svelte:fragment slot=\\\"content-header\\\">",
+		source: "(121:12) <svelte:fragment slot=\\\"content-header\\\">",
 		ctx
 	});
 
@@ -33146,13 +33210,14 @@ function create_fragment(ctx) {
 	let current_block_type_index;
 	let if_block;
 	let current;
-	const if_block_creators = [create_if_block, create_if_block_1, create_else_block];
+	const if_block_creators = [create_if_block, create_if_block_1, create_if_block_2, create_else_block];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
 		if (/*initLoading*/ ctx[0]) return 0;
-		if (/*$wakeState*/ ctx[2].isAnvilInstalled === undefined || !/*$wakeState*/ ctx[2].isAnvilInstalled) return 1;
-		return 2;
+		if (/*$wakeState*/ ctx[2].isServerRunning === false) return 1;
+		if (!/*$wakeState*/ ctx[2].isAnvilInstalled) return 2;
+		return 3;
 	}
 
 	current_block_type_index = select_block_type(ctx);
@@ -33163,7 +33228,7 @@ function create_fragment(ctx) {
 			main = element("main");
 			if_block.c();
 			attr_dev(main, "class", "h-full my-0 overflow-hidden");
-			add_location(main, file, 40, 0, 1786);
+			add_location(main, file, 60, 0, 2354);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -33226,6 +33291,8 @@ function create_fragment(ctx) {
 	return block;
 }
 
+const SERVER_TIMEOUT = 10000;
+
 function instance($$self, $$props, $$invalidate) {
 	let $wakeState;
 	let $compilationIssuesVisible;
@@ -33262,10 +33329,36 @@ function instance($$self, $$props, $$invalidate) {
 	];
 
 	onMount(async () => {
-		await setupStores();
-		$$invalidate(0, initLoading = false);
+		startServer();
+		setupListeners();
 		activeTab.set(tabs[0].id);
 	});
+
+	const startServer = () => {
+		$$invalidate(0, initLoading = true);
+
+		const timeout = setTimeout(
+			() => {
+				$$invalidate(0, initLoading = false);
+				setServerRunning(false);
+				console.log('Server not running', $wakeState);
+			},
+			SERVER_TIMEOUT
+		);
+
+		requestState().then(() => {
+			clearTimeout(timeout);
+			setServerRunning(true);
+			$$invalidate(0, initLoading = false);
+		});
+	};
+
+	const setServerRunning = isRunning => {
+		wakeState.set({
+			isAnvilInstalled: $wakeState.isAnvilInstalled,
+			isServerRunning: isRunning
+		});
+	};
 
 	const installAnvil = () => {
 		openExternal('https://book.getfoundry.sh/getting-started/installation');
@@ -33274,7 +33367,7 @@ function instance($$self, $$props, $$invalidate) {
 	const writable_props = [];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Sake> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1.warn(`<Sake> was created with unknown prop '${key}'`);
 	});
 
 	const click_handler = () => compilationIssuesVisible.set(false);
@@ -33296,10 +33389,11 @@ function instance($$self, $$props, $$invalidate) {
 		onMount,
 		Tabs,
 		deployedContracts,
-		setupStores,
+		requestState,
 		compilationIssuesVisible,
 		activeTab,
 		wakeState,
+		setupListeners,
 		Compile,
 		Deploy,
 		Run,
@@ -33308,8 +33402,11 @@ function instance($$self, $$props, $$invalidate) {
 		CompilationIssues,
 		openExternal,
 		initLoading,
+		SERVER_TIMEOUT,
 		TabId,
 		tabs,
+		startServer,
+		setServerRunning,
 		installAnvil,
 		$wakeState,
 		$compilationIssuesVisible,
@@ -33335,6 +33432,7 @@ function instance($$self, $$props, $$invalidate) {
 		$activeTab,
 		$deployedContracts,
 		tabs,
+		startServer,
 		installAnvil,
 		click_handler
 	];
@@ -33343,7 +33441,7 @@ function instance($$self, $$props, $$invalidate) {
 class Sake extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init$1(this, options, instance, create_fragment, safe_not_equal, {});
+		init(this, options, instance, create_fragment, safe_not_equal, {});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,

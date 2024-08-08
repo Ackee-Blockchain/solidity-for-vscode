@@ -208,6 +208,7 @@ export interface AccountStateData {
 
 export interface WakeStateData {
     isAnvilInstalled: boolean | undefined;
+    isServerRunning: boolean | undefined;
 }
 
 export type TxHistoryStateData = TxDeploymentOutput | TxCallOutput;

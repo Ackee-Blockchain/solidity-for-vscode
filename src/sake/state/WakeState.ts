@@ -6,7 +6,8 @@ export class WakeState extends BaseState<WakeStateData> {
 
     private constructor() {
         super(StateId.Wake, {
-            isAnvilInstalled: undefined
+            isAnvilInstalled: undefined,
+            isServerRunning: undefined
         });
     }
 
@@ -17,9 +18,17 @@ export class WakeState extends BaseState<WakeStateData> {
         return this._instance;
     }
 
-    public set(isAnvilInstalled: boolean) {
+    public setIsAnvilInstalled(isAnvilInstalled: boolean) {
         this.state = {
+            ...this._state,
             isAnvilInstalled: isAnvilInstalled
+        };
+    }
+
+    public setIsServerRunning(isServerRunning: boolean) {
+        this.state = {
+            ...this._state,
+            isServerRunning: isServerRunning
         };
     }
 }
