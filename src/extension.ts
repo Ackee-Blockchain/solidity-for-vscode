@@ -160,6 +160,8 @@ export async function activate(context: vscode.ExtensionContext) {
             );
     }
 
+    registerCommands(outputChannel, context);
+
     if (!wakePort) {
         let installer: Installer;
 
@@ -316,7 +318,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.window.registerTreeDataProvider('wake-detections', wakeProvider);
     vscode.window.registerTreeDataProvider('solc-detections', solcProvider);
 
-    registerCommands(outputChannel, context);
+    // registerCommands(outputChannel, context);
 
     initCoverage(outputChannel);
 
