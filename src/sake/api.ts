@@ -377,9 +377,7 @@ async function sendWakeRequest<T>(
     } catch (e) {
         console.error(e);
         const message = typeof e === 'string' ? e : (e as Error).message;
-        console.log('message', `|${message}|`);
-        console.log('===', message === 'Anvil executable not found');
-        if (message === 'Anvil executable not found') {
+        if (message == 'Anvil executable not found') {
             wakeState.set(false);
         }
         throw Error(message);

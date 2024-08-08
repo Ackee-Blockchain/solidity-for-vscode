@@ -24,6 +24,11 @@
 {#if $compilationState.issues.length > 0}
     <section class="w-full">
         <div class="flex flex-col gap-2">
+            <span class="text-sm mb-2">
+                The compilation process handles files in batches. If any errors occur in a single
+                file, the entire batch won't be compiled, and the contracts from that batch won't be
+                displayed in <span class="italic">Compiled Contracts</span>.
+            </span>
             {#each $compilationState.issues as issue (issue.fqn + issue.type)}
                 <CompilationError {issue} />
             {/each}

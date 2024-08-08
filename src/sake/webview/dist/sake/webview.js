@@ -31943,7 +31943,7 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (15:0) {:else}
+// (20:0) {:else}
 function create_else_block$1(ctx) {
 	let section;
 	let div;
@@ -31956,11 +31956,11 @@ function create_else_block$1(ctx) {
 			span = element("span");
 			span.textContent = "No compilation issues";
 			attr_dev(span, "class", "text-sm my-2 text-center text-secon");
-			add_location(span, file$1, 17, 12, 937);
+			add_location(span, file$1, 22, 12, 1273);
 			attr_dev(div, "class", "flex flex-col gap-2 items-center text-vscodeInputForeground");
-			add_location(div, file$1, 16, 8, 851);
+			add_location(div, file$1, 21, 8, 1187);
 			attr_dev(section, "class", "h-full w-full flex flex-col items-center justify-center gap-3");
-			add_location(section, file$1, 15, 4, 763);
+			add_location(section, file$1, 20, 4, 1099);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, section, anchor);
@@ -31979,7 +31979,7 @@ function create_else_block$1(ctx) {
 		block,
 		id: create_else_block$1.name,
 		type: "else",
-		source: "(15:0) {:else}",
+		source: "(20:0) {:else}",
 		ctx
 	});
 
@@ -31990,6 +31990,11 @@ function create_else_block$1(ctx) {
 function create_if_block$1(ctx) {
 	let section;
 	let div;
+	let span1;
+	let t0;
+	let span0;
+	let t2;
+	let t3;
 	let each_blocks = [];
 	let each_1_lookup = new Map();
 	let current;
@@ -32008,11 +32013,21 @@ function create_if_block$1(ctx) {
 		c: function create() {
 			section = element("section");
 			div = element("div");
+			span1 = element("span");
+			t0 = text("The compilation process handles files in batches. If any errors occur in a single\n                file, the entire batch won't be compiled, and the contracts from that batch won't be\n                displayed in ");
+			span0 = element("span");
+			span0.textContent = "Compiled Contracts";
+			t2 = text(".");
+			t3 = space();
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
+			attr_dev(span0, "class", "italic");
+			add_location(span0, file$1, 12, 29, 845);
+			attr_dev(span1, "class", "text-sm mb-2");
+			add_location(span1, file$1, 9, 12, 589);
 			attr_dev(div, "class", "flex flex-col gap-2");
 			add_location(div, file$1, 8, 8, 543);
 			attr_dev(section, "class", "w-full");
@@ -32021,6 +32036,11 @@ function create_if_block$1(ctx) {
 		m: function mount(target, anchor) {
 			insert_dev(target, section, anchor);
 			append_dev(section, div);
+			append_dev(div, span1);
+			append_dev(span1, t0);
+			append_dev(span1, span0);
+			append_dev(span1, t2);
+			append_dev(div, t3);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				if (each_blocks[i]) {
@@ -32076,7 +32096,7 @@ function create_if_block$1(ctx) {
 	return block;
 }
 
-// (10:12) {#each $compilationState.issues as issue (issue.fqn + issue.type)}
+// (15:12) {#each $compilationState.issues as issue (issue.fqn + issue.type)}
 function create_each_block(key_1, ctx) {
 	let first;
 	let compilationerror;
@@ -32125,7 +32145,7 @@ function create_each_block(key_1, ctx) {
 		block,
 		id: create_each_block.name,
 		type: "each",
-		source: "(10:12) {#each $compilationState.issues as issue (issue.fqn + issue.type)}",
+		source: "(15:12) {#each $compilationState.issues as issue (issue.fqn + issue.type)}",
 		ctx
 	});
 
