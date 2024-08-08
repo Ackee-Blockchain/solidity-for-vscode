@@ -85,7 +85,8 @@ export enum WebviewMessage {
     onGetBalances = 'onGetBalances', // @ todo rename, probably dony use 'on' everywhere
     onSetBalances = 'onSetBalances',
     onsetLabel = 'onsetLabel',
-    onNavigate = 'onNavigate'
+    onNavigate = 'onNavigate',
+    onOpenExternal = 'onOpenExternal'
 }
 
 // TODO create pairs of WebviewMessage and WebviewInput and WebviewOutput
@@ -205,13 +206,18 @@ export interface AccountStateData {
     nick: string | null;
 }
 
+export interface WakeStateData {
+    isAnvilInstalled: boolean | undefined;
+}
+
 export type TxHistoryStateData = TxDeploymentOutput | TxCallOutput;
 
 export enum StateId {
     DeployedContracts = 'deployedContracts',
     CompiledContracts = 'compiledContracts',
     Accounts = 'accounts',
-    TxHistory = 'txHistory'
+    TxHistory = 'txHistory',
+    Wake = 'wake'
 }
 
 export interface TxReceipt {

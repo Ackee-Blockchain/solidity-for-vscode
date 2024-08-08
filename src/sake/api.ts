@@ -36,11 +36,13 @@ import { decodeCallReturnValue } from './utils/call';
 import { OutputViewManager, SakeOutputTreeProvider } from './providers/OutputTreeProvider';
 import { TxHistoryState } from './state/TxHistoryState';
 import { validate } from './utils/validate';
+import { WakeState } from './state/WakeState';
 
 const accountState = AccountState.getInstance();
 const deploymentState = DeploymentState.getInstance();
 const compilationState = CompilationState.getInstance();
 const txHistoryState = TxHistoryState.getInstance();
+const wakeState = WakeState.getInstance();
 
 /**
  * Get accounts and balances and save to state
@@ -54,7 +56,7 @@ export async function getAccounts(client: LanguageClient | undefined) {
             throw new Error('Missing language client');
         }
 
-        let result = await client?.sendRequest<Address[]>('wake/sake/getAccounts');
+        let result = await sendWakeRequest<Address[]>(client, 'wake/sake/getAccounts');
 
         result = validate(result);
 
@@ -104,7 +106,8 @@ export async function getBalances(
             throw new Error('Missing language client');
         }
 
-        let result = await client?.sendRequest<WakeGetBalancesResponse>(
+        let result = await sendWakeRequest<WakeGetBalancesResponse>(
+            client,
             'wake/sake/getBalances',
             requestParams
         );
@@ -143,7 +146,8 @@ export async function setBalances(
             throw new Error('Missing language client');
         }
 
-        let result = await client?.sendRequest<WakeSetBalancesResponse>(
+        let result = await sendWakeRequest<WakeSetBalancesResponse>(
+            client,
             'wake/sake/setBalances',
             requestParams
         );
@@ -172,7 +176,7 @@ export async function compile(client: LanguageClient | undefined) {
             throw new Error('Missing language client');
         }
 
-        let result = await client?.sendRequest<WakeCompilationResponse>('wake/sake/compile');
+        let result = await sendWakeRequest<WakeCompilationResponse>(client, 'wake/sake/compile');
 
         console.log(result);
 
@@ -207,7 +211,8 @@ export async function deploy(
             throw new Error('Missing language client');
         }
 
-        let result = await client?.sendRequest<WakeDeploymentResponse>(
+        let result = await sendWakeRequest<WakeDeploymentResponse>(
+            client,
             'wake/sake/deploy',
             requestParams
         );
@@ -283,7 +288,7 @@ export async function call(
         const apiEndpoint =
             callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
         // const apiEndpoint = 'wake/sake/transact';
-        let result = await client?.sendRequest<WakeCallResponse>(apiEndpoint, requestParams);
+        let result = await sendWakeRequest<WakeCallResponse>(client, apiEndpoint, requestParams);
 
         result = validate(result);
 
@@ -342,7 +347,7 @@ export async function setLabel(
             throw new Error('Missing language client');
         }
 
-        client?.sendRequest<WakeSetBalancesResponse>('wake/sake/setLabel', requestParams);
+        sendWakeRequest<WakeSetBalancesResponse>(client, 'wake/sake/setLabel', requestParams);
     } catch (e) {
         const message = typeof e === 'string' ? e : (e as Error).message;
         vscode.window.showErrorMessage('Failed to set balances: ' + message);
@@ -354,4 +359,29 @@ function specifyCallType(func: ContractFunction): CallType {
     return func.stateMutability === 'view' || func.stateMutability === 'pure'
         ? CallType.Call
         : CallType.Transact;
+}
+
+async function sendWakeRequest<T>(
+    client: LanguageClient | undefined,
+    method: string,
+    params?: any
+): Promise<T> {
+    if (client === undefined) {
+        throw new Error('Missing language client');
+    }
+
+    try {
+        const response = await client.sendRequest<T>(method, params);
+        wakeState.set(true);
+        return response;
+    } catch (e) {
+        console.error(e);
+        const message = typeof e === 'string' ? e : (e as Error).message;
+        console.log('message', `|${message}|`);
+        console.log('===', message === 'Anvil executable not found');
+        if (message === 'Anvil executable not found') {
+            wakeState.set(false);
+        }
+        throw Error(message);
+    }
 }

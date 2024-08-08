@@ -84,3 +84,7 @@ export async function navigateTo(
 ) {
     messageHandler.send(WebviewMessage.onNavigate, { path, startOffset, endOffset });
 }
+
+export async function openExternal(url: string) {
+    messageHandler.send(WebviewMessage.onOpenExternal, { path: url });
+}

@@ -20,7 +20,8 @@
         deployedContracts,
         setupStores,
         compilationIssuesVisible,
-        activeTab
+        activeTab,
+        wakeState
     } from '../../helpers/store';
     import Compile from './Compile.svelte';
     import Deploy from './Deploy.svelte';
@@ -43,6 +44,8 @@
         vsCodePanelView(),
         vsCodeProgressRing()
     );
+
+    import { openExternal } from '../../helpers/api';
 
     let initLoading = true;
 
@@ -67,6 +70,10 @@
         initLoading = false;
         activeTab.set(tabs[0].id);
     });
+
+    const installAnvil = () => {
+        openExternal('https://book.getfoundry.sh/getting-started/installation');
+    };
 </script>
 
 <main class="h-full my-0 overflow-hidden">
@@ -74,6 +81,18 @@
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
             <vscode-progress-ring />
             <span>Connecting with Wake...</span>
+        </div>
+    {:else if $wakeState.isAnvilInstalled === undefined || !$wakeState.isAnvilInstalled}
+        <div class="flex flex-col gap-4 h-full w-full p-4">
+            <h3 class="uppercase font-bold text-base">Anvil not installed</h3>
+            <span
+                >To use the <span class="italic">Deploy and Interact UI</span>, Froundry's Anvil is
+                required to be installed on your device in order to start a local chain.</span
+            >
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <vscode-button appearance="primary" on:click={installAnvil}>
+                Visit Anvil Installation Page
+            </vscode-button>
         </div>
     {:else}
         <Tabs {tabs}>

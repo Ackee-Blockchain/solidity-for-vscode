@@ -5,7 +5,8 @@ import {
     type AccountStateData,
     type CompilationStateData,
     type CompiledContract,
-    type DeploymentStateData
+    type DeploymentStateData,
+    type WakeStateData
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import { parseComplexNumber } from '../../shared/validate';
@@ -40,6 +41,9 @@ export const compilationState = writable<CompilationStateData>({
     contracts: [],
     issues: [],
     dirty: true
+});
+export const wakeState = writable<WakeStateData>({
+    isAnvilInstalled: undefined
 });
 
 /**
@@ -120,6 +124,15 @@ function setupListeners() {
                         );
                     }
 
+                    return;
+                }
+
+                if (stateId === StateId.Wake) {
+                    if (payload === undefined) {
+                        return;
+                    }
+                    // console.log('wake state', payload);
+                    wakeState.set(payload);
                     return;
                 }
 

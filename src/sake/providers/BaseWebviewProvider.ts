@@ -15,6 +15,7 @@ import {
 } from '../webview/shared/types';
 import { CompilationState } from '../state/CompilationState';
 import { AccountState } from '../state/AccountState';
+import { WakeState } from '../state/WakeState';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -39,6 +40,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         DeploymentState.getInstance().subscribe(this);
         CompilationState.getInstance().subscribe(this);
         AccountState.getInstance().subscribe(this);
+        WakeState.getInstance().subscribe(this);
 
         // Handle messages from the webview
         webviewView.webview.onDidReceiveMessage(async (message) => {
@@ -398,6 +400,17 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                         vscode.TextEditorRevealType.InCenter
                     );
                 }
+            }
+
+            case WebviewMessage.onOpenExternal: {
+                if (!payload) {
+                    console.error('No external link provided');
+                    return;
+                }
+
+                const { path } = payload;
+
+                vscode.env.openExternal(vscode.Uri.parse(path));
             }
 
             default: {

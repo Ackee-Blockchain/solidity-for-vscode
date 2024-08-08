@@ -25,6 +25,7 @@
     import WarningIcon from '../../components/icons/WarningIcon.svelte';
     import ErrorIcon from '../../components/icons/ErrorIcon.svelte';
     import TextContainerDark from '../../components/TextContainerDark.svelte';
+    import { compileContracts } from '../../helpers/api';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -39,7 +40,7 @@
 
     const compile = async () => {
         compiling = true;
-        await messageHandler.request<boolean>(WebviewMessage.onCompile);
+        await compileContracts();
         compiling = false;
     };
 
