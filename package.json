@@ -982,11 +982,11 @@
         "viewsWelcome": [
             {
                 "view": "wake-detections",
-                "contents": "Open a workspace with Solidity files to start detecting vulnerabilities."
+                "contents": ""
             },
             {
                 "view": "solc-detections",
-                "contents": "Open a workspace with Solidity files to start detecting vulnerabilities."
+                "contents": ""
             },
             {
                 "view": "sake",
