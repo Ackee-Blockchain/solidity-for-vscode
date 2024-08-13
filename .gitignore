@@ -4,3 +4,5 @@ node_modules
 .vscode-test/
 *.vsix
 env.ts
+.DS_Store
+.todo

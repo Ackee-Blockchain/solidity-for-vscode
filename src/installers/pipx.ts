@@ -124,6 +124,7 @@ export class PipxInstaller implements Installer {
                 this.outputChannel.appendLine(`Found 'eth-wake' in version ${version} but the target minimal version is ${WAKE_MIN_VERSION}.`);
                 await this.pipxUpgrade();
             }
+            this.analytics.setWakeVersion(this.getWakeVersion());
         } catch(err) {
             this.analytics.logCrash(EventType.ERROR_WAKE_INSTALL_PIPX, err);
             if (err instanceof Error) {

@@ -15,6 +15,7 @@ export class CondaInstaller implements Installer {
     private readonly storage = new Storage();
     private readonly publicKey: string;
     private readonly markerFile: string;
+    private readonly upgradeFile: string;
     private readonly activateCommand: string;
     private readonly shell: string;
 
@@ -27,6 +28,7 @@ export class CondaInstaller implements Installer {
         const pubkeyPath = context.asAbsolutePath('resources/conda_public_key.pem');
         this.publicKey = fs.readFileSync(pubkeyPath, 'utf8');
         this.markerFile = path.join(context.globalStorageUri.fsPath, '.conda-version');
+        this.upgradeFile = path.join(context.globalStorageUri.fsPath, '.conda-upgrade');
 
         if (process.platform === 'win32') {
             this.activateCommand = '"' + path.join(context.globalStorageUri.fsPath, 'wake-conda', 'Scripts', 'activate.bat') + '"';
@@ -130,7 +132,9 @@ export class CondaInstaller implements Installer {
                 cwd: extractPath,
             });
         });
+    }
 
+    private async condaUnpack(): Promise<void> {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Setting up conda environment`,
@@ -141,6 +145,24 @@ export class CondaInstaller implements Installer {
     }
 
     async setup(): Promise<void> {
+        const extractPath = path.join(this.context.globalStorageUri.fsPath, 'wake-conda');
+        const upgradePath = path.join(this.context.globalStorageUri.fsPath, 'wake-conda-upgrade');
+
+        // finish upgrade if needed
+        if (fs.existsSync(this.upgradeFile) && fs.existsSync(upgradePath)) {
+            const upgradeVersion = fs.readFileSync(this.upgradeFile, 'utf8').trim();
+
+            if (fs.existsSync(extractPath)) {
+                fs.rmSync(extractPath, { recursive: true });
+            }
+            fs.renameSync(upgradePath, extractPath);
+
+            await this.condaUnpack();
+
+            fs.writeFileSync(this.markerFile, upgradeVersion);
+            fs.rmSync(this.upgradeFile);
+        }
+
         let platform: string;
         if (process.platform === 'win32') {
             platform = 'windows';
@@ -194,8 +216,6 @@ export class CondaInstaller implements Installer {
             resolve([latestFile, latestVersion]);
         });
 
-        const extractPath = path.join(this.context.globalStorageUri.fsPath, 'wake-conda');
-
         let currentVersion: string | undefined = undefined;
         if (fs.existsSync(this.markerFile)) {
             try {
@@ -206,24 +226,27 @@ export class CondaInstaller implements Installer {
         if (currentVersion === undefined || compare(currentVersion, WAKE_MIN_VERSION) < 0) {
             if (currentVersion !== undefined) {
                 await vscode.window.showInformationMessage(
-                    `The conda environment in version ${currentVersion} installed but the minimal version is ${WAKE_MIN_VERSION}. Updating...`,
+                    `The Wake conda environment in version ${currentVersion} installed but the minimal version is ${WAKE_MIN_VERSION}. Updating...`,
                 );
             }
             let [latestFile, latestVersion] = await promise;
 
             // no conda environment installed yet
             if (latestFile === undefined || latestVersion === undefined) {
-                await vscode.window.showErrorMessage(`No conda environment found for platform ${process.platform} and architecture ${process.arch}`);
-                throw new Error(`No conda environment found for platform ${process.platform} and architecture ${process.arch}`);
+                await vscode.window.showErrorMessage(`No Wake conda environment found for platform ${process.platform} and architecture ${process.arch}`);
+                throw new Error(`No Wake conda environment found for platform ${process.platform} and architecture ${process.arch}`);
             }
 
             await this.verifyAndExtractArchive(extractPath, latestFile.name);
+            await this.condaUnpack();
             fs.writeFileSync(this.markerFile, latestVersion);
 
-            // TODO: do we have to restart the extension because of overwritten binaries?
+            this.analytics.setWakeVersion(latestVersion);
 
             return;
         } else {
+            this.analytics.setWakeVersion(currentVersion);
+
             promise.then(([latestFile, latestVersion]) => {
                 if (latestFile === undefined || latestVersion === undefined) {
                     return;
@@ -234,13 +257,21 @@ export class CondaInstaller implements Installer {
                 }
 
                 // offer an update
-                // TODO: better message
-                const message = `A new conda environment version is available. Would you like to update to version ${latestVersion}?`;
+                const message = `A new Wake conda environment version is available. Would you like to update to version ${latestVersion}?`;
 
                 vscode.window.showInformationMessage(message, 'Yes', 'No').then(async (update) => {
                     if (update === 'Yes') {
-                        await this.verifyAndExtractArchive(extractPath, latestFile.name);
-                        fs.writeFileSync(this.markerFile, latestVersion);
+                        await this.verifyAndExtractArchive(upgradePath, latestFile.name);
+                        fs.writeFileSync(this.upgradeFile, latestVersion);
+
+                        await vscode.window.showInformationMessage(
+                            `The Wake conda environment will be updated to version ${latestVersion} after restarting VS Code.`,
+                            'Restart Now'
+                        ).then((restart) => {
+                            if (restart === 'Restart Now') {
+                                vscode.commands.executeCommand('workbench.action.reloadWindow');
+                            }
+                        });
                     }
                     return update;
                 });

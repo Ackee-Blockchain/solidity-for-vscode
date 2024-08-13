@@ -24,6 +24,7 @@ class TelemetrySender implements vscode.TelemetrySender {
 export class Analytics{
     context : vscode.ExtensionContext;
     telemetryLogger: vscode.TelemetryLogger;
+    wakeVersion: string | undefined;
 
     constructor(context: vscode.ExtensionContext, private readonly installation: string){
         appInsights.setup(env.TELEMETRY_KEY)
@@ -41,8 +42,13 @@ export class Analytics{
 
         this.context = context;
         this.telemetryLogger = vscode.env.createTelemetryLogger(new TelemetrySender());
+        this.wakeVersion = undefined;
 
         context.subscriptions.push(this.telemetryLogger);
+    }
+
+    public setWakeVersion(version: string){
+        this.wakeVersion = version;
     }
 
     logActivate(){
@@ -65,6 +71,7 @@ export class Analytics{
                 'common.os': process.platform.toString(),
                 'common.nodeArch': process.arch,
                 'installation': this.installation,
+                'wake.version': this.wakeVersion || 'unknown',
             }
         );
     }
