@@ -72,6 +72,7 @@ export class CondaInstaller implements Installer {
                     }
                 });
                 fileStream.on('error', (err: Error) => {
+                    console.error(`fileStream error ${err}`);
                     reject(err);
                 });
 
@@ -92,6 +93,8 @@ export class CondaInstaller implements Installer {
         const hashPath = `${archivePath}.sha256`;
         const signaturePath = `${archivePath}.sha256.sig`;
 
+        console.error(`archivePath ${archivePath}`);
+
         await this.downloadFile(filename, archivePath);
         await this.downloadFile(`${filename}.sha256`, hashPath);
         await this.downloadFile(`${filename}.sha256.sig`, signaturePath);
@@ -100,8 +103,8 @@ export class CondaInstaller implements Installer {
         const hashData = fs.readFileSync(hashPath);
 
         if (!this.verifySignature(hashData, signature)) {
-            console.log(`hashData: ${hashData.toString('utf8')}`);
-            console.log(`signature: ${signature.toString('hex')}`);
+            console.error(`hashData: ${hashData.toString('utf8')}`);
+            console.error(`signature: ${signature.toString('hex')}`);
             await vscode.window.showErrorMessage(`Signature verification failed for ${filename}`);
             throw new Error('Signature verification failed');
         }
