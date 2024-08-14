@@ -225,7 +225,7 @@ export class CondaInstaller implements Installer {
 
         if (currentVersion === undefined || compare(currentVersion, WAKE_MIN_VERSION) < 0) {
             if (currentVersion !== undefined) {
-                await vscode.window.showInformationMessage(
+                vscode.window.showInformationMessage(
                     `The Wake conda environment in version ${currentVersion} installed but the minimal version is ${WAKE_MIN_VERSION}. Updating...`,
                 );
             }
