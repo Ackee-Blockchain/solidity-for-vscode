@@ -188,7 +188,7 @@ export class CondaInstaller implements Installer {
             let latestFile = undefined;
 
             try {
-                const [files] = await this.storage.bucket(this.bucketName).getFiles();
+                const [files] = await this.storage.bucket(this.bucketName).getFiles({matchGlob: `*${platform}-${arch}.tar.gz`});
 
                 for (const file of files) {
                     const [metadata] = await file.getMetadata();
