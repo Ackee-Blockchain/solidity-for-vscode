@@ -97,8 +97,6 @@ export class CondaInstaller implements Installer {
         const hashData = fs.readFileSync(hashPath);
 
         if (!this.verifySignature(hashData, signature)) {
-            console.log(`hashData: ${hashData.toString('utf8')}`);
-            console.log(`signature: ${signature.toString('hex')}`);
             await vscode.window.showErrorMessage(`Signature verification failed for ${filename}`);
             throw new Error('Signature verification failed');
         }
