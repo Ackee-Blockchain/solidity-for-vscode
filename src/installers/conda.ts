@@ -57,10 +57,7 @@ export class CondaInstaller implements Installer {
             let lastPercentage = 0;
 
             return new Promise<void>((resolve, reject) => {
-                fileStream.on('end', () => {
-                    destFile.end();
-                    resolve();
-                });
+                destFile.on('finish', resolve);
 
                 fileStream.on('data', (chunk: Buffer) => {
                     if (fileSize !== 0) {
@@ -100,8 +97,6 @@ export class CondaInstaller implements Installer {
         const hashData = fs.readFileSync(hashPath);
 
         if (!this.verifySignature(hashData, signature)) {
-            console.log(`hashData: ${hashData.toString('utf8')}`);
-            console.log(`signature: ${signature.toString('hex')}`);
             await vscode.window.showErrorMessage(`Signature verification failed for ${filename}`);
             throw new Error('Signature verification failed');
         }
