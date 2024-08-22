@@ -8,8 +8,8 @@
         vsCodeCheckbox,
         vsCodeTextField
     } from '@vscode/webview-ui-toolkit';
-    import { compilationState } from '../../helpers/store';
-    import CompilationError from '../../components/CompilationError.svelte';
+    import { compilationState } from '../helpers/store';
+    import CompilationError from './CompilationError.svelte';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
