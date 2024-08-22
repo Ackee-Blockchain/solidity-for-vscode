@@ -20692,8 +20692,7 @@ const wakeState = writable({
  * setup stores
  */
 async function requestState() {
-    const a = await client.messageHandler.request(WebviewMessage.onGetAccounts);
-    console.log('response from get accs', a);
+    await client.messageHandler.request(WebviewMessage.onGetAccounts);
     await client.messageHandler.request(WebviewMessage.getState, StateId.DeployedContracts);
     await client.messageHandler.request(WebviewMessage.getState, StateId.CompiledContracts);
 }

@@ -325,6 +325,14 @@ export async function activate(context: vscode.ExtensionContext) {
     client.start();
     analytics.logActivate();
 
+    // force show walkthrough on new release
+    const shownWalkthrough = context.globalState.get('tools-for-solidity.force-shown-walkthrough');
+    if (!shownWalkthrough) {
+        // Set the flag in globalState
+        await context.globalState.update('tools-for-solidity.force-shown-walkthrough', true);
+        vscode.commands.executeCommand('Tools-for-Solidity.open_walkthrough');
+    }
+
     // activate Sake
     activateSake(context, client);
 }
@@ -616,6 +624,16 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.open-sake-ui', async () => {
             vscode.commands.executeCommand('workbench.view.extension.sake');
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.open_walkthrough', () => {
+            vscode.commands.executeCommand(
+                `workbench.action.openWalkthrough`,
+                `ackeeblockchain.tools-for-solidity#tfs-walkthrough`,
+                false
+            );
         })
     );
 }
