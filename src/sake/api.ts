@@ -220,7 +220,6 @@ export async function deploy(
         if (result == null) {
             throw new Error('No result returned');
         }
-        // if (!result.success) { throw new Error("Deployment was unsuccessful"); }
 
         let _contractCompilationData;
         if (result.success) {
@@ -246,7 +245,7 @@ export async function deploy(
         // Add to tx history
         const txOutput: TxDeploymentOutput = {
             type: TxType.Deployment,
-            success: true, // TODO success will show true even on revert
+            success: result.success, // TODO success will show true even on revert
             from: requestParams.sender,
             contractAddress: result.contractAddress,
             contractName: getNameFromContractFqn(requestParams.contractFqn),
