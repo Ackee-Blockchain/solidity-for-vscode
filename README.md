@@ -1,5 +1,24 @@
 # Solidity by [Ackee Blockchain Security](https://ackee.xyz)
-**Ethereum Solidity and local node testing with security features for Visual Studio Code.**
+
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="https://img.shields.io/discord/867746290678104064?colorA=21262d&colorB=0000FF&style=flat">
+  <img
+    src="https://img.shields.io/discord/867746290678104064?colorA=f6f8fa&colorB=0000FF&style=flat"
+    alt="Get help on Discord">
+</picture>
+
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="https://img.shields.io/visual-studio-marketplace/d/AckeeBlockchain.tools-for-solidity?colorA=21262d&colorB=0000FF&style=flat">
+  <img
+    src="https://img.shields.io/visual-studio-marketplace/d/AckeeBlockchain.tools-for-solidity?colorA=f6f8fa&colorB=0000FF&style=flat"
+    alt="Visual Studio Marketplace Downloads">
+</picture><br></br>
+
+Ethereum Solidity and local node testing with security features for Visual Studio Code.
 
 This extension adds language support for Solidity to Visual Studio Code, and provides a remix-like experience for testing contracts on your local network. Benefits:
 - Test and interact with your smart contracts on an Ethereum local node
