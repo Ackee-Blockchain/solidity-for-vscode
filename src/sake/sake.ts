@@ -73,16 +73,6 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
         })
     );
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.open_walkthrough', () => {
-            vscode.commands.executeCommand(
-                `workbench.action.openWalkthrough`,
-                `ackeeblockchain.tools-for-solidity#tfs-walkthrough`,
-                false
-            );
-        })
-    );
-
     // // register status bar
     // const statusBarEnvironmentProvider = new StatusBarEnvironmentProvider();
     // context.subscriptions.push(statusBarEnvironmentProvider.registerCommand());

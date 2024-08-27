@@ -53,7 +53,6 @@ export const wakeState = writable<WakeStateData>({
 
 export async function requestState() {
     const a = await messageHandler.request(WebviewMessage.onGetAccounts);
-    console.log('response from get accs', a);
     await messageHandler.request(WebviewMessage.getState, StateId.DeployedContracts);
     await messageHandler.request(WebviewMessage.getState, StateId.CompiledContracts);
 }

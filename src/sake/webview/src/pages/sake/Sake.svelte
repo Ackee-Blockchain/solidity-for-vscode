@@ -29,7 +29,7 @@
     import Run from './Run.svelte';
     import BlankIcon from '../../components/icons/BlankIcon.svelte';
     import BackIcon from '../../components/icons/BackIcon.svelte';
-    import CompilationIssues from './CompilationIssues.svelte';
+    import CompilationIssues from '../../components/CompilationIssues.svelte';
     // import '../../../shared/types'; // Importing types to avoid TS error
 
     provideVSCodeDesignSystem().register(
