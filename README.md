@@ -1,4 +1,4 @@
-# Solidity by [Ackee Blockchain](https://ackee.xyz)
+# Solidity by [Ackee Blockchain Security](https://ackee.xyz)
 **Ethereum Solidity and local node testing with security features for Visual Studio Code.**
 
 This extension adds language support for Solidity to Visual Studio Code, and provides a remix-like experience for testing contracts on your local network. Benefits:
@@ -86,7 +86,6 @@ Visualise contract inheritance and function control flows with graphs
 ![alt text](images/readme/development/graph.gif)
 
 
-
 ## Requirements
 
 The Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.8 or higher. Python 3.12 is experimentally supported. This package is automatically installed via conda by default. See [link](https://ackee.xyz/solidity/docs/installation) for other installation optional.
@@ -105,7 +104,6 @@ Get help and give feedback in our [Discord](https://discord.gg/x7qXXnGCsa)
 Follow Ackee on [Twitter](https://twitter.com/AckeeBlockchain)
 
 
-
 ## Known Issues
 
 - **Files created/modified/deleted outside of VS Code are not properly analyzed**
@@ -119,7 +117,3 @@ It is always recommended to open a project as a folder (`File -> Open folder`). 
 - **Analysis does not work when the workspace contains compilation errors**
 
 The extension relies on the `solc` compiler. For this reason, files containing compilation errors and files importing these files cannot be analysed.
-
-
-
-
