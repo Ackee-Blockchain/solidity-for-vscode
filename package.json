@@ -12,7 +12,10 @@
         "audit",
         "security",
         "compiler",
-        "solidity security"
+        "remix",
+        "wake",
+        "evm",
+        "solhint"
     ],
     "homepage": "https://ackee.xyz/blog/introducing-tools-for-solidity/",
     "bugs": {
