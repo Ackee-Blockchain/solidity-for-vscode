@@ -1,157 +1,110 @@
-# [Ackee Blockchain](https://ackee.xyz) Tools for Solidity ([Wake](https://getwake.io))
+# Solidity by [Ackee Blockchain](https://ackee.xyz)
+**Ethereum Solidity and local node testing with security features for Visual Studio Code.**
 
-Tools for Solidity is an extension for Visual Studio Code, powered by [Wake](https://getwake.io), that offers most of the language server features and displays real-time results of vulnerability detectors and compiler warnings/errors in custom UI. Different graph types can be generated to better visualize the relations in the code.
+This extension adds language support for Solidity to Visual Studio Code, and provides a remix-like experience for testing contracts on your local network. Benefits:
+- Test and interact with your smart contracts on an Ethereum local node
+- See vulnerabilities from static analysis in real-time
+- Best code navigation experience, call-graphs and more.
 
-**Features:**
+## Test and interact with your smart contracts on an Ethereum local node
 
-- Diagnostics & Detections UI
-- Go to Definition, Type Definition, Implementation
-- Find References
-- Type Hierarchy
-- Document Links, Document Symbols, Workspace Symbols
-- Hover
-- Code Lens
-- Rename
+### Compile and deploy contracts
 
-**Supported graph types:**
+Compile your contracts and deploy them on a local chain for testing
 
-- Control Flow Graph
-- Inheritance Graph
-- Linearized Inheritance Graph
+![alt text](images/readme/sake/1-compile-deploy.gif)
 
-## Dependencies
 
-The Tools for Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.8 or higher. Python 3.12 is experimentally supported.
+### Interact with contracts
 
-Rosetta is required to be enabled on Apple Silicon (M1, M2 & M3) Macs.
+Test your deployed contracts by interacting with them using function calls with different inputs
 
-## Installation
+![alt text](images/readme/sake/2-interact.gif)
 
-The package [eth-wake](https://pypi.org/project/eth-wake/) is installed `automatically` when this extension is activated.
+## See vulnerabilities from static analysis in real-time
 
-Alternatively, it can be installed `manually` using:
+### Compilation Errors
 
-```shell
-python3 -m pip install eth-wake
-```
+See compilation errors highlighted in code
 
-## Features
+![alt text](images/readme/diagnostics/1-compilation-errors.gif)
 
-### Detections
+### See vulnerabilities from static analysis in real-time
 
-Vulnerability detections from [Wake](https://getwake.io) are shown in our Detections UI with customizable grouping by path, impact, confidence or detector, and filtering by impact and confidence.
+Catch potential issues early with real-time static analysis
 
-![Detections preview](images/detections-ui.png)
+![alt text](images/readme/diagnostics/2-realtime-detectors.gif)
+
+### Security Overview in the Sidebar
+
+Get an overall overview of issues in your project
+
+![alt text](images/readme/diagnostics/3-sidebar-overview.gif)
+
+## Best code navigation experience, call-graphs and more
 
 ### Go to definition
 
-![Go to definition preview](images/go-to-definition.gif)
+Quickly navigate to any function or variable definition with a click
 
-### Go to implementation
-
-Find implementations of an unimplemented function or modifier.
-
-![Go to implementation preview](images/go-to-implementation.gif)
+![alt text](images/readme/development/go_to_definition.gif)
 
 ### Find references
 
-![Find references preview](images/find-references.gif)
+Right click to see a context menu, and use it to find all references
 
-### Code lens
+![alt text](images/readme/development/references.gif)
 
-Number of references is shown above each declaration.
+### Document Links
 
-![Code lens preview](images/code-lens.png)
+Click and jump to linked files and resources
 
-### Type hierarchy
-
-Also works for virtual functions.
-
-![Contract type hierarchy preview](images/contract-type-hierarchy.gif)
-
-### Document links
-
-![Document links preview](images/document-links.gif)
-
-### Document symbols
-
-![Document symbols preview](images/document-symbols.png)
+![alt text](images/readme/development/document_links.gif)
 
 ### Hover
 
-Includes links to documentation for OpenZeppelin contracts.
+Use hover to see instant documentation in your code
 
-![Hover preview](images/hover.gif)
+![alt text](images/readme/development/hover.gif)
 
-### Control flow graphs
+### See Contract Outline
 
-![Control flow graph](images/control_flow_graph.png)
+Navigate big projects with ease using the Contract Outline
 
-### Inheritance graphs
+![alt text](images/readme/development/outline.gif)
 
-![Inheritance graph](images/inheritance_graph.png)
+### Code Lens
 
-### Diagnostics
+Code Lens shows you relevant information like functions selectors and parameter references inside your code
 
-![Diagnostics preview](images/diagnostics-1.gif)
+![alt text](images/readme/development/codelens.gif)
 
-![Diagnostics preview](images/diagnostics-2.png)
+### Graphs
 
-Together with compiler errors, diagnostics also include results from [Wake](https://getwake.io) vulnerability detectors.
+Visualise contract inheritance and function control flows with graphs
 
-Detections and compiler warnings may be ignored by adding a comment in one of the following formats:
+![alt text](images/readme/development/graph.gif)
 
-- `// wake-disable-line` disables diagnostics for the current line,
-- `// wake-disable-next-line` disables diagnostics for the next line,
-- `// wake-disable` disables diagnostics for the current line and all following lines until `// wake-enable` is encountered,
-- `// wake-enable` re-enables diagnostics after `// wake-disable`.
 
-All comment types may be followed by a list of detector names and compiler warning codes separated by commas.
-Whitespace is ignored. For example:
 
-```solidity
-// wake-disable-line reentrancy, 1349
-```
+## Requirements
 
-Compiler errors cannot be ignored. If no detectors or warning codes are specified, all diagnostics are ignored (or re-enabled in case of `// wake-enable`).
+The Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.8 or higher. Python 3.12 is experimentally supported. This package is automatically installed via conda by default. See [link](https://ackee.xyz/solidity/docs/installation) for other installation optional.
 
-## Supported commands
+Rosetta is required to be enabled on Apple Silicon (M1, M2 & M3) Macs.
 
-- **Tools for Solidity: Force Recompile Project**
+## Credits
+[juanfranblanco/vscode-solidity](https://github.com/juanfranblanco/vscode-solidity/blob/master/syntaxes/solidity.json): a base of our Solidity grammar
 
-```shell
-Tools-for-Solidity.detections.force_recompile
-```
-Force recompile the opened project/files.
+[joaompinto/vscode-graphviz](https://github.com/joaompinto/vscode-graphviz): a base of our Graphviz integration
 
-- **Tools for Solidity: Force Rerun Detectors**
 
-```shell
-Tools-for-Solidity.detections.force_rerun_detectors
-```
+## Feedback, help and news
+Get help and give feedback in our [Discord](https://discord.gg/x7qXXnGCsa)
 
-Force rerun Wake vulnerability and issue detectors on the opened project/files.
+Follow Ackee on [Twitter](https://twitter.com/AckeeBlockchain)
 
-- **Tools for Solidity: Generate Inheritance Graph**
 
-```shell
-Tools-for-Solidity.generate.inheritance_graph
-```
-Generate an inheritance graph for the whole project.
-
-- **Tools for Solidity: Generate Imports Graph**
-
-```shell
-Tools-for-Solidity.generate.imports_graph
-```
-Generate an imports graph for the whole project.
-
-- **Tools for Solidity: Import Foundry Remappings**
-
-```shell
-Tools-for-Solidity.foundry.import_remappings
-```
-Automatically configure the compiler remappings in a Foundry project.
 
 ## Known Issues
 
@@ -167,7 +120,6 @@ It is always recommended to open a project as a folder (`File -> Open folder`). 
 
 The extension relies on the `solc` compiler. For this reason, files containing compilation errors and files importing these files cannot be analysed.
 
-## Acknowledgements
 
-- [juanfranblanco/vscode-solidity](https://github.com/juanfranblanco/vscode-solidity/blob/master/syntaxes/solidity.json): a base of our Solidity grammar
-- [joaompinto/vscode-graphviz](https://github.com/joaompinto/vscode-graphviz): a base of our Graphviz integration
+
+
