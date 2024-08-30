@@ -1004,12 +1004,15 @@
         "webpack-dev": "webpack --mode development --watch",
         "package": "webpack --mode production --devtool hidden-source-map",
         "test-compile": "tsc -p ./",
-        "build": "concurrently \"npm run build.extension\" \"npm run build.webview\"",
+        "build": "npm run build.webview && npm run build.extension",
         "dev": "concurrently \"npm run build.extension.dev\" \"npm run build.webview.dev\"",
         "build.extension": "webpack --mode development",
         "build.extension.dev": "webpack --mode development --watch",
         "build.webview": "cd src/sake/webview; npm run build",
-        "build.webview.dev": "cd src/sake/webview; npm run dev"
+        "build.webview.dev": "cd src/sake/webview; npm run dev",
+        "clean-install": "npm run clean-install.webview && npm run clean-install.extension",
+        "clean-install.webview": "cd src/sake/webview; npm ci",
+        "clean-install.extension": "npm ci"
     },
     "devDependencies": {
         "@types/glob": "^7.2.0",
