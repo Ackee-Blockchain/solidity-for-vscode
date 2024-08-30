@@ -100,7 +100,7 @@ function onNotification(outputChannel: vscode.OutputChannel, detection: Diagnost
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
     const outputChannel = vscode.window.createOutputChannel(
-        'Tools for Solidity',
+        'Solidity: Output',
         'tools-for-solidity-output'
     );
     const extensionConfig: vscode.WorkspaceConfiguration =

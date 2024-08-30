@@ -585,19 +585,19 @@
             "activitybar": [
                 {
                     "id": "tools-for-solidity",
-                    "title": "Tools for Solidity",
+                    "title": "Solidity: Errors & Detections",
                     "icon": "resources/icons/activity_bar_solidity.png"
                 },
                 {
                     "id": "sake",
-                    "title": "Deploy & Interact",
+                    "title": "Solidity: Deploy & Interact",
                     "icon": "resources/icons/activity_bar_deploy_interact.png"
                 }
             ],
             "panel": [
                 {
                     "id": "sake-output",
-                    "title": "Deploy & Interact",
+                    "title": "Solidity: Transactions",
                     "icon": ""
                 }
             ]
@@ -610,7 +610,7 @@
                 },
                 {
                     "id": "solc-detections",
-                    "name": "Compiler"
+                    "name": "Compiler Errors"
                 }
             ],
             "sake": [
@@ -623,7 +623,7 @@
             "sake-output": [
                 {
                     "id": "sake-output",
-                    "name": "Output"
+                    "name": "Transactions"
                 }
             ]
         },
