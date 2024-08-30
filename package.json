@@ -1,8 +1,8 @@
 {
-    "name": "tools-for-solidity",
+    "name": "tfs-test",
     "displayName": "Tools for Solidity (Wake)",
     "version": "1.15.2",
-    "publisher": "ackeeblockchain",
+    "publisher": "soyrubio",
     "description": "Advanced Solidity support and vulnerability detectors developed by Ackee Blockchain",
     "keywords": [
         "solidity",

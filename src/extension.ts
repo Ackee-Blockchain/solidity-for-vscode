@@ -631,7 +631,7 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
         vscode.commands.registerCommand('Tools-for-Solidity.open_walkthrough', () => {
             vscode.commands.executeCommand(
                 `workbench.action.openWalkthrough`,
-                `ackeeblockchain.tools-for-solidity#tfs-walkthrough`,
+                `soyrubio.tools-for-solidity#tfs-walkthrough`,
                 false
             );
         })
