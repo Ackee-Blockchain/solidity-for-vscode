@@ -1,0 +1,27 @@
+name: VS Code Marketplace Release
+
+on:
+    release:
+        types: [created]
+
+jobs:
+    build:
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: '14'
+            - run: npm run clean-install
+            - run: npm run build
+
+    publish:
+        needs: build
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: '14'
+            - run: npm install -g vsce
+            - run: vsce publish --pat ${{ secrets.VS_MARKETPLACE_TOKEN }}
