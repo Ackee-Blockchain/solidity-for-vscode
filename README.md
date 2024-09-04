@@ -20,10 +20,23 @@
 
 Ethereum Solidity and local node testing with security features for Visual Studio Code.
 
-This extension adds language support for Solidity to Visual Studio Code, and provides a remix-like experience for testing contracts on your local network. Benefits:
-- Test and interact with your smart contracts on an Ethereum local node
-- See vulnerabilities from static analysis in real-time
-- Best code navigation experience, call-graphs and more.
+This extension adds language support for Solidity to Visual Studio Code, and provides a remix-like experience for testing contracts on your local network.
+Benefits:
+- [Test and interact with your smart contracts on an Ethereum local node](#test-and-interact-with-your-smart-contracts-on-an-ethereum-local-node)
+  - [Compile and deploy contracts](#compile-and-deploy-contracts)
+  - [Interact with contracts](#interact-with-contracts)
+- [See vulnerabilities from static analysis in real-time](#see-vulnerabilities-from-static-analysis-in-real-time)
+  - [Compilation Errors](#compilation-errors)
+  - [See vulnerabilities from static analysis in real-time](#see-vulnerabilities-from-static-analysis-in-real-time-1)
+  - [Security Overview in the Sidebar](#security-overview-in-the-sidebar)
+- [Best code navigation experience, call-graphs and more](#best-code-navigation-experience-call-graphs-and-more)
+  - [Go to definition](#go-to-definition)
+  - [Find references](#find-references)
+  - [Document Links](#document-links)
+  - [Hover](#hover)
+  - [Contract Outline](#contract-outline)
+  - [Code Lens](#code-lens)
+  - [Graphs](#graphs)
 
 ## Test and interact with your smart contracts on an Ethereum local node
 
@@ -86,7 +99,7 @@ Use hover to see instant documentation in your code
 
 ![alt text](images/readme/development/hover.gif)
 
-### See Contract Outline
+### Contract Outline
 
 Navigate big projects with ease using the Contract Outline
 
