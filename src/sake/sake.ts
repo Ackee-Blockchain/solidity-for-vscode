@@ -33,7 +33,7 @@ import { TxHistoryState } from './state/TxHistoryState';
 import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
 
-export function activateSake(context: vscode.ExtensionContext, client: LanguageClient | undefined) {
+export function activateSake(context: vscode.ExtensionContext, client?: LanguageClient) {
     // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
     const sakeOutputProvider = new SakeOutputTreeProvider(context);
     const treeView = vscode.window.createTreeView('sake-output', {
