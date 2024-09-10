@@ -80,8 +80,8 @@ const config = {
             to: 'sake/media/vscode.css'
         },
         {
-            from: 'src/wallet/dist/*',
-            to: 'wallet/*'
+            from: 'src/wallet/dist',
+            to: 'wallet'
         }
       ],
     }),

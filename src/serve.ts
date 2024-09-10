@@ -1,40 +1,64 @@
 import * as polka from 'polka';
 import sirv from 'sirv';
 import * as vscode from 'vscode';
-import { json } from 'body-parser';
+const getPort = require('get-port');
 
-class WalletServer {
-    private app: ReturnType<typeof polka>;
-    private root: vscode.Uri;
-    private deployment: Record<string, any> = {
-        version: '1.0.0',
-        environment: 'development'
-    };
+export class WalletServer {
+    private _app: polka.Polka;
+    private _staticFiles: polka.Middleware;
+    private _port: number | undefined;
+    private _deploymentData: any;
 
-    constructor(private context: vscode.ExtensionContext) {
-        this.root = vscode.Uri.joinPath(this.context.extensionUri, 'webview', 'wallet');
-        this.app = polka();
+    constructor(private _context: vscode.ExtensionContext) {
+        this._app = polka();
+        const root = vscode.Uri.joinPath(_context.extensionUri, 'dist', 'wallet');
+        this._staticFiles = sirv(root.fsPath, { single: true });
     }
 
-    public start(port: number = 3000) {
-        const staticFiles = sirv(this.root.fsPath, { single: true });
+    public async start() {
+        if (this._port) {
+            console.log(`Wallet Server already running on http://localhost:${this._port}`);
+            return this._port;
+        }
 
-        this.app
-            .use(json())
-            .use(staticFiles)
-            .get('/api/deployment', (req: any, res: any) => {
-                res.end(JSON.stringify(this.deployment));
-            })
-            .listen(port, (err: Error) => {
+        this._port = await getPort({ port: 3000 });
+        this._app.use(this._staticFiles);
+
+        this._app.get('/api/deployment', (req, res) => {
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(this._deploymentData));
+        });
+
+        return new Promise((resolve, reject) => {
+            this._app.listen(this._port, (err: Error) => {
                 if (err) {
                     console.error(err);
+                    reject(err);
                     return;
                 }
-                console.log(`Server running on http://localhost:${port}`);
+                console.log(`Wallet Server running on http://localhost:${this._port}`);
+                resolve(this._port);
             });
 
-        this.context.subscriptions.push({
-            dispose: () => this.app.server!.close()
+            this._context.subscriptions.push({
+                dispose: () => {
+                    console.log(`Stopping Wallet Server`);
+                    this._port = undefined;
+                    this._app.server!.close();
+                }
+            });
         });
+    }
+
+    public get port() {
+        return this._port;
+    }
+
+    public setDeploymentData(deploymentData: any) {
+        this._deploymentData = deploymentData;
+    }
+
+    public async openInBrowser() {
+        await vscode.env.openExternal(vscode.Uri.parse(`http://localhost:${this._port}`));
     }
 }

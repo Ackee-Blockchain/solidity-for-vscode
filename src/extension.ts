@@ -52,6 +52,7 @@ import { Installer } from './installers/installerInterface';
 import { PipxInstaller } from './installers/pipx';
 import { PipInstaller } from './installers/pip';
 import { ManualInstaller } from './installers/manual';
+import { WalletServer } from './serve';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ExecaChildProcess | undefined = undefined;
@@ -63,6 +64,7 @@ let errorHandler: ClientErrorHandler;
 let printers: PrintersHandler;
 let crashlog: string[] = [];
 let graphvizGenerator: GraphvizPreviewGenerator;
+let walletServer: WalletServer;
 
 //export let log: Log
 
@@ -136,6 +138,9 @@ export async function activate(context: vscode.ExtensionContext) {
     } else {
         throw new Error(`Unknown installation method: ${installationMethod}`);
     }
+
+    // Create a Wallet Server
+    walletServer = new WalletServer(context);
 
     analytics = new Analytics(context, method);
     errorHandler = new ClientErrorHandler(outputChannel, analytics);
@@ -639,7 +644,18 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.serve', async () => {
-            vscode.commands.executeCommand('workbench.view.extension.sake');
+            console.log(`start serve`);
+            walletServer
+                .start()
+                .then((port) => {
+                    console.log(`Wallet Server running on http://localhost:${port}`);
+                })
+                .then(() => {
+                    walletServer.openInBrowser();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
         })
     );
 }
