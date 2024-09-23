@@ -1,13 +1,14 @@
 import * as polka from 'polka';
 import sirv from 'sirv';
 import * as vscode from 'vscode';
+import { WalletDeploymentData } from './sake/webview/shared/types';
 const getPort = require('get-port');
 
 export class WalletServer {
     private _app: polka.Polka;
     private _staticFiles: polka.Middleware;
     private _port: number | undefined;
-    private _deploymentData: any;
+    private _deploymentData: WalletDeploymentData | undefined;
 
     constructor(private _context: vscode.ExtensionContext) {
         this._app = polka();
@@ -21,10 +22,22 @@ export class WalletServer {
             return this._port;
         }
 
-        this._port = await getPort({ port: 3000 });
-        this._app.use(this._staticFiles);
+        this._deploymentData = undefined;
 
+        this._port = await getPort({ port: 3000 });
+
+        // Serve static files only on the root path
+        this._app.use((req, res, next) => {
+            if (!req.path.startsWith('/api')) {
+                this._staticFiles(req, res, next);
+            } else {
+                next();
+            }
+        });
+
+        // Serve deployment data on /api/deployment
         this._app.get('/api/deployment', (req, res) => {
+            console.log('fetching deployment data');
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(this._deploymentData));
         });
@@ -44,6 +57,7 @@ export class WalletServer {
                 dispose: () => {
                     console.log(`Stopping Wallet Server`);
                     this._port = undefined;
+                    this._deploymentData = undefined;
                     this._app.server!.close();
                 }
             });
@@ -54,7 +68,7 @@ export class WalletServer {
         return this._port;
     }
 
-    public setDeploymentData(deploymentData: any) {
+    public setDeploymentData(deploymentData: WalletDeploymentData) {
         this._deploymentData = deploymentData;
     }
 

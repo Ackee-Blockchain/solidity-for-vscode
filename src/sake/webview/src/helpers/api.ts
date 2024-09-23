@@ -1,10 +1,14 @@
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import {
     WebviewMessage,
-    type DeploymentStateData,
+    type DeploymentState,
     type CallPayload,
     type WakeDeploymentRequestParams,
-    type WakeSetBalancesRequestParams
+    type WakeSetBalancesRequestParams,
+    type CompiledContract,
+    type WalletDeploymentData,
+    type Bytecode,
+    type WakeGetBytecodeResponse
 } from '../../shared/types';
 import { deployedContracts } from './store';
 
@@ -66,14 +70,14 @@ export async function compileContracts(): Promise<boolean> {
     return await messageHandler.request<boolean>(WebviewMessage.onCompile);
 }
 
-export async function removeContract(contract: DeploymentStateData) {
+export async function removeContract(contract: DeploymentState) {
     return await messageHandler.request<boolean>(WebviewMessage.onUndeployContract, contract);
     // deployedContracts.update((state) => {
     //     return state.filter((c) => c.address !== contract.address);
     // });
 }
 
-export async function setLabel(contract: DeploymentStateData) {
+export async function setLabel(contract: DeploymentState) {
     return await messageHandler.request<boolean>(WebviewMessage.onsetLabel, contract);
 }
 
@@ -87,4 +91,39 @@ export async function navigateTo(
 
 export async function openExternal(url: string) {
     messageHandler.send(WebviewMessage.onOpenExternal, { path: url });
+}
+
+export async function getBytecode(contractFqn: string): Promise<WakeGetBytecodeResponse> {
+    return await messageHandler.request<WakeGetBytecodeResponse>(WebviewMessage.onGetBytecode, {
+        contractFqn
+    });
+}
+
+export async function openDeploymentInBrowser(
+    contract: CompiledContract,
+    calldata: string,
+    value: number
+) {
+    const { success, bytecode } = await getBytecode(contract.fqn);
+
+    if (!success) {
+        return;
+    }
+
+    if (!bytecode) {
+        console.error('No bytecode found');
+        return;
+    }
+
+    const _params = {
+        name: contract.name,
+        abi: contract.abi,
+        bytecode: bytecode,
+        calldata: calldata,
+        value: value
+    } as WalletDeploymentData;
+
+    console.log('openDeploymentInBrowser params', _params);
+
+    messageHandler.send(WebviewMessage.onOpenDeploymentInBrowser, _params);
 }

@@ -19,6 +19,7 @@
 
     export let abi: ContractAbi | undefined;
     export let onDeploy: (calldata: string) => void;
+    export let onOpenDeploymentInBrowser: (calldata: string) => void;
     export let name: string;
     let constructor: ContractFunctionType | undefined;
     let deployFunction: ContractFunction;
@@ -60,5 +61,6 @@
         func={constructor}
         onFunctionCall={onDeploy}
         isConstructor={true}
+        {onOpenDeploymentInBrowser}
     />
 {/if}

@@ -10,12 +10,15 @@ import {
     WebviewMessageData,
     WebviewMessage,
     WakeDeploymentRequestParams,
-    DeploymentStateData,
-    WakeSetLabelRequestParams
+    DeploymentState,
+    WakeSetLabelRequestParams,
+    WakeGetBytecodeRequestParams,
+    WakeGetBytecodeResponse
 } from '../webview/shared/types';
 import { CompilationState } from '../state/CompilationState';
 import { AccountState } from '../state/AccountState';
 import { WakeState } from '../state/WakeState';
+import { getBytecode } from '../api';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -342,12 +345,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 }
 
                 vscode.commands.executeCommand('Tools-for-Solidity.sake.setLabel', {
-                    address: (payload as DeploymentStateData).address,
+                    address: (payload as DeploymentState).address,
                     label: nick ? nick : null
                 } as WakeSetLabelRequestParams);
 
                 this._getDeployedContracts().updateContract({
-                    ...(payload as DeploymentStateData),
+                    ...(payload as DeploymentState),
                     nick: nick ? nick : null
                 });
 
@@ -409,6 +412,44 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 const { path } = payload;
 
                 vscode.env.openExternal(vscode.Uri.parse(path));
+            }
+
+            case WebviewMessage.onOpenDeploymentInBrowser: {
+                if (!payload) {
+                    console.error('No deployment params provided');
+                    return;
+                }
+
+                const success = await vscode.commands.executeCommand<boolean>(
+                    'Tools-for-Solidity.sake.openDeploymentInBrowser',
+                    payload
+                );
+
+                webviewView.webview.postMessage({
+                    command,
+                    requestId,
+                    payload: success
+                } as MessageHandlerData<boolean>);
+
+                break;
+            }
+
+            case WebviewMessage.onGetBytecode: {
+                if (!payload) {
+                    console.error('No bytecode params provided');
+                    return;
+                }
+
+                const response = await vscode.commands.executeCommand<WakeGetBytecodeResponse>(
+                    'Tools-for-Solidity.sake.getBytecode',
+                    payload
+                );
+
+                webviewView.webview.postMessage({
+                    command,
+                    requestId,
+                    payload: response
+                } as MessageHandlerData<WakeGetBytecodeResponse>);
             }
 
             default: {

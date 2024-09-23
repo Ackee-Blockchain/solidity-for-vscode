@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import {
-    AccountStateData,
+    AccountState,
     Address,
-    DeploymentStateData,
+    DeploymentState,
     CallPayload,
     TxDecodedReturnValue,
     TxDeploymentOutput,
@@ -20,7 +20,9 @@ import {
     WakeSetBalancesResponse,
     CallType,
     ContractFunction,
-    WakeSetLabelRequestParams
+    WakeSetLabelRequestParams,
+    WakeGetBytecodeResponse,
+    WakeGetBytecodeRequestParams
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { CompilationState } from './state/CompilationState';
@@ -52,10 +54,6 @@ const wakeState = WakeState.getInstance();
  */
 export async function getAccounts(client: LanguageClient | undefined) {
     try {
-        if (client === undefined) {
-            throw new Error('Missing language client');
-        }
-
         let result = await sendWakeRequest<Address[]>(client, 'wake/sake/getAccounts');
 
         result = validate(result);
@@ -69,15 +67,15 @@ export async function getAccounts(client: LanguageClient | undefined) {
 
         // @dev set the state here also, even though it will be updated in getBalances
         // this is because balances only update existing accounts state
-        const _accountStateData = result.map((address, i) => {
+        const _accountState = result.map((address, i) => {
             return {
                 address: address,
                 balance: null,
                 nick: `Account ${i}`
-            } as AccountStateData;
+            } as AccountState;
         });
 
-        accountState.setAccountsSilent(_accountStateData);
+        accountState.setAccountsSilent(_accountState);
 
         getBalances({ addresses: result }, client);
 
@@ -102,10 +100,6 @@ export async function getBalances(
     client: LanguageClient | undefined
 ) {
     try {
-        if (client === undefined) {
-            throw new Error('Missing language client');
-        }
-
         let result = await sendWakeRequest<WakeGetBalancesResponse>(
             client,
             'wake/sake/getBalances',
@@ -119,13 +113,13 @@ export async function getBalances(
             throw new Error('Failed to get balances');
         }
 
-        // const _accountStateData = requestParams.addresses.map((address) => {
+        // const _accountState = requestParams.addresses.map((address) => {
         //     return {
         //         address: address,
         //         balance: result.balances[address]
         //     };
         // });
-        // accountState.setAccounts(_accountStateData);
+        // accountState.setAccounts(_accountState);
 
         accountState.updateBalances(result.balances);
 
@@ -142,10 +136,6 @@ export async function setBalances(
     client: LanguageClient | undefined
 ) {
     try {
-        if (client === undefined) {
-            throw new Error('Missing language client');
-        }
-
         let result = await sendWakeRequest<WakeSetBalancesResponse>(
             client,
             'wake/sake/setBalances',
@@ -172,10 +162,6 @@ export async function setBalances(
 
 export async function compile(client: LanguageClient | undefined) {
     try {
-        if (client === undefined) {
-            throw new Error('Missing language client');
-        }
-
         let result = await sendWakeRequest<WakeCompilationResponse>(client, 'wake/sake/compile');
 
         if (result == null) {
@@ -205,10 +191,6 @@ export async function deploy(
     output: OutputViewManager
 ) {
     try {
-        if (client === undefined) {
-            throw new Error('Missing language client');
-        }
-
         let result = await sendWakeRequest<WakeDeploymentResponse>(
             client,
             'wake/sake/deploy',
@@ -229,7 +211,7 @@ export async function deploy(
                     'Contract compilation data not found for fqn: ' + requestParams.contractFqn
                 );
             }
-            const _deploymentData: DeploymentStateData = {
+            const _deploymentData: DeploymentState = {
                 name: _contractCompilationData.name,
                 address: result.contractAddress!,
                 abi: _contractCompilationData.abi,
@@ -277,14 +259,8 @@ export async function call(
     const callType = specifyCallType(func);
 
     try {
-        if (client === undefined) {
-            throw new Error('Missing language client');
-        }
-
-        // TODO fix when fixed in wake
         const apiEndpoint =
             callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
-        // const apiEndpoint = 'wake/sake/transact';
         let result = await sendWakeRequest<WakeCallResponse>(client, apiEndpoint, requestParams);
 
         result = validate(result);
@@ -340,14 +316,27 @@ export async function setLabel(
     client: LanguageClient | undefined
 ) {
     try {
-        if (client === undefined) {
-            throw new Error('Missing language client');
-        }
-
         sendWakeRequest<WakeSetBalancesResponse>(client, 'wake/sake/setLabel', requestParams);
     } catch (e) {
         const message = typeof e === 'string' ? e : (e as Error).message;
         vscode.window.showErrorMessage('Failed to set balances: ' + message);
+        return false;
+    }
+}
+
+export async function getBytecode(
+    requestParams: WakeGetBytecodeRequestParams,
+    client: LanguageClient | undefined
+) {
+    try {
+        return await sendWakeRequest<WakeGetBytecodeResponse>(
+            client,
+            'wake/sake/getBytecode',
+            requestParams
+        );
+    } catch (e) {
+        const message = typeof e === 'string' ? e : (e as Error).message;
+        vscode.window.showErrorMessage('Failed to get bytecode: ' + message);
         return false;
     }
 }

@@ -1,7 +1,7 @@
-import { DeploymentStateData, StateId } from '../webview/shared/types';
+import { DeploymentState, StateId } from '../webview/shared/types';
 import { BaseState } from './BaseState';
 
-export class DeploymentState extends BaseState<DeploymentStateData[]> {
+export class DeploymentState extends BaseState<DeploymentState[]> {
     private static _instance: DeploymentState;
 
     private constructor() {
@@ -15,7 +15,7 @@ export class DeploymentState extends BaseState<DeploymentStateData[]> {
         return this._instance;
     }
 
-    public deploy(contract: DeploymentStateData) {
+    public deploy(contract: DeploymentState) {
         // TODO validate payload
         console.log(contract, 'mimimi');
         const _state = [...this.state, contract];
@@ -23,12 +23,12 @@ export class DeploymentState extends BaseState<DeploymentStateData[]> {
         console.log('deploy', _state);
     }
 
-    public undeploy(contract: DeploymentStateData) {
+    public undeploy(contract: DeploymentState) {
         const _state = this.state.filter((c) => c.address !== contract.address);
         this.state = _state;
     }
 
-    public updateContract(contract: DeploymentStateData) {
+    public updateContract(contract: DeploymentState) {
         const _state = this.state.map((c) => {
             if (c.address === contract.address) {
                 c = contract;
@@ -43,6 +43,6 @@ export class DeploymentState extends BaseState<DeploymentStateData[]> {
         return this.state.reduce((acc, contract) => {
             acc[contract.address] = contract;
             return acc;
-        }, {} as Record<string, DeploymentStateData>);
+        }, {} as Record<string, DeploymentState>);
     }
 }

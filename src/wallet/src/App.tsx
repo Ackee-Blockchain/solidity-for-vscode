@@ -1,4 +1,5 @@
 import { useDeployContract, useReadContract } from 'wagmi';
+import { useEffect, useState } from 'react';
 import './App.css';
 
 const abi = [
@@ -28,6 +29,7 @@ const abi = [
     }
 ]
 
+
 function App() {
     const { deployContract } = useDeployContract();
     const { data: messageData, isLoading: isMessageLoading, isSuccess: isMessageSuccess, refetch: refetchMessage } = useReadContract({
@@ -35,6 +37,25 @@ function App() {
         address: '0x37a57e110f83858750002087f6d027450e1805b3',
         functionName: 'message',
     });
+
+    const [, setDeploymentData] = useState(null);
+
+    useEffect(() => {
+        console.log('fetching deployment data');
+        const fetchDeploymentData = async () => {
+            try {
+                const response = await fetch('/api/deployment');
+                console.log('response', response);
+                const data = await response.json();
+                setDeploymentData(data);
+                console.log('Deployment data:', data);
+            } catch (error) {
+                console.error('Error fetching deployment data:', error);
+            }
+        };
+
+        fetchDeploymentData();
+    }, []);
 
     const deploy = () => {
         deployContract({
@@ -60,10 +81,10 @@ function App() {
     }
 
     return (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', gap: '1rem' }}>
             <w3m-button />
-            <button onClick={deploy}>Deploy Contract</button>
-            <button onClick={getMessage}>Get Message</button>
+            <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" onClick={deploy}>Deploy Contract</button>
+            <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600" onClick={getMessage}>Get Message</button>
         </div>
     )
 }

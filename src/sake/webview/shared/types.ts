@@ -54,6 +54,7 @@ export interface ContractFunctionOutput {
     components: Array<ContractFunctionOutput> | undefined;
 }
 
+export type Bytecode = string;
 /*
  *
  * Messaging
@@ -86,7 +87,9 @@ export enum WebviewMessage {
     onSetBalances = 'onSetBalances',
     onsetLabel = 'onsetLabel',
     onNavigate = 'onNavigate',
-    onOpenExternal = 'onOpenExternal'
+    onOpenExternal = 'onOpenExternal',
+    onOpenDeploymentInBrowser = 'onOpenDeploymentInBrowser',
+    onGetBytecode = 'onGetBytecode'
 }
 
 // TODO create pairs of WebviewMessage and WebviewInput and WebviewOutput
@@ -185,7 +188,7 @@ export interface TxCallOutput extends TxOutput {
  */
 
 // TODO remove this
-export interface DeploymentStateData {
+export interface DeploymentState {
     name: string;
     address: string;
     abi: any;
@@ -193,25 +196,28 @@ export interface DeploymentStateData {
     nick: string | null;
 }
 
-export interface CompilationStateData {
+export interface CompilationState {
     contracts: Array<CompiledContract>;
     issues: CompilationIssue[];
     dirty: boolean;
     // TODO add isDirty
 }
 
-export interface AccountStateData {
+export type AccountState = {
     address: string;
-    balance: number | null;
+    balance: number | null; // TODO remove null
     nick: string | null;
-}
+    // [key: string]: Account;
+};
 
-export interface WakeStateData {
+export interface Account {}
+
+export interface WakeState {
     isAnvilInstalled: boolean | undefined;
     isServerRunning: boolean | undefined;
 }
 
-export type TxHistoryStateData = TxDeploymentOutput | TxCallOutput;
+export type TxHistoryState = TxDeploymentOutput | TxCallOutput;
 
 export enum StateId {
     DeployedContracts = 'deployedContracts',
@@ -299,7 +305,7 @@ export interface WakeDeploymentRequestParams {
     value: number;
 }
 
-export type WakeGetAccountsResponse = AccountStateData;
+export type WakeGetAccountsResponse = AccountState;
 
 export interface WakeCallRequestParams {
     contractAddress: string;
@@ -337,6 +343,15 @@ export interface WakeSetLabelRequestParams {
     label: string | null;
 }
 
+export interface WakeGetBytecodeResponse {
+    success: boolean;
+    bytecode: string;
+}
+
+export interface WakeGetBytecodeRequestParams {
+    contractFqn: string;
+}
+
 export interface CallTrace {
     address: string | null;
     arguments: string | null;
@@ -350,4 +365,18 @@ export interface CallTrace {
     status: string | null;
     value: string | null;
     subtraces: CallTrace[];
+}
+
+/*
+ *
+ * API to Wallet Server
+ *
+ */
+
+export interface WalletDeploymentData {
+    name: string;
+    abi: ContractAbi;
+    calldata: string;
+    value: number;
+    bytecode: Bytecode;
 }

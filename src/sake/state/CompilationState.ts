@@ -1,13 +1,13 @@
 import {
     CompilationIssue,
-    CompilationStateData,
+    CompilationState,
     CompiledContract,
     ContractAbi,
     StateId
 } from '../webview/shared/types';
 import { BaseState } from './BaseState';
 
-export class CompilationState extends BaseState<CompilationStateData> {
+export class CompilationState extends BaseState<CompilationState> {
     private static _instance: CompilationState;
 
     private constructor() {

@@ -5,7 +5,7 @@ import {
     RunWebviewProvider,
     SakeWebviewProvider
 } from './providers/WebviewProviders';
-import { StatusBarEnvironmentProvider } from './providers/StatusBarEnvironmentProvider';
+import { StatusBarEnvironmentProvider } from './providers/StatusBarNetworkProvider';
 import { copyToClipboard, loadSampleAbi, getTextFromInputBox } from './commands';
 import { DeploymentState } from './state/DeploymentState';
 import { CompilationState } from './state/CompilationState';
@@ -17,12 +17,23 @@ import {
     CallPayload,
     WakeGetBalancesRequestParams,
     WakeSetBalancesRequestParams,
-    DeploymentStateData,
-    WakeSetLabelRequestParams
+    DeploymentState,
+    WakeSetLabelRequestParams,
+    WakeGetBytecodeRequestParams,
+    WalletDeploymentData
 } from './webview/shared/types';
 import { LanguageClient, State } from 'vscode-languageclient/node';
 import { parseCompiledContracts } from './utils/compilation';
-import { call, compile, deploy, getAccounts, getBalances, setBalances, setLabel } from './api';
+import {
+    call,
+    compile,
+    deploy,
+    getAccounts,
+    getBalances,
+    getBytecode,
+    setBalances,
+    setLabel
+} from './api';
 import { AccountState } from './state/AccountState';
 import {
     OutputViewManager,
@@ -32,6 +43,7 @@ import {
 import { TxHistoryState } from './state/TxHistoryState';
 import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
+import { WalletServer } from '../serve';
 
 export function activateSake(context: vscode.ExtensionContext, client?: LanguageClient) {
     // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
@@ -44,6 +56,8 @@ export function activateSake(context: vscode.ExtensionContext, client?: Language
     // );
 
     const outputViewManager = new OutputViewManager(sakeOutputProvider, treeView);
+
+    const walletServer = new WalletServer(context);
 
     // const sidebarDeployProvider = new DeployWebviewProvider(context.extensionUri);
     // context.subscriptions.push(
@@ -74,9 +88,9 @@ export function activateSake(context: vscode.ExtensionContext, client?: Language
     );
 
     // // register status bar
-    // const statusBarEnvironmentProvider = new StatusBarEnvironmentProvider();
+    const statusBarEnvironmentProvider = new StatusBarEnvironmentProvider();
     // context.subscriptions.push(statusBarEnvironmentProvider.registerCommand());
-    // context.subscriptions.push(statusBarEnvironmentProvider.getStatusBarItem());
+    context.subscriptions.push(statusBarEnvironmentProvider.getStatusBarItem());
 
     // register commands
     context.subscriptions.push(
@@ -163,8 +177,55 @@ export function activateSake(context: vscode.ExtensionContext, client?: Language
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
+            'Tools-for-Solidity.sake.getBytecode',
+            (params: WakeGetBytecodeRequestParams) => getBytecode(params, client)
+        )
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.copyFromResults',
             (context: SakeOutputItem) => copyToClipboard(context.value)
+        )
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.serve', async () => {
+            console.log(`start serve`);
+            walletServer
+                .start()
+                .then((port) => {
+                    console.log(`Wallet Server running on http://localhost:${port}`);
+                })
+                .then(() => {
+                    walletServer.openInBrowser();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.sake.openDeploymentInBrowser',
+            async (deploymentData: WalletDeploymentData) => {
+                console.log(`start serve`);
+                walletServer
+                    .start()
+                    .then((port) => {
+                        console.log(`Wallet Server running on http://localhost:${port}`);
+                    })
+                    .then(() => {
+                        walletServer.setDeploymentData(deploymentData);
+                    })
+                    .then(() => {
+                        walletServer.openInBrowser();
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            }
         )
     );
 

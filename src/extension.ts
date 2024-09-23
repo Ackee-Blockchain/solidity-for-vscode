@@ -53,6 +53,7 @@ import { PipxInstaller } from './installers/pipx';
 import { PipInstaller } from './installers/pip';
 import { ManualInstaller } from './installers/manual';
 import { WalletServer } from './serve';
+import { DeploymentState } from './sake/webview/shared/types';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ExecaChildProcess | undefined = undefined;
@@ -64,7 +65,6 @@ let errorHandler: ClientErrorHandler;
 let printers: PrintersHandler;
 let crashlog: string[] = [];
 let graphvizGenerator: GraphvizPreviewGenerator;
-let walletServer: WalletServer;
 
 //export let log: Log
 
@@ -140,7 +140,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     // Create a Wallet Server
-    walletServer = new WalletServer(context);
+    const walletServer = new WalletServer(context);
 
     analytics = new Analytics(context, method);
     errorHandler = new ClientErrorHandler(outputChannel, analytics);
@@ -639,23 +639,6 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
                 `ackeeblockchain.tools-for-solidity#tfs-walkthrough`,
                 false
             );
-        })
-    );
-
-    context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.serve', async () => {
-            console.log(`start serve`);
-            walletServer
-                .start()
-                .then((port) => {
-                    console.log(`Wallet Server running on http://localhost:${port}`);
-                })
-                .then(() => {
-                    walletServer.openInBrowser();
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
         })
     );
 }

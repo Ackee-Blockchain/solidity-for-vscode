@@ -14,7 +14,7 @@
         type Contract,
         type WakeCallRequestParams,
         type ContractFunction as ContractFunctionType,
-        type DeploymentStateData
+        type DeploymentState
     } from '../../shared/types';
     import { messageHandler } from '@estruyf/vscode/dist/client';
     import { copyToClipboard, removeContract } from '../helpers/api';

@@ -13,7 +13,7 @@
     import {
         StateId,
         WebviewMessage,
-        type CompilationStateData,
+        type CompilationState,
         type CompiledContract,
         type WakeDeploymentRequestParams,
         CompilationIssueType

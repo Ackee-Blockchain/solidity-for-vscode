@@ -2,11 +2,11 @@ import { writable, get, derived } from 'svelte/store';
 import {
     StateId,
     WebviewMessage,
-    type AccountStateData,
-    type CompilationStateData,
+    type AccountState,
+    type CompilationState,
     type CompiledContract,
-    type DeploymentStateData,
-    type WakeStateData
+    type DeploymentState,
+    type WakeState
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import { parseComplexNumber } from '../../shared/validate';
@@ -15,7 +15,7 @@ import { parseComplexNumber } from '../../shared/validate';
  * frontend svelte data
  */
 
-export const selectedAccount = writable<AccountStateData | null>(null);
+export const selectedAccount = writable<AccountState | null>(null);
 export const selectedValueString = writable<string | null>(null);
 // null indicated wrong stirng input
 export const selectedValue = derived(selectedValueString, ($selectedValueString) => {
@@ -35,14 +35,14 @@ export const activeTab = writable<number>();
  * backend data
  */
 
-export const accounts = writable<AccountStateData[]>([]);
-export const deployedContracts = writable<DeploymentStateData[]>([]);
-export const compilationState = writable<CompilationStateData>({
+export const accounts = writable<AccountState[]>([]);
+export const deployedContracts = writable<DeploymentState[]>([]);
+export const compilationState = writable<CompilationState>({
     contracts: [],
     issues: [],
     dirty: true
 });
-export const wakeState = writable<WakeStateData>({
+export const wakeState = writable<WakeState>({
     isAnvilInstalled: undefined,
     isServerRunning: undefined
 });
@@ -83,7 +83,7 @@ export function setupListeners() {
                 }
 
                 if (stateId === StateId.Accounts) {
-                    const _accounts = payload as AccountStateData[];
+                    const _accounts = payload as AccountState[];
                     const _selectedAccount = get(selectedAccount);
 
                     // update accounts store

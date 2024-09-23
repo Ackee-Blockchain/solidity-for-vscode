@@ -1,7 +1,7 @@
-import { StateId, TxHistoryStateData, TxOutput } from "../webview/shared/types";
-import { BaseState } from "./BaseState";
+import { StateId, TxHistoryState, TxOutput } from '../webview/shared/types';
+import { BaseState } from './BaseState';
 
-export class TxHistoryState extends BaseState<TxHistoryStateData[]> {
+export class TxHistoryState extends BaseState<TxHistoryState[]> {
     private static _instance: TxHistoryState;
 
     private constructor() {
@@ -15,7 +15,7 @@ export class TxHistoryState extends BaseState<TxHistoryStateData[]> {
         return this._instance;
     }
 
-    public addTx(tx: TxHistoryStateData) {
+    public addTx(tx: TxHistoryState) {
         const _state = [...this.state, tx];
         this.state = _state;
     }

@@ -1,7 +1,7 @@
-import { StateId, WakeStateData } from '../webview/shared/types';
+import { StateId, WakeState } from '../webview/shared/types';
 import { BaseState } from './BaseState';
 
-export class WakeState extends BaseState<WakeStateData> {
+export class WakeState extends BaseState<WakeState> {
     private static _instance: WakeState;
 
     private constructor() {

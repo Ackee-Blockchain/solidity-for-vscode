@@ -14,7 +14,7 @@
         type Contract,
         type WakeCallRequestParams,
         type ContractFunction as ContractFunctionType,
-        type DeploymentStateData
+        type DeploymentState
     } from '../../shared/types';
     import { messageHandler } from '@estruyf/vscode/dist/client';
     import { copyToClipboard, removeContract, setLabel } from '../helpers/api';
@@ -25,7 +25,7 @@
 
     provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
-    export let contract: DeploymentStateData;
+    export let contract: DeploymentState;
     export let onFunctionCall: (
         calldata: string,
         contractAddress: string,
