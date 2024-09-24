@@ -1,5 +1,19 @@
 # Change Log
 
+## [1.16.0]
+### Major changes
+- The extension is being rebranded as Solidity for VS Code
+- Introducing Deploy and Interact UI - test and interact with your smart contracts on a local node
+
+### Improvements
+- Language server now watches for external changes to Solidity files and recompiles automatically
+- Improved LSP responsiveness and RAM usage
+
+### Fixes
+- Fixed multiple memory leaks in LSP
+- Fixed sending compilation build to detectors/printers subprocess causing crashes due to build size & cyclic references
+- Fixed multiple minor LSP issues
+
 ## [1.14.0]
 - Added workspace symbols feature
 - Detectors & printers now run in subprocesses, making the language server more responsive
