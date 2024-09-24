@@ -1,4 +1,4 @@
-# Solidity by [Ackee Blockchain Security](https://ackee.xyz)
+# Solidity by Ackee Blockchain Security
 
 <picture>
   <source
@@ -146,4 +146,4 @@ It is always recommended to open a project as a folder (`File -> Open folder`). 
 
 - **Analysis does not work when the workspace contains compilation errors**
 
-The extension relies on the `solc` compiler. For this reason, files containing compilation errors and files importing these files cannot be analysed.
+The extension relies on the `solc` compiler. For this reason, files containing compilation errors and files importing these files cannot be analyzed.
