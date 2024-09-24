@@ -17,7 +17,7 @@ interface FunctionCoverageItem extends CoverageItem {
 
 interface CoverageData {
     [path: string]: FunctionCoverageItem[];
-};
+}
 
 interface CoverageHeader {
     version: string;
@@ -30,7 +30,6 @@ const disposables: { dispose(): any }[] = [];
 let outputChannel: vscode.OutputChannel;
 let fsWatcher: vscode.FileSystemWatcher;
 
-
 export function initCoverage(channel: vscode.OutputChannel) {
     outputChannel = channel;
 
@@ -39,9 +38,9 @@ export function initCoverage(channel: vscode.OutputChannel) {
         { backgroundColor: 'rgba(255, 165, 0, 0.3)' },
         { backgroundColor: 'rgba(255, 255, 0, 0.3)' },
         { backgroundColor: 'rgba(144, 238, 144, 0.3)' },
-        { backgroundColor: 'rgba(0, 255, 0, 0.3)' },
+        { backgroundColor: 'rgba(0, 255, 0, 0.3)' }
     ];
-    options.forEach(o => {
+    options.forEach((o) => {
         decorationTypes.push(vscode.window.createTextEditorDecorationType(o));
     });
 }
@@ -49,36 +48,45 @@ export function initCoverage(channel: vscode.OutputChannel) {
 export function showCoverageCallback() {
     hideCoverageCallback();
 
-    disposables.push(vscode.window.onDidChangeVisibleTextEditors(editors => {
-        editors.forEach(e => {
-            applyDecorationsOnTextEditor(e);
-        });
-    }));
+    disposables.push(
+        vscode.window.onDidChangeVisibleTextEditors((editors) => {
+            editors.forEach((e) => {
+                applyDecorationsOnTextEditor(e);
+            });
+        })
+    );
 
     const options: vscode.OpenDialogOptions = {
-        defaultUri: vscode.workspace.workspaceFolders !== undefined ? vscode.workspace.workspaceFolders[0].uri : undefined,
+        defaultUri:
+            vscode.workspace.workspaceFolders !== undefined
+                ? vscode.workspace.workspaceFolders[0].uri
+                : undefined,
         canSelectFiles: true,
         canSelectFolders: false,
         canSelectMany: false,
         filters: {
             'Coverage (*.cov)': ['cov']
         }
-
     };
-    vscode.window.showOpenDialog(options).then(uri => {
+    vscode.window.showOpenDialog(options).then((uri) => {
         if (uri !== undefined) {
             // register file system watcher for the coverage file
-            fsWatcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(uri[0], "*"), true, false, true);
+            fsWatcher = vscode.workspace.createFileSystemWatcher(
+                new vscode.RelativePattern(uri[0], '*'),
+                true,
+                false,
+                true
+            );
             disposables.push(fsWatcher);
-            fsWatcher.onDidChange(changeUri => {
+            fsWatcher.onDidChange((changeUri) => {
                 if (changeUri.toString() === uri[0].toString()) {
-                    vscode.workspace.fs.readFile(uri[0]).then(data => {
+                    vscode.workspace.fs.readFile(uri[0]).then((data) => {
                         loadCoverage(data);
                     });
                 }
             });
 
-            vscode.workspace.fs.readFile(uri[0]).then(data => {
+            vscode.workspace.fs.readFile(uri[0]).then((data) => {
                 loadCoverage(data);
             });
         }
@@ -86,7 +94,7 @@ export function showCoverageCallback() {
 }
 
 export function hideCoverageCallback() {
-    disposables.forEach(d => d.dispose());
+    disposables.forEach((d) => d.dispose());
     disposables.length = 0;
 
     clearDecorations();
@@ -94,7 +102,7 @@ export function hideCoverageCallback() {
 
 function clearDecorations() {
     // clear decorations
-    vscode.window.visibleTextEditors.forEach(e => {
+    vscode.window.visibleTextEditors.forEach((e) => {
         for (let i = 0; i < decorationTypes.length; i++) {
             e.setDecorations(decorationTypes[i], []);
         }
@@ -115,7 +123,7 @@ function loadCoverage(data: Uint8Array) {
     }
 
     if (compare(coverage.version, '2.0.0') >= 0) {
-        const message = `Coverage data version ${coverage.version} is not supported. Please update the Tools for Solidity extension.`;
+        const message = `Coverage data version ${coverage.version} is not supported. Please update the Solidity extension.`;
         outputChannel.appendLine(message);
         vscode.window.showErrorMessage(message);
         return;
@@ -123,7 +131,7 @@ function loadCoverage(data: Uint8Array) {
 
     coverageData = coverage.data;
 
-    vscode.window.visibleTextEditors.forEach(e => {
+    vscode.window.visibleTextEditors.forEach((e) => {
         applyDecorationsOnTextEditor(e);
     });
 }
@@ -131,41 +139,58 @@ function loadCoverage(data: Uint8Array) {
 function buildDecorationOptions(covItem: CoverageItem, ratio: number): vscode.DecorationOptions {
     const coveragePercentage = (ratio * 100).toFixed(2);
     return {
-        range: new vscode.Range(covItem.startLine, covItem.startColumn, covItem.endLine, covItem.endColumn),
-        hoverMessage: new vscode.MarkdownString(`${covItem.coverageHits} ${covItem.coverageHits > 1 ? "hits" : "hit"} (${coveragePercentage}%)`)
+        range: new vscode.Range(
+            covItem.startLine,
+            covItem.startColumn,
+            covItem.endLine,
+            covItem.endColumn
+        ),
+        hoverMessage: new vscode.MarkdownString(
+            `${covItem.coverageHits} ${
+                covItem.coverageHits > 1 ? 'hits' : 'hit'
+            } (${coveragePercentage}%)`
+        )
     };
 }
 
 function applyDecorationsOnTextEditor(editor: vscode.TextEditor) {
     if (editor.document.fileName in coverageData) {
-        const decorationsByIndex: vscode.DecorationOptions[][] = new Array<vscode.DecorationOptions[]>(decorationTypes.length);
+        const decorationsByIndex: vscode.DecorationOptions[][] = new Array<
+            vscode.DecorationOptions[]
+        >(decorationTypes.length);
         for (let i = 0; i < decorationTypes.length; i++) {
-            decorationsByIndex[i]= [];
+            decorationsByIndex[i] = [];
         }
 
-        const fnHitsMax = Math.max(...coverageData[editor.document.fileName].map(fnCov => fnCov.coverageHits));
+        const fnHitsMax = Math.max(
+            ...coverageData[editor.document.fileName].map((fnCov) => fnCov.coverageHits)
+        );
 
-        coverageData[editor.document.fileName].forEach(fnCov => {
+        coverageData[editor.document.fileName].forEach((fnCov) => {
             const relativeHits = fnHitsMax > 0 ? fnCov.coverageHits / fnHitsMax : 0;
-            const decorationIndex = Math.floor(relativeHits * 100 / 25);
+            const decorationIndex = Math.floor((relativeHits * 100) / 25);
             decorationsByIndex[decorationIndex].push(buildDecorationOptions(fnCov, relativeHits));
 
-            const brHitsMax = Math.max(...fnCov.branchRecords.map(brCov => brCov.coverageHits));
+            const brHitsMax = Math.max(...fnCov.branchRecords.map((brCov) => brCov.coverageHits));
 
-            fnCov.branchRecords.forEach(brCov => {
+            fnCov.branchRecords.forEach((brCov) => {
                 //const relativeHits = fnCov.coverageHits > 0 ? brCov.coverageHits / fnCov.coverageHits : 0;
                 const relativeHits = brHitsMax > 0 ? brCov.coverageHits / brHitsMax : 0;
-                const decorationIndex = Math.floor(relativeHits * 100 / 25);
-                decorationsByIndex[decorationIndex].push(buildDecorationOptions(brCov, relativeHits));
+                const decorationIndex = Math.floor((relativeHits * 100) / 25);
+                decorationsByIndex[decorationIndex].push(
+                    buildDecorationOptions(brCov, relativeHits)
+                );
             });
 
-            const modHitsMax = Math.max(...fnCov.modRecords.map(modCov => modCov.coverageHits));
+            const modHitsMax = Math.max(...fnCov.modRecords.map((modCov) => modCov.coverageHits));
 
-            fnCov.modRecords.forEach(modCov => {
+            fnCov.modRecords.forEach((modCov) => {
                 //const relativeHits = fnCov.coverageHits > 0 ? modCov.coverageHits / fnCov.coverageHits : 0;
                 const relativeHits = modHitsMax > 0 ? modCov.coverageHits / modHitsMax : 0;
-                const decorationIndex = Math.floor(relativeHits * 100 / 25);
-                decorationsByIndex[decorationIndex].push(buildDecorationOptions(modCov, relativeHits));
+                const decorationIndex = Math.floor((relativeHits * 100) / 25);
+                decorationsByIndex[decorationIndex].push(
+                    buildDecorationOptions(modCov, relativeHits)
+                );
             });
         });
 
