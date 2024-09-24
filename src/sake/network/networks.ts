@@ -1,33 +1,25 @@
+import { Account } from '../webview/shared/types';
+
 interface NetworkState {
     accounts: string[];
     deployedContracts: string[];
 }
 
-export abstract interface INetworkProvider {
-    name: string?;
-    addAccount(account: string): boolean;
-    removeAccount(account: string): boolean;
-    deploy(contract: string): boolean;
-    get state(): NetworkState;
+export abstract class INetworkProvider {
+    abstract id: string;
+    abstract addAccount(address: string): Account | undefined;
+    abstract setAccountBalance(address: string, balance: number): boolean;
+    abstract deploy(contract: string): boolean;
 }
 
-export NetworkProvider {
-    name: string?;
+export class NetworkProvider {}
 
-}
+export class LocalNodeNetworkProvider {}
 
-export LocalNodeNetworkProvider {
-
-}
-
-export class NetworksProvider {
-    supportedNetworks = [
-        {
-            name: 'Local Node',
-
-        }
-    ]
-        'Local Node',
-        'Network'
+export const SupportedNetworks = [
+    {
+        id: 'local',
+        name: 'Local Node',
+        provider: LocalNodeNetworkProvider
     }
-}
+];

@@ -2238,7 +2238,7 @@ class ViewTemplate {
     }
 }
 // Much thanks to LitHTML for working this out!
-const lastAttributeNameRegex = 
+const lastAttributeNameRegex =
 /* eslint-disable-next-line no-control-regex */
 /([ \x09\x0a\x0c\x0d])([^\0-\x1F\x7F-\x9F "'>=/]+)([ \x09\x0a\x0c\x0d]*=[ \x09\x0a\x0c\x0d]*(?:[^ \x09\x0a\x0c\x0d"'`<>=]*|"[^"]*|'[^']*))$/;
 /**
@@ -2321,7 +2321,7 @@ class ElementStyles {
 ElementStyles.create = (() => {
     if (DOM.supportsAdoptedStyleSheets) {
         const styleSheetCache = new Map();
-        return (styles) => 
+        return (styles) =>
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         new AdoptedStyleSheetsStyles(styles, styleSheetCache);
     }
@@ -4924,7 +4924,7 @@ function applyMixins(derivedCtor, ...baseCtors) {
     baseCtors.forEach(baseCtor => {
         Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
             if (name !== "constructor") {
-                Object.defineProperty(derivedCtor.prototype, name, 
+                Object.defineProperty(derivedCtor.prototype, name,
                 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
                 Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
             }
@@ -10564,18 +10564,18 @@ const vsCodeCheckbox = Checkbox.compose({
     template: checkboxTemplate,
     styles: checkboxStyles,
     checkedIndicator: `
-		<svg 
+		<svg
 			part="checked-indicator"
 			class="checked-indicator"
-			width="16" 
-			height="16" 
-			viewBox="0 0 16 16" 
-			xmlns="http://www.w3.org/2000/svg" 
+			width="16"
+			height="16"
+			viewBox="0 0 16 16"
+			xmlns="http://www.w3.org/2000/svg"
 			fill="currentColor"
 		>
-			<path 
-				fill-rule="evenodd" 
-				clip-rule="evenodd" 
+			<path
+				fill-rule="evenodd"
+				clip-rule="evenodd"
 				d="M14.431 3.323l-8.47 10-.79-.036-3.35-4.77.818-.574 2.978 4.24 8.051-9.506.764.646z"
 			/>
 		</svg>
@@ -10781,18 +10781,18 @@ const vsCodeDropdown = Dropdown.compose({
     template: selectTemplate,
     styles: dropdownStyles,
     indicator: `
-		<svg 
+		<svg
 			class="select-indicator"
 			part="select-indicator"
-			width="16" 
-			height="16" 
-			viewBox="0 0 16 16" 
-			xmlns="http://www.w3.org/2000/svg" 
+			width="16"
+			height="16"
+			viewBox="0 0 16 16"
+			xmlns="http://www.w3.org/2000/svg"
 			fill="currentColor"
 		>
-			<path 
-				fill-rule="evenodd" 
-				clip-rule="evenodd" 
+			<path
+				fill-rule="evenodd"
+				clip-rule="evenodd"
 				d="M7.976 10.072l4.357-4.357.62.618L8.284 11h-.618L3 6.333l.619-.618 4.357 4.357z"
 			/>
 		</svg>
@@ -11532,7 +11532,7 @@ function instance$v($$self, $$props, $$invalidate) {
 	validate_slots('IconButton', slots, ['default']);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -11656,7 +11656,7 @@ function instance$u($$self, $$props, $$invalidate) {
 	validate_slots('CopyButton', slots, []);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	function handleClick() {
@@ -16777,7 +16777,7 @@ ZodReadonly.create = (type, params) => {
         ...processCreateParams(params),
     });
 };
-function custom(check, params = {}, 
+function custom(check, params = {},
 /**
  * @deprecated
  *
@@ -17924,7 +17924,7 @@ along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
 */
 // Explicitly check for the
 // eslint-disable-next-line @typescript-eslint/ban-types
-const isNullish$1 = (item) => 
+const isNullish$1 = (item) =>
 // Using "null" value intentionally for validation
 // eslint-disable-next-line no-null/no-null
 item === undefined || item === null;
@@ -19614,7 +19614,7 @@ var StateId;
     StateId["DeployedContracts"] = "deployedContracts";
     StateId["CompiledContracts"] = "compiledContracts";
     StateId["Accounts"] = "accounts";
-    StateId["TxHistory"] = "txHistory";
+    StateId["TransactionHistory"] = "TransactionHistory";
     StateId["Wake"] = "wake";
 })(StateId || (StateId = {}));
 
@@ -20487,7 +20487,7 @@ version$3.default = _default;
 
 	var _parse = _interopRequireDefault(parse$5);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; } 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 } (commonjsBrowser));
 
 var Messenger$1 = {};
@@ -20638,7 +20638,7 @@ MessageHandler$1.messageHandler = MessageHandler.getInstance();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	__exportStar(MessageHandler$1, exports);
 	__exportStar(Messenger$1, exports);
-	
+
 } (webview));
 
 (function (exports) {
@@ -20654,7 +20654,7 @@ MessageHandler$1.messageHandler = MessageHandler.getInstance();
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	__exportStar(webview, exports);
-	
+
 } (client));
 
 /**
@@ -22633,7 +22633,7 @@ function instance$l($$self, $$props, $$invalidate) {
 	validate_slots('DeleteButton', slots, []);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -22787,7 +22787,7 @@ function instance$k($$self, $$props, $$invalidate) {
 	validate_slots('PlusButton', slots, []);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -22941,7 +22941,7 @@ function instance$j($$self, $$props, $$invalidate) {
 	validate_slots('MinusButton', slots, []);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -25348,7 +25348,7 @@ function create_else_block_1$2(ctx) {
 	return block;
 }
 
-// (112:52) 
+// (112:52)
 function create_if_block_3$4(ctx) {
 	let inputissueindicator;
 	let current;
@@ -26246,7 +26246,7 @@ function instance$g($$self, $$props, $$invalidate) {
 	validate_slots('KebabButton', slots, []);
 
 	let { callback = () => {
-		
+
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -31203,7 +31203,7 @@ function create_if_block_5$1(ctx) {
 	return block;
 }
 
-// (38:70) 
+// (38:70)
 function create_if_block_4$1(ctx) {
 	let warningicon;
 	let current;
@@ -31417,7 +31417,7 @@ function create_if_block$2(ctx) {
 	return block;
 }
 
-// (64:70) 
+// (64:70)
 function create_if_block_2$1(ctx) {
 	let clickablespan;
 	let current;
@@ -32531,7 +32531,7 @@ function create_else_block(ctx) {
 	return block;
 }
 
-// (79:43) 
+// (79:43)
 function create_if_block_2(ctx) {
 	let div;
 	let h3;
@@ -32606,7 +32606,7 @@ function create_if_block_2(ctx) {
 	return block;
 }
 
-// (67:51) 
+// (67:51)
 function create_if_block_1(ctx) {
 	let div;
 	let h3;
@@ -32795,7 +32795,7 @@ function create_tab_header_slot(ctx) {
 	return block;
 }
 
-// (106:64) 
+// (106:64)
 function create_if_block_8(ctx) {
 	let callsetup;
 	let current;
@@ -32975,7 +32975,7 @@ function create_content_fixed_slot(ctx) {
 	return block;
 }
 
-// (117:64) 
+// (117:64)
 function create_if_block_6(ctx) {
 	let run_1;
 	let current;

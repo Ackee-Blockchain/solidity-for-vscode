@@ -2,16 +2,26 @@ import * as vscode from 'vscode';
 import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
 import { StateId, WebviewMessage } from '../webview/shared/types';
 
-export abstract class BaseState<T> {
+export abstract class BaseStateProvider<T> {
     subscriptions: BaseWebviewProvider[] = [];
     _state: T;
 
     protected constructor(private readonly _stateId: StateId, initialState: T) {
         this._state = initialState;
     }
+
     public subscribe(provider: BaseWebviewProvider) {
-        this.subscriptions.push(provider);
-        provider.setSubscribedState(this);
+        if (!this.subscriptions.includes(provider)) {
+            this.subscriptions.push(provider);
+            provider.setSubscribedState(this);
+        }
+    }
+
+    public unsubscribe(provider: BaseWebviewProvider) {
+        if (this.subscriptions.includes(provider)) {
+            this.subscriptions = this.subscriptions.filter((p) => p !== provider);
+            provider.unsetSubscribedState(this);
+        }
     }
 
     public get stateId(): StateId {
@@ -39,8 +49,3 @@ export abstract class BaseState<T> {
         });
     }
 }
-
-/*
- * The state has
- * deployedcontracts, txhistory, compiler
- */

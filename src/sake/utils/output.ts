@@ -1,17 +1,17 @@
 import * as vscode from 'vscode';
-import { TxHistoryState } from '../state/TxHistoryState';
+import { TransactionHistoryState } from '../state/TransactionHistoryStateProvider';
 import { SakeOutputTreeProvider } from '../providers/OutputTreeProvider';
 import { TxDeploymentOutput, TxCallOutput, TxType } from '../webview/shared/types';
 
-const txHistoryState = TxHistoryState.getInstance();
+const TransactionHistoryState = TransactionHistoryState.getInstance();
 
 export async function showTxFromHistory(outputTreeProvider: SakeOutputTreeProvider) {
-    if (txHistoryState.state.length === 0) {
+    if (TransactionHistoryState.state.length === 0) {
         vscode.window.showInformationMessage('No transaction history available');
         return;
     }
 
-    const history = txHistoryState.state;
+    const history = TransactionHistoryState.state;
     const quickPickItems = history.map((_tx) => {
         switch (_tx.type) {
             case TxType.Deployment: {

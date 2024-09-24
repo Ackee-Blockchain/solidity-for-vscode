@@ -5,10 +5,10 @@ import {
     ContractAbi,
     StateId
 } from '../webview/shared/types';
-import { BaseState } from './BaseState';
+import { BaseStateProvider } from './BaseStateProvider';
 
-export class CompilationState extends BaseState<CompilationState> {
-    private static _instance: CompilationState;
+export class CompilationStateProvider extends BaseStateProvider<CompilationState> {
+    private static _instance: CompilationStateProvider;
 
     private constructor() {
         super(StateId.CompiledContracts, {
@@ -18,9 +18,9 @@ export class CompilationState extends BaseState<CompilationState> {
         });
     }
 
-    public static getInstance(): CompilationState {
+    public static getInstance(): CompilationStateProvider {
         if (!this._instance) {
-            this._instance = new CompilationState();
+            this._instance = new CompilationStateProvider();
         }
         return this._instance;
     }

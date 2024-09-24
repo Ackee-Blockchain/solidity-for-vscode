@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import { getNonce } from '../utils/getNonce';
 import { getBasePage } from '../utils/getBasePage';
 import { MessageHandlerData } from '@estruyf/vscode';
-import { BaseState } from '../state/BaseState';
-import { DeploymentState } from '../state/DeploymentState';
+import { BaseState } from '../state/BaseStateProvider';
+import { DeploymentState } from '../state/DeploymentStateProvider';
 import { copyToClipboard, loadSampleAbi } from '../commands';
 import {
     StateId,
@@ -15,10 +15,10 @@ import {
     WakeGetBytecodeRequestParams,
     WakeGetBytecodeResponse
 } from '../webview/shared/types';
-import { CompilationState } from '../state/CompilationState';
-import { AccountState } from '../state/AccountState';
-import { WakeState } from '../state/WakeState';
-import { getBytecode } from '../api';
+import { CompilationState } from '../state/CompilationStateProvider';
+import { AccountState } from '../state/AccountStateProvider';
+import { WakeState } from '../state/WakeStateProvider';
+import { getBytecode } from '../wakeApi';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -89,6 +89,10 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
     public setSubscribedState(subscribedState: BaseState<any>) {
         this._stateSubscriptions.set(subscribedState.stateId, subscribedState);
+    }
+
+    public unsetSubscribedState(subscribedState: BaseState<any>) {
+        this._stateSubscriptions.delete(subscribedState.stateId);
     }
 
     protected _setState(stateId: StateId, state: any) {

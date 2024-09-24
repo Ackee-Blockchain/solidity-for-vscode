@@ -6,11 +6,6 @@
 
 export type Address = string;
 
-export interface Account {
-    address: string;
-    balance: number;
-}
-
 // inherited from Fragment
 export interface ContractFunction {
     // required
@@ -188,7 +183,7 @@ export interface TxCallOutput extends TxOutput {
  */
 
 // TODO remove this
-export interface DeploymentState {
+export interface DeployedContract {
     name: string;
     address: string;
     abi: any;
@@ -204,26 +199,27 @@ export interface CompilationState {
 }
 
 export type AccountState = {
+    [key: string]: Account;
+};
+
+export interface Account {
     address: string;
     balance: number | null; // TODO remove null
     nick: string | null;
-    // [key: string]: Account;
-};
-
-export interface Account {}
+}
 
 export interface WakeState {
     isAnvilInstalled: boolean | undefined;
     isServerRunning: boolean | undefined;
 }
 
-export type TxHistoryState = TxDeploymentOutput | TxCallOutput;
+export type TransactionHistoryState = TxDeploymentOutput | TxCallOutput;
 
 export enum StateId {
     DeployedContracts = 'deployedContracts',
     CompiledContracts = 'compiledContracts',
     Accounts = 'accounts',
-    TxHistory = 'txHistory',
+    TransactionHistory = 'TransactionHistory',
     Wake = 'wake'
 }
 

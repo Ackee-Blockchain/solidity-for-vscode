@@ -1,8 +1,8 @@
 import { StateId, WakeState } from '../webview/shared/types';
-import { BaseState } from './BaseState';
+import { BaseStateProvider } from './BaseStateProvider';
 
-export class WakeState extends BaseState<WakeState> {
-    private static _instance: WakeState;
+export class WakeStateProvider extends BaseStateProvider<WakeState> {
+    private static _instance: WakeStateProvider;
 
     private constructor() {
         super(StateId.Wake, {
@@ -11,9 +11,9 @@ export class WakeState extends BaseState<WakeState> {
         });
     }
 
-    public static getInstance(): WakeState {
+    public static getInstance(): WakeStateProvider {
         if (!this._instance) {
-            this._instance = new WakeState();
+            this._instance = new WakeStateProvider();
         }
         return this._instance;
     }

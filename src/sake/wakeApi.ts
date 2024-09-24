@@ -25,25 +25,25 @@ import {
     WakeGetBytecodeRequestParams
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
-import { CompilationState } from './state/CompilationState';
+import { CompilationState } from './state/CompilationStateProvider';
 import {
     getNameFromContractFqn,
     parseCompilationIssues,
     parseCompilationSkipped,
     parseCompiledContracts
 } from './utils/compilation';
-import { DeploymentState } from './state/DeploymentState';
-import { AccountState } from './state/AccountState';
+import { DeploymentState } from './state/DeploymentStateProvider';
+import { AccountState } from './state/AccountStateProvider';
 import { decodeCallReturnValue } from './utils/call';
 import { OutputViewManager, SakeOutputTreeProvider } from './providers/OutputTreeProvider';
-import { TxHistoryState } from './state/TxHistoryState';
+import { TransactionHistoryState } from './state/TransactionHistoryStateProvider';
 import { validate } from './utils/validate';
-import { WakeState } from './state/WakeState';
+import { WakeState } from './state/WakeStateProvider';
 
-const accountState = AccountState.getInstance();
-const deploymentState = DeploymentState.getInstance();
+const accountState = AccountStateProvider.getInstance();
+const deploymentState = DeploymentStateProvider.getInstance();
 const compilationState = CompilationState.getInstance();
-const txHistoryState = TxHistoryState.getInstance();
+const TransactionHistoryState = TransactionHistoryState.getInstance();
 const wakeState = WakeState.getInstance();
 
 /**
@@ -235,7 +235,7 @@ export async function deploy(
             callTrace: result.callTrace
         };
 
-        txHistoryState.addTx(txOutput);
+        TransactionHistoryState.addTx(txOutput);
         output.set(txOutput);
         vscode.commands.executeCommand('sake-output.focus');
 
@@ -295,7 +295,7 @@ export async function call(
             callTrace: result.callTrace
         };
 
-        txHistoryState.addTx(txOutput);
+        TransactionHistoryState.addTx(txOutput);
         output.set(txOutput);
         vscode.commands.executeCommand('sake-output.focus');
 

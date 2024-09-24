@@ -5,10 +5,9 @@ import {
     RunWebviewProvider,
     SakeWebviewProvider
 } from './providers/WebviewProviders';
-import { StatusBarEnvironmentProvider } from './providers/StatusBarNetworkProvider';
 import { copyToClipboard, loadSampleAbi, getTextFromInputBox } from './commands';
-import { DeploymentState } from './state/DeploymentState';
-import { CompilationState } from './state/CompilationState';
+import { DeploymentStateProvider } from './state/DeploymentStateProvider';
+import { CompilationStateProvider } from './state/CompilationStateProvider';
 import {
     WakeCompilationResponse,
     Contract,
@@ -33,14 +32,14 @@ import {
     getBytecode,
     setBalances,
     setLabel
-} from './api';
-import { AccountState } from './state/AccountState';
+} from './wakeApi';
+import { AccountState, AccountStateProvider } from './state/AccountStateProvider';
 import {
     OutputViewManager,
     SakeOutputItem,
     SakeOutputTreeProvider
 } from './providers/OutputTreeProvider';
-import { TxHistoryState } from './state/TxHistoryState';
+import { TransactionHistoryState } from './state/TransactionHistoryStateProvider';
 import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
 import { WalletServer } from '../serve';
@@ -74,10 +73,10 @@ export function activateSake(context: vscode.ExtensionContext, client?: Language
         vscode.window.registerWebviewViewProvider('sake', sidebarSakeProvider)
     );
 
-    const deploymentState = DeploymentState.getInstance();
-    const compilationState = CompilationState.getInstance();
-    const accountState = AccountState.getInstance();
-    const txHistoryState = TxHistoryState.getInstance();
+    const deploymentState = DeploymentStateProvider.getInstance();
+    const compilationState = CompilationStateProvider.getInstance();
+    const accountState = AccountStateProvider.getInstance();
+    const TransactionHistoryState = TransactionHistoryState.getInstance();
 
     context.subscriptions.push(
         vscode.commands.registerCommand('sake.refresh', async () => {
