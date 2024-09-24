@@ -18,6 +18,9 @@
     alt="Visual Studio Marketplace Downloads">
 </picture><br></br>
 
+[![Solidity for VS Code](images/readme/video-preview-2.png)](https://ackee.xyz/solidity_for_vscode.mp4 "Solidity for VS Code")
+
+
 Ethereum Solidity and local node testing with security features for Visual Studio Code.
 
 This extension adds language support for Solidity to Visual Studio Code, and provides a remix-like experience for testing contracts on your local network.
@@ -37,9 +40,6 @@ Benefits:
   - [Contract Outline](#contract-outline)
   - [Code Lens](#code-lens)
   - [Graphs](#graphs)
-
-[![Solidity for VS Code](images/readme/video-preview.png)](https://ackee.xyz/solidity_for_vscode.mp4 "Solidity for VS Code")
-
 
 ## Test and interact with your smart contracts on an Ethereum local node
 
