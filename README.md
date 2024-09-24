@@ -44,14 +44,14 @@ Benefits:
 
 Compile your contracts and deploy them on a local chain for testing
 
-![alt text](images/readme/sake/1-compile-deploy.gif)
+![Compile and deploy contracts](images/readme/sake/1-compile-deploy.gif)
 
 
 ### Interact with contracts
 
 Test your deployed contracts by interacting with them using function calls with different inputs
 
-![alt text](images/readme/sake/2-interact.gif)
+![Interact with contracts](images/readme/sake/2-interact.gif)
 
 ## See vulnerabilities from static analysis in real-time
 
@@ -59,19 +59,19 @@ Test your deployed contracts by interacting with them using function calls with 
 
 See compilation errors highlighted in code
 
-![alt text](images/readme/diagnostics/1-compilation-errors.gif)
+![Compilation errors](images/readme/diagnostics/1-compilation-errors.gif)
 
 ### See vulnerabilities from static analysis in real-time
 
 Catch potential issues early with real-time static analysis
 
-![alt text](images/readme/diagnostics/2-realtime-detectors.gif)
+![Real-time detectors](images/readme/diagnostics/2-realtime-detectors.gif)
 
 ### Security Overview in the Sidebar
 
 Get an overall overview of issues in your project
 
-![alt text](images/readme/diagnostics/3-sidebar-overview.gif)
+![Security overview in the sidebar](images/readme/diagnostics/3-sidebar-overview.gif)
 
 ## Best code navigation experience, call-graphs and more
 
@@ -79,43 +79,43 @@ Get an overall overview of issues in your project
 
 Quickly navigate to any function or variable definition with a click
 
-![alt text](images/readme/development/go_to_definition.gif)
+![Go to definition](images/readme/development/go_to_definition.gif)
 
 ### Find references
 
 Right click to see a context menu, and use it to find all references
 
-![alt text](images/readme/development/references.gif)
+![Find references](images/readme/development/references.gif)
 
 ### Document Links
 
 Click and jump to linked files and resources
 
-![alt text](images/readme/development/document_links.gif)
+![Document links](images/readme/development/document_links.gif)
 
 ### Hover
 
 Use hover to see instant documentation in your code
 
-![alt text](images/readme/development/hover.gif)
+![Hover](images/readme/development/hover.gif)
 
 ### Contract Outline
 
 Navigate big projects with ease using the Contract Outline
 
-![alt text](images/readme/development/outline.gif)
+![Contract outline](images/readme/development/outline.gif)
 
 ### Code Lens
 
 Code Lens shows you relevant information like functions selectors and parameter references inside your code
 
-![alt text](images/readme/development/codelens.gif)
+![Code Lens](images/readme/development/codelens.gif)
 
 ### Graphs
 
 Visualise contract inheritance and function control flows with graphs
 
-![alt text](images/readme/development/graph.gif)
+![Graphs](images/readme/development/graph.gif)
 
 
 ## Requirements

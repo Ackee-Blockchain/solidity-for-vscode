@@ -1,9 +1,9 @@
 {
     "name": "tools-for-solidity",
-    "displayName": "Tools for Solidity (Wake)",
-    "version": "1.15.2",
+    "displayName": "Solidity",
+    "version": "1.16.0",
     "publisher": "ackeeblockchain",
-    "description": "Advanced Solidity support and vulnerability detectors developed by Ackee Blockchain",
+    "description": "Code fast and secure Solidity smart contracts on Ethereum",
     "keywords": [
         "solidity",
         "ethereum",
@@ -17,13 +17,13 @@
         "evm",
         "solhint"
     ],
-    "homepage": "https://ackee.xyz/blog/introducing-tools-for-solidity/",
+    "homepage": "https://ackee.xyz/solidity-extension",
     "bugs": {
-        "url": "https://github.com/Ackee-Blockchain/tools-for-solidity-vscode/issues"
+        "url": "https://github.com/Ackee-Blockchain/solidity-for-vscode/issues"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/Ackee-Blockchain/tools-for-solidity-vscode.git"
+        "url": "https://github.com/Ackee-Blockchain/solidity-for-vscode.git"
     },
     "icon": "images/icon.png",
     "engines": {
@@ -60,7 +60,7 @@
                 }
             },
             {
-                "title": "Tools for Solidity",
+                "title": "Solidity",
                 "order": -1,
                 "properties": {
                     "Tools-for-Solidity.trace.server": {
@@ -414,48 +414,48 @@
         "commands": [
             {
                 "command": "Tools-for-Solidity.generate.imports_graph",
-                "title": "Tools for Solidity: Generate Imports Graph"
+                "title": "Solidity: Generate Imports Graph"
             },
             {
                 "command": "Tools-for-Solidity.generate.inheritance_graph",
-                "title": "Tools for Solidity: Generate Inheritance Graph"
+                "title": "Solidity: Generate Inheritance Graph"
             },
             {
                 "command": "Tools-for-Solidity.foundry.import_remappings",
-                "title": "Tools for Solidity: Import Foundry Remappings"
+                "title": "Solidity: Import Foundry Remappings"
             },
             {
                 "command": "Tools-for-Solidity.coverage.show",
-                "title": "Tools for Solidity: Show Coverage"
+                "title": "Solidity: Show Coverage"
             },
             {
                 "command": "Tools-for-Solidity.coverage.hide",
-                "title": "Tools for Solidity: Hide Coverage"
+                "title": "Solidity: Hide Coverage"
             },
             {
                 "command": "Tools-for-Solidity.init.detector",
-                "title": "Tools for Solidity: New Detector"
+                "title": "Solidity: New Detector"
             },
             {
                 "command": "Tools-for-Solidity.init.global_detector",
-                "title": "Tools for Solidity: New Global Detector"
+                "title": "Solidity: New Global Detector"
             },
             {
                 "command": "Tools-for-Solidity.init.printer",
-                "title": "Tools for Solidity: New Printer"
+                "title": "Solidity: New Printer"
             },
             {
                 "command": "Tools-for-Solidity.init.global_printer",
-                "title": "Tools for Solidity: New Global Printer"
+                "title": "Solidity: New Global Printer"
             },
             {
                 "command": "Tools-for-Solidity.detections.force_rerun_detectors",
-                "title": "Tools for Solidity: Force Rerun Detectors",
+                "title": "Solidity: Force Rerun Detectors",
                 "icon": "$(refresh)"
             },
             {
                 "command": "Tools-for-Solidity.detections.force_recompile",
-                "title": "Tools for Solidity: Force Recompile Project",
+                "title": "Solidity: Force Recompile Project",
                 "icon": "$(refresh)"
             },
             {
@@ -561,26 +561,26 @@
             },
             {
                 "command": "Tools-for-Solidity.sake.compile",
-                "title": "Tools for Solidity Deploy & Interact: Compile"
+                "title": "Solidity Deploy & Interact: Compile"
             },
             {
                 "command": "Tools-for-Solidity.sake.show_history",
-                "title": "Tools for Solidity Deploy & Interact: Show Transaction History",
+                "title": "Solidity Deploy & Interact: Show Transaction History",
                 "icon": "$(history)"
             },
             {
                 "command": "Tools-for-Solidity.config.enable-prerelease",
-                "title": "Tools for Solidity: Enable Wake Prerelease",
+                "title": "Solidity: Enable Wake Prerelease",
                 "enablement": "!Tools-for-Solidity.Wake.prerelease"
             },
             {
                 "command": "Tools-for-Solidity.config.disable-prerelease",
-                "title": "Tools for Solidity:  Disable Wake Prerelease",
+                "title": "Solidity:  Disable Wake Prerelease",
                 "enablement": "Tools-for-Solidity.Wake.prerelease"
             },
             {
                 "command": "Tools-for-Solidity.sake.copyFromResults",
-                "title": "Tools for Solidity: Copy From Results",
+                "title": "Solidity: Copy From Results",
                 "icon": "$(copy)"
             }
         ],
@@ -912,13 +912,13 @@
         "walkthroughs": [
             {
                 "id": "tfs-walkthrough",
-                "title": "Getting started with Tools for Solidity",
-                "description": "Discover powerful features of Tools for Solidity and learn how to enhance your development experience.",
+                "title": "Getting started with Solidity",
+                "description": "Discover powerful features of Solidity and learn how to enhance your development experience.",
                 "steps": [
                     {
                         "id": "select-wake-installation",
                         "title": "Setup: Select Wake installation method",
-                        "description": "Tools for Solidity needs to install [Wake](https://getwake.io/) to run. By default, Wake is installed using conda for best compatibility. You can change the installation method below.\n**Recommended**: Only change the installation method if necessary.\n[Change Installation Method](command:Tools-for-Solidity.select-installation-method)",
+                        "description": "Solidity needs to install [Wake](https://getwake.io/) to run. By default, Wake is installed using conda for best compatibility. You can change the installation method below.\n**Recommended**: Only change the installation method if necessary.\n[Change Installation Method](command:Tools-for-Solidity.select-installation-method)",
                         "media": {
                             "markdown": "./resources/walkthrough/blank.md"
                         }
@@ -964,7 +964,7 @@
                     {
                         "id": "language-server",
                         "title": "Speed up your workflow with LSP features",
-                        "description": "Tools for Solidity ships with a powerful language server which adds support for **CodeLens**, **Go to Definition**, **Find References**, and more.",
+                        "description": "Solidity ships with a powerful language server which adds support for **CodeLens**, **Go to Definition**, **Find References**, and more.",
                         "media": {
                             "image": "./resources/walkthrough/lsp.png",
                             "altText": "LSP Server"
