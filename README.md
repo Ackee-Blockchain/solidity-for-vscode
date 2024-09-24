@@ -18,8 +18,7 @@
     alt="Visual Studio Marketplace Downloads">
 </picture><br></br>
 
-[![Solidity for VS Code](images/readme/video-preview-2.png)](https://ackee.xyz/solidity_for_vscode.mp4 "Solidity for VS Code")
-
+![Solidity for VS Code](images/readme/solidity_for_vscode.gif)
 
 Ethereum Solidity and local node testing with security features for Visual Studio Code.
 
