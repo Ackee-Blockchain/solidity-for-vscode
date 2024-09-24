@@ -1011,10 +1011,10 @@
         "dev": "concurrently \"npm run build.extension.dev\" \"npm run build.webview.dev\"",
         "build.extension": "webpack --mode development",
         "build.extension.dev": "webpack --mode development --watch",
-        "build.webview": "cd src/sake/webview; npm run build",
-        "build.webview.dev": "cd src/sake/webview; npm run dev",
+        "build.webview": "cd src/sake/webview && npm run build",
+        "build.webview.dev": "cd src/sake/webview && npm run dev",
         "clean-install": "npm run clean-install.webview && npm run clean-install.extension",
-        "clean-install.webview": "cd src/sake/webview; npm ci",
+        "clean-install.webview": "cd src/sake/webview && npm ci",
         "clean-install.extension": "npm ci"
     },
     "devDependencies": {
