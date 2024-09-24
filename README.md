@@ -38,8 +38,6 @@ Benefits:
   - [Code Lens](#code-lens)
   - [Graphs](#graphs)
 
-<br>
-
 [![Solidity for VS Code](images/readme/video-preview.png)](https://ackee.xyz/solidity_for_vscode.mp4 "Solidity for VS Code")
 
 
