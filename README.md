@@ -23,7 +23,7 @@
 
 Ethereum Solidity and local node testing with security features for Visual Studio Code.
 
-This extension adds language support for Solidity to Visual Studio Code, and provides a remix-like experience for testing contracts on your local network.
+This extension adds language support for Solidity to Visual Studio Code, and provides a Remix-like experience for testing contracts on your local network.
 Benefits:
 - [Test and interact with your smart contracts on an Ethereum local node](#test-and-interact-with-your-smart-contracts-on-an-ethereum-local-node)
   - [Compile and deploy contracts](#compile-and-deploy-contracts)
@@ -58,13 +58,7 @@ Test your deployed contracts by interacting with them using function calls with 
 
 ## See vulnerabilities from static analysis in real-time
 
-### Compilation Errors
-
-See compilation errors highlighted in code
-
-![Compilation errors](images/readme/diagnostics/1-compilation-errors.gif)
-
-### See vulnerabilities from static analysis in real-time
+### Free detections with leading security tool Wake
 
 Catch potential issues early with real-time static analysis
 
@@ -75,6 +69,12 @@ Catch potential issues early with real-time static analysis
 Get an overall overview of issues in your project
 
 ![Security overview in the sidebar](images/readme/diagnostics/3-sidebar-overview.gif)
+
+### Compilation Errors
+
+See compilation errors highlighted in code
+
+![Compilation errors](images/readme/diagnostics/1-compilation-errors.gif)
 
 ## Best code navigation experience, call-graphs and more
 
@@ -123,9 +123,9 @@ Visualise contract inheritance and function control flows with graphs
 
 ## Requirements
 
-The Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.8 or higher. Python 3.12 is experimentally supported. This package is automatically installed via conda by default. See [link](https://ackee.xyz/solidity/docs/installation) for other installation optional.
+The Solidity extension uses the PyPi package [eth-wake](https://pypi.org/project/eth-wake/) which requires Python 3.8 or higher. This package is automatically installed via [conda](https://conda.github.io/conda-pack/) by default.
 
-Rosetta is required to be enabled on Apple Silicon (M1, M2 & M3) Macs.
+Rosetta is required to be enabled on Apple Silicon Macs.
 
 ## Credits
 [juanfranblanco/vscode-solidity](https://github.com/juanfranblanco/vscode-solidity/blob/master/syntaxes/solidity.json): a base of our Solidity grammar
@@ -140,10 +140,6 @@ Follow Ackee on [Twitter](https://twitter.com/AckeeBlockchain)
 
 
 ## Known Issues
-
-- **Files created/modified/deleted outside of VS Code are not properly analyzed**
-
-The extension currently does not handle changes external to VS Code. This especially means that files installed into `node_modules` are not detected. Please run the `Wake: Force Recompile Project` command after installing node packages as a workaround.
 
 - **`Go to references`, number of references and other features do not work correctly with no workspace open**
 
