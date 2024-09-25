@@ -327,7 +327,7 @@ export interface WakeGetBalancesResponse {
 }
 
 export interface WakeSetBalancesRequestParams {
-    balances: { [key: string]: number };
+    balances: { [key: Address]: number };
 }
 
 export interface WakeSetBalancesResponse {
@@ -376,3 +376,15 @@ export interface WalletDeploymentData {
     value: number;
     bytecode: Bytecode;
 }
+
+/*
+ *
+ * Network
+ *
+ */
+
+export interface DeploymentRequest {}
+
+export interface CallRequest {}
+
+export interface TransactRequest {}

@@ -46,7 +46,7 @@ const compilationState = CompilationState.getInstance();
 const TransactionHistoryState = TransactionHistoryState.getInstance();
 const wakeState = WakeState.getInstance();
 
-/**
+/*
  * Get accounts and balances and save to state
  *
  * @param client
@@ -87,7 +87,7 @@ export async function getAccounts(client: LanguageClient | undefined) {
     }
 }
 
-/**
+/*
  * Get balances for a list of addresses and save to state
  * @dev only updates existing accounts state
  *

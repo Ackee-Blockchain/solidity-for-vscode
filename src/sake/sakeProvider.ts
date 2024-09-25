@@ -51,8 +51,10 @@ export interface SakeState {
     state: SakeState;
 }
 
-export abstract class AbstractSakeProvider {
-    constructor() {}
+export
+
+export abstract class GenericSakeProvider {
+    abstract initialize(): Promise<void>;
 
     /* Account management */
 
@@ -63,7 +65,7 @@ export abstract class AbstractSakeProvider {
         }
 
         // get data from network
-        const account: Account | undefined = await this.network.addAccount(address);
+        const account: Account | undefined = await this.network.registerAccount(address);
 
         if (account) {
             this.state.accounts.add(account);
@@ -80,6 +82,10 @@ export abstract class AbstractSakeProvider {
         if (success) {
             this.state.accounts.setBalance(address, balance);
         }
+    }
+
+    async setAccountNickname(address: string, nickname: string) {
+        this.state.accounts.setNickname(address, nickname);
     }
 
     /* Deployment management */
@@ -109,7 +115,26 @@ export abstract class AbstractSakeProvider {
     abstract get state(): SakeState;
 }
 
-export class SakeProvider extends AbstractSakeProvider {
+export class LocalNodeSakeProvider extends GenericSakeProvider {
+    constructor() {
+        super();
+        _network =
+    }
+
+    async initialize() {
+        // TODO preload accounts
+    }
+
+    get network(): INetworkProvider {
+        return new LocalNodeNetworkProvider();
+    }
+
+    get state(): SakeState {
+        return new SakeState();
+    }
+}
+
+export class SakeProvider extends GenericSakeProvider {
     private _state!: SakeState;
 
     private networkMap = new Map<

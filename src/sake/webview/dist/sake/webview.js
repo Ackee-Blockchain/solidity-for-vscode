@@ -1,5 +1,7 @@
 'use strict';
 
+var pep440 = require('@renovatebot/pep440');
+
 function noop() { }
 function assign(tar, src) {
     // @ts-ignore
@@ -2238,7 +2240,7 @@ class ViewTemplate {
     }
 }
 // Much thanks to LitHTML for working this out!
-const lastAttributeNameRegex =
+const lastAttributeNameRegex = 
 /* eslint-disable-next-line no-control-regex */
 /([ \x09\x0a\x0c\x0d])([^\0-\x1F\x7F-\x9F "'>=/]+)([ \x09\x0a\x0c\x0d]*=[ \x09\x0a\x0c\x0d]*(?:[^ \x09\x0a\x0c\x0d"'`<>=]*|"[^"]*|'[^']*))$/;
 /**
@@ -2321,7 +2323,7 @@ class ElementStyles {
 ElementStyles.create = (() => {
     if (DOM.supportsAdoptedStyleSheets) {
         const styleSheetCache = new Map();
-        return (styles) =>
+        return (styles) => 
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         new AdoptedStyleSheetsStyles(styles, styleSheetCache);
     }
@@ -4924,7 +4926,7 @@ function applyMixins(derivedCtor, ...baseCtors) {
     baseCtors.forEach(baseCtor => {
         Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
             if (name !== "constructor") {
-                Object.defineProperty(derivedCtor.prototype, name,
+                Object.defineProperty(derivedCtor.prototype, name, 
                 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
                 Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
             }
@@ -10564,18 +10566,18 @@ const vsCodeCheckbox = Checkbox.compose({
     template: checkboxTemplate,
     styles: checkboxStyles,
     checkedIndicator: `
-		<svg
+		<svg 
 			part="checked-indicator"
 			class="checked-indicator"
-			width="16"
-			height="16"
-			viewBox="0 0 16 16"
-			xmlns="http://www.w3.org/2000/svg"
+			width="16" 
+			height="16" 
+			viewBox="0 0 16 16" 
+			xmlns="http://www.w3.org/2000/svg" 
 			fill="currentColor"
 		>
-			<path
-				fill-rule="evenodd"
-				clip-rule="evenodd"
+			<path 
+				fill-rule="evenodd" 
+				clip-rule="evenodd" 
 				d="M14.431 3.323l-8.47 10-.79-.036-3.35-4.77.818-.574 2.978 4.24 8.051-9.506.764.646z"
 			/>
 		</svg>
@@ -10781,18 +10783,18 @@ const vsCodeDropdown = Dropdown.compose({
     template: selectTemplate,
     styles: dropdownStyles,
     indicator: `
-		<svg
+		<svg 
 			class="select-indicator"
 			part="select-indicator"
-			width="16"
-			height="16"
-			viewBox="0 0 16 16"
-			xmlns="http://www.w3.org/2000/svg"
+			width="16" 
+			height="16" 
+			viewBox="0 0 16 16" 
+			xmlns="http://www.w3.org/2000/svg" 
 			fill="currentColor"
 		>
-			<path
-				fill-rule="evenodd"
-				clip-rule="evenodd"
+			<path 
+				fill-rule="evenodd" 
+				clip-rule="evenodd" 
 				d="M7.976 10.072l4.357-4.357.62.618L8.284 11h-.618L3 6.333l.619-.618 4.357 4.357z"
 			/>
 		</svg>
@@ -11532,7 +11534,7 @@ function instance$v($$self, $$props, $$invalidate) {
 	validate_slots('IconButton', slots, ['default']);
 
 	let { callback = () => {
-
+		
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -11656,7 +11658,7 @@ function instance$u($$self, $$props, $$invalidate) {
 	validate_slots('CopyButton', slots, []);
 
 	let { callback = () => {
-
+		
 	} } = $$props;
 
 	function handleClick() {
@@ -16777,7 +16779,7 @@ ZodReadonly.create = (type, params) => {
         ...processCreateParams(params),
     });
 };
-function custom(check, params = {},
+function custom(check, params = {}, 
 /**
  * @deprecated
  *
@@ -17924,7 +17926,7 @@ along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
 */
 // Explicitly check for the
 // eslint-disable-next-line @typescript-eslint/ban-types
-const isNullish$1 = (item) =>
+const isNullish$1 = (item) => 
 // Using "null" value intentionally for validation
 // eslint-disable-next-line no-null/no-null
 item === undefined || item === null;
@@ -19654,7 +19656,7 @@ function rng() {
   return getRandomValues(rnds8);
 }
 
-var stringify$3 = {};
+var stringify$1 = {};
 
 var validate$1 = {};
 
@@ -19683,11 +19685,11 @@ function validate(uuid) {
 var _default$b = validate;
 validate$1.default = _default$b;
 
-Object.defineProperty(stringify$3, "__esModule", {
+Object.defineProperty(stringify$1, "__esModule", {
   value: true
 });
-stringify$3.default = void 0;
-stringify$3.unsafeStringify = unsafeStringify;
+stringify$1.default = void 0;
+stringify$1.unsafeStringify = unsafeStringify;
 
 var _validate$2 = _interopRequireDefault$7(validate$1);
 
@@ -19709,7 +19711,7 @@ function unsafeStringify(arr, offset = 0) {
   return byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]];
 }
 
-function stringify$2(arr, offset = 0) {
+function stringify(arr, offset = 0) {
   const uuid = unsafeStringify(arr, offset); // Consistency check for valid UUID.  If this throws, it's likely due to one
   // of the following:
   // - One or more input array values don't map to a hex octet (leading to
@@ -19723,8 +19725,8 @@ function stringify$2(arr, offset = 0) {
   return uuid;
 }
 
-var _default$a = stringify$2;
-stringify$3.default = _default$a;
+var _default$a = stringify;
+stringify$1.default = _default$a;
 
 Object.defineProperty(v1$1, "__esModule", {
   value: true
@@ -19733,7 +19735,7 @@ v1$1.default = void 0;
 
 var _rng$1 = _interopRequireDefault$6(rng$1);
 
-var _stringify$2 = stringify$3;
+var _stringify$2 = stringify$1;
 
 function _interopRequireDefault$6(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19836,18 +19838,18 @@ var v3$1 = {};
 
 var v35$1 = {};
 
-var parse$5 = {};
+var parse$1 = {};
 
-Object.defineProperty(parse$5, "__esModule", {
+Object.defineProperty(parse$1, "__esModule", {
   value: true
 });
-parse$5.default = void 0;
+parse$1.default = void 0;
 
 var _validate$1 = _interopRequireDefault$5(validate$1);
 
 function _interopRequireDefault$5(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function parse$4(uuid) {
+function parse(uuid) {
   if (!(0, _validate$1.default)(uuid)) {
     throw TypeError('Invalid UUID');
   }
@@ -19879,8 +19881,8 @@ function parse$4(uuid) {
   return arr;
 }
 
-var _default$8 = parse$4;
-parse$5.default = _default$8;
+var _default$8 = parse;
+parse$1.default = _default$8;
 
 Object.defineProperty(v35$1, "__esModule", {
   value: true
@@ -19888,9 +19890,9 @@ Object.defineProperty(v35$1, "__esModule", {
 v35$1.URL = v35$1.DNS = void 0;
 v35$1.default = v35;
 
-var _stringify$1 = stringify$3;
+var _stringify$1 = stringify$1;
 
-var _parse = _interopRequireDefault$4(parse$5);
+var _parse = _interopRequireDefault$4(parse$1);
 
 function _interopRequireDefault$4(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -20223,7 +20225,7 @@ var _native = _interopRequireDefault$2(native);
 
 var _rng = _interopRequireDefault$2(rng$1);
 
-var _stringify = stringify$3;
+var _stringify = stringify$1;
 
 function _interopRequireDefault$2(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -20387,18 +20389,18 @@ nil.default = void 0;
 var _default$1 = '00000000-0000-0000-0000-000000000000';
 nil.default = _default$1;
 
-var version$3 = {};
+var version$2 = {};
 
-Object.defineProperty(version$3, "__esModule", {
+Object.defineProperty(version$2, "__esModule", {
   value: true
 });
-version$3.default = void 0;
+version$2.default = void 0;
 
 var _validate = _interopRequireDefault(validate$1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function version$2(uuid) {
+function version$1(uuid) {
   if (!(0, _validate.default)(uuid)) {
     throw TypeError('Invalid UUID');
   }
@@ -20406,8 +20408,8 @@ function version$2(uuid) {
   return parseInt(uuid.slice(14, 15), 16);
 }
 
-var _default = version$2;
-version$3.default = _default;
+var _default = version$1;
+version$2.default = _default;
 
 (function (exports) {
 
@@ -20479,15 +20481,15 @@ version$3.default = _default;
 
 	var _nil = _interopRequireDefault(nil);
 
-	var _version = _interopRequireDefault(version$3);
+	var _version = _interopRequireDefault(version$2);
 
 	var _validate = _interopRequireDefault(validate$1);
 
-	var _stringify = _interopRequireDefault(stringify$3);
+	var _stringify = _interopRequireDefault(stringify$1);
 
-	var _parse = _interopRequireDefault(parse$5);
+	var _parse = _interopRequireDefault(parse$1);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; } 
 } (commonjsBrowser));
 
 var Messenger$1 = {};
@@ -20638,7 +20640,7 @@ MessageHandler$1.messageHandler = MessageHandler.getInstance();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	__exportStar(MessageHandler$1, exports);
 	__exportStar(Messenger$1, exports);
-
+	
 } (webview));
 
 (function (exports) {
@@ -20654,7 +20656,7 @@ MessageHandler$1.messageHandler = MessageHandler.getInstance();
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	__exportStar(webview, exports);
-
+	
 } (client));
 
 /**
@@ -22633,7 +22635,7 @@ function instance$l($$self, $$props, $$invalidate) {
 	validate_slots('DeleteButton', slots, []);
 
 	let { callback = () => {
-
+		
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -22787,7 +22789,7 @@ function instance$k($$self, $$props, $$invalidate) {
 	validate_slots('PlusButton', slots, []);
 
 	let { callback = () => {
-
+		
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -22941,7 +22943,7 @@ function instance$j($$self, $$props, $$invalidate) {
 	validate_slots('MinusButton', slots, []);
 
 	let { callback = () => {
-
+		
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -23175,7 +23177,7 @@ var __publicField = (obj, key, value) => {
 
 // package.json
 var name = "abitype";
-var version$1 = "0.7.1";
+var version = "0.7.1";
 
 // src/errors.ts
 var BaseError = class extends Error {
@@ -23188,7 +23190,7 @@ var BaseError = class extends Error {
       ...args.metaMessages ? [...args.metaMessages, ""] : [],
       ...docsPath ? [`Docs: https://abitype.dev${docsPath}`] : [],
       ...details ? [`Details: ${details}`] : [],
-      `Version: ${name}@${version$1}`
+      `Version: ${name}@${version}`
     ].join("\n");
     super(message);
     __publicField(this, "details");
@@ -25348,7 +25350,7 @@ function create_else_block_1$2(ctx) {
 	return block;
 }
 
-// (112:52)
+// (112:52) 
 function create_if_block_3$4(ctx) {
 	let inputissueindicator;
 	let current;
@@ -26246,7 +26248,7 @@ function instance$g($$self, $$props, $$invalidate) {
 	validate_slots('KebabButton', slots, []);
 
 	let { callback = () => {
-
+		
 	} } = $$props;
 
 	const writable_props = ['callback'];
@@ -29063,734 +29065,6 @@ class CalldataBytes extends SvelteComponentDev {
 	}
 }
 
-const VERSION_PATTERN$1 = [
-  "v?",
-  "(?:",
-  /* */ "(?:(?<epoch>[0-9]+)!)?", // epoch
-  /* */ "(?<release>[0-9]+(?:\\.[0-9]+)*)", // release segment
-  /* */ "(?<pre>", // pre-release
-  /*    */ "[-_\\.]?",
-  /*    */ "(?<pre_l>(a|b|c|rc|alpha|beta|pre|preview))",
-  /*    */ "[-_\\.]?",
-  /*    */ "(?<pre_n>[0-9]+)?",
-  /* */ ")?",
-  /* */ "(?<post>", // post release
-  /*    */ "(?:-(?<post_n1>[0-9]+))",
-  /*    */ "|",
-  /*    */ "(?:",
-  /*        */ "[-_\\.]?",
-  /*        */ "(?<post_l>post|rev|r)",
-  /*        */ "[-_\\.]?",
-  /*        */ "(?<post_n2>[0-9]+)?",
-  /*    */ ")",
-  /* */ ")?",
-  /* */ "(?<dev>", // dev release
-  /*    */ "[-_\\.]?",
-  /*    */ "(?<dev_l>dev)",
-  /*    */ "[-_\\.]?",
-  /*    */ "(?<dev_n>[0-9]+)?",
-  /* */ ")?",
-  ")",
-  "(?:\\+(?<local>[a-z0-9]+(?:[-_\\.][a-z0-9]+)*))?", // local version
-].join("");
-
-var version = {
-  VERSION_PATTERN: VERSION_PATTERN$1,
-  valid: valid$1,
-  clean: clean$1,
-  explain: explain$2,
-  parse: parse$3,
-  stringify: stringify$1,
-};
-
-const validRegex = new RegExp("^" + VERSION_PATTERN$1 + "$", "i");
-
-function valid$1(version) {
-  return validRegex.test(version) ? version : null;
-}
-
-const cleanRegex = new RegExp("^\\s*" + VERSION_PATTERN$1 + "\\s*$", "i");
-function clean$1(version) {
-  return stringify$1(parse$3(version, cleanRegex));
-}
-
-function parse$3(version, regex) {
-  // Validate the version and parse it into pieces
-  const { groups } = (regex || validRegex).exec(version) || {};
-  if (!groups) {
-    return null;
-  }
-
-  // Store the parsed out pieces of the version
-  const parsed = {
-    epoch: Number(groups.epoch ? groups.epoch : 0),
-    release: groups.release.split(".").map(Number),
-    pre: normalize_letter_version(groups.pre_l, groups.pre_n),
-    post: normalize_letter_version(
-      groups.post_l,
-      groups.post_n1 || groups.post_n2
-    ),
-    dev: normalize_letter_version(groups.dev_l, groups.dev_n),
-    local: parse_local_version(groups.local),
-  };
-
-  return parsed;
-}
-
-function stringify$1(parsed) {
-  if (!parsed) {
-    return null;
-  }
-  const { epoch, release, pre, post, dev, local } = parsed;
-  const parts = [];
-
-  // Epoch
-  if (epoch !== 0) {
-    parts.push(`${epoch}!`);
-  }
-  // Release segment
-  parts.push(release.join("."));
-
-  // Pre-release
-  if (pre) {
-    parts.push(pre.join(""));
-  }
-  // Post-release
-  if (post) {
-    parts.push("." + post.join(""));
-  }
-  // Development release
-  if (dev) {
-    parts.push("." + dev.join(""));
-  }
-  // Local version segment
-  if (local) {
-    parts.push(`+${local}`);
-  }
-  return parts.join("");
-}
-
-function normalize_letter_version(letterIn, numberIn) {
-  let letter = letterIn;
-  let number = numberIn;
-  if (letter) {
-    // We consider there to be an implicit 0 in a pre-release if there is
-    // not a numeral associated with it.
-    if (!number) {
-      number = 0;
-    }
-    // We normalize any letters to their lower case form
-    letter = letter.toLowerCase();
-
-    // We consider some words to be alternate spellings of other words and
-    // in those cases we want to normalize the spellings to our preferred
-    // spelling.
-    if (letter === "alpha") {
-      letter = "a";
-    } else if (letter === "beta") {
-      letter = "b";
-    } else if (["c", "pre", "preview"].includes(letter)) {
-      letter = "rc";
-    } else if (["rev", "r"].includes(letter)) {
-      letter = "post";
-    }
-    return [letter, Number(number)];
-  }
-  if (!letter && number) {
-    // We assume if we are given a number, but we are not given a letter
-    // then this is using the implicit post release syntax (e.g. 1.0-1)
-    letter = "post";
-
-    return [letter, Number(number)];
-  }
-  return null;
-}
-
-function parse_local_version(local) {
-  /*
-    Takes a string like abc.1.twelve and turns it into("abc", 1, "twelve").
-    */
-  if (local) {
-    return local
-      .split(/[._-]/)
-      .map((part) =>
-        Number.isNaN(Number(part)) ? part.toLowerCase() : Number(part)
-      );
-  }
-  return null;
-}
-
-function explain$2(version) {
-  const parsed = parse$3(version);
-  if (!parsed) {
-    return parsed;
-  }
-  const { epoch, release, pre, post, dev, local } = parsed;
-
-  let base_version = "";
-  if (epoch !== 0) {
-    base_version += epoch + "!";
-  }
-  base_version += release.join(".");
-
-  const is_prerelease = Boolean(dev || pre);
-  const is_devrelease = Boolean(dev);
-  const is_postrelease = Boolean(post);
-
-  // return
-
-  return {
-    epoch,
-    release,
-    pre,
-    post: post ? post[1] : post,
-    dev: dev ? dev[1] : dev,
-    local: local ? local.join(".") : local,
-    public: stringify$1(parsed).split("+", 1)[0],
-    base_version,
-    is_prerelease,
-    is_devrelease,
-    is_postrelease,
-  };
-}
-
-const { parse: parse$2 } = version;
-
-var operator = {
-  compare: compare$1,
-  rcompare: rcompare$1,
-  lt: lt$1,
-  le: le$1,
-  eq: eq$1,
-  ne: ne$1,
-  ge: ge$1,
-  gt: gt$1,
-  "<": lt$1,
-  "<=": le$1,
-  "==": eq$1,
-  "!=": ne$1,
-  ">=": ge$1,
-  ">": gt$1,
-  "===": arbitrary,
-};
-
-function lt$1(version, other) {
-  return compare$1(version, other) < 0;
-}
-
-function le$1(version, other) {
-  return compare$1(version, other) <= 0;
-}
-
-function eq$1(version, other) {
-  return compare$1(version, other) === 0;
-}
-
-function ne$1(version, other) {
-  return compare$1(version, other) !== 0;
-}
-
-function ge$1(version, other) {
-  return compare$1(version, other) >= 0;
-}
-
-function gt$1(version, other) {
-  return compare$1(version, other) > 0;
-}
-
-function arbitrary(version, other) {
-  return version.toLowerCase() === other.toLowerCase();
-}
-
-function compare$1(version, other) {
-  const parsedVersion = parse$2(version);
-  const parsedOther = parse$2(other);
-
-  const keyVersion = calculateKey(parsedVersion);
-  const keyOther = calculateKey(parsedOther);
-
-  return pyCompare(keyVersion, keyOther);
-}
-
-function rcompare$1(version, other) {
-  return -compare$1(version, other);
-}
-
-// this logic is buitin in python, but we need to port it to js
-// see https://stackoverflow.com/a/5292332/1438522
-function pyCompare(elemIn, otherIn) {
-  let elem = elemIn;
-  let other = otherIn;
-  if (elem === other) {
-    return 0;
-  }
-  if (Array.isArray(elem) !== Array.isArray(other)) {
-    elem = Array.isArray(elem) ? elem : [elem];
-    other = Array.isArray(other) ? other : [other];
-  }
-  if (Array.isArray(elem)) {
-    const len = Math.min(elem.length, other.length);
-    for (let i = 0; i < len; i += 1) {
-      const res = pyCompare(elem[i], other[i]);
-      if (res !== 0) {
-        return res;
-      }
-    }
-    return elem.length - other.length;
-  }
-  if (elem === -Infinity || other === Infinity) {
-    return -1;
-  }
-  if (elem === Infinity || other === -Infinity) {
-    return 1;
-  }
-  return elem < other ? -1 : 1;
-}
-
-function calculateKey(input) {
-  const { epoch } = input;
-  let { release, pre, post, local, dev } = input;
-  // When we compare a release version, we want to compare it with all of the
-  // trailing zeros removed. So we'll use a reverse the list, drop all the now
-  // leading zeros until we come to something non zero, then take the rest
-  // re-reverse it back into the correct order and make it a tuple and use
-  // that for our sorting key.
-  release = release.concat();
-  release.reverse();
-  while (release.length && release[0] === 0) {
-    release.shift();
-  }
-  release.reverse();
-
-  // We need to "trick" the sorting algorithm to put 1.0.dev0 before 1.0a0.
-  // We'll do this by abusing the pre segment, but we _only_ want to do this
-  // if there is !a pre or a post segment. If we have one of those then
-  // the normal sorting rules will handle this case correctly.
-  if (!pre && !post && dev) pre = -Infinity;
-  // Versions without a pre-release (except as noted above) should sort after
-  // those with one.
-  else if (!pre) pre = Infinity;
-
-  // Versions without a post segment should sort before those with one.
-  if (!post) post = -Infinity;
-
-  // Versions without a development segment should sort after those with one.
-  if (!dev) dev = Infinity;
-
-  if (!local) {
-    // Versions without a local segment should sort before those with one.
-    local = -Infinity;
-  } else {
-    // Versions with a local segment need that segment parsed to implement
-    // the sorting rules in PEP440.
-    // - Alpha numeric segments sort before numeric segments
-    // - Alpha numeric segments sort lexicographically
-    // - Numeric segments sort numerically
-    // - Shorter versions sort before longer versions when the prefixes
-    //   match exactly
-    local = local.map((i) =>
-      Number.isNaN(Number(i)) ? [-Infinity, i] : [Number(i), ""]
-    );
-  }
-
-  return [epoch, release, pre, post, dev, local];
-}
-
-// This file is dual licensed under the terms of the Apache License, Version
-// 2.0, and the BSD License. See the LICENSE file in the root of this repository
-// for complete details.
-
-const { VERSION_PATTERN, explain: explainVersion } = version;
-
-const Operator = operator;
-
-const RANGE_PATTERN$1 = [
-  "(?<operator>(===|~=|==|!=|<=|>=|<|>))",
-  "\\s*",
-  "(",
-  /*  */ "(?<version>(" + VERSION_PATTERN.replace(/\?<\w+>/g, "?:") + "))",
-  /*  */ "(?<prefix>\\.\\*)?",
-  /*  */ "|",
-  /*  */ "(?<legacy>[^,;\\s)]+)",
-  ")",
-].join("");
-
-var specifier = {
-  RANGE_PATTERN: RANGE_PATTERN$1,
-  parse: parse$1,
-  satisfies: satisfies$1,
-  filter: filter$1,
-  validRange: validRange$1,
-  maxSatisfying: maxSatisfying$1,
-  minSatisfying: minSatisfying$1,
-};
-
-const isEqualityOperator = (op) => ["==", "!=", "==="].includes(op);
-
-const rangeRegex = new RegExp("^" + RANGE_PATTERN$1 + "$", "i");
-
-function parse$1(ranges) {
-  if (!ranges.trim()) {
-    return [];
-  }
-
-  const specifiers = ranges
-    .split(",")
-    .map((range) => rangeRegex.exec(range.trim()) || {})
-    .map(({ groups }) => {
-      if (!groups) {
-        return null;
-      }
-
-      let { ...spec } = groups;
-      const { operator, version, prefix, legacy } = groups;
-
-      if (version) {
-        spec = { ...spec, ...explainVersion(version) };
-        if (operator === "~=") {
-          if (spec.release.length < 2) {
-            return null;
-          }
-        }
-        if (!isEqualityOperator(operator) && spec.local) {
-          return null;
-        }
-
-        if (prefix) {
-          if (!isEqualityOperator(operator) || spec.dev || spec.local) {
-            return null;
-          }
-        }
-      }
-      if (legacy && operator !== "===") {
-        return null;
-      }
-
-      return spec;
-    });
-
-  if (specifiers.filter(Boolean).length !== specifiers.length) {
-    return null;
-  }
-
-  return specifiers;
-}
-
-function filter$1(versions, specifier, options = {}) {
-  const filtered = pick(versions, specifier, options);
-  if (filtered.length === 0 && options.prereleases === undefined) {
-    return pick(versions, specifier, { prereleases: true });
-  }
-  return filtered;
-}
-
-function maxSatisfying$1(versions, range, options) {
-  const found = filter$1(versions, range, options).sort(Operator.compare);
-  return found.length === 0 ? null : found[found.length - 1];
-}
-
-function minSatisfying$1(versions, range, options) {
-  const found = filter$1(versions, range, options).sort(Operator.compare);
-  return found.length === 0 ? null : found[0];
-}
-
-function pick(versions, specifier, options) {
-  const parsed = parse$1(specifier);
-
-  if (!parsed) {
-    return [];
-  }
-
-  return versions.filter((version) => {
-    const explained = explainVersion(version);
-
-    if (!parsed.length) {
-      return explained && !(explained.is_prerelease && !options.prereleases);
-    }
-
-    return parsed.reduce((pass, spec) => {
-      if (!pass) {
-        return false;
-      }
-      return contains({ ...spec, ...options }, { version, explained });
-    }, true);
-  });
-}
-
-function satisfies$1(version, specifier, options = {}) {
-  const filtered = pick([version], specifier, options);
-
-  return filtered.length === 1;
-}
-
-function contains(specifier, input) {
-  const { explained } = input;
-  let { version } = input;
-  const { ...spec } = specifier;
-
-  if (spec.prereleases === undefined) {
-    spec.prereleases = spec.is_prerelease;
-  }
-
-  if (explained && explained.is_prerelease && !spec.prereleases) {
-    return false;
-  }
-
-  if (spec.operator === "~=") {
-    let compatiblePrefix = spec.release.slice(0, -1).concat("*").join(".");
-    if (spec.epoch) {
-      compatiblePrefix = spec.epoch + "!" + compatiblePrefix;
-    }
-    return satisfies$1(version, `>=${spec.version}, ==${compatiblePrefix}`);
-  }
-
-  if (spec.prefix) {
-    return version.startsWith(spec.version) === (spec.operator === "==");
-  }
-
-  if (explained)
-    if (explained.local && spec.version) {
-      version = explained.public;
-      spec.version = explainVersion(spec.version).public;
-    }
-
-  if (spec.operator === "<" || spec.operator === ">") {
-    // simplified version of https://www.python.org/dev/peps/pep-0440/#exclusive-ordered-comparison
-    if (Operator.eq(spec.release.join("."), explained.release.join("."))) {
-      return false;
-    }
-  }
-
-  const op = Operator[spec.operator];
-  return op(version, spec.version || spec.legacy);
-}
-
-function validRange$1(specifier) {
-  return Boolean(parse$1(specifier));
-}
-
-const { explain: explain$1, parse, stringify } = version;
-
-// those notation are borrowed from semver
-var semantic = {
-  major: major$1,
-  minor: minor$1,
-  patch: patch$1,
-  inc: inc$1,
-};
-
-function major$1(input) {
-  const version = explain$1(input);
-  if (!version) {
-    throw new TypeError("Invalid Version: " + input);
-  }
-  return version.release[0];
-}
-
-function minor$1(input) {
-  const version = explain$1(input);
-  if (!version) {
-    throw new TypeError("Invalid Version: " + input);
-  }
-  if (version.release.length < 2) {
-    return 0;
-  }
-  return version.release[1];
-}
-
-function patch$1(input) {
-  const version = explain$1(input);
-  if (!version) {
-    throw new TypeError("Invalid Version: " + input);
-  }
-  if (version.release.length < 3) {
-    return 0;
-  }
-  return version.release[2];
-}
-
-function inc$1(input, release, preReleaseIdentifier) {
-  let identifier = preReleaseIdentifier || `a`;
-  const version = parse(input);
-
-  if (!version) {
-    return null;
-  }
-
-  if (
-    !["a", "b", "c", "rc", "alpha", "beta", "pre", "preview"].includes(
-      identifier
-    )
-  ) {
-    return null;
-  }
-
-  switch (release) {
-    case "premajor":
-      {
-        const [majorVersion] = version.release;
-        version.release.fill(0);
-        version.release[0] = majorVersion + 1;
-      }
-      version.pre = [identifier, 0];
-      delete version.post;
-      delete version.dev;
-      delete version.local;
-      break;
-    case "preminor":
-      {
-        const [majorVersion, minorVersion = 0] = version.release;
-        version.release.fill(0);
-        version.release[0] = majorVersion;
-        version.release[1] = minorVersion + 1;
-      }
-      version.pre = [identifier, 0];
-      delete version.post;
-      delete version.dev;
-      delete version.local;
-      break;
-    case "prepatch":
-      {
-        const [majorVersion, minorVersion = 0, patchVersion = 0] =
-          version.release;
-        version.release.fill(0);
-        version.release[0] = majorVersion;
-        version.release[1] = minorVersion;
-        version.release[2] = patchVersion + 1;
-      }
-      version.pre = [identifier, 0];
-      delete version.post;
-      delete version.dev;
-      delete version.local;
-      break;
-    case "prerelease":
-      if (version.pre === null) {
-        const [majorVersion, minorVersion = 0, patchVersion = 0] =
-          version.release;
-        version.release.fill(0);
-        version.release[0] = majorVersion;
-        version.release[1] = minorVersion;
-        version.release[2] = patchVersion + 1;
-        version.pre = [identifier, 0];
-      } else {
-        if (preReleaseIdentifier === undefined && version.pre !== null) {
-          [identifier] = version.pre;
-        }
-
-        const [letter, number] = version.pre;
-        if (letter === identifier) {
-          version.pre = [letter, number + 1];
-        } else {
-          version.pre = [identifier, 0];
-        }
-      }
-
-      delete version.post;
-      delete version.dev;
-      delete version.local;
-      break;
-    case "major":
-      if (
-        version.release.slice(1).some((value) => value !== 0) ||
-        version.pre === null
-      ) {
-        const [majorVersion] = version.release;
-        version.release.fill(0);
-        version.release[0] = majorVersion + 1;
-      }
-      delete version.pre;
-      delete version.post;
-      delete version.dev;
-      delete version.local;
-      break;
-    case "minor":
-      if (
-        version.release.slice(2).some((value) => value !== 0) ||
-        version.pre === null
-      ) {
-        const [majorVersion, minorVersion = 0] = version.release;
-        version.release.fill(0);
-        version.release[0] = majorVersion;
-        version.release[1] = minorVersion + 1;
-      }
-      delete version.pre;
-      delete version.post;
-      delete version.dev;
-      delete version.local;
-      break;
-    case "patch":
-      if (
-        version.release.slice(3).some((value) => value !== 0) ||
-        version.pre === null
-      ) {
-        const [majorVersion, minorVersion = 0, patchVersion = 0] =
-          version.release;
-        version.release.fill(0);
-        version.release[0] = majorVersion;
-        version.release[1] = minorVersion;
-        version.release[2] = patchVersion + 1;
-      }
-      delete version.pre;
-      delete version.post;
-      delete version.dev;
-      delete version.local;
-      break;
-    default:
-      return null;
-  }
-
-  return stringify(version);
-}
-
-const { valid, clean, explain } = version;
-
-const { lt, le, eq, ne, ge, gt, compare, rcompare } = operator;
-
-const {
-  filter,
-  maxSatisfying,
-  minSatisfying,
-  RANGE_PATTERN,
-  satisfies,
-  validRange,
-} = specifier;
-
-const { major, minor, patch, inc } = semantic;
-
-var pep440 = {
-  // version
-  valid,
-  clean,
-  explain,
-
-  // operator
-  lt,
-  le,
-  lte: le,
-  eq,
-  ne,
-  neq: ne,
-  ge,
-  gte: ge,
-  gt,
-  compare,
-  rcompare,
-
-  // range
-  filter,
-  maxSatisfying,
-  minSatisfying,
-  RANGE_PATTERN,
-  satisfies,
-  validRange,
-
-  // semantic
-  major,
-  minor,
-  patch,
-  inc,
-};
-
 /* src/components/Contract.svelte generated by Svelte v3.59.2 */
 const file$7 = "src/components/Contract.svelte";
 
@@ -31203,7 +30477,7 @@ function create_if_block_5$1(ctx) {
 	return block;
 }
 
-// (38:70)
+// (38:70) 
 function create_if_block_4$1(ctx) {
 	let warningicon;
 	let current;
@@ -31417,7 +30691,7 @@ function create_if_block$2(ctx) {
 	return block;
 }
 
-// (64:70)
+// (64:70) 
 function create_if_block_2$1(ctx) {
 	let clickablespan;
 	let current;
@@ -32531,7 +31805,7 @@ function create_else_block(ctx) {
 	return block;
 }
 
-// (79:43)
+// (79:43) 
 function create_if_block_2(ctx) {
 	let div;
 	let h3;
@@ -32606,7 +31880,7 @@ function create_if_block_2(ctx) {
 	return block;
 }
 
-// (67:51)
+// (67:51) 
 function create_if_block_1(ctx) {
 	let div;
 	let h3;
@@ -32795,7 +32069,7 @@ function create_tab_header_slot(ctx) {
 	return block;
 }
 
-// (106:64)
+// (106:64) 
 function create_if_block_8(ctx) {
 	let callsetup;
 	let current;
@@ -32975,7 +32249,7 @@ function create_content_fixed_slot(ctx) {
 	return block;
 }
 
-// (117:64)
+// (117:64) 
 function create_if_block_6(ctx) {
 	let run_1;
 	let current;
