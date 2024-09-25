@@ -56,6 +56,11 @@
                         "type": "string",
                         "default": "wake.toml",
                         "description": "Path to the TOML configuration file relative to the workspace root."
+                    },
+                    "Tools-for-Solidity.wake.configuration.autoimport_remappings": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Automatically import Foundry remappings from the workspace folder."
                     }
                 }
             },
