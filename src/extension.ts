@@ -5,6 +5,7 @@ import * as net from 'net';
 import { Analytics, EventType } from './Analytics';
 import * as path from 'path';
 import * as os from 'os';
+const fs = require('fs');
 
 import {
     LanguageClient,
@@ -335,6 +336,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // activate Sake
     activateSake(context, client);
+
+    // check for foundry remappings
+    checkFoundryRemappings();
 }
 
 function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext) {
@@ -636,6 +640,63 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
             );
         })
     );
+}
+
+function checkFoundryRemappings() {
+    console.log('checkFoundryRemappings');
+
+    const workspaces = vscode.workspace.workspaceFolders;
+    if (workspaces === undefined || workspaces.length > 1) {
+        return;
+    }
+
+    const workspace = workspaces[0];
+
+    const cfg = vscode.workspace.getConfiguration('Tools-for-Solidity');
+    const autoImportRemappings = cfg.get<boolean>('wake.configuration.autoimport_remappings');
+    console.log('autoImportRemappings', autoImportRemappings);
+
+    if (autoImportRemappings !== undefined && !autoImportRemappings) {
+        return;
+    }
+
+    const cwd = workspace.uri.fsPath;
+    if (!fs.existsSync(cwd + '/remappings.txt')) {
+        return;
+    }
+
+    const remappings = vscode.workspace
+        .getConfiguration('Tools-for-Solidity')
+        .get('compiler.solc.remappings');
+
+    if (remappings !== undefined) {
+        // don't re-import
+        return;
+    }
+
+    // if (remappings) {
+    vscode.window
+        .showInformationMessage(
+            'Foundry Remappings detected, do you want to import them?',
+            'Yes',
+            'No',
+            'Never'
+        )
+        .then((selection) => {
+            if (selection === 'Yes') {
+                vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings');
+            }
+            if (selection === 'Never') {
+                vscode.workspace
+                    .getConfiguration('Tools-for-Solidity')
+                    .update(
+                        'wake.configuration.autoimport_remappings',
+                        false,
+                        vscode.ConfigurationTarget.Global
+                    );
+            }
+        });
+    // }
 }
 
 function openFile(uri: vscode.Uri, range: vscode.Range) {

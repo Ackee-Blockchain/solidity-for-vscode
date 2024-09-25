@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { URI, Position } from 'vscode-languageclient/node';
 import * as os from 'os';
 import { GraphvizPreviewGenerator } from './graphviz/GraphvizPreviewGenerator';
+
 const fs = require('fs');
 
 async function showDot(content: string, title: string, graphviz: GraphvizPreviewGenerator) {
@@ -75,38 +76,40 @@ export async function importFoundryRemappings(out: vscode.OutputChannel) {
         return;
     }
 
+    if (vscode.workspace.workspaceFolders.length > 1) {
+        vscode.window.showErrorMessage(
+            'Importing remappings is not supported for multi-root workspaces.'
+        );
+        return;
+    }
+
     const cwd = vscode.workspace.workspaceFolders[0].uri.fsPath;
     let remappings: string[] = [];
 
     try {
-        remappings = execFileSync(os.homedir() + '/.foundry/bin/forge', ['remappings'], {
-            cwd: cwd
-        })
+        // First, try to read from remappings.txt
+        remappings = fs
+            .readFileSync(cwd + '/remappings.txt')
             .toString('utf8')
             .split(/\r?\n/);
     } catch (e) {
+        // If remappings.txt doesn't exist or can't be read, try using forge
         try {
-            remappings = execFileSync(os.homedir() + '/.cargo/bin/forge', ['remappings'], {
+            remappings = execFileSync(os.homedir() + '/.foundry/bin/forge', ['remappings'], {
                 cwd: cwd
             })
                 .toString('utf8')
                 .split(/\r?\n/);
         } catch (e) {
             try {
-                if (vscode.workspace.workspaceFolders !== undefined) {
-                    remappings = fs
-                        .readFileSync(cwd + '/remappings.txt')
-                        .toString('utf8')
-                        .split(/\r?\n/);
-                } else {
-                    vscode.window.showErrorMessage(
-                        'Failed to find `forge` executable or `remappings.txt` file.'
-                    );
-                    return;
-                }
+                remappings = execFileSync(os.homedir() + '/.cargo/bin/forge', ['remappings'], {
+                    cwd: cwd
+                })
+                    .toString('utf8')
+                    .split(/\r?\n/);
             } catch (e) {
                 vscode.window.showErrorMessage(
-                    'Failed to find `forge` executable or `remappings.txt` file.'
+                    'Failed to find `remappings.txt` file or `forge` executable.'
                 );
                 return;
             }
