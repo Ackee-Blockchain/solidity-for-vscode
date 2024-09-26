@@ -70,16 +70,20 @@ export async function copyToClipboardHandler(text: string) {
     await vscode.window.showInformationMessage('Copied to clipboard.');
 }
 
-export async function importFoundryRemappings(out: vscode.OutputChannel) {
+export async function importFoundryRemappings(out: vscode.OutputChannel, silent: boolean = false) {
     if (vscode.workspace.workspaceFolders === undefined) {
-        vscode.window.showErrorMessage('No workspace folder open.');
+        if (!silent) {
+            vscode.window.showErrorMessage('No workspace folder open.');
+        }
         return;
     }
 
     if (vscode.workspace.workspaceFolders.length > 1) {
-        vscode.window.showErrorMessage(
-            'Importing remappings is not supported for multi-root workspaces.'
-        );
+        if (!silent) {
+            vscode.window.showErrorMessage(
+                'Importing remappings is not supported for multi-root workspaces.'
+            );
+        }
         return;
     }
 
@@ -108,9 +112,11 @@ export async function importFoundryRemappings(out: vscode.OutputChannel) {
                     .toString('utf8')
                     .split(/\r?\n/);
             } catch (e) {
-                vscode.window.showErrorMessage(
-                    'Failed to find `remappings.txt` file or `forge` executable.'
-                );
+                if (!silent) {
+                    vscode.window.showErrorMessage(
+                        'Failed to find `remappings.txt` file or `forge` executable.'
+                    );
+                }
                 return;
             }
         }
@@ -120,7 +126,9 @@ export async function importFoundryRemappings(out: vscode.OutputChannel) {
     vscode.workspace
         .getConfiguration('wake.compiler.solc')
         .update('remappings', remappings, vscode.ConfigurationTarget.Workspace);
-    vscode.window.showInformationMessage(`Imported ${remappings.length} remappings.`);
+    if (!silent) {
+        vscode.window.showInformationMessage(`Imported ${remappings.length} remappings.`);
+    }
 }
 
 export async function generateImportsGraphHandler(
