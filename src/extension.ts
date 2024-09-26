@@ -338,7 +338,7 @@ export async function activate(context: vscode.ExtensionContext) {
     activateSake(context, client);
 
     // check for foundry remappings
-    checkFoundryRemappings();
+    watchFoundryRemappings();
 }
 
 function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.ExtensionContext) {
@@ -388,6 +388,12 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
         vscode.commands.registerCommand(
             'Tools-for-Solidity.foundry.import_remappings',
             async () => await importFoundryRemappings(outputChannel)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.foundry.import_remappings_silent',
+            async () => await importFoundryRemappings(outputChannel, true)
         )
     );
     context.subscriptions.push(
@@ -642,9 +648,7 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
     );
 }
 
-function checkFoundryRemappings() {
-    console.log('checkFoundryRemappings');
-
+function watchFoundryRemappings() {
     const workspaces = vscode.workspace.workspaceFolders;
     if (workspaces === undefined || workspaces.length > 1) {
         return;
@@ -654,12 +658,28 @@ function checkFoundryRemappings() {
 
     const cfg = vscode.workspace.getConfiguration('Tools-for-Solidity');
     const autoImportRemappings = cfg.get<boolean>('wake.configuration.autoimport_remappings');
-    console.log('autoImportRemappings', autoImportRemappings);
 
     if (autoImportRemappings !== undefined && !autoImportRemappings) {
         return;
     }
 
+    // start file system watcher
+    const watcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(workspace, 'remappings.txt')
+    );
+    watcher.onDidChange(async () => {
+        vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
+    });
+    watcher.onDidCreate(async () => {
+        vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
+    });
+    watcher.onDidDelete(async () => {
+        vscode.workspace
+            .getConfiguration('wake.compiler.solc')
+            .update('remappings', undefined, vscode.ConfigurationTarget.Workspace);
+    });
+
+    // check if remappings.txt exists and import remappings if not
     const cwd = workspace.uri.fsPath;
     if (!fs.existsSync(cwd + '/remappings.txt')) {
         return;
@@ -669,34 +689,9 @@ function checkFoundryRemappings() {
         .getConfiguration('Tools-for-Solidity')
         .get('compiler.solc.remappings');
 
-    if (remappings !== undefined) {
-        // don't re-import
-        return;
+    if (remappings === undefined) {
+        vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
     }
-
-    // if (remappings) {
-    vscode.window
-        .showInformationMessage(
-            'Foundry Remappings detected, do you want to import them?',
-            'Yes',
-            'No',
-            'Never'
-        )
-        .then((selection) => {
-            if (selection === 'Yes') {
-                vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings');
-            }
-            if (selection === 'Never') {
-                vscode.workspace
-                    .getConfiguration('Tools-for-Solidity')
-                    .update(
-                        'wake.configuration.autoimport_remappings',
-                        false,
-                        vscode.ConfigurationTarget.Global
-                    );
-            }
-        });
-    // }
 }
 
 function openFile(uri: vscode.Uri, range: vscode.Range) {
