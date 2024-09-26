@@ -88,6 +88,7 @@ export class Analytics{
                 'common.os': process.platform.toString(),
                 'common.nodeArch': process.arch,
                 'installation': this.installation,
+                'wake.version': this.wakeVersion || 'unknown',
                 'error': error.toString().slice(-8100),
             }
         );
