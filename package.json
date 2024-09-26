@@ -60,7 +60,7 @@
                     "Tools-for-Solidity.wake.configuration.autoimport_remappings": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Automatically import Foundry remappings from the workspace folder."
+                        "description": "Automatically import Foundry remappings from the remappings.txt file in the workspace folder."
                     }
                 }
             },

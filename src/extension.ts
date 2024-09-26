@@ -685,13 +685,7 @@ function watchFoundryRemappings() {
         return;
     }
 
-    const remappings = vscode.workspace
-        .getConfiguration('Tools-for-Solidity')
-        .get('compiler.solc.remappings');
-
-    if (remappings === undefined) {
-        vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
-    }
+    vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
 }
 
 function openFile(uri: vscode.Uri, range: vscode.Range) {
