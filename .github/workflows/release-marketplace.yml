@@ -9,24 +9,40 @@ jobs:
         if: '!github.event.release.prerelease'
         runs-on: windows-latest
         steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v4
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Create env.ts file
+              run: echo "export const TELEMETRY_KEY = '${{ secrets.TELEMETRY_KEY }}'" > src/env.ts
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
               with:
                   node-version: 'latest'
-            - run: npm run clean-install
-            - run: npm run build
-            - run: npm install -g @vscode/vsce
-            - run: vsce publish --pat ${{ secrets.VS_MARKETPLACE_TOKEN }}
+            - name: Install dependencies
+              run: npm run clean-install
+            - name: Build project
+              run: npm run build
+            - name: Install vsce
+              run: npm install -g @vscode/vsce
+            - name: Publish to VS Code Marketplace
+              run: vsce publish --pat ${{ secrets.VS_MARKETPLACE_TOKEN }}
 
     publish-prerelease:
         if: 'github.event.release.prerelease'
         runs-on: windows-latest
         steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v4
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Create env.ts file
+              run: echo "export const TELEMETRY_KEY = '${{ secrets.TELEMETRY_KEY }}'" > src/env.ts
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
               with:
                   node-version: 'latest'
-            - run: npm run clean-install
-            - run: npm run build
-            - run: npm install -g @vscode/vsce
-            - run: vsce publish --pat ${{ secrets.VS_MARKETPLACE_TOKEN }} --pre-release
+            - name: Install dependencies
+              run: npm run clean-install
+            - name: Build project
+              run: npm run build
+            - name: Install vsce
+              run: npm install -g @vscode/vsce
+            - name: Publish pre-release to VS Code Marketplace
+              run: vsce publish --pat ${{ secrets.VS_MARKETPLACE_TOKEN }} --pre-release
