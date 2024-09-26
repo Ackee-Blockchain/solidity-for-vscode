@@ -298,6 +298,9 @@ export class CondaInstaller implements Installer {
             env.REQUESTS_CA_BUNDLE = certifiPath;
         }
 
+        delete env.PYTHONPATH;
+        delete env.PYTHONHOME;
+
         this.outputChannel.appendLine(`Running '${this.activateCommand} && wake lsp --port ${port}'`);
         return execa(
             `${this.activateCommand} && wake lsp --port ${port}`,
