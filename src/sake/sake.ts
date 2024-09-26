@@ -43,8 +43,10 @@ import { TransactionHistoryState } from './state/TransactionHistoryStateProvider
 import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
 import { WalletServer } from '../serve';
+import { LocalNodeNetworkProvider, PublicNodeNetworkProvider } from './network/networks';
+import { LocalNodeSakeProvider, SakeProviderManager } from './sakeProvider';
 
-export function activateSake(context: vscode.ExtensionContext, client?: LanguageClient) {
+export function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
     const sakeOutputProvider = new SakeOutputTreeProvider(context);
     const treeView = vscode.window.createTreeView('sake-output', {
@@ -73,16 +75,17 @@ export function activateSake(context: vscode.ExtensionContext, client?: Language
         vscode.window.registerWebviewViewProvider('sake', sidebarSakeProvider)
     );
 
-    const deploymentState = DeploymentStateProvider.getInstance();
-    const compilationState = CompilationStateProvider.getInstance();
-    const accountState = AccountStateProvider.getInstance();
-    const TransactionHistoryState = TransactionHistoryState.getInstance();
+    /* Initialize Network (Chain) Providers */
+    const publicNodeNetworkProvider = new PublicNodeNetworkProvider();
+    const localNodeNetworkProvider = new LocalNodeNetworkProvider(client);
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('sake.refresh', async () => {
-            // TODO: change helloworld to sake
-            // HelloWorldPanel.kill();
-            // HelloWorldPanel.createOrShow(context.extensionUri);
+    // initialize sake provider
+    const sake = new SakeProviderManager(context,
+        new LocalNodeSakeProvider({
+            id: 'local-chain-1',
+            displayName: 'Local Chain 1',
+            network: localNodeNetworkProvider
+            webview: sidebarSakeProvider
         })
     );
 

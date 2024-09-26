@@ -1,19 +1,20 @@
-import { Account, AccountState, Contract } from './webview/shared/types';
+import {, TransactRequest
+    Account,
+    AccountState,
+    CallRequest,
+    Contract,
+    DeploymentRequest
+} from './webview/shared/types';
 
-import { INetworkProvider } from './network/networks';
+import { INetworkProvider, LocalNodeNetworkProvider } from './network/networks';
 import { AccountStateProvider } from './state/AccountStateProvider';
 import { DeploymentStateProvider } from './state/DeploymentStateProvider';
 import { CompilationStateProvider } from './state/CompilationStateProvider';
 import { BaseWebviewProvider } from './providers/BaseWebviewProvider';
 import { TransactionHistoryStateProvider } from './state/TransactionHistoryStateProvider';
 import { WakeStateProvider } from './state/WakeStateProvider';
-import { assert } from 'console';
 
-export interface ISakeProvider {
-    accounts: Promise<string[]>;
-    getDeployedContracts: () => Promise<string[]>;
-    getContract: (address: string) => Promise<Contract>;
-}
+import * as vscode from 'vscode';
 
 export class SakeState {
     accounts: AccountStateProvider;
@@ -51,10 +52,22 @@ export interface SakeState {
     state: SakeState;
 }
 
-export
+export abstract class SakeProvider {
+    state: SakeState;
+    network: INetworkProvider; // TODO consider making this not private
 
-export abstract class GenericSakeProvider {
-    abstract initialize(): Promise<void>;
+    constructor(
+        public id: string,
+        public displayName: string,
+        networkProvider: INetworkProvider,
+        webviewProvider: BaseWebviewProvider
+    ) {
+        this.state = new SakeState(webviewProvider);
+        this.network = networkProvider;
+        this.initialize();
+    }
+
+    protected abstract initialize(): Promise<void>;
 
     /* Account management */
 
@@ -88,105 +101,191 @@ export abstract class GenericSakeProvider {
         this.state.accounts.setNickname(address, nickname);
     }
 
+    async refreshAccount(address: string) {
+        const account: Account | undefined = await this.network.getAccountDetails(address);
+
+        if (account) {
+            this.state.accounts.add(account);
+        }
+    }
+
     /* Deployment management */
 
-    async deployContract(contract: string) {
-        const success = this.network.deployContract(contract);
+    async deployContract(deploymentRequest: DeploymentRequest) {
+        const success = this.network.deployContract(deploymentRequest);
 
+        // TODO
         if (success) {
-            this.state.deployedContracts.add(contract);
+            this.state.deployedContracts.add(deploymentRequest);
         }
+
+        // TODO add to history
     }
 
     async removeDeployedContract(contract: string) {
         this.state.deployedContracts.remove(contract);
     }
 
-    async getDeployedContracts(): Promise<string[]> {
-        return this._networkProvider.getDeployedContracts();
+    /* Interactions */
+
+    async call(callRequest: CallRequest) {
+        const success = this.network.call(callRequest);
+
+        if (success) {
+            // TODO add to history
+            this.state.history.add(callRequest);
+        }
     }
 
-    async getContract(address: string): Promise<Contract> {
-        return this._networkProvider.getContract(address);
+    async transact(transactRequest: TransactRequest) {
+        const success = this.network.transact(transactRequest);
+
+        if (success) {
+            // TODO add to history
+            this.state.history.add(transactRequest);
+        }
     }
 
-    // abstract methods
-    abstract get network(): INetworkProvider;
-    abstract get state(): SakeState;
+    /* Helper functions */
+
+    async fetchContractFromEtherscan(address: string) {
+        throw new Error('Method not implemented.');
+        // TODO
+    }
+
+    /* Event handling */
+
+    async onActivateProvider() {
+        // TODO save state
+        this.state.subscribe();
+    }
+
+    async onDeactivateProvider() {
+        // TODO save state
+        this.state.unsubscribe();
+    }
 }
 
-export class LocalNodeSakeProvider extends GenericSakeProvider {
-    constructor() {
-        super();
-        _network =
+export class LocalNodeSakeProvider extends SakeProvider {
+    constructor(
+        networkProvider: INetworkProvider,
+        webviewProvider: BaseWebviewProvider
+        // private wakeApi: WakeApi
+    ) {
+        super(networkProvider, webviewProvider);
     }
 
     async initialize() {
-        // TODO preload accounts
-    }
-
-    get network(): INetworkProvider {
-        return new LocalNodeNetworkProvider();
-    }
-
-    get state(): SakeState {
-        return new SakeState();
+        // TODO load initial accounts
+        // this.state.accounts.add(wakeApi.getAccounts());
     }
 }
 
-export class SakeProvider extends GenericSakeProvider {
-    private _state!: SakeState;
+export class PublicNodeSakeProvider extends SakeProvider {
+    async initialize() {}
+}
 
-    private networkMap = new Map<
-        string,
-        {
-            _networkProvider: INetworkProvider;
-            _state: SakeState;
-        }
-    >();
+export class SakeProviderManager {
+    private _selectedProviderId!: string;
+    private _providers!: Map<string, SakeProvider>;
+    private _statusBarItem: vscode.StatusBarItem;
 
     constructor(
-        private _networkProvider: INetworkProvider,
-        private _webviewProvider: BaseWebviewProvider
+        private context: vscode.ExtensionContext,
+        ...providers: SakeProvider[]
     ) {
-        super();
-        this.setNetwork(_networkProvider);
-    }
-
-    setNetwork(network: INetworkProvider) {
-        const prevState = this.state;
-        const prevNetwork = this.network;
-
-        // create a new state for the network
-        if (!this.networkMap.has(network.id)) {
-            this.networkMap.set(network.id, {
-                _networkProvider: network,
-                _state: new SakeState(this._webviewProvider)
-            });
+        if (providers.length === 0) {
+            throw new Error('No providers provided');
         }
 
-        const newState = this.networkMap.get(network.id)!._state;
-        const newNetwork = network;
-        assert(newState !== undefined, 'State is undefined');
-        assert(newNetwork !== undefined, 'Network provider is undefined');
+        this._initializeStatusBar();
 
-        // set the network and state
-        this._state = newState;
-        this._networkProvider = newNetwork;
+        for (const provider of providers) {
+            this.addProvider(provider);
+        }
 
-        // change subscriptions
-        prevState.unsubscribe();
-        newState.subscribe();
+        this.setProvider(providers[0].id);
+    }
+
+    addProvider(provider: SakeProvider) {
+        if (this._providers.has(provider.id)) {
+            throw new Error('Provider with id ' + provider.id + ' already exists');
+        }
+
+        this._providers.set(provider.id, provider);
+    }
+
+    removeProvider(id: string) {
+        if (!this._providers.has(id)) {
+            throw new Error('Provider with id ' + id + ' does not exist');
+        }
+
+        if (id === this._selectedProviderId) {
+            throw new Error('Cannot remove the current provider');
+        }
+
+        if (this._providers.size === 1) {
+            throw new Error('Cannot have less than 1 provider');
+        }
+
+        this._providers.delete(id);
+    }
+
+    get provider(): SakeProvider {
+        return this._providers.get(this._selectedProviderId)!;
+    }
+
+    get state(): SakeState {
+        return this.provider.state;
+    }
+
+    // get network(): INetworkProvider {
+    //     return this.provider.network;
+    // }
+
+    setProvider(id: string) {
+        if (!this._providers.has(id)) {
+            throw new Error('Provider with id ' + id + ' does not exist');
+        }
+
+        if (this._selectedProviderId === id) {
+            return;
+        }
+
+        this.provider.onDeactivateProvider();
+
+        this._selectedProviderId = id;
+        this.provider.onActivateProvider();
+
+        this._updateStatusBar();
 
         // notify webviews of the switch
         // TODO
     }
 
-    get network(): INetworkProvider {
-        return this._networkProvider;
+    private _updateStatusBar() {
+        this._statusBarItem.text = `$(cloud) ${this.provider.displayName}`;
+        this._statusBarItem.show();
     }
 
-    get state(): SakeState {
-        return this._state;
+    private _selectProvider() {
+        const providerOptions = Array.from(this._providers.keys()).map(id => ({ label: id }));
+        vscode.window.showQuickPick(providerOptions).then((selected) => {
+            if (selected) {
+                this.setProvider(selected.label);
+            }
+        });
+    }
+
+    private _initializeStatusBar() {
+        this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
+        this.context.subscriptions.push(this._statusBarItem);
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(
+                'Tools-for-Solidity.sake.selectSakeProvider',
+                this._selectProvider.bind(this)
+            )
+        );
+        this._statusBarItem.command = 'Tools-for-Solidity.sake.selectSakeProvider';
     }
 }
