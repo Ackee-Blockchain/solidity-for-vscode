@@ -1,7 +1,4 @@
-import * as vscode from 'vscode';
 import {
-    Address,
-    CallPayload,
     WakeCompilationResponse,
     WakeDeploymentRequestParams,
     WakeDeploymentResponse,
@@ -10,12 +7,16 @@ import {
     WakeGetBalancesResponse,
     WakeSetBalancesRequestParams,
     WakeSetBalancesResponse,
-    CallType,
-    ContractFunction
+    WakeGetAccountsResponse,
+    WakeSetLabelRequestParams,
+    WakeSetLabelResponse,
+    WakeTransactionType,
+    AbiFunctionFragment
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from './utils/validate';
 import { WakeStateProvider } from './state/WakeStateProvider';
+import { CallRequest } from './webview/shared/messaging_types';
 
 const wakeState = WakeStateProvider.getInstance();
 
@@ -55,7 +56,9 @@ export class WakeApi {
 
     async getAccounts() {
         try {
-            const result = await this.sendWakeRequest<Address[]>('wake/sake/getAccounts');
+            const result = await this.sendWakeRequest<WakeGetAccountsResponse>(
+                'wake/sake/getAccounts'
+            );
 
             if (result == null) {
                 throw new Error('No result returned');
@@ -101,6 +104,31 @@ export class WakeApi {
                 throw new Error('No result returned');
             }
 
+            if (!result.success) {
+                throw new Error('Failed to set balances');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(`[Wake API] ${e instanceof Error ? e.message : String(e)}`);
+        }
+    }
+
+    async setLabel(requestParams: WakeSetLabelRequestParams) {
+        try {
+            const result = await this.sendWakeRequest<WakeSetLabelResponse>(
+                'wake/sake/setLabel',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            if (!result.success) {
+                throw new Error('Failed to set label');
+            }
+
             return result;
         } catch (e) {
             throw new WakeApiError(`[Wake API] ${e instanceof Error ? e.message : String(e)}`);
@@ -142,12 +170,12 @@ export class WakeApi {
         }
     }
 
-    async call(callPayload: CallPayload) {
+    async call(callRequest: CallRequest) {
         try {
-            const { requestParams, func } = callPayload;
+            const { requestParams, func } = callRequest;
             const callType = specifyCallType(func);
             const apiEndpoint =
-                callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
+                callType === WakeTransactionType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
             const result = await this.sendWakeRequest<WakeCallResponse>(apiEndpoint, requestParams);
 
             if (result == null) {
@@ -161,8 +189,11 @@ export class WakeApi {
     }
 
     private async sendWakeRequest<T>(method: string, params?: any): Promise<T> {
+        if (WakeApi._client == null) {
+            throw new WakeApiError('Client not initialized');
+        }
         try {
-            const response = await this._client.sendRequest<T>(method, params);
+            const response = await WakeApi._client.sendRequest<T>(method, params);
             wakeState.setIsAnvilInstalled(true);
             return validate(response);
         } catch (e) {
@@ -175,10 +206,10 @@ export class WakeApi {
     }
 }
 
-function specifyCallType(func: ContractFunction): CallType {
+function specifyCallType(func: AbiFunctionFragment): WakeTransactionType {
     return func.stateMutability === 'view' || func.stateMutability === 'pure'
-        ? CallType.Call
-        : CallType.Transact;
+        ? WakeTransactionType.Call
+        : WakeTransactionType.Transact;
 }
 
 // /*
@@ -337,11 +368,11 @@ function specifyCallType(func: ContractFunction): CallType {
 // }
 
 // export async function call(
-//     callPayload: CallPayload,
+//     CallRequest: CallRequest,
 //     client: LanguageClient | undefined,
 //     output: OutputViewManager
 // ) {
-//     const { requestParams, func } = callPayload;
+//     const { requestParams, func } = CallRequest;
 
 //     const callType = specifyCallType(func);
 

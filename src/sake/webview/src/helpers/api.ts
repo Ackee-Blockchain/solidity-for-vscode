@@ -2,7 +2,7 @@ import { messageHandler } from '@estruyf/vscode/dist/client';
 import {
     WebviewMessage,
     type DeploymentState,
-    type CallPayload,
+    type CallRequest,
     type WakeDeploymentRequestParams,
     type WakeSetBalancesRequestParams,
     type CompiledContract,
@@ -28,7 +28,7 @@ export async function setBalance(address: string, balance: number): Promise<bool
     return success;
 }
 
-export function functionCall(payload: CallPayload) {
+export function functionCall(payload: CallRequest) {
     messageHandler.send(WebviewMessage.onContractFunctionCall, payload);
 }
 

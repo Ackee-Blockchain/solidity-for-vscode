@@ -11,7 +11,7 @@ import {
     Contract,
     WakeDeploymentRequestParams,
     WakeCallRequestParams,
-    CallPayload,
+    CallRequest,
     WakeGetBalancesRequestParams,
     WakeSetBalancesRequestParams,
     WakeSetLabelRequestParams,
@@ -139,8 +139,9 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.call', (params: CallPayload) =>
-            call(params, client, outputViewManager)
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.sake.call',
+            (params: WakeCallRequestParams) => call(params, client, outputViewManager)
         )
     );
 

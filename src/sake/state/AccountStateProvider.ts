@@ -1,4 +1,4 @@
-import { Account, AccountState, StateId } from '../webview/shared/types';
+import { Account, StateId } from '../webview/shared/types';
 import { BaseStateProvider } from './BaseStateProvider';
 
 export class AccountStateProvider extends BaseStateProvider<Account[]> {

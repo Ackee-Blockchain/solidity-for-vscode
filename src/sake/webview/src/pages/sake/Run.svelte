@@ -11,7 +11,7 @@
     import Contract from '../../components/Contract.svelte';
     import Divider from '../../components/Divider.svelte';
     import {
-        type CallPayload,
+        type CallRequest,
         type WakeCallRequestParams,
         type ContractFunction as ContractFunctionType
     } from '../../../shared/types';
@@ -55,7 +55,7 @@
 
         console.log('requestParams');
 
-        const payload: CallPayload = {
+        const payload: CallRequest = {
             func: func,
             requestParams: requestParams
         };

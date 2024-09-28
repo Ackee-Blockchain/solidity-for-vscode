@@ -4,18 +4,18 @@ import {
     CompiledContract,
     WakeCompilationErrors,
     WakeCompilationSkipped,
-    WakeCompiledContract
+    WakeCompiledContracts
 } from '../webview/shared/types';
 
 export function parseCompiledContracts(
-    compilationResult: WakeCompiledContract
+    compilationResult: WakeCompiledContracts
 ): Array<CompiledContract> {
     // Wake returns an object with a key "fqn:contractName" and value contractAbi
     // this needs to be converted to an array of CompiledContract
 
     let contracts: Array<CompiledContract> = [];
 
-    let key: keyof WakeCompiledContract;
+    let key: keyof WakeCompiledContracts;
     for (key in compilationResult) {
         // split the key to get the contract name
         const [_fqn, _contractName] = key.split(':');
@@ -45,7 +45,7 @@ export function parseCompilationIssues(
 ): CompilationIssue[] {
     const errors: CompilationIssue[] = [];
 
-    let key: keyof WakeCompiledContract;
+    let key: keyof WakeCompiledContracts;
     for (key in compilationErrors) {
         const error: CompilationIssue = {
             type: CompilationIssueType.Error,
@@ -64,7 +64,7 @@ export function parseCompilationSkipped(
 ): CompilationIssue[] {
     const errors: CompilationIssue[] = [];
 
-    let key: keyof WakeCompiledContract;
+    let key: keyof WakeCompiledContracts;
     for (key in compilationSkipped) {
         const error: CompilationIssue = {
             type: CompilationIssueType.Skipped,
