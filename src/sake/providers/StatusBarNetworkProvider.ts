@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 export class StatusBarNetworkProvider {
     private _statusBarItem?: vscode.StatusBarItem;
-    private _networks: string[] = ["Local Node", ""]
+    private _networks: string[] = ['Local Node', ''];
     private _currentEnv?: string;
 
     constructor(private _context: vscode.ExtensionContext) {

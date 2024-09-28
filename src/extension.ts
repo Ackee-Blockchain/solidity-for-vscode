@@ -53,7 +53,6 @@ import { PipxInstaller } from './installers/pipx';
 import { PipInstaller } from './installers/pip';
 import { ManualInstaller } from './installers/manual';
 import { WalletServer } from './serve';
-import { DeploymentState } from './sake/webview/shared/types';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ExecaChildProcess | undefined = undefined;

@@ -1,3 +1,5 @@
+import * as Web3Types from 'web3-types';
+
 /*
  *
  * Account and Contract Interfaces
@@ -204,7 +206,10 @@ export type AccountState = {
 
 export interface Account {
     address: string;
-    balance: number | null; // TODO remove null
+    balance: number; // TODO remove null
+}
+
+export interface SakeAccount extends Account {
     nick: string | null;
 }
 

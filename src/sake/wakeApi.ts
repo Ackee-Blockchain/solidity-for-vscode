@@ -1,50 +1,23 @@
 import * as vscode from 'vscode';
 import {
-    AccountState,
     Address,
-    DeploymentState,
     CallPayload,
-    TxDecodedReturnValue,
-    TxDeploymentOutput,
-    TxCallOutput,
-    TxOutput,
-    TxType,
     WakeCompilationResponse,
     WakeDeploymentRequestParams,
     WakeDeploymentResponse,
-    WakeCallRequestParams,
     WakeCallResponse,
     WakeGetBalancesRequestParams,
     WakeGetBalancesResponse,
     WakeSetBalancesRequestParams,
     WakeSetBalancesResponse,
     CallType,
-    ContractFunction,
-    WakeSetLabelRequestParams,
-    WakeGetBytecodeResponse,
-    WakeGetBytecodeRequestParams
+    ContractFunction
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
-import { CompilationState } from './state/CompilationStateProvider';
-import {
-    getNameFromContractFqn,
-    parseCompilationIssues,
-    parseCompilationSkipped,
-    parseCompiledContracts
-} from './utils/compilation';
-import { DeploymentState } from './state/DeploymentStateProvider';
-import { AccountState } from './state/AccountStateProvider';
-import { decodeCallReturnValue } from './utils/call';
-import { OutputViewManager, SakeOutputTreeProvider } from './providers/OutputTreeProvider';
-import { TransactionHistoryState } from './state/TransactionHistoryStateProvider';
 import { validate } from './utils/validate';
-import { WakeState } from './state/WakeStateProvider';
+import { WakeStateProvider } from './state/WakeStateProvider';
 
-const accountState = AccountStateProvider.getInstance();
-const deploymentState = DeploymentStateProvider.getInstance();
-const compilationState = CompilationState.getInstance();
-const TransactionHistoryState = TransactionHistoryState.getInstance();
-const wakeState = WakeState.getInstance();
+const wakeState = WakeStateProvider.getInstance();
 
 /*
  * Get accounts and balances and save to state
@@ -52,292 +25,153 @@ const wakeState = WakeState.getInstance();
  * @param client
  * @returns boolean based on success
  */
-export async function getAccounts(client: LanguageClient | undefined) {
-    try {
-        let result = await sendWakeRequest<Address[]>(client, 'wake/sake/getAccounts');
 
-        result = validate(result);
+export class WakeError extends Error {}
+export class WakeApiError extends WakeError {}
+export class WakeAnvilNotFoundError extends WakeError {}
 
-        if (result == null) {
-            throw new Error('No result returned');
+export class WakeApi {
+    private static _client: LanguageClient;
+    private static _instance: WakeApi;
+
+    private constructor() {}
+
+    public static getInstance(): WakeApi {
+        if (!this._client) {
+            throw new Error('Failed to initialize Wake API without a language client set');
         }
-        if (result.length === 0) {
-            throw new Error('No accounts returned');
+        if (!this._instance) {
+            this._instance = new WakeApi();
         }
-
-        // @dev set the state here also, even though it will be updated in getBalances
-        // this is because balances only update existing accounts state
-        const _accountState = result.map((address, i) => {
-            return {
-                address: address,
-                balance: null,
-                nick: `Account ${i}`
-            } as AccountState;
-        });
-
-        accountState.setAccountsSilent(_accountState);
-
-        getBalances({ addresses: result }, client);
-
-        return true;
-    } catch (e) {
-        const message = typeof e === 'string' ? e : (e as Error).message;
-        vscode.window.showErrorMessage('Failed to get accounts: ' + message);
-        return false;
+        return this._instance;
     }
-}
 
-/*
- * Get balances for a list of addresses and save to state
- * @dev only updates existing accounts state
- *
- * @param requestParams - list of addresses
- * @param client - language client
- * @returns boolean based on success
- */
-export async function getBalances(
-    requestParams: WakeGetBalancesRequestParams,
-    client: LanguageClient | undefined
-) {
-    try {
-        let result = await sendWakeRequest<WakeGetBalancesResponse>(
-            client,
-            'wake/sake/getBalances',
-            requestParams
-        );
-
-        if (result == null) {
-            throw new Error('No result returned');
+    public static initializeClient(client: LanguageClient) {
+        if (this._client) {
+            throw new Error('Client already set');
         }
-        if (!result.success) {
-            throw new Error('Failed to get balances');
-        }
-
-        // const _accountState = requestParams.addresses.map((address) => {
-        //     return {
-        //         address: address,
-        //         balance: result.balances[address]
-        //     };
-        // });
-        // accountState.setAccounts(_accountState);
-
-        accountState.updateBalances(result.balances);
-
-        return true;
-    } catch (e) {
-        const message = typeof e === 'string' ? e : (e as Error).message;
-        vscode.window.showErrorMessage('Failed to get addresses: ' + message);
-        return false;
+        this._client = client;
     }
-}
 
-export async function setBalances(
-    requestParams: WakeSetBalancesRequestParams,
-    client: LanguageClient | undefined
-) {
-    try {
-        let result = await sendWakeRequest<WakeSetBalancesResponse>(
-            client,
-            'wake/sake/setBalances',
-            requestParams
-        );
+    async getAccounts() {
+        try {
+            const result = await this.sendWakeRequest<Address[]>('wake/sake/getAccounts');
 
-        result = validate(result);
-
-        if (result == null) {
-            throw new Error('No result returned');
-        }
-        if (!result.success) {
-            throw new Error('Failed to set balances');
-        }
-
-        // Update balances
-        accountState.updateBalances(requestParams.balances);
-    } catch (e) {
-        const message = typeof e === 'string' ? e : (e as Error).message;
-        vscode.window.showErrorMessage('Failed to set balances: ' + message);
-        return false;
-    }
-}
-
-export async function compile(client: LanguageClient | undefined) {
-    try {
-        let result = await sendWakeRequest<WakeCompilationResponse>(client, 'wake/sake/compile');
-
-        if (result == null) {
-            throw new Error('No result returned');
-        }
-        if (!result.success) {
-            throw new Error('Compilation was unsuccessful');
-        }
-
-        // vscode.window.showInformationMessage('Compilation was successful!');
-        const parsedContracts = parseCompiledContracts(result.contracts);
-        const parsedErrors = parseCompilationIssues(result.errors);
-        const parsedSkipped = parseCompilationSkipped(result.skipped);
-        compilationState.set(parsedContracts, [...parsedErrors, ...parsedSkipped]);
-
-        return result.success;
-    } catch (e) {
-        const message = typeof e === 'string' ? e : (e as Error).message;
-        vscode.window.showErrorMessage('Compilation failed with error: ' + message);
-        return false;
-    }
-}
-
-export async function deploy(
-    requestParams: WakeDeploymentRequestParams,
-    client: LanguageClient | undefined,
-    output: OutputViewManager
-) {
-    try {
-        let result = await sendWakeRequest<WakeDeploymentResponse>(
-            client,
-            'wake/sake/deploy',
-            requestParams
-        );
-
-        result = validate(result);
-
-        if (result == null) {
-            throw new Error('No result returned');
-        }
-
-        let _contractCompilationData;
-        if (result.success) {
-            _contractCompilationData = compilationState.getContract(requestParams.contractFqn);
-            if (_contractCompilationData == null) {
-                throw new Error(
-                    'Contract compilation data not found for fqn: ' + requestParams.contractFqn
-                );
+            if (result == null) {
+                throw new Error('No result returned');
             }
-            const _deploymentData: DeploymentState = {
-                name: _contractCompilationData.name,
-                address: result.contractAddress!,
-                abi: _contractCompilationData.abi,
-                balance: null,
-                nick: null
-            };
 
-            deploymentState.deploy(_deploymentData);
-
-            // update calldata
-        }
-
-        // Add to tx history
-        const txOutput: TxDeploymentOutput = {
-            type: TxType.Deployment,
-            success: result.success, // TODO success will show true even on revert
-            from: requestParams.sender,
-            contractAddress: result.contractAddress,
-            contractName: getNameFromContractFqn(requestParams.contractFqn),
-            receipt: result.txReceipt,
-            callTrace: result.callTrace
-        };
-
-        TransactionHistoryState.addTx(txOutput);
-        output.set(txOutput);
-        vscode.commands.executeCommand('sake-output.focus');
-
-        // vscode.window.showInformationMessage('Deployment was successful!');
-
-        return true;
-    } catch (e) {
-        const message = typeof e === 'string' ? e : (e as Error).message;
-        vscode.window.showErrorMessage('Deployment failed with error: ' + message);
-        return false;
-    }
-}
-
-export async function call(
-    callPayload: CallPayload,
-    client: LanguageClient | undefined,
-    output: OutputViewManager
-) {
-    const { requestParams, func } = callPayload;
-
-    const callType = specifyCallType(func);
-
-    try {
-        const apiEndpoint =
-            callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
-        let result = await sendWakeRequest<WakeCallResponse>(client, apiEndpoint, requestParams);
-
-        result = validate(result);
-
-        if (result == null) {
-            throw new Error('No result returned');
-        }
-        // if (!result.success) { throw new Error("Function call was unsuccessful"); }
-
-        let decodedReturnValue: TxDecodedReturnValue[] | undefined = undefined;
-        if (result.success) {
-            // parse result
-            try {
-                decodedReturnValue = decodeCallReturnValue(result.returnValue, func);
-            } catch (e) {
-                vscode.window.showErrorMessage('Failed to decode return value: ' + e);
+            if (result.length === 0) {
+                throw new Error('No accounts returned');
             }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(
+                `Failed to get balances: ${e instanceof Error ? e.message : String(e)}`
+            );
         }
-
-        const txOutput: TxCallOutput = {
-            callType: callType,
-            type: TxType.FunctionCall,
-            success: result.success, // TODO success will show true even on revert
-            from: requestParams.sender,
-            to: requestParams.contractAddress,
-            functionName: func.name,
-            returnData: {
-                bytes: result.returnValue,
-                decoded: decodedReturnValue
-            },
-            receipt: result.txReceipt,
-            callTrace: result.callTrace
-        };
-
-        TransactionHistoryState.addTx(txOutput);
-        output.set(txOutput);
-        vscode.commands.executeCommand('sake-output.focus');
-
-        // vscode.window.showInformationMessage("Function call was successful!");
-
-        return true;
-    } catch (e) {
-        const message = typeof e === 'string' ? e : (e as Error).message;
-        vscode.window.showErrorMessage(
-            'Function call failed with error received from LSP server: ' + message
-        );
-        return false;
     }
-}
 
-export async function setLabel(
-    requestParams: WakeSetLabelRequestParams,
-    client: LanguageClient | undefined
-) {
-    try {
-        sendWakeRequest<WakeSetBalancesResponse>(client, 'wake/sake/setLabel', requestParams);
-    } catch (e) {
-        const message = typeof e === 'string' ? e : (e as Error).message;
-        vscode.window.showErrorMessage('Failed to set balances: ' + message);
-        return false;
+    async getBalances(requestParams: WakeGetBalancesRequestParams) {
+        try {
+            const result = await this.sendWakeRequest<WakeGetBalancesResponse>(
+                'wake/sake/getBalances',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(`[Wake API] ${e instanceof Error ? e.message : String(e)}`);
+        }
     }
-}
 
-export async function getBytecode(
-    requestParams: WakeGetBytecodeRequestParams,
-    client: LanguageClient | undefined
-) {
-    try {
-        return await sendWakeRequest<WakeGetBytecodeResponse>(
-            client,
-            'wake/sake/getBytecode',
-            requestParams
-        );
-    } catch (e) {
-        const message = typeof e === 'string' ? e : (e as Error).message;
-        vscode.window.showErrorMessage('Failed to get bytecode: ' + message);
-        return false;
+    async setBalances(requestParams: WakeSetBalancesRequestParams) {
+        try {
+            const result = await this.sendWakeRequest<WakeSetBalancesResponse>(
+                'wake/sake/setBalances',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(`[Wake API] ${e instanceof Error ? e.message : String(e)}`);
+        }
+    }
+
+    async compile() {
+        try {
+            const result = await this.sendWakeRequest<WakeCompilationResponse>('wake/sake/compile');
+
+            if (result == null) {
+                throw new WakeApiError('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(
+                `Failed to compile: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
+    }
+
+    async deploy(requestParams: WakeDeploymentRequestParams) {
+        try {
+            const result = await this.sendWakeRequest<WakeDeploymentResponse>(
+                'wake/sake/deploy',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(
+                `Failed to deploy: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
+    }
+
+    async call(callPayload: CallPayload) {
+        try {
+            const { requestParams, func } = callPayload;
+            const callType = specifyCallType(func);
+            const apiEndpoint =
+                callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
+            const result = await this.sendWakeRequest<WakeCallResponse>(apiEndpoint, requestParams);
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(`Failed to call: ${e instanceof Error ? e.message : String(e)}`);
+        }
+    }
+
+    private async sendWakeRequest<T>(method: string, params?: any): Promise<T> {
+        try {
+            const response = await this._client.sendRequest<T>(method, params);
+            wakeState.setIsAnvilInstalled(true);
+            return validate(response);
+        } catch (e) {
+            const message = typeof e === 'string' ? e : (e as Error).message;
+            if (message == 'Anvil executable not found') {
+                wakeState.setIsAnvilInstalled(false);
+            }
+            throw new WakeAnvilNotFoundError(message);
+        }
     }
 }
 
@@ -347,24 +181,257 @@ function specifyCallType(func: ContractFunction): CallType {
         : CallType.Transact;
 }
 
-async function sendWakeRequest<T>(
-    client: LanguageClient | undefined,
-    method: string,
-    params?: any
-): Promise<T> {
-    if (client === undefined) {
-        throw new Error('Missing language client');
-    }
+// /*
+//  * Get balances for a list of addresses and save to state
+//  * @dev only updates existing accounts state
+//  *
+//  * @param requestParams - list of addresses
+//  * @param client - language client
+//  * @returns boolean based on success
+//  */
+// export async function getBalances(
+//     requestParams: WakeGetBalancesRequestParams,
+//     client: LanguageClient | undefined
+// ) {
+//     try {
+//         let result = await sendWakeRequest<WakeGetBalancesResponse>(
+//             client,
+//             'wake/sake/getBalances',
+//             requestParams
+//         );
 
-    try {
-        const response = await client.sendRequest<T>(method, params);
-        wakeState.setIsAnvilInstalled(true);
-        return response;
-    } catch (e) {
-        const message = typeof e === 'string' ? e : (e as Error).message;
-        if (message == 'Anvil executable not found') {
-            wakeState.setIsAnvilInstalled(false);
-        }
-        throw Error(message);
-    }
-}
+//         // const _accountState = requestParams.addresses.map((address) => {
+//         //     return {
+//         //         address: address,
+//         //         balance: result.balances[address]
+//         //     };
+//         // });
+//         // accountState.setAccounts(_accountState);
+
+//         accountState.updateBalances(result.balances);
+
+//         return true;
+//     } catch (e) {
+//         const message = typeof e === 'string' ? e : (e as Error).message;
+//         vscode.window.showErrorMessage('Failed to get addresses: ' + message);
+//         return false;
+//     }
+// }
+
+// export async function setBalances(
+//     requestParams: WakeSetBalancesRequestParams,
+//     client: LanguageClient | undefined
+// ) {
+//     try {
+//         let result = await sendWakeRequest<WakeSetBalancesResponse>(
+//             client,
+//             'wake/sake/setBalances',
+//             requestParams
+//         );
+
+//         result = validate(result);
+
+//         if (result == null) {
+//             throw new Error('No result returned');
+//         }
+//         if (!result.success) {
+//             throw new Error('Failed to set balances');
+//         }
+
+//         // Update balances
+//         accountState.updateBalances(requestParams.balances);
+//     } catch (e) {
+//         const message = typeof e === 'string' ? e : (e as Error).message;
+//         vscode.window.showErrorMessage('Failed to set balances: ' + message);
+//         return false;
+//     }
+// }
+
+// export async function compile(client: LanguageClient | undefined) {
+//     try {
+//         let result = await sendWakeRequest<WakeCompilationResponse>(client, 'wake/sake/compile');
+
+//         if (result == null) {
+//             throw new Error('No result returned');
+//         }
+//         if (!result.success) {
+//             throw new Error('Compilation was unsuccessful');
+//         }
+
+//         // vscode.window.showInformationMessage('Compilation was successful!');
+//         const parsedContracts = parseCompiledContracts(result.contracts);
+//         const parsedErrors = parseCompilationIssues(result.errors);
+//         const parsedSkipped = parseCompilationSkipped(result.skipped);
+//         compilationState.set(parsedContracts, [...parsedErrors, ...parsedSkipped]);
+
+//         return result.success;
+//     } catch (e) {
+//         const message = typeof e === 'string' ? e : (e as Error).message;
+//         vscode.window.showErrorMessage('Compilation failed with error: ' + message);
+//         return false;
+//     }
+// }
+
+// export async function deploy(
+//     requestParams: WakeDeploymentRequestParams,
+//     client: LanguageClient | undefined,
+//     output: OutputViewManager
+// ) {
+//     try {
+//         let result = await sendWakeRequest<WakeDeploymentResponse>(
+//             client,
+//             'wake/sake/deploy',
+//             requestParams
+//         );
+
+//         result = validate(result);
+
+//         if (result == null) {
+//             throw new Error('No result returned');
+//         }
+
+//         let _contractCompilationData;
+//         if (result.success) {
+//             _contractCompilationData = compilationState.getContract(requestParams.contractFqn);
+//             if (_contractCompilationData == null) {
+//                 throw new Error(
+//                     'Contract compilation data not found for fqn: ' + requestParams.contractFqn
+//                 );
+//             }
+//             const _deploymentData: DeploymentState = {
+//                 name: _contractCompilationData.name,
+//                 address: result.contractAddress!,
+//                 abi: _contractCompilationData.abi,
+//                 balance: null,
+//                 nick: null
+//             };
+
+//             deploymentState.deploy(_deploymentData);
+
+//             // update calldata
+//         }
+
+//         // Add to tx history
+//         const txOutput: TxDeploymentOutput = {
+//             type: TxType.Deployment,
+//             success: result.success, // TODO success will show true even on revert
+//             from: requestParams.sender,
+//             contractAddress: result.contractAddress,
+//             contractName: getNameFromContractFqn(requestParams.contractFqn),
+//             receipt: result.txReceipt,
+//             callTrace: result.callTrace
+//         };
+
+//         TransactionHistoryState.addTx(txOutput);
+//         output.set(txOutput);
+//         vscode.commands.executeCommand('sake-output.focus');
+
+//         // vscode.window.showInformationMessage('Deployment was successful!');
+
+//         return true;
+//     } catch (e) {
+//         const message = typeof e === 'string' ? e : (e as Error).message;
+//         vscode.window.showErrorMessage('Deployment failed with error: ' + message);
+//         return false;
+//     }
+// }
+
+// export async function call(
+//     callPayload: CallPayload,
+//     client: LanguageClient | undefined,
+//     output: OutputViewManager
+// ) {
+//     const { requestParams, func } = callPayload;
+
+//     const callType = specifyCallType(func);
+
+//     try {
+//         const apiEndpoint =
+//             callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
+//         let result = await sendWakeRequest<WakeCallResponse>(client, apiEndpoint, requestParams);
+
+//         result = validate(result);
+
+//         if (result == null) {
+//             throw new Error('No result returned');
+//         }
+//         // if (!result.success) { throw new Error("Function call was unsuccessful"); }
+
+//         let decodedReturnValue: TxDecodedReturnValue[] | undefined = undefined;
+//         if (result.success) {
+//             // parse result
+//             try {
+//                 decodedReturnValue = decodeCallReturnValue(result.returnValue, func);
+//             } catch (e) {
+//                 vscode.window.showErrorMessage('Failed to decode return value: ' + e);
+//             }
+//         }
+
+//         const txOutput: TxCallOutput = {
+//             callType: callType,
+//             type: TxType.FunctionCall,
+//             success: result.success, // TODO success will show true even on revert
+//             from: requestParams.sender,
+//             to: requestParams.contractAddress,
+//             functionName: func.name,
+//             returnData: {
+//                 bytes: result.returnValue,
+//                 decoded: decodedReturnValue
+//             },
+//             receipt: result.txReceipt,
+//             callTrace: result.callTrace
+//         };
+
+//         TransactionHistoryState.addTx(txOutput);
+//         output.set(txOutput);
+//         vscode.commands.executeCommand('sake-output.focus');
+
+//         // vscode.window.showInformationMessage("Function call was successful!");
+
+//         return true;
+//     } catch (e) {
+//         const message = typeof e === 'string' ? e : (e as Error).message;
+//         vscode.window.showErrorMessage(
+//             'Function call failed with error received from LSP server: ' + message
+//         );
+//         return false;
+//     }
+// }
+
+// export async function setLabel(
+//     requestParams: WakeSetLabelRequestParams,
+//     client: LanguageClient | undefined
+// ) {
+//     try {
+//         sendWakeRequest<WakeSetBalancesResponse>(client, 'wake/sake/setLabel', requestParams);
+//     } catch (e) {
+//         const message = typeof e === 'string' ? e : (e as Error).message;
+//         vscode.window.showErrorMessage('Failed to set balances: ' + message);
+//         return false;
+//     }
+// }
+
+// export async function getBytecode(
+//     requestParams: WakeGetBytecodeRequestParams,
+//     client: LanguageClient | undefined
+// ) {
+//     try {
+//         return await sendWakeRequest<WakeGetBytecodeResponse>(
+//             client,
+//             'wake/sake/getBytecode',
+//             requestParams
+//         );
+//     } catch (e) {
+//         const message = typeof e === 'string' ? e : (e as Error).message;
+//         vscode.window.showErrorMessage('Failed to get bytecode: ' + message);
+//         return false;
+//     }
+// }
+
+// function specifyCallType(func: ContractFunction): CallType {
+//     return func.stateMutability === 'view' || func.stateMutability === 'pure'
+//         ? CallType.Call
+//         : CallType.Transact;
+// }
+
+// }

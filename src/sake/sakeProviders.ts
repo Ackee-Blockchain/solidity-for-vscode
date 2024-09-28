@@ -1,4 +1,5 @@
-import {, TransactRequest
+import {
+    TransactRequest,
     Account,
     AccountState,
     CallRequest,
@@ -15,6 +16,7 @@ import { TransactionHistoryStateProvider } from './state/TransactionHistoryState
 import { WakeStateProvider } from './state/WakeStateProvider';
 
 import * as vscode from 'vscode';
+import { WakeApi } from './wakeApi';
 
 export class SakeState {
     accounts: AccountStateProvider;
@@ -64,33 +66,34 @@ export abstract class SakeProvider {
     ) {
         this.state = new SakeState(webviewProvider);
         this.network = networkProvider;
-        this.initialize();
     }
-
-    protected abstract initialize(): Promise<void>;
 
     /* Account management */
 
     async addAccount(address: string) {
-        // check if account is already in the list
-        if (this.state.accounts.includes(address)) {
-            return;
-        }
+        throw new Error('Method not implemented.');
 
-        // get data from network
-        const account: Account | undefined = await this.network.registerAccount(address);
+        // // check if account is already in the list
+        // if (this.state.accounts.includes(address)) {
+        //     return;
+        // }
 
-        if (account) {
-            this.state.accounts.add(account);
-        }
+        // // get data from network
+        // const account: Account | undefined = await this.network.registerAccount(address);
+
+        // if (account) {
+        //     this.state.accounts.add(account);
+        // }
     }
 
     async removeAccount(address: string) {
-        this.state.accounts.remove(address);
+        throw new Error('Method not implemented.');
+
+        // this.state.accounts.remove(address);
     }
 
     async setAccountBalance(address: string, balance: number) {
-        const success = this.network.setAccountBalance(address, balance);
+        const success = await this.network.setAccountBalance(address, balance);
 
         if (success) {
             this.state.accounts.setBalance(address, balance);
@@ -112,7 +115,7 @@ export abstract class SakeProvider {
     /* Deployment management */
 
     async deployContract(deploymentRequest: DeploymentRequest) {
-        const success = this.network.deployContract(deploymentRequest);
+        const success = await this.network.deployContract(deploymentRequest);
 
         // TODO
         if (success) {
@@ -129,20 +132,20 @@ export abstract class SakeProvider {
     /* Interactions */
 
     async call(callRequest: CallRequest) {
-        const success = this.network.call(callRequest);
+        const success = await this.network.call(callRequest);
 
         if (success) {
             // TODO add to history
-            this.state.history.add(callRequest);
+            // this.state.history.add(callRequest);
         }
     }
 
     async transact(transactRequest: TransactRequest) {
-        const success = this.network.transact(transactRequest);
+        const success = await this.network.transact(transactRequest);
 
         if (success) {
             // TODO add to history
-            this.state.history.add(transactRequest);
+            // this.state.history.add(transactRequest);
         }
     }
 
@@ -167,33 +170,39 @@ export abstract class SakeProvider {
 }
 
 export class LocalNodeSakeProvider extends SakeProvider {
+    private _wake: WakeApi;
     constructor(
+        id: string,
+        displayName: string,
         networkProvider: INetworkProvider,
         webviewProvider: BaseWebviewProvider
         // private wakeApi: WakeApi
     ) {
-        super(networkProvider, webviewProvider);
+        super(id, displayName, networkProvider, webviewProvider);
+
+        this._wake = WakeApi.getInstance();
+        this.initialize();
     }
 
     async initialize() {
-        // TODO load initial accounts
-        // this.state.accounts.add(wakeApi.getAccounts());
+        const accounts = await this._wake.getAccounts();
+        for (const account of accounts) {
+            const accountDetails = await this.network.getAccountDetails(account);
+            if (accountDetails) {
+                this.state.accounts.add(accountDetails);
+            }
+        }
     }
 }
 
-export class PublicNodeSakeProvider extends SakeProvider {
-    async initialize() {}
-}
+// export class PublicNodeSakeProvider extends SakeProvider {}
 
 export class SakeProviderManager {
     private _selectedProviderId!: string;
     private _providers!: Map<string, SakeProvider>;
-    private _statusBarItem: vscode.StatusBarItem;
+    private _statusBarItem!: vscode.StatusBarItem;
 
-    constructor(
-        private context: vscode.ExtensionContext,
-        ...providers: SakeProvider[]
-    ) {
+    constructor(private context: vscode.ExtensionContext, ...providers: SakeProvider[]) {
         if (providers.length === 0) {
             throw new Error('No providers provided');
         }
@@ -269,7 +278,7 @@ export class SakeProviderManager {
     }
 
     private _selectProvider() {
-        const providerOptions = Array.from(this._providers.keys()).map(id => ({ label: id }));
+        const providerOptions = Array.from(this._providers.keys()).map((id) => ({ label: id }));
         vscode.window.showQuickPick(providerOptions).then((selected) => {
             if (selected) {
                 this.setProvider(selected.label);

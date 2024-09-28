@@ -6,8 +6,6 @@ import {
     SakeWebviewProvider
 } from './providers/WebviewProviders';
 import { copyToClipboard, loadSampleAbi, getTextFromInputBox } from './commands';
-import { DeploymentStateProvider } from './state/DeploymentStateProvider';
-import { CompilationStateProvider } from './state/CompilationStateProvider';
 import {
     WakeCompilationResponse,
     Contract,
@@ -16,7 +14,6 @@ import {
     CallPayload,
     WakeGetBalancesRequestParams,
     WakeSetBalancesRequestParams,
-    DeploymentState,
     WakeSetLabelRequestParams,
     WakeGetBytecodeRequestParams,
     WalletDeploymentData
@@ -31,22 +28,23 @@ import {
     getBalances,
     getBytecode,
     setBalances,
-    setLabel
+    setLabel,
+    WakeApi
 } from './wakeApi';
-import { AccountState, AccountStateProvider } from './state/AccountStateProvider';
 import {
     OutputViewManager,
     SakeOutputItem,
     SakeOutputTreeProvider
 } from './providers/OutputTreeProvider';
-import { TransactionHistoryState } from './state/TransactionHistoryStateProvider';
 import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
 import { WalletServer } from '../serve';
 import { LocalNodeNetworkProvider, PublicNodeNetworkProvider } from './network/networks';
-import { LocalNodeSakeProvider, SakeProviderManager } from './sakeProvider';
+import { LocalNodeSakeProvider, SakeProviderManager } from './sakeProviders';
 
 export function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
+    // Initialize Wake API
+    WakeApi.initializeClient(client);
     // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
     const sakeOutputProvider = new SakeOutputTreeProvider(context);
     const treeView = vscode.window.createTreeView('sake-output', {
@@ -80,19 +78,15 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     const localNodeNetworkProvider = new LocalNodeNetworkProvider(client);
 
     // initialize sake provider
-    const sake = new SakeProviderManager(context,
-        new LocalNodeSakeProvider({
-            id: 'local-chain-1',
-            displayName: 'Local Chain 1',
-            network: localNodeNetworkProvider
-            webview: sidebarSakeProvider
-        })
+    const sake = new SakeProviderManager(
+        context,
+        new LocalNodeSakeProvider(
+            'local-chain-1',
+            'Local Chain 1',
+            localNodeNetworkProvider,
+            sidebarSakeProvider
+        )
     );
-
-    // // register status bar
-    const statusBarEnvironmentProvider = new StatusBarEnvironmentProvider();
-    // context.subscriptions.push(statusBarEnvironmentProvider.registerCommand());
-    context.subscriptions.push(statusBarEnvironmentProvider.getStatusBarItem());
 
     // register commands
     context.subscriptions.push(
@@ -233,8 +227,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     vscode.workspace.onDidChangeTextDocument((e) => {
         if (e.document.languageId == 'solidity' && !e.document.isDirty) {
-            console.log('.sol file changed, set compilation state dirty');
-            compilationState.makeDirty();
+            sake.state.compiledContracts.makeDirty();
         }
         // TODO might need to rework using vscode.workspace.createFileSystemWatcher
     });

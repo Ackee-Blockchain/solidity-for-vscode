@@ -4,55 +4,65 @@ import {
     CallRequest,
     DeploymentRequest,
     TransactRequest,
-    WakeSetBalancesRequestParams
+    WakeSetBalancesRequestParams,
+    WakeSetBalancesResponse
 } from '../webview/shared/types';
 import * as Wake from '../wakeApi';
+import { WakeApi } from '../wakeApi';
 
-interface NetworkState {
-    accounts: string[];
-    deployedContracts: string[];
-}
+export class NetworkError extends Error {}
 
 export interface INetworkProvider {
     // id: string;
-    registerAccount(address: string): Account | undefined;
-    getAccountDetails(address: string): Account | undefined;
-    setAccountBalance(address: string, balance: number): boolean;
-    deployContract(params: DeploymentRequest): boolean;
-    call(params: CallRequest): boolean;
-    transact(params: TransactRequest): boolean;
+    registerAccount(address: string): Promise<Account | undefined>;
+    getAccountDetails(address: string): Promise<Account | undefined>;
+    setAccountBalance(address: string, balance: number): Promise<void>;
+    deployContract(params: DeploymentRequest): Promise<DeploymentResponse>;
+    call(params: CallRequest): Promise<CallResponse>;
 }
 
-export class PublicNodeNetworkProvider {}
+// export class PublicNodeNetworkProvider {}
 
 export class LocalNodeNetworkProvider implements INetworkProvider {
     // id: string = 'local-node';
+    private _wake: WakeApi;
 
-    constructor(private readonly client: LanguageClient) {}
+    constructor() {
+        this._wake = WakeApi.getInstance();
+    }
 
-    registerAccount(address: string): Account | undefined {
+    async registerAccount(address: string): Promise<Account | undefined> {
         throw new Error('Method not implemented.');
     }
-    getAccountDetails(address: string): Account | undefined {
+
+    async getAccountDetails(address: string): Promise<Account | undefined> {
+        const result = await this._wake.getBalances({
+            addresses: [address]
+        });
+
+        return {
+            address,
+            balance: result.balances[address]
+        };
+    }
+
+    async setAccountBalance(address: string, balance: number): Promise<void> {
+        const response: WakeSetBalancesResponse = await this._wake.setBalances({
+            balances: {
+                [address]: balance
+            }
+        } as WakeSetBalancesRequestParams);
+
+        if (!response.success) {
+            throw new NetworkError('Failed to set account balance');
+        }
+    }
+
+    async deployContract(params: DeploymentRequest): Promise<DeploymentResponse> {
         throw new Error('Method not implemented.');
     }
-    setAccountBalance(address: string, balance: number): boolean {
-        Wake.setBalances(
-            {
-                balances: {
-                    [address]: balance
-                }
-            } as WakeSetBalancesRequestParams,
-            this.client
-        );
-    }
-    deployContract(params: DeploymentRequest): boolean {
-        throw new Error('Method not implemented.');
-    }
-    call(params: CallRequest): boolean {
-        throw new Error('Method not implemented.');
-    }
-    transact(params: TransactRequest): boolean {
+
+    async call(params: CallRequest): Promise<CallResponse> {
         throw new Error('Method not implemented.');
     }
 }
