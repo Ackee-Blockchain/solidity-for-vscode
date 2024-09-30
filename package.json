@@ -88,20 +88,20 @@
                             "manual"
                         ],
                         "default": "conda",
-                        "description": "Method used to install Wake language server."
+                        "markdownDescription": "Method used to install [Wake](https://getwake.io/) language server, which is required for the extension to work."
                     },
                     "Tools-for-Solidity.Wake.prerelease": {
                         "type": "boolean",
                         "default": false,
-                        "description": "Install prerelease versions of Wake."
+                        "description": "Install pre-release versions of Wake."
                     },
                     "Tools-for-Solidity.Wake.pathToExecutable": {
                         "type": "string",
-                        "description": "Path to Wake executable, overrides Tools-for-Solidity.Wake.installationMethod."
+                        "markdownDescription": "Path to Wake executable, overrides `#Tools-for-Solidity.Wake.installationMethod#`."
                     },
                     "Tools-for-Solidity.Wake.port": {
                         "type": "integer",
-                        "description": "Port on which Wake is listening. Overrides both Tools-for-Solidity.Wake.installationMethod and Tools-for-Solidity.Wake.pathToExecutable."
+                        "markdownDescription": "Port on which Wake LSP is listening. Overrides both `#Tools-for-Solidity.Wake.installationMethod#` and `#Tools-for-Solidity.Wake.pathToExecutable#`."
                     },
                     "Tools-for-Solidity.Wake.compiler.solc.ignoredWarnings": {
                         "type": "array",
@@ -178,7 +178,7 @@
                             "type": "string"
                         },
                         "default": [],
-                        "markdownDescription": "Compiler remappings (see [Solidity docs](https://docs.soliditylang.org/en/latest/using-the-compiler.html#base-path-and-import-remapping))."
+                        "markdownDescription": "Compiler remappings (see [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html#base-path-and-import-remapping))."
                     },
                     "wake.compiler.solc.target_version": {
                         "type": "string",
