@@ -7,8 +7,8 @@ import {
     WakeSetBalancesRequestParams,
     WakeSetBalancesResponse
 } from '../webview/shared/types';
-import * as Wake from '../wakeApi';
-import { WakeApi } from '../wakeApi';
+import * as Wake from '../api/wake';
+import { WakeApi } from '../api/wake';
 
 export class NetworkError extends Error {}
 

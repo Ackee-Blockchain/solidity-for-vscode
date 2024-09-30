@@ -20,17 +20,7 @@ import {
 } from './webview/shared/types';
 import { LanguageClient, State } from 'vscode-languageclient/node';
 import { parseCompiledContracts } from './utils/compilation';
-import {
-    call,
-    compile,
-    deploy,
-    getAccounts,
-    getBalances,
-    getBytecode,
-    setBalances,
-    setLabel,
-    WakeApi
-} from './wakeApi';
+import { WakeApi } from './api/wake';
 import {
     OutputViewManager,
     SakeOutputItem,
@@ -39,8 +29,8 @@ import {
 import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
 import { WalletServer } from '../serve';
-import { LocalNodeNetworkProvider, PublicNodeNetworkProvider } from './network/networks';
-import { LocalNodeSakeProvider, SakeProviderManager } from './sakeProviders';
+import { LocalNodeNetworkProvider } from './network/networks';
+import { LocalNodeSakeProvider, SakeProviderManager } from './providers/SakeProviders';
 
 export function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     // Initialize Wake API

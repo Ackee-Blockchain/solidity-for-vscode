@@ -1,4 +1,4 @@
-import type { Account, ContractAbi, TransactionResult } from './types';
+import type { Address, ContractAbi, ExtendedAccount, TransactionResult } from './types';
 
 export enum StateId {
     DeployedContracts = 'deployedContracts',
@@ -10,16 +10,16 @@ export enum StateId {
 
 /* Account */
 
-export type AccountState = Account[];
+export type AccountState = ExtendedAccount[];
 
 /* Deployment */
 
 export interface DeployedContract {
     name: string;
-    address: string;
-    abi: any;
-    balance: number | null;
-    nick: string | null;
+    address: Address;
+    abi: ContractAbi;
+    balance: number;
+    nick?: string;
 }
 
 export type DeploymentState = DeployedContract[];

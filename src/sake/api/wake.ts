@@ -12,11 +12,11 @@ import {
     WakeSetLabelResponse,
     WakeTransactionType,
     AbiFunctionFragment
-} from './webview/shared/types';
+} from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
-import { validate } from './utils/validate';
-import { WakeStateProvider } from './state/WakeStateProvider';
-import { CallRequest } from './webview/shared/messaging_types';
+import { validate } from '../utils/validate';
+import { WakeStateProvider } from '../state/WakeStateProvider';
+import { CallRequest } from '../webview/shared/messaging_types';
 
 const wakeState = WakeStateProvider.getInstance();
 
@@ -54,7 +54,7 @@ export class WakeApi {
         this._client = client;
     }
 
-    async getAccounts() {
+    async getAccounts(): Promise<WakeGetAccountsResponse> {
         try {
             const result = await this.sendWakeRequest<WakeGetAccountsResponse>(
                 'wake/sake/getAccounts'
@@ -76,7 +76,9 @@ export class WakeApi {
         }
     }
 
-    async getBalances(requestParams: WakeGetBalancesRequestParams) {
+    async getBalances(
+        requestParams: WakeGetBalancesRequestParams
+    ): Promise<WakeGetBalancesResponse> {
         try {
             const result = await this.sendWakeRequest<WakeGetBalancesResponse>(
                 'wake/sake/getBalances',
@@ -93,7 +95,9 @@ export class WakeApi {
         }
     }
 
-    async setBalances(requestParams: WakeSetBalancesRequestParams) {
+    async setBalances(
+        requestParams: WakeSetBalancesRequestParams
+    ): Promise<WakeSetBalancesResponse> {
         try {
             const result = await this.sendWakeRequest<WakeSetBalancesResponse>(
                 'wake/sake/setBalances',
@@ -114,7 +118,7 @@ export class WakeApi {
         }
     }
 
-    async setLabel(requestParams: WakeSetLabelRequestParams) {
+    async setLabel(requestParams: WakeSetLabelRequestParams): Promise<WakeSetLabelResponse> {
         try {
             const result = await this.sendWakeRequest<WakeSetLabelResponse>(
                 'wake/sake/setLabel',
@@ -135,7 +139,7 @@ export class WakeApi {
         }
     }
 
-    async compile() {
+    async compile(): Promise<WakeCompilationResponse> {
         try {
             const result = await this.sendWakeRequest<WakeCompilationResponse>('wake/sake/compile');
 
@@ -151,7 +155,7 @@ export class WakeApi {
         }
     }
 
-    async deploy(requestParams: WakeDeploymentRequestParams) {
+    async deploy(requestParams: WakeDeploymentRequestParams): Promise<WakeDeploymentResponse> {
         try {
             const result = await this.sendWakeRequest<WakeDeploymentResponse>(
                 'wake/sake/deploy',
@@ -170,7 +174,7 @@ export class WakeApi {
         }
     }
 
-    async call(callRequest: CallRequest) {
+    async call(callRequest: CallRequest): Promise<WakeCallResponse> {
         try {
             const { requestParams, func } = callRequest;
             const callType = specifyCallType(func);

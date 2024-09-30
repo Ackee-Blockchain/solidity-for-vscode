@@ -1,22 +1,15 @@
-import {
-    TransactRequest,
-    Account,
-    AccountState,
-    CallRequest,
-    Contract,
-    DeploymentRequest
-} from './webview/shared/types';
+import { CallRequest, DeploymentRequest } from '../webview/shared/types';
 
-import { INetworkProvider, LocalNodeNetworkProvider } from './network/networks';
-import { AccountStateProvider } from './state/AccountStateProvider';
-import { DeploymentStateProvider } from './state/DeploymentStateProvider';
-import { CompilationStateProvider } from './state/CompilationStateProvider';
-import { BaseWebviewProvider } from './providers/BaseWebviewProvider';
-import { TransactionHistoryStateProvider } from './state/TransactionHistoryStateProvider';
-import { WakeStateProvider } from './state/WakeStateProvider';
+import { INetworkProvider, LocalNodeNetworkProvider } from '../network/networks';
+import { AccountStateProvider } from '../state/AccountStateProvider';
+import { DeploymentStateProvider } from '../state/DeploymentStateProvider';
+import { CompilationStateProvider } from '../state/CompilationStateProvider';
+import { BaseWebviewProvider } from './BaseWebviewProvider';
+import { TransactionHistoryStateProvider } from '../state/TransactionHistoryStateProvider';
+import { WakeStateProvider } from '../state/WakeStateProvider';
 
 import * as vscode from 'vscode';
-import { WakeApi } from './wakeApi';
+import { WakeApi } from '../api/wake';
 
 export class SakeState {
     accounts: AccountStateProvider;
@@ -47,11 +40,6 @@ export class SakeState {
         this.deployedContracts.unsubscribe(this._webviewProvider);
         this.history.unsubscribe(this._webviewProvider);
     }
-}
-
-export interface SakeState {
-    network: INetworkProvider;
-    state: SakeState;
 }
 
 export abstract class SakeProvider {
@@ -137,15 +125,6 @@ export abstract class SakeProvider {
         if (success) {
             // TODO add to history
             // this.state.history.add(callRequest);
-        }
-    }
-
-    async transact(transactRequest: TransactRequest) {
-        const success = await this.network.transact(transactRequest);
-
-        if (success) {
-            // TODO add to history
-            // this.state.history.add(transactRequest);
         }
     }
 

@@ -18,7 +18,7 @@ import {
 import { CompilationState } from '../state/CompilationStateProvider';
 import { AccountState } from '../state/AccountStateProvider';
 import { WakeState } from '../state/WakeStateProvider';
-import { getBytecode } from '../wakeApi';
+import { getBytecode } from '../api/wake';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;

@@ -6,11 +6,9 @@ import {
     type WakeDeploymentRequestParams,
     type WakeSetBalancesRequestParams,
     type CompiledContract,
-    type WalletDeploymentData,
-    type Bytecode,
-    type WakeGetBytecodeResponse
+    type WakeGetBytecodeResponse,
+    type WalletDeploymentData
 } from '../../shared/types';
-import { deployedContracts } from './store';
 
 export function copyToClipboard(stringToCopy: string) {
     messageHandler.send(WebviewMessage.copyToClipboard, stringToCopy);
@@ -121,7 +119,8 @@ export async function openDeploymentInBrowser(
         bytecode: bytecode,
         calldata: calldata,
         value: value
-    } as WalletDeploymentData;
+    };
+    // } as WalletDeploymentData; TODO: fix this
 
     console.log('openDeploymentInBrowser params', _params);
 

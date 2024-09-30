@@ -3,7 +3,7 @@ import * as w3t from 'web3-types';
 export * from './wake_types';
 export * from './state_types';
 export * from './messaging_types';
-// export * from './network_types';
+export * from './network_types';
 
 /*
  *

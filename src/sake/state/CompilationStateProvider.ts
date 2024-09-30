@@ -40,7 +40,7 @@ export class CompilationStateProvider extends BaseStateProvider<CompilationState
         };
     }
 
-    public setCompilation(contracts: Array<CompiledContract>): void {
+    public setCompilation(contracts: CompiledContract[]): void {
         this.state = {
             ...this.state,
             contracts: contracts,
