@@ -267,8 +267,7 @@ export class CondaInstaller implements Installer {
             // no conda environment installed yet
             if (latestFile === undefined || latestVersion === undefined) {
                 await vscode.window.showErrorMessage(
-                    `Unable to find a Wake conda environment for platform ${process.platform} and architecture ${process.arch}. [Consider changing the installation method](command:workbench.action.openSettings?%22Tools-for-Solidity.Wake.installationMethod%22) to continue.`,
-                    { modal: true }
+                    `Unable to find a Wake conda environment for platform ${process.platform} and architecture ${process.arch}. [Consider changing the installation method](command:workbench.action.openSettings?%22Tools-for-Solidity.Wake.installationMethod%22) to continue.`
                 );
                 throw new Error(
                     `No Wake conda environment found for platform ${process.platform} and architecture ${process.arch}`
