@@ -7,7 +7,23 @@ export class AccountStateProvider extends BaseStateProvider<AccountState> {
     }
 
     public add(account: ExtendedAccount) {
+        if (this.includes(account.address)) {
+            return;
+        }
         this.state = [...this.state, account];
+    }
+
+    public update(account: ExtendedAccount) {
+        this.state = this.state.map((a) => {
+            if (a.address === account.address) {
+                return account;
+            }
+            return a;
+        });
+    }
+
+    public get(address: Address): ExtendedAccount | undefined {
+        return this.state.find((a) => a.address === address);
     }
 
     public includes(address: Address): boolean {

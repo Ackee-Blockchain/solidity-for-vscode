@@ -30,12 +30,3 @@ export enum WebviewMessage {
     onOpenDeploymentInBrowser = 'onOpenDeploymentInBrowser',
     onGetBytecode = 'onGetBytecode'
 }
-
-// TODO move to a separate networks state types
-
-export interface CallRequest {
-    func: AbiFunctionFragment;
-    requestParams: WakeCallRequestParams;
-}
-
-export interface DeploymentRequest {}

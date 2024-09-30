@@ -353,7 +353,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     label: nick ? nick : null
                 } as WakeSetLabelRequestParams);
 
-                this._getDeployedContracts().updateContract({
+                this._getDeployedContracts().update({
                     ...(payload as DeploymentState),
                     nick: nick ? nick : null
                 });

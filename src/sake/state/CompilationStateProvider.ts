@@ -62,7 +62,7 @@ export class CompilationStateProvider extends BaseStateProvider<CompilationState
         }, {} as Record<string, CompiledContract>);
     }
 
-    public getContract(fqn: string): CompiledContract | undefined {
-        return this.state.contracts.find((contract) => contract.fqn === fqn);
+    public get(contractFqn: string): CompiledContract | undefined {
+        return this.state.contracts.find((contract) => contract.fqn === contractFqn);
     }
 }

@@ -1,4 +1,4 @@
-import { DeployedContract, DeploymentState, StateId } from '../webview/shared/types';
+import { Address, DeployedContract, DeploymentState, StateId } from '../webview/shared/types';
 import { BaseStateProvider } from './BaseStateProvider';
 
 export class DeploymentStateProvider extends BaseStateProvider<DeploymentState> {
@@ -12,19 +12,18 @@ export class DeploymentStateProvider extends BaseStateProvider<DeploymentState> 
         this.state = _state;
     }
 
-    public remove(contract: DeployedContract) {
-        const _state = this.state.filter((c) => c.address !== contract.address);
+    public remove(address: Address) {
+        const _state = this.state.filter((c) => c.address !== address);
         this.state = _state;
     }
 
-    public updateContract(contract: DeployedContract) {
+    public update(contract: DeployedContract) {
         const _state = this.state.map((c) => {
             if (c.address === contract.address) {
                 c = contract;
             }
             return c;
         });
-        console.log('updateContract', _state);
         this.state = _state;
     }
 

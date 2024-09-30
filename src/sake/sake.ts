@@ -64,8 +64,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     );
 
     /* Initialize Network (Chain) Providers */
-    const publicNodeNetworkProvider = new PublicNodeNetworkProvider();
-    const localNodeNetworkProvider = new LocalNodeNetworkProvider(client);
+    const localNodeNetworkProvider = new LocalNodeNetworkProvider();
 
     // initialize sake provider
     const sake = new SakeProviderManager(

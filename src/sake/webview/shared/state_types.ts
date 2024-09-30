@@ -18,7 +18,7 @@ export interface DeployedContract {
     name: string;
     address: Address;
     abi: ContractAbi;
-    balance: number;
+    balance?: number;
     nick?: string;
 }
 

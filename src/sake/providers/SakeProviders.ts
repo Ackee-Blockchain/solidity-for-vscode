@@ -1,6 +1,6 @@
-import { CallRequest, DeploymentRequest } from '../webview/shared/types';
+import { Account, Address, CallRequest, DeploymentRequest } from '../webview/shared/types';
 
-import { INetworkProvider, LocalNodeNetworkProvider } from '../network/networks';
+import { NetworkProvider, LocalNodeNetworkProvider } from '../network/networks';
 import { AccountStateProvider } from '../state/AccountStateProvider';
 import { DeploymentStateProvider } from '../state/DeploymentStateProvider';
 import { CompilationStateProvider } from '../state/CompilationStateProvider';
@@ -42,14 +42,16 @@ export class SakeState {
     }
 }
 
-export abstract class SakeProvider {
+export class SakeError extends Error {}
+
+export class SakeProvider {
     state: SakeState;
-    network: INetworkProvider; // TODO consider making this not private
+    network: NetworkProvider;
 
     constructor(
         public id: string,
         public displayName: string,
-        networkProvider: INetworkProvider,
+        networkProvider: NetworkProvider,
         webviewProvider: BaseWebviewProvider
     ) {
         this.state = new SakeState(webviewProvider);
@@ -58,27 +60,23 @@ export abstract class SakeProvider {
 
     /* Account management */
 
-    async addAccount(address: string) {
-        throw new Error('Method not implemented.');
+    // async addAccount(address: string) {
+    //     // check if account is already in the list
+    //     if (this.state.accounts.includes(address)) {
+    //         return;
+    //     }
 
-        // // check if account is already in the list
-        // if (this.state.accounts.includes(address)) {
-        //     return;
-        // }
+    //     // get data from network
+    //     const account: Account | undefined = await this.network.registerAccount(address);
 
-        // // get data from network
-        // const account: Account | undefined = await this.network.registerAccount(address);
+    //     if (account) {
+    //         this.state.accounts.add(account);
+    //     }
+    // }
 
-        // if (account) {
-        //     this.state.accounts.add(account);
-        // }
-    }
-
-    async removeAccount(address: string) {
-        throw new Error('Method not implemented.');
-
-        // this.state.accounts.remove(address);
-    }
+    // async removeAccount(address: string) {
+    //     this.state.accounts.remove(address);
+    // }
 
     async setAccountBalance(address: string, balance: number) {
         const success = await this.network.setAccountBalance(address, balance);
@@ -95,7 +93,16 @@ export abstract class SakeProvider {
     async refreshAccount(address: string) {
         const account: Account | undefined = await this.network.getAccountDetails(address);
 
-        if (account) {
+        if (!account) {
+            return;
+        }
+
+        if (this.state.accounts.includes(address)) {
+            this.state.accounts.update({
+                ...account,
+                nick: this.state.accounts.get(address)?.nick
+            });
+        } else {
             this.state.accounts.add(account);
         }
     }
@@ -103,24 +110,51 @@ export abstract class SakeProvider {
     /* Deployment management */
 
     async deployContract(deploymentRequest: DeploymentRequest) {
-        const success = await this.network.deployContract(deploymentRequest);
+        const deploymentResponse = await this.network.deploy(deploymentRequest);
 
-        // TODO
-        if (success) {
-            this.state.deployedContracts.add(deploymentRequest);
+        if (deploymentResponse.success) {
+            const compilation = this.state.compiledContracts.get(deploymentRequest.contractFqn);
+
+            if (!compilation) {
+                vscode.window.showErrorMessage('Deployment failed: Contract ABI was not found');
+                return;
+            }
+
+            const balance = (
+                await this.network.getAccountDetails(deploymentResponse.deployedAddress)
+            )?.balance;
+
+            this.state.deployedContracts.add({
+                name: compilation.name,
+                address: deploymentResponse.deployedAddress,
+                abi: compilation.abi,
+                balance: balance
+            });
         }
 
         // TODO add to history
     }
 
-    async removeDeployedContract(contract: string) {
-        this.state.deployedContracts.remove(contract);
+    async removeDeployedContract(address: Address) {
+        this.state.deployedContracts.remove(address);
     }
 
     /* Interactions */
 
-    async call(callRequest: CallRequest) {
-        const success = await this.network.call(callRequest);
+    async callContract(callRequest: CallRequest) {
+        const { requestParams, func } = callRequest;
+        const callType = specifyCallType(func);
+        const apiEndpoint =
+            callType === WakeTransactionType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
+
+        const callResponse = await this.network.call(callRequest);
+
+        //  const { requestParams, func } = callRequest;
+        //  const callType = specifyCallType(func);
+        //  const apiEndpoint =
+        //      callType === WakeTransactionType.Transact
+        //          ? 'wake/sake/transact'
+        //          : 'wake/sake/call';
 
         if (success) {
             // TODO add to history
@@ -153,7 +187,7 @@ export class LocalNodeSakeProvider extends SakeProvider {
     constructor(
         id: string,
         displayName: string,
-        networkProvider: INetworkProvider,
+        networkProvider: NetworkProvider,
         webviewProvider: BaseWebviewProvider
         // private wakeApi: WakeApi
     ) {
@@ -227,7 +261,7 @@ export class SakeProviderManager {
         return this.provider.state;
     }
 
-    // get network(): INetworkProvider {
+    // get network(): NetworkProvider {
     //     return this.provider.network;
     // }
 

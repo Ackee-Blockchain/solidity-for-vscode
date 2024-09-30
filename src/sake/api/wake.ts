@@ -11,12 +11,14 @@ import {
     WakeSetLabelRequestParams,
     WakeSetLabelResponse,
     WakeTransactionType,
-    AbiFunctionFragment
+    AbiFunctionFragment,
+    WakeCallRequestParams,
+    WakeTransactRequestParams,
+    WakeTransactResponse
 } from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
 import { WakeStateProvider } from '../state/WakeStateProvider';
-import { CallRequest } from '../webview/shared/messaging_types';
 
 const wakeState = WakeStateProvider.getInstance();
 
@@ -174,13 +176,12 @@ export class WakeApi {
         }
     }
 
-    async call(callRequest: CallRequest): Promise<WakeCallResponse> {
+    async call(requestParams: WakeCallRequestParams): Promise<WakeCallResponse> {
         try {
-            const { requestParams, func } = callRequest;
-            const callType = specifyCallType(func);
-            const apiEndpoint =
-                callType === WakeTransactionType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
-            const result = await this.sendWakeRequest<WakeCallResponse>(apiEndpoint, requestParams);
+            const result = await this.sendWakeRequest<WakeCallResponse>(
+                'wake/sake/call',
+                requestParams
+            );
 
             if (result == null) {
                 throw new Error('No result returned');
@@ -189,6 +190,25 @@ export class WakeApi {
             return result;
         } catch (e) {
             throw new WakeApiError(`Failed to call: ${e instanceof Error ? e.message : String(e)}`);
+        }
+    }
+
+    async transact(requestParams: WakeTransactRequestParams): Promise<WakeTransactResponse> {
+        try {
+            const result = await this.sendWakeRequest<WakeTransactResponse>(
+                'wake/sake/transact',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(
+                `Failed to transact: ${e instanceof Error ? e.message : String(e)}`
+            );
         }
     }
 

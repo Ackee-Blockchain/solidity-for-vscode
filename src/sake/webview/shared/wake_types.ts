@@ -92,9 +92,13 @@ export interface WakeCallRequestParams {
     value: number;
 }
 
+export interface WakeTransactRequestParams extends WakeCallRequestParams {}
+
 export interface WakeCallResponse extends WakeTransaction {
     returnValue: w3t.HexString; // might need to change to hex string
 }
+
+export interface WakeTransactResponse extends WakeCallResponse {}
 
 /* Get Balances */
 
