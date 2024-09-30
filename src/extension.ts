@@ -679,12 +679,6 @@ function watchFoundryRemappings() {
             .update('remappings', undefined, vscode.ConfigurationTarget.Workspace);
     });
 
-    // check if remappings.txt exists and import remappings if not
-    const cwd = workspace.uri.fsPath;
-    if (!fs.existsSync(cwd + '/remappings.txt')) {
-        return;
-    }
-
     vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
 }
 
