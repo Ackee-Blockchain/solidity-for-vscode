@@ -23,7 +23,7 @@ export class CondaInstaller implements Installer {
         private readonly context: vscode.ExtensionContext,
         private readonly outputChannel: vscode.OutputChannel,
         private readonly analytics: Analytics,
-        private readonly prerelease: boolean,
+        private readonly prerelease: boolean
     ) {
         const pubkeyPath = context.asAbsolutePath('resources/conda_public_key.pem');
         this.publicKey = fs.readFileSync(pubkeyPath, 'utf8');
@@ -31,50 +31,72 @@ export class CondaInstaller implements Installer {
         this.upgradeFile = path.join(context.globalStorageUri.fsPath, '.conda-upgrade');
 
         if (process.platform === 'win32') {
-            this.activateCommand = '"' + path.join(context.globalStorageUri.fsPath, 'wake-conda', 'Scripts', 'activate.bat') + '"';
+            this.activateCommand =
+                '"' +
+                path.join(
+                    context.globalStorageUri.fsPath,
+                    'wake-conda',
+                    'Scripts',
+                    'activate.bat'
+                ) +
+                '"';
             this.shell = 'cmd.exe';
         } else {
-            this.activateCommand = '. "' + path.join(context.globalStorageUri.fsPath, 'wake-conda', 'bin', 'activate') + '"';
+            this.activateCommand =
+                '. "' +
+                path.join(context.globalStorageUri.fsPath, 'wake-conda', 'bin', 'activate') +
+                '"';
             this.shell = '/bin/bash';
         }
     }
 
     private async downloadFile(filename: string, destination: string): Promise<void> {
-        await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: `Downloading ${filename}`,
-            cancellable: false
-        }, async (progress) => {
-            const file = this.storage.bucket(this.bucketName).file(filename);
+        await vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: `Downloading ${filename}`,
+                cancellable: false
+            },
+            async (progress) => {
+                const file = this.storage.bucket(this.bucketName).file(filename);
 
-            const [metadata] = await file.getMetadata();
-            const fileSize = metadata.size !== undefined ? (typeof metadata.size === 'string' ? parseInt(metadata.size) : metadata.size) : 0;
+                const [metadata] = await file.getMetadata();
+                const fileSize =
+                    metadata.size !== undefined
+                        ? typeof metadata.size === 'string'
+                            ? parseInt(metadata.size)
+                            : metadata.size
+                        : 0;
 
-            const destFile = fs.createWriteStream(destination);
-            const fileStream = file.createReadStream();
+                const destFile = fs.createWriteStream(destination);
+                const fileStream = file.createReadStream();
 
-            let downloadedBytes = 0;
-            let lastPercentage = 0;
+                let downloadedBytes = 0;
+                let lastPercentage = 0;
 
-            return new Promise<void>((resolve, reject) => {
-                destFile.on('finish', resolve);
+                return new Promise<void>((resolve, reject) => {
+                    destFile.on('finish', resolve);
 
-                fileStream.on('data', (chunk: Buffer) => {
-                    if (fileSize !== 0) {
-                        downloadedBytes += chunk.length;
-                        const percentage = Math.floor((downloadedBytes / fileSize) * 100);
-                        progress.report({ increment: percentage - lastPercentage, message: `${percentage}%` });
+                    fileStream.on('data', (chunk: Buffer) => {
+                        if (fileSize !== 0) {
+                            downloadedBytes += chunk.length;
+                            const percentage = Math.floor((downloadedBytes / fileSize) * 100);
+                            progress.report({
+                                increment: percentage - lastPercentage,
+                                message: `${percentage}%`
+                            });
 
-                        lastPercentage = percentage;
-                    }
+                            lastPercentage = percentage;
+                        }
+                    });
+                    fileStream.on('error', (err: Error) => {
+                        reject(err);
+                    });
+
+                    fileStream.pipe(destFile);
                 });
-                fileStream.on('error', (err: Error) => {
-                    reject(err);
-                });
-
-                fileStream.pipe(destFile);
-            });
-        });
+            }
+        );
     }
 
     private verifySignature(data: Buffer, signature: Buffer): boolean {
@@ -119,26 +141,32 @@ export class CondaInstaller implements Installer {
         }
         fs.mkdirSync(extractPath, { recursive: true });
 
-        await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: `Extracting ${filename}`,
-            cancellable: false
-        }, async () => {
-            await tar.x({
-                file: archivePath,
-                cwd: extractPath,
-            });
-        });
+        await vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: `Extracting ${filename}`,
+                cancellable: false
+            },
+            async () => {
+                await tar.x({
+                    file: archivePath,
+                    cwd: extractPath
+                });
+            }
+        );
     }
 
     private async condaUnpack(): Promise<void> {
-        await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: `Setting up conda environment`,
-            cancellable: false
-        }, async () => {
-            execaSync(`${this.activateCommand} && conda-unpack`, { shell: this.shell });
-        });
+        await vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: `Setting up conda environment`,
+                cancellable: false
+            },
+            async () => {
+                execaSync(`${this.activateCommand} && conda-unpack`, { shell: this.shell });
+            }
+        );
     }
 
     async setup(): Promise<void> {
@@ -180,38 +208,46 @@ export class CondaInstaller implements Installer {
             arch = process.arch;
         }
 
-        let promise = new Promise<[File|undefined, string|undefined]>(async (resolve, reject) => {
-            let latestVersion = undefined;
-            let latestFile = undefined;
+        let promise = new Promise<[File | undefined, string | undefined]>(
+            async (resolve, reject) => {
+                let latestVersion = undefined;
+                let latestFile = undefined;
 
-            try {
-                const [files] = await this.storage.bucket(this.bucketName).getFiles({matchGlob: `*${platform}-${arch}.tar.gz`});
+                try {
+                    const [files] = await this.storage
+                        .bucket(this.bucketName)
+                        .getFiles({ matchGlob: `*${platform}-${arch}.tar.gz` });
 
-                for (const file of files) {
-                    const [metadata] = await file.getMetadata();
-                    if (metadata.metadata === undefined || !(typeof metadata.metadata['version'] === 'string')) {
-                        continue;
+                    for (const file of files) {
+                        const [metadata] = await file.getMetadata();
+                        if (
+                            metadata.metadata === undefined ||
+                            !(typeof metadata.metadata['version'] === 'string')
+                        ) {
+                            continue;
+                        }
+
+                        const explained = explain(metadata.metadata['version']);
+                        if (explained === null) {
+                            continue;
+                        }
+
+                        if (
+                            metadata.metadata['os'] === platform &&
+                            metadata.metadata['arch'] === arch &&
+                            (latestVersion === undefined ||
+                                compare(metadata.metadata['version'], latestVersion) > 0) &&
+                            (this.prerelease || !explained.is_prerelease)
+                        ) {
+                            latestVersion = metadata.metadata['version'];
+                            latestFile = file;
+                        }
                     }
+                } catch (error) {} // internet connection error most likely
 
-                    const explained = explain(metadata.metadata['version']);
-                    if (explained === null) {
-                        continue;
-                    }
-
-                    if (
-                        metadata.metadata['os'] === platform &&
-                        metadata.metadata['arch'] === arch &&
-                        (latestVersion === undefined || compare(metadata.metadata['version'], latestVersion) > 0) &&
-                        (this.prerelease || !explained.is_prerelease)
-                    ) {
-                        latestVersion = metadata.metadata['version'];
-                        latestFile = file;
-                    }
-                }
-            } catch (error) {} // internet connection error most likely
-
-            resolve([latestFile, latestVersion]);
-        });
+                resolve([latestFile, latestVersion]);
+            }
+        );
 
         let currentVersion: string | undefined = undefined;
         if (fs.existsSync(this.markerFile)) {
@@ -223,15 +259,20 @@ export class CondaInstaller implements Installer {
         if (currentVersion === undefined || compare(currentVersion, WAKE_MIN_VERSION) < 0) {
             if (currentVersion !== undefined) {
                 vscode.window.showInformationMessage(
-                    `The Wake conda environment in version ${currentVersion} installed but the minimal version is ${WAKE_MIN_VERSION}. Updating...`,
+                    `The Wake conda environment in version ${currentVersion} installed but the minimal version is ${WAKE_MIN_VERSION}. Updating...`
                 );
             }
             let [latestFile, latestVersion] = await promise;
 
             // no conda environment installed yet
             if (latestFile === undefined || latestVersion === undefined) {
-                await vscode.window.showErrorMessage(`No Wake conda environment found for platform ${process.platform} and architecture ${process.arch}`);
-                throw new Error(`No Wake conda environment found for platform ${process.platform} and architecture ${process.arch}`);
+                await vscode.window.showErrorMessage(
+                    `Unable to find a Wake conda environment for platform ${process.platform} and architecture ${process.arch}. [Consider changing the installation method](command:workbench.action.openSettings?%22Tools-for-Solidity.Wake.installationMethod%22) to continue.`,
+                    { modal: true }
+                );
+                throw new Error(
+                    `No Wake conda environment found for platform ${process.platform} and architecture ${process.arch}`
+                );
             }
 
             await this.verifyAndExtractArchive(extractPath, latestFile.name);
@@ -261,14 +302,16 @@ export class CondaInstaller implements Installer {
                         await this.verifyAndExtractArchive(upgradePath, latestFile.name);
                         fs.writeFileSync(this.upgradeFile, latestVersion);
 
-                        await vscode.window.showInformationMessage(
-                            `The Wake conda environment will be updated to version ${latestVersion} after restarting VS Code.`,
-                            'Restart Now'
-                        ).then((restart) => {
-                            if (restart === 'Restart Now') {
-                                vscode.commands.executeCommand('workbench.action.reloadWindow');
-                            }
-                        });
+                        await vscode.window
+                            .showInformationMessage(
+                                `The Wake conda environment will be updated to version ${latestVersion} after restarting VS Code.`,
+                                'Restart Now'
+                            )
+                            .then((restart) => {
+                                if (restart === 'Restart Now') {
+                                    vscode.commands.executeCommand('workbench.action.reloadWindow');
+                                }
+                            });
                     }
                     return update;
                 });
@@ -278,7 +321,10 @@ export class CondaInstaller implements Installer {
 
     private getCertifiPath(): string | undefined {
         try {
-            return execaSync(`${this.activateCommand} && python -c "import certifi; print(certifi.where())"`, { shell: this.shell }).stdout;
+            return execaSync(
+                `${this.activateCommand} && python -c "import certifi; print(certifi.where())"`,
+                { shell: this.shell }
+            ).stdout;
         } catch (error) {
             this.analytics.logCrash(EventType.ERROR_CERTIFI_PATH, error);
             return undefined;
@@ -301,10 +347,13 @@ export class CondaInstaller implements Installer {
         delete env.PYTHONPATH;
         delete env.PYTHONHOME;
 
-        this.outputChannel.appendLine(`Running '${this.activateCommand} && wake lsp --port ${port}'`);
-        return execa(
-            `${this.activateCommand} && wake lsp --port ${port}`,
-            { shell: this.shell, stdio: ['ignore', 'ignore', 'pipe'], env: env }
+        this.outputChannel.appendLine(
+            `Running '${this.activateCommand} && wake lsp --port ${port}'`
         );
+        return execa(`${this.activateCommand} && wake lsp --port ${port}`, {
+            shell: this.shell,
+            stdio: ['ignore', 'ignore', 'pipe'],
+            env: env
+        });
     }
 }
