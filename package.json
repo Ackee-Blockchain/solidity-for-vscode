@@ -143,10 +143,11 @@
                             "paris",
                             "shanghai",
                             "cancun",
+                            "prague",
                             ""
                         ],
                         "default": "",
-                        "description": "EVM version passed to the solc compiler."
+                        "description": "EVM version passed to the solc compiler. If left empty, the compiler will choose the version automatically."
                     },
                     "wake.compiler.solc.exclude_paths": {
                         "type": "array",
