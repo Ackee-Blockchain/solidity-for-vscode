@@ -655,6 +655,35 @@ function watchFoundryRemappings() {
     }
 
     const workspace = workspaces[0];
+    const fileWatcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(workspace, 'remappings.txt')
+    );
+
+    let configWatcher: vscode.Disposable;
+
+    // listen to config changes
+    configWatcher = vscode.workspace.onDidChangeConfiguration((event) => {
+        if (
+            event.affectsConfiguration(
+                'Tools-for-Solidity.wake.configuration.autoimport_remappings'
+            )
+        ) {
+            // get value
+            const autoImportRemappings = vscode.workspace
+                .getConfiguration('Tools-for-Solidity')
+                .get<boolean>('wake.configuration.autoimport_remappings');
+
+            if (autoImportRemappings === undefined) {
+                return;
+            }
+
+            fileWatcher.dispose();
+            if (autoImportRemappings) {
+                configWatcher.dispose();
+                watchFoundryRemappings();
+            }
+        }
+    });
 
     const cfg = vscode.workspace.getConfiguration('Tools-for-Solidity');
     const autoImportRemappings = cfg.get<boolean>('wake.configuration.autoimport_remappings');
@@ -664,16 +693,13 @@ function watchFoundryRemappings() {
     }
 
     // start file system watcher
-    const watcher = vscode.workspace.createFileSystemWatcher(
-        new vscode.RelativePattern(workspace, 'remappings.txt')
-    );
-    watcher.onDidChange(async () => {
+    fileWatcher.onDidChange(async () => {
         vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
     });
-    watcher.onDidCreate(async () => {
+    fileWatcher.onDidCreate(async () => {
         vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
     });
-    watcher.onDidDelete(async () => {
+    fileWatcher.onDidDelete(async () => {
         vscode.workspace
             .getConfiguration('wake.compiler.solc')
             .update('remappings', undefined, vscode.ConfigurationTarget.Workspace);
