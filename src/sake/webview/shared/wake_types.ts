@@ -1,4 +1,5 @@
 import * as w3t from 'web3-types';
+import type { CallOperation, CallType } from './network_types';
 
 export interface WakeCompiledContracts {
     [key: string]: {
@@ -167,18 +168,8 @@ export interface WakeCallTrace {
 // TODO change this when adding testnet/mainnet support
 // move to network_types
 
-export enum WakeTransactionOperation {
-    Deployment = 'Deployment',
-    FunctionCall = 'Function Call'
-}
-
-export enum WakeTransactionType {
-    Call = 'Call',
-    Transact = 'Transact'
-}
-
 export interface TransactionResultBase {
-    type: WakeTransactionOperation;
+    type: CallOperation;
     success: boolean;
     from: string;
     receipt?: w3t.TransactionReceipt;
@@ -186,14 +177,14 @@ export interface TransactionResultBase {
 }
 
 export interface TransactionDeploymentResult extends TransactionResultBase {
-    type: WakeTransactionOperation.Deployment;
+    type: CallOperation.Deployment;
     contractName: string;
     contractAddress?: w3t.Address;
 }
 
 export interface TransactionCallResult extends TransactionResultBase {
-    type: WakeTransactionOperation.FunctionCall;
-    callType: WakeTransactionType;
+    type: CallOperation.FunctionCall;
+    callType: CallType;
     to: w3t.Address; // TODO maybe this could be joined with deployed address
     functionName: string;
     returnData: TransactionReturnData;

@@ -3,6 +3,7 @@ import {
     Account,
     CallRequest,
     CallResponse,
+    CallType,
     DeploymentRequest,
     DeploymentResponse,
     SetAccountBalanceResponse,
@@ -86,25 +87,20 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
     }
 
     async call(params: CallRequest): Promise<CallResponse> {
-        const response: WakeCallResponse = await this._wake.call({
-            contractAddress: params.to,
-            sender: params.from,
-            calldata: params.calldata,
-            value: params.value
-        } as WakeCallRequestParams);
-
-        return response as CallResponse;
-    }
-
-    async transact(params: TransactRequest): Promise<TransactResponse> {
-        const response: WakeTransactResponse = await this._wake.transact({
+        if (params.callType == CallType.Call) {
+            return await this._wake.call({
+                contractAddress: params.to,
+                sender: params.from,
+                calldata: params.calldata,
+                value: params.value
+            } as WakeCallRequestParams);
+        }
+        return await this._wake.transact({
             contractAddress: params.to,
             sender: params.from,
             calldata: params.calldata,
             value: params.value
         } as WakeTransactRequestParams);
-
-        return response as TransactResponse;
     }
 }
 

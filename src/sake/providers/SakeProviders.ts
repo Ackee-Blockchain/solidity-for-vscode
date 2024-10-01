@@ -10,6 +10,7 @@ import { WakeStateProvider } from '../state/WakeStateProvider';
 
 import * as vscode from 'vscode';
 import { WakeApi } from '../api/wake';
+import { OutputViewManager } from './OutputTreeProvider';
 
 export class SakeState {
     accounts: AccountStateProvider;
@@ -47,6 +48,7 @@ export class SakeError extends Error {}
 export class SakeProvider {
     state: SakeState;
     network: NetworkProvider;
+    protected output: OutputViewManager;
 
     constructor(
         public id: string,
@@ -56,6 +58,19 @@ export class SakeProvider {
     ) {
         this.state = new SakeState(webviewProvider);
         this.network = networkProvider;
+        this.output = OutputViewManager.getInstance();
+
+        this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
+        this.setAccountNickname = showVSCodeMessageOnErrorWrapper(
+            this.setAccountNickname.bind(this)
+        );
+        this.refreshAccount = showVSCodeMessageOnErrorWrapper(this.refreshAccount.bind(this));
+        this.deployContract = showVSCodeMessageOnErrorWrapper(this.deployContract.bind(this));
+        this.removeDeployedContract = showVSCodeMessageOnErrorWrapper(
+            this.removeDeployedContract.bind(this)
+        );
+        this.callContract = showVSCodeMessageOnErrorWrapper(this.callContract.bind(this));
+        // this.transactContract = showVSCodeMessageOnErrorWrapper(this.transactContract.bind(this));
     }
 
     /* Account management */
@@ -116,8 +131,7 @@ export class SakeProvider {
             const compilation = this.state.compiledContracts.get(deploymentRequest.contractFqn);
 
             if (!compilation) {
-                vscode.window.showErrorMessage('Deployment failed: Contract ABI was not found');
-                return;
+                throw new SakeError('Deployment failed: Contract ABI was not found');
             }
 
             const balance = (
@@ -133,6 +147,8 @@ export class SakeProvider {
         }
 
         // TODO add to history
+
+        // TODO add to history
     }
 
     async removeDeployedContract(address: Address) {
@@ -142,25 +158,23 @@ export class SakeProvider {
     /* Interactions */
 
     async callContract(callRequest: CallRequest) {
-        const { requestParams, func } = callRequest;
-        const callType = specifyCallType(func);
-        const apiEndpoint =
-            callType === WakeTransactionType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
+        // const { requestParams, func } = callRequest;
+        // const callType = specifyCallType(func);
+        // const apiEndpoint =
+        //     callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
 
         const callResponse = await this.network.call(callRequest);
 
-        //  const { requestParams, func } = callRequest;
-        //  const callType = specifyCallType(func);
-        //  const apiEndpoint =
-        //      callType === WakeTransactionType.Transact
-        //          ? 'wake/sake/transact'
-        //          : 'wake/sake/call';
-
-        if (success) {
+        if (callResponse.success) {
+            this.output.set(callResponse);
             // TODO add to history
             // this.state.history.add(callRequest);
         }
     }
+
+    // async transactContract(transactRequest: TransactRequest) {
+    //     const transactResponse = await this.network.transact(transactRequest);
+    // }
 
     /* Helper functions */
 
@@ -310,4 +324,18 @@ export class SakeProviderManager {
         );
         this._statusBarItem.command = 'Tools-for-Solidity.sake.selectSakeProvider';
     }
+}
+
+// TODO add context if needed
+function showVSCodeMessageOnErrorWrapper<T, Args extends any[]>(
+    func: (...args: Args) => Promise<T>
+): (...args: Args) => Promise<T | undefined> {
+    return async (...args: Args) => {
+        try {
+            return await func(...args);
+        } catch (e) {
+            vscode.window.showErrorMessage(`${e instanceof Error ? e.message : String(e)}`);
+            return undefined;
+        }
+    };
 }

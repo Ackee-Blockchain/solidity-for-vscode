@@ -10,7 +10,7 @@ import {
     WakeGetAccountsResponse,
     WakeSetLabelRequestParams,
     WakeSetLabelResponse,
-    WakeTransactionType,
+    CallType,
     AbiFunctionFragment,
     WakeCallRequestParams,
     WakeTransactRequestParams,
@@ -49,7 +49,7 @@ export class WakeApi {
         return this._instance;
     }
 
-    public static initializeClient(client: LanguageClient) {
+    public static initialize(client: LanguageClient) {
         if (this._client) {
             throw new Error('Client already set');
         }
@@ -230,10 +230,10 @@ export class WakeApi {
     }
 }
 
-function specifyCallType(func: AbiFunctionFragment): WakeTransactionType {
+function specifyCallType(func: AbiFunctionFragment): CallType {
     return func.stateMutability === 'view' || func.stateMutability === 'pure'
-        ? WakeTransactionType.Call
-        : WakeTransactionType.Transact;
+        ? CallType.Call
+        : CallType.Transact;
 }
 
 // /*

@@ -14,6 +14,16 @@ interface Transaction {
     callTrace?: WakeCallTrace;
 }
 
+export enum CallType {
+    Call = 'Call',
+    Transact = 'Transact'
+}
+
+export enum CallOperation {
+    Deployment = 'Deployment',
+    FunctionCall = 'Function Call'
+}
+
 /* Account Management */
 
 export interface SetAccountBalanceResponse {
@@ -40,6 +50,7 @@ export interface CallRequest {
     from: Address;
     calldata: HexString;
     value: number;
+    callType?: CallType;
 }
 
 export interface CallResponse {

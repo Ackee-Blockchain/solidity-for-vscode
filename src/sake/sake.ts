@@ -21,11 +21,7 @@ import {
 import { LanguageClient, State } from 'vscode-languageclient/node';
 import { parseCompiledContracts } from './utils/compilation';
 import { WakeApi } from './api/wake';
-import {
-    OutputViewManager,
-    SakeOutputItem,
-    SakeOutputTreeProvider
-} from './providers/OutputTreeProvider';
+import { OutputViewManager, SakeOutputItem } from './providers/OutputTreeProvider';
 import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
 import { WalletServer } from '../serve';
@@ -34,17 +30,12 @@ import { LocalNodeSakeProvider, SakeProviderManager } from './providers/SakeProv
 
 export function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     // Initialize Wake API
-    WakeApi.initializeClient(client);
+    WakeApi.initialize(client);
+    OutputViewManager.initialize(context);
     // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
-    const sakeOutputProvider = new SakeOutputTreeProvider(context);
-    const treeView = vscode.window.createTreeView('sake-output', {
-        treeDataProvider: sakeOutputProvider
-    });
     // context.subscriptions.push(
     //     vscode.window.registerTreeDataProvider('sake-output', sakeOutputProvider)
     // );
-
-    const outputViewManager = new OutputViewManager(sakeOutputProvider, treeView);
 
     const walletServer = new WalletServer(context);
 
