@@ -246,7 +246,6 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
 
         // add return data
         if (data.returnData !== undefined) {
-            console.log('return Data', data.returnData);
             const hasReturnData = data.returnData.bytes !== '';
 
             const returnDataNode = new SakeOutputItem(
@@ -273,6 +272,7 @@ export class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.Tr
 
                 decoded.forEach((item) => {
                     returnDataDecodedNode.setChildren([
+                        ...returnDataDecodedNode.children,
                         new SakeOutputItem(
                             item.name,
                             item.value,
