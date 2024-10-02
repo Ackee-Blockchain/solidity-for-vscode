@@ -252,7 +252,9 @@ export class CondaInstaller implements Installer {
                             latestFile = file;
                         }
                     }
-                } catch (error) {} // internet connection error most likely
+                } catch (error) {
+                    this.analytics.logCrash(EventType.ERROR_CONDA_INSTALL, error);
+                }
 
                 resolve([latestFile, latestVersion]);
             }
