@@ -5,14 +5,23 @@ import * as tar from 'tar';
 import * as crypto from 'crypto';
 import * as tmp from 'tmp';
 import { File, Storage } from '@google-cloud/storage';
+import { Compute, GoogleAuth } from 'google-auth-library';
 import { ExecaChildProcess, execaSync, execa } from 'execa';
 import { compare, explain } from '@renovatebot/pep440';
 import { Analytics, EventType } from '../Analytics';
 import { Installer, WAKE_MIN_VERSION } from './installerInterface';
+import { JSONClient } from 'google-auth-library/build/src/auth/googleauth';
+
+
+class AnonymousAuthClient extends GoogleAuth {
+    async getClient(): Promise<Compute | JSONClient | JSONClient> {
+        throw new Error('Could not load the default credentials. Browse to https://cloud.google.com/docs/authentication/getting-started for more information.');
+    }
+}
 
 export class CondaInstaller implements Installer {
     private readonly bucketName = 'wake-conda';
-    private readonly storage = new Storage();
+    private readonly storage = new Storage({ authClient: new AnonymousAuthClient() });
     private readonly publicKey: string;
     private readonly markerFile: string;
     private readonly upgradeFile: string;
