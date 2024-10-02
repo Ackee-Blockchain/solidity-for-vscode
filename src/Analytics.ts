@@ -100,6 +100,7 @@ export enum EventType{
     MIGRATE = "migrate",
     ERROR_PYTHON_VERSION = "error_python_version",
     ERROR_PIP_INSTALL = "error_pip_install",
+    ERROR_CONDA_INSTALL = "error_conda_install",
     ERROR_CERTIFI_PATH = "error_certifi_path",
     ERROR_WAKE_INSTALL_PIPX = "error_wake_install_pipx",
     ERROR_WAKE_INSTALL_PIP = "error_wake_install_pip",
