@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.16.1]
+### Improvements
+- Added auto-importing of Foundry remappings
+- Added support for decoding structs in transaction output
+- Added option for upcoming Prague EVM version in settings
+- Improved error messaging when Wake installation via conda fails
+- Refined descriptions for various settings
+
+### Fixes
+- Resolved anonymous authentication issues when downloading Wake (conda installation)
+
 ## [1.16.0]
 ### Major changes
 - The extension is being rebranded as Solidity for VS Code
