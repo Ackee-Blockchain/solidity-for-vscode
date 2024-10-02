@@ -17,10 +17,8 @@ export class DeploymentState extends BaseState<DeploymentStateData[]> {
 
     public deploy(contract: DeploymentStateData) {
         // TODO validate payload
-        console.log(contract, 'mimimi');
         const _state = [...this.state, contract];
         this.state = _state;
-        console.log('deploy', _state);
     }
 
     public undeploy(contract: DeploymentStateData) {
@@ -35,7 +33,6 @@ export class DeploymentState extends BaseState<DeploymentStateData[]> {
             }
             return c;
         });
-        console.log('updateContract', _state);
         this.state = _state;
     }
 
