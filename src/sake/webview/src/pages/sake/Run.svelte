@@ -53,8 +53,6 @@
             value: func.stateMutability === 'payable' ? _value : 0
         };
 
-        console.log('requestParams');
-
         const payload: CallPayload = {
             func: func,
             requestParams: requestParams
