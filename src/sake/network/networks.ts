@@ -7,6 +7,7 @@ import {
     DeploymentRequest,
     DeploymentResponse,
     SetAccountBalanceResponse,
+    SetAccountBalanceRequest,
     TransactRequest,
     TransactResponse,
     WakeCallRequestParams,
@@ -36,8 +37,7 @@ export abstract class NetworkProvider {
     abstract registerAccount(address: string): Promise<Account | undefined>;
     abstract getAccountDetails(address: string): Promise<Account | undefined>;
     abstract setAccountBalance(
-        address: string,
-        balance: number
+        request: SetAccountBalanceRequest
     ): Promise<SetAccountBalanceResponse>;
     abstract deploy(params: DeploymentRequest): Promise<DeploymentResponse>;
     abstract call(params: CallRequest): Promise<CallResponse>;
@@ -68,10 +68,10 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
         };
     }
 
-    async setAccountBalance(address: string, balance: number): Promise<SetAccountBalanceResponse> {
+    async setAccountBalance(request: SetAccountBalanceRequest): Promise<SetAccountBalanceResponse> {
         const response: WakeSetBalancesResponse = await this._wake.setBalances({
             balances: {
-                [address]: balance
+                [request.address]: request.balance
             }
         } as WakeSetBalancesRequestParams);
 

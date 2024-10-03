@@ -1,28 +1,17 @@
 import * as vscode from 'vscode';
+import { SakeWebviewProvider } from './providers/WebviewProviders';
+import { copyToClipboard, getTextFromInputBox } from './commands';
 import {
-    DeployWebviewProvider,
-    CompilerWebviewProvider,
-    RunWebviewProvider,
-    SakeWebviewProvider
-} from './providers/WebviewProviders';
-import { copyToClipboard, loadSampleAbi, getTextFromInputBox } from './commands';
-import {
-    WakeCompilationResponse,
-    Contract,
-    WakeDeploymentRequestParams,
-    WakeCallRequestParams,
     CallRequest,
-    WakeGetBalancesRequestParams,
-    WakeSetBalancesRequestParams,
-    WakeSetLabelRequestParams,
-    WakeGetBytecodeRequestParams,
-    WalletDeploymentData
+    WalletDeploymentData,
+    DeploymentRequest,
+    SetAccountBalanceRequest,
+    SetAccountNicknameRequest,
+    GetBytecodeRequest
 } from './webview/shared/types';
-import { LanguageClient, State } from 'vscode-languageclient/node';
-import { parseCompiledContracts } from './utils/compilation';
+import { LanguageClient } from 'vscode-languageclient/node';
 import { WakeApi } from './api/wake';
 import { OutputViewManager, SakeOutputItem } from './providers/OutputTreeProvider';
-import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
 import { WalletServer } from '../serve';
 import { LocalNodeNetworkProvider } from './network/networks';
@@ -102,60 +91,63 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     // );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.compile', () => compile(client))
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.compile', () =>
+            sake.provider.compile()
+        )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.deploy',
-            (params: WakeDeploymentRequestParams) => deploy(params, client, outputViewManager)
+            (request: DeploymentRequest) => sake.provider.deployContract(request)
         )
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.getAccounts', () =>
-            getAccounts(client)
-        )
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.getAccounts', () => {
+            // TODO possibly remove
+        })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand(
-            'Tools-for-Solidity.sake.call',
-            (params: WakeCallRequestParams) => call(params, client, outputViewManager)
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.call', (request: CallRequest) =>
+            sake.provider.callContract(request)
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.show_history', () =>
-            showTxFromHistory(sakeOutputProvider)
+            sake.state.history.show()
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.setBalances',
-            (params: WakeSetBalancesRequestParams) => setBalances(params, client)
+            (request: SetAccountBalanceRequest) => sake.provider.setAccountBalance(request)
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.getBalances',
-            (params: WakeGetBalancesRequestParams) => getBalances(params, client)
+            () => {}
+            // TODO possibly remove
+            // TODO add refresh account
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.setLabel',
-            (params: WakeSetLabelRequestParams) => setLabel(params, client)
+            (request: SetAccountNicknameRequest) => sake.provider.setAccountNickname(request)
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.getBytecode',
-            (params: WakeGetBytecodeRequestParams) => getBytecode(params, client)
+            (request: GetBytecodeRequest) => sake.provider.getBytecode(request)
         )
     );
 
@@ -208,7 +200,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     vscode.workspace.onDidChangeTextDocument((e) => {
         if (e.document.languageId == 'solidity' && !e.document.isDirty) {
-            sake.state.compiledContracts.makeDirty();
+            sake.state.compilation.makeDirty();
         }
         // TODO might need to rework using vscode.workspace.createFileSystemWatcher
     });

@@ -1,4 +1,19 @@
-import { Account, Address, CallRequest, DeploymentRequest } from '../webview/shared/types';
+import {
+    AbiFunctionFragment,
+    Account,
+    Address,
+    CallOperation,
+    CallRequest,
+    CallType,
+    DeploymentRequest,
+    GetBytecodeRequest,
+    SetAccountBalanceRequest,
+    SetAccountNicknameRequest,
+    TransactionCallResult,
+    TransactionDecodedReturnValue,
+    TransactionDeploymentResult,
+    TransactionResult
+} from '../webview/shared/types';
 
 import { NetworkProvider, LocalNodeNetworkProvider } from '../network/networks';
 import { AccountStateProvider } from '../state/AccountStateProvider';
@@ -11,34 +26,41 @@ import { WakeStateProvider } from '../state/WakeStateProvider';
 import * as vscode from 'vscode';
 import { WakeApi } from '../api/wake';
 import { OutputViewManager } from './OutputTreeProvider';
+import {
+    getNameFromContractFqn,
+    parseCompilationIssues,
+    parseCompilationSkipped,
+    parseCompiledContracts
+} from '../utils/compilation';
+import { decodeCallReturnValue } from '../utils/call';
 
 export class SakeState {
     accounts: AccountStateProvider;
-    deployedContracts: DeploymentStateProvider;
-    compiledContracts: CompilationStateProvider;
+    deployment: DeploymentStateProvider;
+    compilation: CompilationStateProvider;
     history: TransactionHistoryStateProvider;
     wake: WakeStateProvider;
 
     constructor(private _webviewProvider: BaseWebviewProvider) {
         // network-specific state
         this.accounts = new AccountStateProvider();
-        this.deployedContracts = new DeploymentStateProvider();
+        this.deployment = new DeploymentStateProvider();
         this.history = new TransactionHistoryStateProvider();
 
         // shared state
-        this.compiledContracts = CompilationStateProvider.getInstance();
+        this.compilation = CompilationStateProvider.getInstance();
         this.wake = WakeStateProvider.getInstance();
     }
 
     subscribe() {
         this.accounts.subscribe(this._webviewProvider);
-        this.deployedContracts.subscribe(this._webviewProvider);
+        this.deployment.subscribe(this._webviewProvider);
         this.history.subscribe(this._webviewProvider);
     }
 
     unsubscribe() {
         this.accounts.unsubscribe(this._webviewProvider);
-        this.deployedContracts.unsubscribe(this._webviewProvider);
+        this.deployment.unsubscribe(this._webviewProvider);
         this.history.unsubscribe(this._webviewProvider);
     }
 }
@@ -49,6 +71,7 @@ export class SakeProvider {
     state: SakeState;
     network: NetworkProvider;
     protected output: OutputViewManager;
+    protected wake: WakeApi;
 
     constructor(
         public id: string,
@@ -59,7 +82,7 @@ export class SakeProvider {
         this.state = new SakeState(webviewProvider);
         this.network = networkProvider;
         this.output = OutputViewManager.getInstance();
-
+        this.wake = WakeApi.getInstance();
         this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
         this.setAccountNickname = showVSCodeMessageOnErrorWrapper(
             this.setAccountNickname.bind(this)
@@ -71,6 +94,28 @@ export class SakeProvider {
         );
         this.callContract = showVSCodeMessageOnErrorWrapper(this.callContract.bind(this));
         // this.transactContract = showVSCodeMessageOnErrorWrapper(this.transactContract.bind(this));
+    }
+
+    /* Compilation */
+
+    async compile() {
+        const compilationResponse = await this.wake.compile();
+
+        if (!compilationResponse.success) {
+            throw new SakeError('Compilation was unsuccessful');
+        }
+
+        const parsedContracts = parseCompiledContracts(compilationResponse.contracts);
+        const parsedErrors = parseCompilationIssues(compilationResponse.errors);
+        const parsedSkipped = parseCompilationSkipped(compilationResponse.skipped);
+        this.state.compilation.set(parsedContracts, [...parsedErrors, ...parsedSkipped]);
+
+        return compilationResponse;
+    }
+
+    async getBytecode(request: GetBytecodeRequest) {
+        const bytecodeResponse = await this.wake.getBytecode(request);
+        return bytecodeResponse;
     }
 
     /* Account management */
@@ -93,16 +138,16 @@ export class SakeProvider {
     //     this.state.accounts.remove(address);
     // }
 
-    async setAccountBalance(address: string, balance: number) {
-        const success = await this.network.setAccountBalance(address, balance);
+    async setAccountBalance(request: SetAccountBalanceRequest) {
+        const success = await this.network.setAccountBalance(request);
 
         if (success) {
-            this.state.accounts.setBalance(address, balance);
+            this.state.accounts.setBalance(request.address, request.balance);
         }
     }
 
-    async setAccountNickname(address: string, nickname: string) {
-        this.state.accounts.setNickname(address, nickname);
+    async setAccountNickname(request: SetAccountNicknameRequest) {
+        this.state.accounts.setNickname(request.address, request.nickname);
     }
 
     async refreshAccount(address: string) {
@@ -125,20 +170,20 @@ export class SakeProvider {
     /* Deployment management */
 
     async deployContract(deploymentRequest: DeploymentRequest) {
+        const compilation = this.state.compilation.get(deploymentRequest.contractFqn);
+
+        if (!compilation) {
+            throw new SakeError('Deployment failed: Contract ABI was not found');
+        }
+
         const deploymentResponse = await this.network.deploy(deploymentRequest);
 
         if (deploymentResponse.success) {
-            const compilation = this.state.compiledContracts.get(deploymentRequest.contractFqn);
-
-            if (!compilation) {
-                throw new SakeError('Deployment failed: Contract ABI was not found');
-            }
-
             const balance = (
                 await this.network.getAccountDetails(deploymentResponse.deployedAddress)
             )?.balance;
 
-            this.state.deployedContracts.add({
+            this.state.deployment.add({
                 name: compilation.name,
                 address: deploymentResponse.deployedAddress,
                 abi: compilation.abi,
@@ -146,35 +191,65 @@ export class SakeProvider {
             });
         }
 
-        // TODO add to history
+        // TODO consider check and update balance of caller
 
-        // TODO add to history
+        const transaction: TransactionDeploymentResult = {
+            type: CallOperation.Deployment,
+            success: deploymentResponse.success, // TODO success will show true even on revert
+            from: deploymentRequest.sender,
+            contractAddress: deploymentResponse.deployedAddress,
+            contractName: getNameFromContractFqn(deploymentRequest.contractFqn),
+            receipt: deploymentResponse.receipt,
+            callTrace: deploymentResponse.callTrace
+        };
+
+        this.output.set(transaction);
+        this.state.history.add(transaction);
     }
 
     async removeDeployedContract(address: Address) {
-        this.state.deployedContracts.remove(address);
+        this.state.deployment.remove(address);
     }
 
     /* Interactions */
 
     async callContract(callRequest: CallRequest) {
-        // const { requestParams, func } = callRequest;
-        // const callType = specifyCallType(func);
-        // const apiEndpoint =
-        //     callType === CallType.Transact ? 'wake/sake/transact' : 'wake/sake/call';
+        if (callRequest.callType === undefined) {
+            callRequest.callType = specifyCallType(callRequest.functionAbi);
+        }
 
         const callResponse = await this.network.call(callRequest);
 
-        if (callResponse.success) {
-            this.output.set(callResponse);
-            // TODO add to history
-            // this.state.history.add(callRequest);
-        }
-    }
+        let decoded: TransactionDecodedReturnValue[] | undefined;
 
-    // async transactContract(transactRequest: TransactRequest) {
-    //     const transactResponse = await this.network.transact(transactRequest);
-    // }
+        if (callResponse.success) {
+            try {
+                decoded = decodeCallReturnValue(callResponse.returnValue, callRequest.functionAbi);
+            } catch (e) {
+                vscode.window.showErrorMessage('Failed to decode return value: ' + e);
+            }
+        }
+
+        const transaction: TransactionCallResult = {
+            type: CallOperation.FunctionCall,
+            success: callResponse.success,
+            from: callRequest.from,
+            to: callRequest.to,
+            functionName: callRequest.functionAbi.name,
+            callType: callRequest.callType,
+            returnData: {
+                bytes: callResponse.returnValue,
+                decoded: decoded
+            },
+            receipt: callResponse.receipt,
+            callTrace: callResponse.callTrace
+        };
+
+        this.output.set(transaction);
+        this.state.history.add(transaction);
+
+        // TODO consider check and update balance of caller and callee
+    }
 
     /* Helper functions */
 
@@ -338,4 +413,10 @@ function showVSCodeMessageOnErrorWrapper<T, Args extends any[]>(
             return undefined;
         }
     };
+}
+
+function specifyCallType(func: AbiFunctionFragment): CallType {
+    return func.stateMutability === 'view' || func.stateMutability === 'pure'
+        ? CallType.Call
+        : CallType.Transact;
 }

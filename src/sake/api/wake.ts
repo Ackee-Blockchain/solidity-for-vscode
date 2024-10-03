@@ -14,7 +14,9 @@ import {
     AbiFunctionFragment,
     WakeCallRequestParams,
     WakeTransactRequestParams,
-    WakeTransactResponse
+    WakeTransactResponse,
+    WakeGetBytecodeRequestParams,
+    WakeGetBytecodeResponse
 } from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
@@ -153,6 +155,27 @@ export class WakeApi {
         } catch (e) {
             throw new WakeApiError(
                 `Failed to compile: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
+    }
+
+    async getBytecode(
+        requestParams: WakeGetBytecodeRequestParams
+    ): Promise<WakeGetBytecodeResponse> {
+        try {
+            const result = await this.sendWakeRequest<WakeGetBytecodeResponse>(
+                'wake/sake/getBytecode',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(
+                `Failed to get bytecode: ${e instanceof Error ? e.message : String(e)}`
             );
         }
     }

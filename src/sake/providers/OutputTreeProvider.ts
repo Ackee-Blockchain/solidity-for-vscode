@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import {
-    CallTrace,
-    TxDeploymentOutput,
-    TxCallOutput,
-    TxOutput,
-    TxType
+    CallOperation,
+    TransactionCallResult,
+    TransactionDeploymentResult,
+    TransactionReceipt,
+    TransactionResult,
+    WakeCallTrace
 } from '../webview/shared/types';
 
 class BaseOutputItem extends vscode.TreeItem {
@@ -51,18 +52,18 @@ export class OutputViewManager {
         return this._instance;
     }
 
-    public set(data: TxOutput) {
+    public set(data: TransactionResult) {
         this.provider.set(data);
         this._setMessage(data);
     }
 
-    private _setMessage(data: TxOutput): void {
+    private _setMessage(data: TransactionResult): void {
         let _data;
         let message = '';
 
         switch (data.type) {
-            case TxType.Deployment:
-                _data = data as TxDeploymentOutput;
+            case CallOperation.Deployment:
+                _data = data as TransactionDeploymentResult;
                 if (_data.success) {
                     message = `✓ Successfully deployed ${_data.contractName}`;
 
@@ -72,13 +73,16 @@ export class OutputViewManager {
 
                 break;
 
-            case TxType.FunctionCall:
-                _data = data as TxCallOutput;
+            case CallOperation.FunctionCall:
+                _data = data as TransactionCallResult;
+                const _called = _data.callTrace
+                    ? buildFunctionString(_data.callTrace)
+                    : _data.functionName;
                 if (_data.success) {
-                    message = `✓ Successfully called ${buildFunctionString(_data.callTrace)}`;
+                    message = `✓ Successfully called ${_called}`;
                     break;
                 }
-                message = `✗ Failed to call ${buildFunctionString(_data.callTrace)}`;
+                message = `✗ Failed to call ${_called}`;
                 break;
 
             default:
@@ -171,23 +175,23 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         this._onDidChangeTreeData.fire(undefined);
     }
 
-    set(data: TxOutput) {
+    set(data: TransactionResult) {
         this.rootNodes = this._parseJson(data);
         this.refresh();
     }
 
-    private _parseJson(data: TxOutput): BaseOutputItem[] {
+    private _parseJson(data: TransactionResult): BaseOutputItem[] {
         switch (data.type) {
-            case TxType.Deployment:
-                return this._parseDeployment(data as TxDeploymentOutput);
-            case TxType.FunctionCall:
-                return this._parseFunctionCall(data as TxCallOutput);
+            case CallOperation.Deployment:
+                return this._parseDeployment(data as TransactionDeploymentResult);
+            case CallOperation.FunctionCall:
+                return this._parseFunctionCall(data as TransactionCallResult);
             default:
                 throw new Error('Invalid TxType');
         }
     }
 
-    private _parseDeployment(data: TxDeploymentOutput): BaseOutputItem[] {
+    private _parseDeployment(data: TransactionDeploymentResult): BaseOutputItem[] {
         const rootNodes: SakeOutputItem[] = [];
 
         // parse from
@@ -216,14 +220,14 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
 
         // value
         if (
-            data.callTrace.value != null &&
-            data.callTrace.value !== '0' &&
-            data.callTrace.value !== '0 wei'
+            data.callTrace?.value != null &&
+            data.callTrace?.value !== '0' &&
+            data.callTrace?.value !== '0 wei'
         ) {
             rootNodes.push(
                 new SakeOutputItem(
                     'Value',
-                    data.callTrace.value,
+                    data.callTrace?.value,
                     vscode.TreeItemCollapsibleState.None,
                     'squirrel'
                 )
@@ -253,7 +257,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
             const receiptChildren = Object.keys(data.receipt).map((key) => {
                 return new SakeOutputItem(
                     key,
-                    data.receipt![key],
+                    (data.receipt as any)[key],
                     vscode.TreeItemCollapsibleState.None
                 ) as BaseOutputItem;
             });
@@ -264,7 +268,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         return rootNodes as BaseOutputItem[];
     }
 
-    private _parseFunctionCall(data: TxCallOutput): BaseOutputItem[] {
+    private _parseFunctionCall(data: TransactionCallResult): BaseOutputItem[] {
         const rootNodes: SakeOutputItem[] = [];
 
         // add return data
@@ -320,14 +324,14 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
 
         // value
         if (
-            data.callTrace.value != null &&
-            data.callTrace.value !== '0' &&
-            data.callTrace.value !== '0 wei'
+            data.callTrace?.value != null &&
+            data.callTrace?.value !== '0' &&
+            data.callTrace?.value !== '0 wei'
         ) {
             rootNodes.push(
                 new SakeOutputItem(
                     'Value',
-                    data.callTrace.value,
+                    data.callTrace?.value,
                     vscode.TreeItemCollapsibleState.None,
                     'squirrel'
                 )
@@ -380,7 +384,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
             const receiptChildren = Object.keys(data.receipt).map((key) => {
                 return new SakeOutputItem(
                     key,
-                    data.receipt![key],
+                    (data.receipt as any)[key],
                     vscode.TreeItemCollapsibleState.None
                 ) as BaseOutputItem;
             });
@@ -426,14 +430,14 @@ class CallTraceItem extends BaseOutputItem {
     }
 }
 
-function parseCallTrace(callTrace: CallTrace) {
-    const _parseCallTrace = (callTrace: CallTrace): CallTraceItem => {
+function parseCallTrace(callTrace: WakeCallTrace) {
+    const _parseCallTrace = (callTrace: WakeCallTrace): CallTraceItem => {
         const _string = `${callTrace.status === '✗' ? '✗' : ''}  ${buildFunctionString(callTrace)}`;
         const root = new CallTraceItem(_string);
         if (callTrace.error) {
             root.setChildren([new CallTraceItem(callTrace.error)]);
         } else if (callTrace.subtraces !== undefined) {
-            root.setChildren(callTrace.subtraces.map((subtrace) => _parseCallTrace(subtrace)));
+            root.setChildren(callTrace.subtraces.map((subtrace: any) => _parseCallTrace(subtrace)));
         }
         return root;
     };
@@ -480,7 +484,7 @@ function parseCallTraceString(callTrace: string): BaseOutputItem {
     return root as BaseOutputItem;
 }
 
-function buildFunctionString(callTrace: CallTrace, withoutArguments = false): string {
+function buildFunctionString(callTrace: WakeCallTrace, withoutArguments = false): string {
     return `${callTrace.contractName}.${callTrace.functionName}${
         withoutArguments ? '()' : callTrace.arguments
     }`;

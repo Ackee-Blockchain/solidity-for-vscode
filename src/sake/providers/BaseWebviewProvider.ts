@@ -2,9 +2,7 @@ import * as vscode from 'vscode';
 import { getNonce } from '../utils/getNonce';
 import { getBasePage } from '../utils/getBasePage';
 import { MessageHandlerData } from '@estruyf/vscode';
-import { BaseState } from '../state/BaseStateProvider';
-import { DeploymentState } from '../state/DeploymentStateProvider';
-import { copyToClipboard, loadSampleAbi } from '../commands';
+import { copyToClipboard } from '../commands';
 import {
     StateId,
     WebviewMessageData,
@@ -13,12 +11,9 @@ import {
     DeploymentState,
     WakeSetLabelRequestParams,
     WakeGetBytecodeRequestParams,
-    WakeGetBytecodeResponse
+    WakeGetBytecodeResponse,
+    GetBytecodeResponse
 } from '../webview/shared/types';
-import { CompilationState } from '../state/CompilationStateProvider';
-import { AccountState } from '../state/AccountStateProvider';
-import { WakeState } from '../state/WakeStateProvider';
-import { getBytecode } from '../api/wake';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -197,16 +192,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     stateId: _stateId,
                     payload: state?.state
                 } as MessageHandlerData<any>);
-                break;
-            }
-
-            case 'getSampleContractAbi': {
-                const sampleContractAbi = await loadSampleAbi();
-                webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    payload: sampleContractAbi
-                } as MessageHandlerData<string>);
                 break;
             }
 
@@ -444,7 +429,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     return;
                 }
 
-                const response = await vscode.commands.executeCommand<WakeGetBytecodeResponse>(
+                const response = await vscode.commands.executeCommand<GetBytecodeResponse>(
                     'Tools-for-Solidity.sake.getBytecode',
                     payload
                 );

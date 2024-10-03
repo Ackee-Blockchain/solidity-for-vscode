@@ -168,12 +168,14 @@ export interface WakeCallTrace {
 // TODO change this when adding testnet/mainnet support
 // move to network_types
 
+export type TransactionReceipt = w3t.TransactionReceipt;
+
 export interface TransactionResultBase {
     type: CallOperation;
     success: boolean;
     from: string;
     receipt?: w3t.TransactionReceipt;
-    callTrace: WakeCallTrace;
+    callTrace?: WakeCallTrace;
 }
 
 export interface TransactionDeploymentResult extends TransactionResultBase {

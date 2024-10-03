@@ -1,5 +1,10 @@
 import type { AbiFunctionFragment, Address, HexString, TransactionReceipt } from 'web3-types';
-import type { WakeCallRequestParams, WakeCallTrace } from './wake_types';
+import type {
+    WakeCallRequestParams,
+    WakeCallTrace,
+    WakeGetBytecodeResponse,
+    WakeGetBytecodeRequestParams
+} from './wake_types';
 
 export type WalletDeploymentData = {
     contractFqn: string;
@@ -24,10 +29,25 @@ export enum CallOperation {
     FunctionCall = 'Function Call'
 }
 
+/* Compilation */
+
+export type GetBytecodeRequest = WakeGetBytecodeRequestParams;
+export type GetBytecodeResponse = WakeGetBytecodeResponse;
+
 /* Account Management */
+
+export interface SetAccountBalanceRequest {
+    address: Address;
+    balance: number;
+}
 
 export interface SetAccountBalanceResponse {
     success: boolean;
+}
+
+export interface SetAccountNicknameRequest {
+    address: Address;
+    nickname: string;
 }
 
 /* Deployment */
@@ -51,9 +71,10 @@ export interface CallRequest {
     calldata: HexString;
     value: number;
     callType?: CallType;
+    functionAbi: AbiFunctionFragment;
 }
 
-export interface CallResponse {
+export interface CallResponse extends Transaction {
     returnValue: HexString;
 }
 
