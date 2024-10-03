@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.16.2]
+### Fixes
+- Python environment variables are now being unset before activating conda environment
+
 ## [1.16.1]
 ### Improvements
 - Added auto-importing of Foundry remappings
