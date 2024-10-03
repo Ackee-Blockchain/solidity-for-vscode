@@ -41,7 +41,7 @@ export class CondaInstaller implements Installer {
 
         if (process.platform === 'win32') {
             this.activateCommand =
-                '"' +
+                'set "PYTHONPATH=" && set "PYTHONHOME=" && set "PYTHONSTARTUP=" && "' +
                 path.join(
                     context.globalStorageUri.fsPath,
                     'wake-conda',
@@ -52,7 +52,7 @@ export class CondaInstaller implements Installer {
             this.shell = 'cmd.exe';
         } else {
             this.activateCommand =
-                '. "' +
+                'unset PYTHONPATH && unset PYTHONHOME && unset PYTHONSTARTUP && . "' +
                 path.join(context.globalStorageUri.fsPath, 'wake-conda', 'bin', 'activate') +
                 '"';
             this.shell = '/bin/bash';
@@ -356,6 +356,7 @@ export class CondaInstaller implements Installer {
 
         delete env.PYTHONPATH;
         delete env.PYTHONHOME;
+        delete env.PYTHONSTARTUP;
 
         this.outputChannel.appendLine(
             `Running '${this.activateCommand} && wake lsp --port ${port}'`
