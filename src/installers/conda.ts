@@ -371,11 +371,6 @@ export class CondaInstaller implements Installer {
             );
 
             this.analytics.setCorrectSysPath(correctSysPath);
-
-            this.outputChannel.appendLine(`Python path: ${pythonPath}`);
-            this.outputChannel.appendLine(`Correct Python path: ${correctPythonPath}`);
-            this.outputChannel.appendLine(`Sys path: ${sysPathOutput}`);
-            this.outputChannel.appendLine(`Correct sys path: ${correctSysPath}`);
         } catch (error) {}
 
         let certifiPath = undefined;
