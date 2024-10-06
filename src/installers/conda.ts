@@ -348,6 +348,8 @@ export class CondaInstaller implements Installer {
             let pythonPath = execaSync(`${this.activateCommand} && python -c "import sys; print(sys.executable)"`, { shell: this.shell }).stdout;
 
             let correctPythonPath = undefined;
+            let correctSysPath = undefined;
+
             if (process.platform === 'win32') {
                 let expectedPythonPath = path.join(this.context.globalStorageUri.fsPath, 'wake-conda', 'python.exe');
                 correctPythonPath = (path.normalize(pythonPath) === path.normalize(expectedPythonPath));
@@ -357,8 +359,23 @@ export class CondaInstaller implements Installer {
                 correctPythonPath = (path.normalize(pythonPath) === path.normalize(expectedPythonPath)) || (path.normalize(pythonPath) === path.normalize(expectedPython3Path));
             }
 
+            this.analytics.setCorrectPythonPath(correctPythonPath);
+
+            // Check sys.path
+            let sysPathOutput = execaSync(`${this.activateCommand} && python -c "import sys; print(';'.join(sys.path))"`, { shell: this.shell }).stdout;
+            let sysPathList = sysPathOutput.split(';');
+
+            correctSysPath = sysPathList.every(p =>
+                p === '' ||
+                path.normalize(p).startsWith(path.normalize(path.join(this.context.globalStorageUri.fsPath, 'wake-conda')))
+            );
+
+            this.analytics.setCorrectSysPath(correctSysPath);
+
             this.outputChannel.appendLine(`Python path: ${pythonPath}`);
             this.outputChannel.appendLine(`Correct Python path: ${correctPythonPath}`);
+            this.outputChannel.appendLine(`Sys path: ${sysPathOutput}`);
+            this.outputChannel.appendLine(`Correct sys path: ${correctSysPath}`);
         } catch (error) {}
 
         let certifiPath = undefined;
