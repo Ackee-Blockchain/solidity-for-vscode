@@ -25,6 +25,8 @@ export class Analytics{
     context : vscode.ExtensionContext;
     telemetryLogger: vscode.TelemetryLogger;
     wakeVersion: string | undefined;
+    correctPythonPath: boolean | undefined;
+    correctSysPath: boolean | undefined;
 
     constructor(context: vscode.ExtensionContext, private readonly installation: string){
         appInsights.setup(env.TELEMETRY_KEY)
@@ -43,12 +45,22 @@ export class Analytics{
         this.context = context;
         this.telemetryLogger = vscode.env.createTelemetryLogger(new TelemetrySender());
         this.wakeVersion = undefined;
+        this.correctPythonPath = undefined;
+        this.correctSysPath = undefined;
 
         context.subscriptions.push(this.telemetryLogger);
     }
 
     public setWakeVersion(version: string){
         this.wakeVersion = version;
+    }
+
+    public setCorrectPythonPath(correct: boolean){
+        this.correctPythonPath = correct;
+    }
+
+    public setCorrectSysPath(correct: boolean){
+        this.correctSysPath = correct;
     }
 
     logActivate(){
@@ -92,6 +104,8 @@ export class Analytics{
                 'error': error.toString().slice(-8100),
                 'env.keys': Object.keys(process.env),
                 'env': process.env,
+                'correctPythonPath': this.correctPythonPath,
+                'correctSysPath': this.correctSysPath,
             }
         );
     }
