@@ -344,6 +344,23 @@ export class CondaInstaller implements Installer {
     startWake(port: number): ExecaChildProcess {
         const env = { ...process.env, PYTHONIOENCODING: 'utf8' } as { [key: string]: string };
 
+        try {
+            let pythonPath = execaSync(`${this.activateCommand} && python -c "import sys; print(sys.executable)"`, { shell: this.shell }).stdout;
+
+            let correctPythonPath = undefined;
+            if (process.platform === 'win32') {
+                let expectedPythonPath = path.join(this.context.globalStorageUri.fsPath, 'wake-conda', 'python.exe');
+                correctPythonPath = (path.normalize(pythonPath) === path.normalize(expectedPythonPath));
+            } else {
+                let expectedPythonPath = path.join(this.context.globalStorageUri.fsPath, 'wake-conda', 'bin', 'python');
+                let expectedPython3Path = path.join(this.context.globalStorageUri.fsPath, 'wake-conda', 'bin', 'python3');
+                correctPythonPath = (path.normalize(pythonPath) === path.normalize(expectedPythonPath)) || (path.normalize(pythonPath) === path.normalize(expectedPython3Path));
+            }
+
+            this.outputChannel.appendLine(`Python path: ${pythonPath}`);
+            this.outputChannel.appendLine(`Correct Python path: ${correctPythonPath}`);
+        } catch (error) {}
+
         let certifiPath = undefined;
         if (process.platform === 'darwin') {
             certifiPath = this.getCertifiPath();
