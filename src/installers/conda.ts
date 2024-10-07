@@ -371,6 +371,10 @@ export class CondaInstaller implements Installer {
             );
 
             this.analytics.setCorrectSysPath(correctSysPath);
+
+            // Add debug output from pip debug
+            let pipDebugOutput = execaSync(`${this.activateCommand} && pip debug`, { shell: this.shell }).stdout;
+            this.analytics.setPipDebugOutput(pipDebugOutput);
         } catch (error) {}
 
         let certifiPath = undefined;

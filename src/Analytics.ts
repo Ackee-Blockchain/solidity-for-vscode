@@ -27,6 +27,7 @@ export class Analytics{
     wakeVersion: string | undefined;
     correctPythonPath: boolean | undefined;
     correctSysPath: boolean | undefined;
+    pipDebugOutput: string | undefined;
 
     constructor(context: vscode.ExtensionContext, private readonly installation: string){
         appInsights.setup(env.TELEMETRY_KEY)
@@ -61,6 +62,10 @@ export class Analytics{
 
     public setCorrectSysPath(correct: boolean){
         this.correctSysPath = correct;
+    }
+
+    public setPipDebugOutput(output: string){
+        this.pipDebugOutput = output;
     }
 
     logActivate(){
@@ -106,6 +111,7 @@ export class Analytics{
                 'env': process.env,
                 'correctPythonPath': this.correctPythonPath,
                 'correctSysPath': this.correctSysPath,
+                'pipDebugOutput': this.pipDebugOutput,
             }
         );
     }
