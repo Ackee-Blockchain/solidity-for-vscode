@@ -139,7 +139,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     // Create a Wallet Server
-    const walletServer = new WalletServer(context);
+    // const walletServer = new WalletServer(context);
 
     analytics = new Analytics(context, method);
     errorHandler = new ClientErrorHandler(outputChannel, analytics);

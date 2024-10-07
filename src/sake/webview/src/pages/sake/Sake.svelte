@@ -11,7 +11,8 @@
         vsCodePanelTab,
         vsCodeBadge,
         vsCodePanelView,
-        vsCodeProgressRing
+        vsCodeProgressRing,
+        vsCodeTag
     } from '@vscode/webview-ui-toolkit';
     import CallSetup from '../../components/CallSetup.svelte';
     import { onMount } from 'svelte';
@@ -21,13 +22,12 @@
         requestState,
         compilationIssuesVisible,
         activeTab,
-        wakeState,
+        sharedChainState,
         setupListeners
     } from '../../helpers/store';
     import Compile from './Compile.svelte';
     import Deploy from './Deploy.svelte';
     import Run from './Run.svelte';
-    import BlankIcon from '../../components/icons/BlankIcon.svelte';
     import BackIcon from '../../components/icons/BackIcon.svelte';
     import CompilationIssues from '../../components/CompilationIssues.svelte';
     // import '../../../shared/types'; // Importing types to avoid TS error
@@ -43,14 +43,16 @@
         vsCodePanelTab(),
         vsCodeBadge(),
         vsCodePanelView(),
-        vsCodeProgressRing()
+        vsCodeProgressRing(),
+        vsCodeTag()
     );
 
-    import { openExternal } from '../../helpers/api';
+    import { openExternal, requestNewChain, restartWakeServer } from '../../helpers/api';
 
-    let initLoading = true;
+    let showLoading = true;
 
-    const SERVER_TIMEOUT = 10_000;
+    const RESTART_WAKE_SERVER_TIMEOUT = 5_000;
+    const RESTART_WAKE_SERVER_TRIES = 1;
 
     enum TabId {
         CompileDeploy = 0,
@@ -69,29 +71,37 @@
     ];
 
     onMount(async () => {
-        startServer();
         setupListeners();
         activeTab.set(tabs[0].id);
     });
 
-    const startServer = () => {
-        initLoading = true;
-        const timeout = setTimeout(() => {
-            initLoading = false;
-            setServerRunning(false);
-            console.log('Server not running', $wakeState);
-        }, SERVER_TIMEOUT);
-        requestState().then(() => {
-            clearTimeout(timeout);
-            setServerRunning(true);
-            initLoading = false;
-        });
-    };
+    // const startServer = () => {
+    //     showLoading = true;
+    //     const timeout = setTimeout(() => {
+    //         showLoading = false;
+    //         setServerRunning(false);
+    //         console.log('Server not running', $sharedChainState);
+    //     }, SERVER_TIMEOUT);
+    //     requestState().then(() => {
+    //         clearTimeout(timeout);
+    //         setServerRunning(true);
+    //         showLoading = false;
+    //     });
+    // };
 
-    const setServerRunning = (isRunning: boolean) => {
-        wakeState.set({
-            isAnvilInstalled: $wakeState.isAnvilInstalled,
-            isServerRunning: isRunning
+    const tryWakeServerRestart = (tries: number = 0) => {
+        if (tries >= RESTART_WAKE_SERVER_TRIES) {
+            return;
+        }
+
+        const wakeServerRestartTimeout = setTimeout(() => {
+            tryWakeServerRestart(tries + 1);
+        }, RESTART_WAKE_SERVER_TIMEOUT);
+
+        restartWakeServer().then((success) => {
+            if (success) {
+                clearTimeout(wakeServerRestartTimeout);
+            }
         });
     };
 
@@ -101,12 +111,21 @@
 </script>
 
 <main class="h-full my-0 overflow-hidden">
-    {#if initLoading}
+    {#if $sharedChainState.chains.length === 0}
+        <div class="flex flex-col gap-4 h-full w-full p-4">
+            <h3 class="uppercase font-bold text-base">No chains found</h3>
+            <span>No chains set up. Please set up a chain first. </span>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <vscode-button appearance="primary" on:click={requestNewChain}>
+                Setup new chain
+            </vscode-button>
+        </div>
+    {:else if showLoading}
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
             <vscode-progress-ring />
             <span>Connecting with Wake...</span>
         </div>
-    {:else if $wakeState.isServerRunning === false}
+    {:else if $sharedChainState.isWakeServerRunning === false}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Wake Server is not running</h3>
             <span
@@ -114,11 +133,11 @@
                 workspace with Solidity files open.
             </span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <vscode-button appearance="primary" on:click={startServer}>
+            <vscode-button appearance="primary" on:click={tryWakeServerRestart}>
                 Restart Connection
             </vscode-button>
         </div>
-    {:else if !$wakeState.isAnvilInstalled}
+    {:else if !$sharedChainState.isAnvilInstalled}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Anvil is not installed</h3>
             <span

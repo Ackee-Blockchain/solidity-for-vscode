@@ -1,12 +1,12 @@
 import { writable, get, derived } from 'svelte/store';
 import {
     StateId,
-    WebviewMessage,
+    WebviewMessageId,
     type AccountState,
     type CompilationState,
-    type CompiledContract,
     type DeploymentState,
-    type WakeState
+    type ExtendedAccount,
+    type SharedChainState
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import { parseComplexNumber } from '../../shared/validate';
@@ -15,7 +15,7 @@ import { parseComplexNumber } from '../../shared/validate';
  * frontend svelte data
  */
 
-export const selectedAccount = writable<AccountState | null>(null);
+export const selectedAccount = writable<ExtendedAccount | null>(null);
 export const selectedValueString = writable<string | null>(null);
 // null indicated wrong stirng input
 export const selectedValue = derived(selectedValueString, ($selectedValueString) => {
@@ -35,16 +35,18 @@ export const activeTab = writable<number>();
  * backend data
  */
 
-export const accounts = writable<AccountState[]>([]);
-export const deployedContracts = writable<DeploymentState[]>([]);
+export const accounts = writable<AccountState>([]);
+export const deployedContracts = writable<DeploymentState>([]);
 export const compilationState = writable<CompilationState>({
     contracts: [],
     issues: [],
     dirty: true
 });
-export const wakeState = writable<WakeState>({
+export const sharedChainState = writable<SharedChainState>({
     isAnvilInstalled: undefined,
-    isServerRunning: undefined
+    isWakeServerRunning: undefined,
+    chains: [],
+    currentChainId: undefined
 });
 
 /**
@@ -52,9 +54,12 @@ export const wakeState = writable<WakeState>({
  */
 
 export async function requestState() {
-    const a = await messageHandler.request(WebviewMessage.onGetAccounts);
-    await messageHandler.request(WebviewMessage.getState, StateId.DeployedContracts);
-    await messageHandler.request(WebviewMessage.getState, StateId.CompiledContracts);
+    // TODO fix
+    console.log('requestState');
+    await messageHandler.request(WebviewMessageId.getState, StateId.Accounts);
+    await messageHandler.request(WebviewMessageId.getState, StateId.DeployedContracts);
+    await messageHandler.request(WebviewMessageId.getState, StateId.CompiledContracts);
+    await messageHandler.request(WebviewMessageId.getState, StateId.Chains);
 }
 
 export function setupListeners() {
@@ -66,7 +71,7 @@ export function setupListeners() {
         const { command, payload, stateId } = event.data;
 
         switch (command) {
-            case WebviewMessage.getState: {
+            case WebviewMessageId.getState: {
                 if (stateId === StateId.DeployedContracts) {
                     if (payload === undefined) {
                         return;
@@ -83,7 +88,7 @@ export function setupListeners() {
                 }
 
                 if (stateId === StateId.Accounts) {
-                    const _accounts = payload as AccountState[];
+                    const _accounts = payload as AccountState;
                     const _selectedAccount = get(selectedAccount);
 
                     // update accounts store
@@ -120,11 +125,12 @@ export function setupListeners() {
                     return;
                 }
 
-                if (stateId === StateId.Wake) {
+                if (stateId === StateId.Chains) {
                     if (payload === undefined) {
                         return;
                     }
-                    wakeState.set(payload);
+                    console.log('state chains in webview', payload);
+                    sharedChainState.set(payload);
                     return;
                 }
 

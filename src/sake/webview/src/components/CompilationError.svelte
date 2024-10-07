@@ -4,21 +4,10 @@
         vsCodeTextField,
         vsCodeButton
     } from '@vscode/webview-ui-toolkit';
-    import IconButton from './IconButton.svelte';
     import IconSpacer from './icons/IconSpacer.svelte';
     import ExpandButton from './icons/ExpandButton.svelte';
-    import DeleteButton from './icons/DeleteButton.svelte';
-    import CopyButton from './icons/CopyButton.svelte';
-    import InputIssueIndicator from './InputIssueIndicator.svelte';
-    import type {
-        CompilationIssue,
-        Contract,
-        ContractAbi,
-        ContractFunction as ContractFunctionType,
-        CompilationErrorSpecific
-    } from '../../shared/types';
+    import type { CompilationIssue, CompilationErrorSpecific } from '../../shared/types';
     import { CompilationIssueType } from '../../shared/types';
-    import ContractFunction from './ContractFunction.svelte';
     import TextContainer from './TextContainer.svelte';
     import { navigateTo } from '../helpers/api';
     import ErrorIcon from './icons/ErrorIcon.svelte';

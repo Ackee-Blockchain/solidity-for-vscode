@@ -1,40 +1,10 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeDropdown,
-        vsCodeOption,
-        vsCodeDivider,
-        vsCodeCheckbox,
-        vsCodeTextField
-    } from '@vscode/webview-ui-toolkit';
-    import CallSetup from '../../components/CallSetup.svelte';
-    import { messageHandler } from '@estruyf/vscode/dist/client';
-    import {
-        StateId,
-        WebviewMessage,
-        type CompilationState,
-        type CompiledContract,
-        type WakeDeploymentRequestParams,
-        CompilationIssueType
-    } from '../../../shared/types';
-    import { onMount } from 'svelte';
-    import Constructor from '../../components/Constructor.svelte';
+    import { CompilationIssueType } from '../../../shared/types';
     import { compilationIssuesVisible, compilationState } from '../../helpers/store';
     import TextContainer from '../../components/TextContainer.svelte';
     import WarningIcon from '../../components/icons/WarningIcon.svelte';
     import ErrorIcon from '../../components/icons/ErrorIcon.svelte';
-    import TextContainerDark from '../../components/TextContainerDark.svelte';
     import { compileContracts } from '../../helpers/api';
-
-    provideVSCodeDesignSystem().register(
-        vsCodeButton(),
-        vsCodeDropdown(),
-        vsCodeOption(),
-        vsCodeDivider(),
-        vsCodeCheckbox(),
-        vsCodeTextField()
-    );
 
     let compiling = false;
 

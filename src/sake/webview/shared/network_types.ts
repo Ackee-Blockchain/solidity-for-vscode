@@ -45,7 +45,7 @@ export interface SetAccountBalanceResponse {
     success: boolean;
 }
 
-export interface SetAccountNicknameRequest {
+export interface SetAccountLabelRequest {
     address: Address;
     nickname: string;
 }

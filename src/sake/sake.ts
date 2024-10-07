@@ -6,56 +6,46 @@ import {
     WalletDeploymentData,
     DeploymentRequest,
     SetAccountBalanceRequest,
-    SetAccountNicknameRequest,
+    SetAccountLabelRequest,
     GetBytecodeRequest
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { WakeApi } from './api/wake';
 import { OutputViewManager, SakeOutputItem } from './providers/OutputTreeProvider';
 import { copyToClipboardHandler } from '../commands';
-import { WalletServer } from '../serve';
-import { LocalNodeNetworkProvider } from './network/networks';
-import { LocalNodeSakeProvider, SakeProviderManager } from './providers/SakeProviders';
+import { SakeProviderManager } from './providers/SakeProviderManager';
 
 export function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
-    // Initialize Wake API
+    /* Initializers */
     WakeApi.initialize(client);
     OutputViewManager.initialize(context);
-    // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
-    // context.subscriptions.push(
-    //     vscode.window.registerTreeDataProvider('sake-output', sakeOutputProvider)
-    // );
+    SakeProviderManager.initialize(context);
 
-    const walletServer = new WalletServer(context);
+    /* Initialize Sake Provider */
+    const sake = SakeProviderManager.getInstance();
 
-    // const sidebarDeployProvider = new DeployWebviewProvider(context.extensionUri);
-    // context.subscriptions.push(
-    //     vscode.window.registerWebviewViewProvider('sake-compile-deploy', sidebarDeployProvider)
-    // );
-
-    // const sidebarRunProvider = new RunWebviewProvider(context.extensionUri);
-    // context.subscriptions.push(
-    //     vscode.window.registerWebviewViewProvider('sake-run', sidebarRunProvider)
-    // );
-
+    /* Register Webview */
     const sidebarSakeProvider = new SakeWebviewProvider(context.extensionUri);
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider('sake', sidebarSakeProvider)
     );
 
-    /* Initialize Network (Chain) Providers */
-    const localNodeNetworkProvider = new LocalNodeNetworkProvider();
+    /* Set Webview Provider */
+    sake._setWebviewProvider(sidebarSakeProvider);
 
-    // initialize sake provider
-    const sake = new SakeProviderManager(
-        context,
-        new LocalNodeSakeProvider(
-            'local-chain-1',
-            'Local Chain 1',
-            localNodeNetworkProvider,
-            sidebarSakeProvider
-        )
-    );
+    /* Initialize Wallet Server */
+    // const walletServer = new WalletServer(context);
+
+    /* Initialize Network (Chain) Providers */
+
+    // new LocalNodeSakeProvider(
+    //     'local-chain-1',
+    //     'Local Chain 1',
+    //     localNodeNetworkProvider,
+    //     sidebarSakeProvider
+    // );
+
+    // TODO remove unnecessary commands
 
     // register commands
     context.subscriptions.push(
@@ -92,14 +82,14 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.compile', () =>
-            sake.provider.compile()
+            sake.provider?.compile()
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.deploy',
-            (request: DeploymentRequest) => sake.provider.deployContract(request)
+            (request: DeploymentRequest) => sake.provider?.deployContract(request)
         )
     );
 
@@ -111,20 +101,20 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.call', (request: CallRequest) =>
-            sake.provider.callContract(request)
+            sake.provider?.callContract(request)
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.show_history', () =>
-            sake.state.history.show()
+            sake.state?.history.show()
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.setBalances',
-            (request: SetAccountBalanceRequest) => sake.provider.setAccountBalance(request)
+            (request: SetAccountBalanceRequest) => sake.provider?.setAccountBalance(request)
         )
     );
 
@@ -140,14 +130,14 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.setLabel',
-            (request: SetAccountNicknameRequest) => sake.provider.setAccountNickname(request)
+            (request: SetAccountLabelRequest) => sake.provider?.setAccountLabel(request)
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.getBytecode',
-            (request: GetBytecodeRequest) => sake.provider.getBytecode(request)
+            (request: GetBytecodeRequest) => sake.provider?.getBytecode(request)
         )
     );
 
@@ -160,18 +150,18 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.serve', async () => {
-            console.log(`start serve`);
-            walletServer
-                .start()
-                .then((port) => {
-                    console.log(`Wallet Server running on http://localhost:${port}`);
-                })
-                .then(() => {
-                    walletServer.openInBrowser();
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
+            // console.log(`start serve`);
+            // walletServer
+            //     .start()
+            //     .then((port) => {
+            //         console.log(`Wallet Server running on http://localhost:${port}`);
+            //     })
+            //     .then(() => {
+            //         walletServer.openInBrowser();
+            //     })
+            //     .catch((err) => {
+            //         console.error(err);
+            //     });
         })
     );
 
@@ -179,28 +169,28 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.openDeploymentInBrowser',
             async (deploymentData: WalletDeploymentData) => {
-                console.log(`start serve`);
-                walletServer
-                    .start()
-                    .then((port) => {
-                        console.log(`Wallet Server running on http://localhost:${port}`);
-                    })
-                    .then(() => {
-                        walletServer.setDeploymentData(deploymentData);
-                    })
-                    .then(() => {
-                        walletServer.openInBrowser();
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                    });
+                // console.log(`start serve`);
+                // walletServer
+                //     .start()
+                //     .then((port) => {
+                //         console.log(`Wallet Server running on http://localhost:${port}`);
+                //     })
+                //     .then(() => {
+                //         walletServer.setDeploymentData(deploymentData);
+                //     })
+                //     .then(() => {
+                //         walletServer.openInBrowser();
+                //     })
+                //     .catch((err) => {
+                //         console.error(err);
+                //     });
             }
         )
     );
 
     vscode.workspace.onDidChangeTextDocument((e) => {
         if (e.document.languageId == 'solidity' && !e.document.isDirty) {
-            sake.state.compilation.makeDirty();
+            sake.state?.compilation.makeDirty();
         }
         // TODO might need to rework using vscode.workspace.createFileSystemWatcher
     });

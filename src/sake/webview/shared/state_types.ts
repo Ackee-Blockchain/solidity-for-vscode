@@ -5,7 +5,7 @@ export enum StateId {
     CompiledContracts = 'compiledContracts',
     Accounts = 'accounts',
     TransactionHistory = 'TransactionHistory',
-    Wake = 'wake'
+    Chains = 'chains'
 }
 
 /* Account */
@@ -14,12 +14,10 @@ export type AccountState = ExtendedAccount[];
 
 /* Deployment */
 
-export interface DeployedContract {
-    name: string;
-    address: Address;
+export interface DeployedContract extends ExtendedAccount {
     abi: ContractAbi;
-    balance?: number;
     nick?: string;
+    name: string;
 }
 
 export type DeploymentState = DeployedContract[];
@@ -59,11 +57,19 @@ export interface CompilationState {
     // TODO add isDirty
 }
 
-/* Wake */
+/* Chain */
 
-export interface WakeState {
-    isAnvilInstalled: boolean | undefined;
-    isServerRunning: boolean | undefined;
+export interface SharedChainState {
+    isAnvilInstalled?: boolean;
+    isWakeServerRunning?: boolean;
+    chains: ChainState[];
+    currentChainId: string | undefined;
+}
+
+export interface ChainState {
+    chainId: string;
+    network: string;
+    connected: boolean;
 }
 
 /* Transaction History */

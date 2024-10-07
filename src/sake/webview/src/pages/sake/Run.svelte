@@ -1,41 +1,14 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeDropdown,
-        vsCodeOption,
-        vsCodeDivider,
-        vsCodeCheckbox,
-        vsCodeTextField
-    } from '@vscode/webview-ui-toolkit';
     import Contract from '../../components/Contract.svelte';
-    import Divider from '../../components/Divider.svelte';
-    import {
-        type CallRequest,
-        type WakeCallRequestParams,
-        type ContractFunction as ContractFunctionType
-    } from '../../../shared/types';
+    import { type CallRequest, type AbiFunctionFragment } from '../../../shared/types';
     import { deployedContracts, selectedAccount, selectedValue } from '../../helpers/store';
     import { functionCall, showErrorMessage } from '../../helpers/api';
-    import TextContainerDark from '../../components/TextContainerDark.svelte';
-    // import '../../../shared/types'; // Importing types to avoid TS error
-
-    provideVSCodeDesignSystem().register(
-        vsCodeButton(),
-        vsCodeDropdown(),
-        vsCodeOption(),
-        vsCodeDivider(),
-        vsCodeCheckbox(),
-        vsCodeTextField()
-    );
-
-    // let filterString: string = '';
 
     // @todo extract into a helper function
     const call = async function (
         calldata: string,
         contractAddress: string,
-        func: ContractFunctionType
+        func: AbiFunctionFragment
     ) {
         const _sender: string | undefined = $selectedAccount?.address;
         if (_sender === undefined) {
@@ -45,53 +18,20 @@
 
         const _value: number = $selectedValue ?? 0;
 
-        const requestParams: WakeCallRequestParams = {
-            contractAddress: contractAddress,
-            sender: _sender,
-            calldata: calldata,
-            // @dev automatically set value to 0 if function is not payable
-            value: func.stateMutability === 'payable' ? _value : 0
-        };
-
-        console.log('requestParams');
-
         const payload: CallRequest = {
-            func: func,
-            requestParams: requestParams
+            to: contractAddress,
+            from: _sender,
+            calldata: calldata,
+            value: func.stateMutability === 'payable' ? _value : 0,
+            functionAbi: func
         };
 
         functionCall(payload);
     };
-
-    // const handleFilter = function (e: any) {
-    //     filterString = e.target?.value;
-    //     // console.log("filter string", _filterString);
-    // };
 </script>
 
 {#if $deployedContracts.length > 0}
     <section class="w-full">
-        <!-- <vscode-text-field
-            class="w-full mb-2"
-            placeholder="Filter compiled contracts"
-            disabled={$deployedContracts.length === 0}
-            value={filterString}
-            on:input={handleFilter}
-        >
-            <span slot="start">
-                <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    ><path
-                        d="M15.25 0a8.25 8.25 0 0 0-6.18 13.72L1 22.88l1.12 1 8.05-9.12A8.251 8.251 0 1 0 15.25.01V0zm0 15a6.75 6.75 0 1 1 0-13.5 6.75 6.75 0 0 1 0 13.5z"
-                    /></svg
-                >
-            </span>
-        </vscode-text-field> -->
-
         <div class="flex flex-col gap-5">
             {#each $deployedContracts as contract, i}
                 <!-- {#if i > 0}
@@ -119,7 +59,6 @@
             <span class="text-sm my-2 text-center text-secon">No deployed contracts</span>
         </div>
     </section>
-    <!-- <p class="text-center">No contracts are compiled</p> -->
 {/if}
 
 <style global>

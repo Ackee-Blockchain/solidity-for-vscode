@@ -13,7 +13,11 @@ export * from './network_types';
 
 export type Address = w3t.Address;
 export type AbiFunctionFragment = w3t.AbiFunctionFragment;
+export type AbiConstructorFragment = w3t.AbiConstructorFragment & {
+    name: string;
+};
 export type AbiFragment = w3t.AbiFragment;
+export type AbiParameter = w3t.AbiParameter;
 export type ContractAbi = w3t.ContractAbi;
 
 export type StateMutability = string | 'nonpayable' | 'payable' | 'pure' | 'view';

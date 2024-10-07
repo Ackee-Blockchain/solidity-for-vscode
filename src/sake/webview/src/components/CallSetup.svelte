@@ -1,18 +1,8 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeTextField,
-        vsCodeDropdown,
-        vsCodeOption
-    } from '@vscode/webview-ui-toolkit';
-    import IconButton from './IconButton.svelte';
-    import CopyButton from './icons/CopyButton.svelte';
     import ClickableSpan from './ClickableSpan.svelte';
     import { parseComplexNumber } from '../../shared/validate';
     import { displayEtherValue } from '../../shared/ether';
     import InputIssueIndicator from './InputIssueIndicator.svelte';
-
-    provideVSCodeDesignSystem().register(vsCodeDropdown(), vsCodeOption(), vsCodeTextField());
 
     import {
         selectedValue,
@@ -20,12 +10,7 @@
         selectedAccount,
         accounts
     } from '../helpers/store';
-    import {
-        copyToClipboard,
-        getInputFromTopBar,
-        setBalance,
-        showErrorMessage
-    } from '../helpers/api';
+    import { getInputFromTopBar, setBalance, showErrorMessage } from '../helpers/api';
     import CopyableSpan from './CopyableSpan.svelte';
 
     function handleAccountChange(event: any) {

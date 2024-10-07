@@ -1,27 +1,9 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeDropdown,
-        vsCodeOption,
-        vsCodeDivider,
-        vsCodeCheckbox,
-        vsCodeTextField
-    } from '@vscode/webview-ui-toolkit';
     import { type CompiledContract } from '../../../shared/types';
     import Constructor from '../../components/Constructor.svelte';
     import { selectedAccount, selectedValue, compilationState } from '../../helpers/store';
     import { deployContract, openDeploymentInBrowser, showErrorMessage } from '../../helpers/api';
     import TextContainerDark from '../../components/TextContainerDark.svelte';
-
-    provideVSCodeDesignSystem().register(
-        vsCodeButton(),
-        vsCodeDropdown(),
-        vsCodeOption(),
-        vsCodeDivider(),
-        vsCodeCheckbox(),
-        vsCodeTextField()
-    );
 
     let filterString: string = '';
     $: filteredContracts = $compilationState.contracts.filter((contract) =>

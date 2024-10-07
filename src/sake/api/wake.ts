@@ -20,9 +20,9 @@ import {
 } from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
-import { WakeStateProvider } from '../state/WakeStateProvider';
+import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
 
-const wakeState = WakeStateProvider.getInstance();
+const SharedChainState = SharedChainStateProvider.getInstance();
 
 /*
  * Get accounts and balances and save to state
@@ -241,12 +241,12 @@ export class WakeApi {
         }
         try {
             const response = await WakeApi._client.sendRequest<T>(method, params);
-            wakeState.setIsAnvilInstalled(true);
+            SharedChainState.setIsAnvilInstalled(true);
             return validate(response);
         } catch (e) {
             const message = typeof e === 'string' ? e : (e as Error).message;
             if (message == 'Anvil executable not found') {
-                wakeState.setIsAnvilInstalled(false);
+                SharedChainState.setIsAnvilInstalled(false);
             }
             throw new WakeAnvilNotFoundError(message);
         }

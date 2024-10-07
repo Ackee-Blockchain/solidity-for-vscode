@@ -1,24 +1,14 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeTextField
-    } from '@vscode/webview-ui-toolkit';
     import ContractFunctionInput from './ContractFunctionInput.svelte';
     import ExpandButton from './icons/ExpandButton.svelte';
     import KebabButton from './icons/KebabButton.svelte';
     import { buildTree, RootInputHandler } from '../helpers/FunctionInputsHandler';
     import IconSpacer from './icons/IconSpacer.svelte';
-    import { messageHandler } from '@estruyf/vscode/dist/client';
-    import {
-        type ContractFunction as ContractFunctionType,
-        WebviewMessage
-    } from '../../shared/types';
+    import { type AbiFunctionFragment } from '../../shared/types';
+    import { showErrorMessage } from '../helpers/api';
 
-    provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
-
-    export let func: ContractFunctionType;
-    export let onFunctionCall: (calldata: string, func: ContractFunctionType) => void;
+    export let func: AbiFunctionFragment;
+    export let onFunctionCall: (calldata: string, func: AbiFunctionFragment) => void;
     export let onOpenDeploymentInBrowser: ((calldata: string) => void) | undefined = undefined;
     export let isConstructor: boolean = false;
     export let isCalldata: boolean = false;
@@ -26,7 +16,7 @@
     let inputRoot: RootInputHandler;
     $: funcChanged(func);
 
-    const funcChanged = (_func: ContractFunctionType) => {
+    const funcChanged = (_func: AbiFunctionFragment) => {
         inputRoot = buildTree(_func);
         expanded = false;
     };
@@ -48,7 +38,7 @@
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
             const message = `Failed to encode input with error: ${errorMessage}`;
-            messageHandler.send(WebviewMessage.onError, message);
+            showErrorMessage(message);
             return;
         }
 
@@ -62,7 +52,7 @@
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
             const message = `Failed to encode input with error: ${errorMessage}`;
-            messageHandler.send(WebviewMessage.onError, message);
+            showErrorMessage(message);
             return;
         }
         onOpenDeploymentInBrowser!(_encodedInput);

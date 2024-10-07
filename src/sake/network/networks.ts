@@ -19,9 +19,7 @@ import {
     WakeTransactRequestParams,
     WakeTransactResponse
 } from '../webview/shared/types';
-import * as Wake from '../api/wake';
 import { WakeApi } from '../api/wake';
-import { SakeProvider } from '../providers/SakeProviders';
 
 export class NetworkError extends Error {}
 
@@ -33,9 +31,9 @@ export abstract class NetworkProvider {
     // }
 
     // maybe just allowing to get shared state should work...
-
+    public abstract id: string;
     abstract registerAccount(address: string): Promise<Account | undefined>;
-    abstract getAccountDetails(address: string): Promise<Account | undefined>;
+    abstract getAccountDetails(address: string): Promise<Account>;
     abstract setAccountBalance(
         request: SetAccountBalanceRequest
     ): Promise<SetAccountBalanceResponse>;
@@ -44,7 +42,7 @@ export abstract class NetworkProvider {
 }
 
 export class LocalNodeNetworkProvider extends NetworkProvider implements NetworkProvider {
-    // id: string = 'local-node';
+    public id: string = 'local-node';
     private _wake: WakeApi;
 
     constructor() {
@@ -57,7 +55,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
         // TODO
     }
 
-    async getAccountDetails(address: string): Promise<Account | undefined> {
+    async getAccountDetails(address: string): Promise<Account> {
         const result = await this._wake.getBalances({
             addresses: [address]
         });

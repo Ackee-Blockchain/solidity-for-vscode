@@ -5,24 +5,23 @@ import {
     CallOperation,
     CallRequest,
     CallType,
+    ChainState,
     DeploymentRequest,
     GetBytecodeRequest,
+    GetBytecodeResponse,
     SetAccountBalanceRequest,
-    SetAccountNicknameRequest,
+    SetAccountLabelRequest,
     TransactionCallResult,
     TransactionDecodedReturnValue,
-    TransactionDeploymentResult,
-    TransactionResult
+    TransactionDeploymentResult
 } from '../webview/shared/types';
-
-import { NetworkProvider, LocalNodeNetworkProvider } from '../network/networks';
+import { LocalNodeNetworkProvider, NetworkProvider } from '../network/networks';
 import { AccountStateProvider } from '../state/AccountStateProvider';
 import { DeploymentStateProvider } from '../state/DeploymentStateProvider';
 import { CompilationStateProvider } from '../state/CompilationStateProvider';
 import { BaseWebviewProvider } from './BaseWebviewProvider';
 import { TransactionHistoryStateProvider } from '../state/TransactionHistoryStateProvider';
-import { WakeStateProvider } from '../state/WakeStateProvider';
-
+import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
 import * as vscode from 'vscode';
 import { WakeApi } from '../api/wake';
 import { OutputViewManager } from './OutputTreeProvider';
@@ -33,13 +32,16 @@ import {
     parseCompiledContracts
 } from '../utils/compilation';
 import { decodeCallReturnValue } from '../utils/call';
+import { v4 as uuidv4 } from 'uuid';
+import { getTextFromInputBox } from '../commands';
 
 export class SakeState {
     accounts: AccountStateProvider;
     deployment: DeploymentStateProvider;
     compilation: CompilationStateProvider;
     history: TransactionHistoryStateProvider;
-    wake: WakeStateProvider;
+    chains: SharedChainStateProvider;
+    subscribed: boolean;
 
     constructor(private _webviewProvider: BaseWebviewProvider) {
         // network-specific state
@@ -49,19 +51,37 @@ export class SakeState {
 
         // shared state
         this.compilation = CompilationStateProvider.getInstance();
-        this.wake = WakeStateProvider.getInstance();
+        this.chains = SharedChainStateProvider.getInstance();
+
+        this.subscribed = false;
     }
 
     subscribe() {
         this.accounts.subscribe(this._webviewProvider);
         this.deployment.subscribe(this._webviewProvider);
         this.history.subscribe(this._webviewProvider);
+        this.chains.subscribe(this._webviewProvider);
+        this.compilation.subscribe(this._webviewProvider);
+
+        this.subscribed = true;
     }
 
     unsubscribe() {
         this.accounts.unsubscribe(this._webviewProvider);
         this.deployment.unsubscribe(this._webviewProvider);
         this.history.unsubscribe(this._webviewProvider);
+        this.chains.unsubscribe(this._webviewProvider);
+        this.compilation.unsubscribe(this._webviewProvider);
+
+        this.subscribed = false;
+    }
+
+    forceUpdate() {
+        this.accounts.forceUpdate();
+        this.deployment.forceUpdate();
+        this.history.forceUpdate();
+        this.chains.forceUpdate();
+        this.compilation.forceUpdate();
     }
 }
 
@@ -84,9 +104,7 @@ export class SakeProvider {
         this.output = OutputViewManager.getInstance();
         this.wake = WakeApi.getInstance();
         this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
-        this.setAccountNickname = showVSCodeMessageOnErrorWrapper(
-            this.setAccountNickname.bind(this)
-        );
+        this.setAccountLabel = showVSCodeMessageOnErrorWrapper(this.setAccountLabel.bind(this));
         this.refreshAccount = showVSCodeMessageOnErrorWrapper(this.refreshAccount.bind(this));
         this.deployContract = showVSCodeMessageOnErrorWrapper(this.deployContract.bind(this));
         this.removeDeployedContract = showVSCodeMessageOnErrorWrapper(
@@ -113,7 +131,7 @@ export class SakeProvider {
         return compilationResponse;
     }
 
-    async getBytecode(request: GetBytecodeRequest) {
+    async getBytecode(request: GetBytecodeRequest): Promise<GetBytecodeResponse | undefined> {
         const bytecodeResponse = await this.wake.getBytecode(request);
         return bytecodeResponse;
     }
@@ -146,7 +164,7 @@ export class SakeProvider {
         }
     }
 
-    async setAccountNickname(request: SetAccountNicknameRequest) {
+    async setAccountLabel(request: SetAccountLabelRequest) {
         this.state.accounts.setNickname(request.address, request.nickname);
     }
 
@@ -181,7 +199,7 @@ export class SakeProvider {
         if (deploymentResponse.success) {
             const balance = (
                 await this.network.getAccountDetails(deploymentResponse.deployedAddress)
-            )?.balance;
+            ).balance;
 
             this.state.deployment.add({
                 name: compilation.name,
@@ -195,7 +213,7 @@ export class SakeProvider {
 
         const transaction: TransactionDeploymentResult = {
             type: CallOperation.Deployment,
-            success: deploymentResponse.success, // TODO success will show true even on revert
+            success: deploymentResponse.success,
             from: deploymentRequest.sender,
             contractAddress: deploymentResponse.deployedAddress,
             contractName: getNameFromContractFqn(deploymentRequest.contractFqn),
@@ -283,7 +301,15 @@ export class LocalNodeSakeProvider extends SakeProvider {
         super(id, displayName, networkProvider, webviewProvider);
 
         this._wake = WakeApi.getInstance();
+
+        const subscribed = this.state.subscribed;
+        if (subscribed) {
+            this.state.unsubscribe();
+        }
         this.initialize();
+        if (subscribed) {
+            this.state.subscribe();
+        }
     }
 
     async initialize() {
@@ -294,110 +320,6 @@ export class LocalNodeSakeProvider extends SakeProvider {
                 this.state.accounts.add(accountDetails);
             }
         }
-    }
-}
-
-// export class PublicNodeSakeProvider extends SakeProvider {}
-
-export class SakeProviderManager {
-    private _selectedProviderId!: string;
-    private _providers!: Map<string, SakeProvider>;
-    private _statusBarItem!: vscode.StatusBarItem;
-
-    constructor(private context: vscode.ExtensionContext, ...providers: SakeProvider[]) {
-        if (providers.length === 0) {
-            throw new Error('No providers provided');
-        }
-
-        this._initializeStatusBar();
-
-        for (const provider of providers) {
-            this.addProvider(provider);
-        }
-
-        this.setProvider(providers[0].id);
-    }
-
-    addProvider(provider: SakeProvider) {
-        if (this._providers.has(provider.id)) {
-            throw new Error('Provider with id ' + provider.id + ' already exists');
-        }
-
-        this._providers.set(provider.id, provider);
-    }
-
-    removeProvider(id: string) {
-        if (!this._providers.has(id)) {
-            throw new Error('Provider with id ' + id + ' does not exist');
-        }
-
-        if (id === this._selectedProviderId) {
-            throw new Error('Cannot remove the current provider');
-        }
-
-        if (this._providers.size === 1) {
-            throw new Error('Cannot have less than 1 provider');
-        }
-
-        this._providers.delete(id);
-    }
-
-    get provider(): SakeProvider {
-        return this._providers.get(this._selectedProviderId)!;
-    }
-
-    get state(): SakeState {
-        return this.provider.state;
-    }
-
-    // get network(): NetworkProvider {
-    //     return this.provider.network;
-    // }
-
-    setProvider(id: string) {
-        if (!this._providers.has(id)) {
-            throw new Error('Provider with id ' + id + ' does not exist');
-        }
-
-        if (this._selectedProviderId === id) {
-            return;
-        }
-
-        this.provider.onDeactivateProvider();
-
-        this._selectedProviderId = id;
-        this.provider.onActivateProvider();
-
-        this._updateStatusBar();
-
-        // notify webviews of the switch
-        // TODO
-    }
-
-    private _updateStatusBar() {
-        this._statusBarItem.text = `$(cloud) ${this.provider.displayName}`;
-        this._statusBarItem.show();
-    }
-
-    private _selectProvider() {
-        const providerOptions = Array.from(this._providers.keys()).map((id) => ({ label: id }));
-        vscode.window.showQuickPick(providerOptions).then((selected) => {
-            if (selected) {
-                this.setProvider(selected.label);
-            }
-        });
-    }
-
-    private _initializeStatusBar() {
-        this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
-        this.context.subscriptions.push(this._statusBarItem);
-        this.context.subscriptions.push(
-            vscode.commands.registerCommand(
-                'Tools-for-Solidity.sake.selectSakeProvider',
-                this._selectProvider.bind(this)
-            )
-        );
-        this._statusBarItem.command = 'Tools-for-Solidity.sake.selectSakeProvider';
     }
 }
 

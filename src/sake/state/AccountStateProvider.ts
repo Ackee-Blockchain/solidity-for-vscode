@@ -76,5 +76,9 @@ export class AccountStateProvider extends BaseStateProvider<AccountState> {
         });
     }
 
+    public getAccounts(): Account[] {
+        return this.state;
+    }
+
     // TODO, add balances etc... maybe diff between account state data and wake acc state data response
 }
