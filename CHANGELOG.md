@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.16.3]
+### Fixes
+- Fixed various compilation issues
+- Increased timeouts to download solc binaries
+- Anvil is now also being detected in standard `~/.foundry/bin` directory
+
 ## [1.16.2]
 ### Fixes
 - Python environment variables are now being unset before activating conda environment
