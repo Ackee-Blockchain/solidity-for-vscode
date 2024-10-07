@@ -7,6 +7,7 @@ import {
     CallType,
     ChainState,
     DeploymentRequest,
+    DeploymentResponse,
     GetBytecodeRequest,
     GetBytecodeResponse,
     SetAccountBalanceRequest,
@@ -33,7 +34,7 @@ import {
 } from '../utils/compilation';
 import { decodeCallReturnValue } from '../utils/call';
 import { v4 as uuidv4 } from 'uuid';
-import { getTextFromInputBox } from '../commands';
+import { getTextFromInputBox, showTimedInfoMessage } from '../commands';
 
 export class SakeState {
     accounts: AccountStateProvider;
@@ -76,12 +77,17 @@ export class SakeState {
         this.subscribed = false;
     }
 
-    forceUpdate() {
-        this.accounts.forceUpdate();
-        this.deployment.forceUpdate();
-        this.history.forceUpdate();
-        this.chains.forceUpdate();
-        this.compilation.forceUpdate();
+    sendToWebview() {
+        if (!this.subscribed) {
+            console.error('Cannot force state update, webview not subscribed');
+            return;
+        }
+
+        this.accounts.sendToWebview();
+        this.deployment.sendToWebview();
+        this.history.sendToWebview();
+        this.chains.sendToWebview();
+        this.compilation.sendToWebview();
     }
 }
 
@@ -194,7 +200,7 @@ export class SakeProvider {
             throw new SakeError('Deployment failed: Contract ABI was not found');
         }
 
-        const deploymentResponse = await this.network.deploy(deploymentRequest);
+        const deploymentResponse: DeploymentResponse = await this.network.deploy(deploymentRequest);
 
         if (deploymentResponse.success) {
             const balance = (
@@ -207,6 +213,9 @@ export class SakeProvider {
                 abi: compilation.abi,
                 balance: balance
             });
+
+            // TODO
+            showTimedInfoMessage(`Deployed contract ${compilation.name} at address`);
         }
 
         // TODO consider check and update balance of caller

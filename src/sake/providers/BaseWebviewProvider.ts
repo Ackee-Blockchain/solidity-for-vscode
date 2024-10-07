@@ -17,7 +17,7 @@ import { SakeProviderManager } from './SakeProviderManager';
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
     _doc?: vscode.TextDocument;
-    _stateSubscriptions: Map<StateId, any> = new Map(); // TODO add type
+    _stateSubscriptions: Map<StateId, BaseStateProvider<any>> = new Map();
     _sake: SakeProviderManager;
 
     constructor(private readonly _extensionUri: vscode.Uri, private readonly _targetPath: string) {
@@ -89,6 +89,20 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
     private async _handleMessage(message: WebviewMessageRequest, webviewView: vscode.WebviewView) {
         switch (message.command) {
+            case WebviewMessageId.requestState: {
+                const state = this._stateSubscriptions.get(message.payload);
+
+                webviewView.webview.postMessage({
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success: state !== undefined
+                    }
+                } as WebviewMessageResponse);
+
+                state?.sendToWebview();
+            }
+
             case WebviewMessageId.onInfo: {
                 vscode.window.showWarningMessage(message.payload);
                 break;
@@ -127,7 +141,16 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.onCompile: {
-                this._sake.provider?.compile();
+                await this._sake.provider?.compile();
+
+                webviewView.webview.postMessage({
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success: true // TODO returns true always
+                    }
+                } as WebviewMessageResponse);
+
                 break;
             }
 

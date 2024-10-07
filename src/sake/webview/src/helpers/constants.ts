@@ -1,0 +1,3 @@
+export const RESTART_WAKE_SERVER_TIMEOUT = 5_000;
+export const RESTART_WAKE_SERVER_TRIES = 1;
+export const REQUEST_STATE_TIMEOUT = 5_000;

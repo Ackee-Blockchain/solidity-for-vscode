@@ -33,6 +33,9 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     /* Set Webview Provider */
     sake._setWebviewProvider(sidebarSakeProvider);
 
+    // Start with a default local chain
+    sake.createNewLocalChain('Local Chain', true);
+
     /* Initialize Wallet Server */
     // const walletServer = new WalletServer(context);
 

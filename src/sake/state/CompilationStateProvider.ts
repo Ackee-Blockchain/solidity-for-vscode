@@ -2,7 +2,6 @@ import {
     CompilationIssue,
     CompilationState,
     CompiledContract,
-    ContractAbi,
     StateId
 } from '../webview/shared/types';
 import { BaseStateProvider } from './BaseStateProvider';

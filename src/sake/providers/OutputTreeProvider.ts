@@ -28,11 +28,15 @@ export class OutputViewManager {
     treeView: vscode.TreeView<vscode.TreeItem>;
 
     private constructor(context: vscode.ExtensionContext) {
-        this.provider = new SakeOutputTreeProvider(context);
+        this.provider = new SakeOutputTreeProvider();
         this.treeView = vscode.window.createTreeView('sake-output', {
             treeDataProvider: this.provider
         });
-        context.subscriptions.push(this.treeView);
+        this.treeView.context.subscriptions.push(this.treeView);
+    }
+
+    public show() {
+        this;
     }
 
     public static initialize(context: vscode.ExtensionContext) {
@@ -53,8 +57,12 @@ export class OutputViewManager {
     }
 
     public set(data: TransactionResult) {
+        console.log('setting output view', data);
+        console.log('provider', this.provider);
+        console.log('tree view', this.treeView);
         this.provider.set(data);
         this._setMessage(data);
+        this.treeView;
     }
 
     private _setMessage(data: TransactionResult): void {
@@ -160,16 +168,12 @@ export class SakeOutputItem extends vscode.TreeItem {
 }
 
 class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-    context: vscode.ExtensionContext;
-
     _onDidChangeTreeData: vscode.EventEmitter<undefined> = new vscode.EventEmitter<undefined>();
     onDidChangeTreeData: vscode.Event<undefined> = this._onDidChangeTreeData.event;
 
     rootNodes: BaseOutputItem[] = [];
 
-    constructor(context: vscode.ExtensionContext) {
-        this.context = context;
-    }
+    constructor() {}
 
     refresh(): void {
         this._onDidChangeTreeData.fire(undefined);

@@ -73,7 +73,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
             }
         } as WakeSetBalancesRequestParams);
 
-        return response as SetAccountBalanceResponse;
+        return response;
     }
 
     async deploy(params: DeploymentRequest): Promise<DeploymentResponse> {
@@ -81,7 +81,12 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
             params as WakeDeploymentRequestParams
         );
 
-        return response as DeploymentResponse;
+        return {
+            success: response.success,
+            receipt: response.receipt,
+            callTrace: response.callTrace,
+            deployedAddress: response.contractAddress
+        };
     }
 
     async call(params: CallRequest): Promise<CallResponse> {
@@ -104,8 +109,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
 
 export const SupportedNetworks = [
     {
-        id: 'local',
-        name: 'Local Node',
+        defaultName: 'Local Node',
         provider: LocalNodeNetworkProvider
     }
 ];

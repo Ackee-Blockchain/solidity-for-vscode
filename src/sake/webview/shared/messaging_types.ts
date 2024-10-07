@@ -5,7 +5,7 @@ import type {
     SetAccountBalanceRequest,
     SetAccountLabelRequest
 } from './network_types';
-import type { Address, WakeSetLabelResponse } from './types';
+import type { Address, StateId, WakeSetLabelResponse } from './types';
 
 export interface BaseWebviewMessageRequest {
     requestId?: string;
@@ -18,6 +18,7 @@ export interface BaseWebviewMessageResponse {
 export enum WebviewMessageId {
     // TODO consider removing in favor of specific getters
     getState = 'getState', // getter for any state
+    requestState = 'requestState', // request any state from the backend
     onInfo = 'onInfo',
     onError = 'onError',
     getTextFromInputBox = 'getTextFromInputBox',
@@ -45,9 +46,13 @@ export type SpecificWebviewMessageRequest<T extends WebviewMessageId> = {
 } & BaseWebviewMessageRequest;
 
 export type WebviewMessageRequest =
+    // | ({
+    //       command: WebviewMessageId.getState;
+    //       payload: StateId;
+    //   } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.getState;
-          payload: any;
+          command: WebviewMessageId.requestState;
+          payload: StateId;
       } & BaseWebviewMessageRequest)
     | ({
           command: WebviewMessageId.onInfo;
@@ -129,6 +134,12 @@ export type WebviewMessageResponse =
           payload: any;
       } & BaseWebviewMessageResponse)
     | ({
+          command: WebviewMessageId.requestState;
+          payload: {
+              success: boolean;
+          };
+      } & BaseWebviewMessageResponse)
+    | ({
           command: WebviewMessageId.onGetBytecode;
           payload: {
               bytecode?: string;
@@ -142,6 +153,12 @@ export type WebviewMessageResponse =
       } & BaseWebviewMessageResponse)
     | ({
           command: WebviewMessageId.onRestartWakeServer;
+          payload: {
+              success: boolean;
+          };
+      } & BaseWebviewMessageResponse)
+    | ({
+          command: WebviewMessageId.onCompile;
           payload: {
               success: boolean;
           };

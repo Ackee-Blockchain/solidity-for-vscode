@@ -1,11 +1,11 @@
 import type { Address, ContractAbi, ExtendedAccount, TransactionResult } from './types';
 
 export enum StateId {
-    DeployedContracts = 'deployedContracts',
-    CompiledContracts = 'compiledContracts',
-    Accounts = 'accounts',
+    DeployedContracts = 'DeployedContracts',
+    CompiledContracts = 'CompiledContracts',
+    Accounts = 'Accounts',
     TransactionHistory = 'TransactionHistory',
-    Chains = 'chains'
+    Chains = 'Chains'
 }
 
 /* Account */

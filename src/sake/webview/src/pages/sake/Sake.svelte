@@ -19,17 +19,21 @@
     import Tabs from '../../components/Tabs.svelte';
     import {
         deployedContracts,
-        requestState,
         compilationIssuesVisible,
         activeTab,
         sharedChainState,
-        setupListeners
+        setupListeners,
+        requestState
     } from '../../helpers/store';
     import Compile from './Compile.svelte';
     import Deploy from './Deploy.svelte';
     import Run from './Run.svelte';
     import BackIcon from '../../components/icons/BackIcon.svelte';
     import CompilationIssues from '../../components/CompilationIssues.svelte';
+    import {
+        RESTART_WAKE_SERVER_TIMEOUT,
+        RESTART_WAKE_SERVER_TRIES
+    } from '../../helpers/constants';
     // import '../../../shared/types'; // Importing types to avoid TS error
 
     provideVSCodeDesignSystem().register(
@@ -51,9 +55,6 @@
 
     let showLoading = true;
 
-    const RESTART_WAKE_SERVER_TIMEOUT = 5_000;
-    const RESTART_WAKE_SERVER_TRIES = 1;
-
     enum TabId {
         CompileDeploy = 0,
         DeployedContracts = 1
@@ -71,8 +72,10 @@
     ];
 
     onMount(async () => {
-        setupListeners();
+        setupListeners(); // @dev listeners have to be set up before requesting state
+        await requestState();
         activeTab.set(tabs[0].id);
+        showLoading = false;
     });
 
     // const startServer = () => {
@@ -90,7 +93,10 @@
     // };
 
     const tryWakeServerRestart = (tries: number = 0) => {
+        showLoading = true;
+        console.log('tryWakeServerRestart', tries);
         if (tries >= RESTART_WAKE_SERVER_TRIES) {
+            showLoading = false;
             return;
         }
 
@@ -100,7 +106,9 @@
 
         restartWakeServer().then((success) => {
             if (success) {
+                console.log('Wake server restarted');
                 clearTimeout(wakeServerRestartTimeout);
+                showLoading = false;
             }
         });
     };

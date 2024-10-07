@@ -10,6 +10,7 @@ import {
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import { parseComplexNumber } from '../../shared/validate';
+import { REQUEST_STATE_TIMEOUT } from './constants';
 
 /**
  * frontend svelte data
@@ -53,13 +54,37 @@ export const sharedChainState = writable<SharedChainState>({
  * setup stores
  */
 
-export async function requestState() {
-    // TODO fix
-    console.log('requestState');
-    await messageHandler.request(WebviewMessageId.getState, StateId.Accounts);
-    await messageHandler.request(WebviewMessageId.getState, StateId.DeployedContracts);
-    await messageHandler.request(WebviewMessageId.getState, StateId.CompiledContracts);
-    await messageHandler.request(WebviewMessageId.getState, StateId.Chains);
+export async function requestState(): Promise<boolean> {
+    const timeout = new Promise<void>((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out')), REQUEST_STATE_TIMEOUT)
+    );
+
+    return await Promise.race([
+        Promise.all([
+            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.Accounts),
+            messageHandler.request<boolean>(
+                WebviewMessageId.requestState,
+                StateId.DeployedContracts
+            ),
+            messageHandler.request<boolean>(
+                WebviewMessageId.requestState,
+                StateId.CompiledContracts
+            ),
+            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.Chains)
+        ]),
+        timeout
+    ])
+        .then((results) => {
+            if (!(results as boolean[]).every((result) => result)) {
+                console.error('requestState failed');
+                return false;
+            }
+            return true;
+        })
+        .catch((_) => {
+            console.error('Requesting state from the extension timed out');
+            return false;
+        });
 }
 
 export function setupListeners() {
@@ -69,6 +94,8 @@ export function setupListeners() {
         }
 
         const { command, payload, stateId } = event.data;
+
+        // console.log('received message', command, payload, stateId);
 
         switch (command) {
             case WebviewMessageId.getState: {
@@ -80,6 +107,7 @@ export function setupListeners() {
                 }
 
                 if (stateId === StateId.CompiledContracts) {
+                    console.log('got compiled contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
@@ -129,7 +157,6 @@ export function setupListeners() {
                     if (payload === undefined) {
                         return;
                     }
-                    console.log('state chains in webview', payload);
                     sharedChainState.set(payload);
                     return;
                 }

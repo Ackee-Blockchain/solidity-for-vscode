@@ -63,7 +63,7 @@ export interface WakeDeploymentRequestParams {
 }
 
 export interface WakeDeploymentResponse extends WakeTransaction {
-    deployedAddress?: w3t.Address;
+    contractAddress: w3t.Address;
 }
 
 // export interface WakeDeployedContract {

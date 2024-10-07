@@ -126,7 +126,8 @@ export class SakeProviderManager {
         this._updateStatusBar();
 
         // force update provider
-        this.state?.forceUpdate();
+        console.log('forcing update', this.state);
+        this.state?.sendToWebview();
 
         // notify webviews of the switch
         // TODO
@@ -167,21 +168,41 @@ export class SakeProviderManager {
             'Local Chain'
         );
 
+        if (!chainName) {
+            return;
+        }
+
+        this.createNewLocalChain(chainName);
+    }
+
+    public createNewLocalChain(name: string, forceSetProvider: boolean = false) {
+        if (!this._webviewProvider) {
+            throw new Error('Webview provider not set');
+        }
+
         const providerId = 'local-chain-' + uuidv4();
 
-        // TODO offer setup
         this.addProvider(
             new LocalNodeSakeProvider(
                 providerId,
-                chainName ? chainName : 'Local Chain',
+                name,
                 this._localNodeNetworkProvider,
                 this._webviewProvider
             )
         );
 
-        if (this._providers.size === 1) {
+        if (forceSetProvider) {
             this.setProvider(providerId);
+            return;
         }
+
+        vscode.window
+            .showInformationMessage(`New local chain '${name}' created.`, 'Switch to chain')
+            .then((selected) => {
+                if (selected === 'Switch to chain') {
+                    this.setProvider(providerId);
+                }
+            });
     }
 
     private _initializeStatusBar() {

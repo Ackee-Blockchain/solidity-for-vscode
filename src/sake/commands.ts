@@ -54,3 +54,17 @@ export async function navigateTo(path: string, startOffset?: number, endOffset?:
 export async function openExternal(path: string) {
     vscode.env.openExternal(vscode.Uri.parse(path));
 }
+
+export async function showTimedInfoMessage(message: string, timeout: number = 5000) {
+    await vscode.window.withProgress(
+        {
+            location: vscode.ProgressLocation.Notification,
+            title: message,
+            cancellable: true
+        },
+        async (progress) => {
+            progress.report({ increment: 0 });
+            await new Promise((resolve) => setTimeout(resolve, timeout));
+        }
+    );
+}

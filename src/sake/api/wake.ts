@@ -83,6 +83,7 @@ export class WakeApi {
     async getBalances(
         requestParams: WakeGetBalancesRequestParams
     ): Promise<WakeGetBalancesResponse> {
+        console.log('getBalances', requestParams);
         try {
             const result = await this.sendWakeRequest<WakeGetBalancesResponse>(
                 'wake/sake/getBalances',
@@ -145,7 +146,11 @@ export class WakeApi {
 
     async compile(): Promise<WakeCompilationResponse> {
         try {
-            const result = await this.sendWakeRequest<WakeCompilationResponse>('wake/sake/compile');
+            const result = await this.sendWakeRequest<WakeCompilationResponse>(
+                'wake/sake/compile',
+                undefined,
+                false
+            );
 
             if (result == null) {
                 throw new WakeApiError('No result returned');
@@ -235,14 +240,18 @@ export class WakeApi {
         }
     }
 
-    private async sendWakeRequest<T>(method: string, params?: any): Promise<T> {
+    private async sendWakeRequest<T>(
+        method: string,
+        params?: any,
+        validateResponse: boolean = true
+    ): Promise<T> {
         if (WakeApi._client == null) {
             throw new WakeApiError('Client not initialized');
         }
         try {
             const response = await WakeApi._client.sendRequest<T>(method, params);
             SharedChainState.setIsAnvilInstalled(true);
-            return validate(response);
+            return validateResponse ? validate(response) : response;
         } catch (e) {
             const message = typeof e === 'string' ? e : (e as Error).message;
             if (message == 'Anvil executable not found') {

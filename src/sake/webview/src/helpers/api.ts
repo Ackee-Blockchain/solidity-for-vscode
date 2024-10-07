@@ -82,12 +82,12 @@ export async function getInputFromTopBar(
     return await messageHandler.request<string | undefined>(request.command, request.payload);
 }
 
-export function compileContracts() {
+export async function compileContracts() {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.onCompile,
         payload: undefined
     };
-    messageHandler.send(request.command, request.payload);
+    messageHandler.request(request.command, request.payload);
 }
 
 export async function removeDeployedContract(address: Address) {
