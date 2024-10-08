@@ -41,7 +41,7 @@ export class CondaInstaller implements Installer {
 
         if (process.platform === 'win32') {
             this.activateCommand =
-                'set "PYTHONPATH=" && set "PYTHONHOME=" && set "PYTHONSTARTUP=" && "' +
+                'set "PYTHONPATH=" && set "PYTHONHOME=" && set "PYTHONSTARTUP=" && set PYTHONNOUSERSITE=1 && "' +
                 path.join(
                     context.globalStorageUri.fsPath,
                     'wake-conda',
@@ -52,7 +52,7 @@ export class CondaInstaller implements Installer {
             this.shell = 'cmd.exe';
         } else {
             this.activateCommand =
-                'unset PYTHONPATH && unset PYTHONHOME && unset PYTHONSTARTUP && . "' +
+                'unset PYTHONPATH && unset PYTHONHOME && unset PYTHONSTARTUP && export PYTHONNOUSERSITE=1 && . "' +
                 path.join(context.globalStorageUri.fsPath, 'wake-conda', 'bin', 'activate') +
                 '"';
             this.shell = '/bin/bash';
