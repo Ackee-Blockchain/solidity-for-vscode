@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import { v4 as uuidv4 } from 'uuid';
 import { getTextFromInputBox } from '../commands';
 import { LocalNodeSakeProvider, SakeProvider, SakeState } from './SakeProviders';
+import { WakeApi } from '../api/wake';
 
 export class SakeProviderManager {
     private static _instance: SakeProviderManager;
@@ -16,11 +17,13 @@ export class SakeProviderManager {
     private _localNodeNetworkProvider: LocalNodeNetworkProvider;
     private _webviewProvider: BaseWebviewProvider | undefined;
     private _chainsState: SharedChainStateProvider;
+    private _wake: WakeApi;
 
     private constructor() {
         this._providers = new Map();
         this._localNodeNetworkProvider = new LocalNodeNetworkProvider();
         this._chainsState = SharedChainStateProvider.getInstance();
+        this._wake = WakeApi.getInstance();
         this._initializeStatusBar();
         this._initializeChainsState();
     }
@@ -187,8 +190,27 @@ export class SakeProviderManager {
             this._webviewProvider
         );
 
-        await provider.initialize();
+        console.log('creating new local chain provider');
 
+        // check if wake is running
+        const wakeInitialized = await this._wake
+            .ping()
+            .then((isRunning) => {
+                console.log('wake connected');
+                this._chainsState.setIsWakeServerRunning(isRunning);
+                return isRunning;
+            })
+            .catch((error) => {
+                console.error('Failed to ping Wake:', error);
+                this._chainsState.setIsWakeServerRunning(false);
+                return false;
+            });
+
+        console.log('wake initialized', wakeInitialized);
+
+        if (wakeInitialized) {
+            await provider.initialize();
+        }
         this.addProvider(provider);
 
         if (forceSetProvider) {

@@ -257,6 +257,15 @@ export class WakeApi {
         }
     }
 
+    async ping(): Promise<boolean> {
+        try {
+            const result = await this.sendWakeRequest<boolean>('wake/sake/ping');
+            return result;
+        } catch (e) {
+            throw new WakeApiError(`Failed to ping: ${e instanceof Error ? e.message : String(e)}`);
+        }
+    }
+
     private async sendWakeRequest<T>(
         method: string,
         params?: any,
