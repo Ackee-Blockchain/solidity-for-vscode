@@ -215,7 +215,9 @@ export class SakeProvider {
             });
 
             // TODO
-            showTimedInfoMessage(`Deployed contract ${compilation.name} at address`);
+            showTimedInfoMessage(
+                `Deployed contract ${compilation.name} at address ${deploymentResponse.deployedAddress}`
+            );
         }
 
         // TODO consider check and update balance of caller
@@ -310,21 +312,13 @@ export class LocalNodeSakeProvider extends SakeProvider {
         super(id, displayName, networkProvider, webviewProvider);
 
         this._wake = WakeApi.getInstance();
-
-        const subscribed = this.state.subscribed;
-        if (subscribed) {
-            this.state.unsubscribe();
-        }
-        this.initialize();
-        if (subscribed) {
-            this.state.subscribe();
-        }
     }
 
     async initialize() {
         const accounts = await this._wake.getAccounts();
         for (const account of accounts) {
             const accountDetails = await this.network.getAccountDetails(account);
+            // console.log('account details', accountDetails);
             if (accountDetails) {
                 this.state.accounts.add(accountDetails);
             }

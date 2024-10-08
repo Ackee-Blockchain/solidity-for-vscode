@@ -87,7 +87,7 @@ export async function compileContracts() {
         command: WebviewMessageId.onCompile,
         payload: undefined
     };
-    messageHandler.request(request.command, request.payload);
+    await messageHandler.request(request.command, request.payload);
 }
 
 export async function removeDeployedContract(address: Address) {
@@ -156,9 +156,9 @@ export async function getBytecode(contractFqn: string): Promise<GetBytecodeRespo
     return await messageHandler.request<GetBytecodeResponse>(request.command, request.payload);
 }
 
-export async function requestNewChain() {
+export async function requestNewProvider() {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onRequestNewChain,
+        command: WebviewMessageId.onrequestNewProvider,
         payload: undefined
     };
     messageHandler.send(request.command, request.payload);

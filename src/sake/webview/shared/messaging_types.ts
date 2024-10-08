@@ -33,7 +33,7 @@ export enum WebviewMessageId {
     onOpenExternal = 'onOpenExternal',
     onOpenDeploymentInBrowser = 'onOpenDeploymentInBrowser',
     onGetBytecode = 'onGetBytecode',
-    onRequestNewChain = 'onRequestNewChain',
+    onrequestNewProvider = 'onrequestNewProvider',
     onRestartWakeServer = 'onRestartWakeServer'
 }
 
@@ -120,7 +120,7 @@ export type WebviewMessageRequest =
           payload: GetBytecodeRequest;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onRequestNewChain;
+          command: WebviewMessageId.onrequestNewProvider;
           payload: undefined;
       } & BaseWebviewMessageRequest)
     | ({

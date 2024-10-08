@@ -1,4 +1,3 @@
-import { LanguageClient } from 'vscode-languageclient/node';
 import {
     Account,
     CallRequest,
@@ -8,29 +7,18 @@ import {
     DeploymentResponse,
     SetAccountBalanceResponse,
     SetAccountBalanceRequest,
-    TransactRequest,
-    TransactResponse,
     WakeCallRequestParams,
     WakeCallResponse,
     WakeDeploymentRequestParams,
     WakeDeploymentResponse,
     WakeSetBalancesRequestParams,
-    WakeSetBalancesResponse,
-    WakeTransactRequestParams,
-    WakeTransactResponse
+    WakeSetBalancesResponse
 } from '../webview/shared/types';
 import { WakeApi } from '../api/wake';
 
 export class NetworkError extends Error {}
 
 export abstract class NetworkProvider {
-    // constructor(private _sake: SakeProvider) {}
-
-    // protected get sakeState() {
-    //     return this._sake.state;
-    // }
-
-    // maybe just allowing to get shared state should work...
     public abstract id: string;
     abstract registerAccount(address: string): Promise<Account | undefined>;
     abstract getAccountDetails(address: string): Promise<Account>;
@@ -51,7 +39,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
     }
 
     async registerAccount(address: string): Promise<Account | undefined> {
-        throw new Error('Method not implemented.');
+        throw new NetworkError('Method not implemented.');
         // TODO
     }
 
@@ -83,27 +71,31 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
 
         return {
             success: response.success,
-            receipt: response.receipt,
+            receipt: response.txReceipt,
             callTrace: response.callTrace,
             deployedAddress: response.contractAddress
         };
     }
 
     async call(params: CallRequest): Promise<CallResponse> {
-        if (params.callType == CallType.Call) {
-            return await this._wake.call({
-                contractAddress: params.to,
-                sender: params.from,
-                calldata: params.calldata,
-                value: params.value
-            } as WakeCallRequestParams);
-        }
-        return await this._wake.transact({
+        const request: WakeCallRequestParams = {
             contractAddress: params.to,
             sender: params.from,
             calldata: params.calldata,
             value: params.value
-        } as WakeTransactRequestParams);
+        };
+
+        const response: WakeCallResponse =
+            params.callType == CallType.Call
+                ? await this._wake.call(request)
+                : await this._wake.transact(request);
+
+        return {
+            success: response.success,
+            receipt: response.txReceipt,
+            callTrace: response.callTrace,
+            returnValue: response.returnValue
+        };
     }
 }
 

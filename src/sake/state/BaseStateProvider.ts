@@ -39,6 +39,7 @@ export abstract class BaseStateProvider<T> {
     }
 
     private _sendUpdateMessage() {
+        // console.log('sending update message', this._stateId, this._state);
         this.subscriptions.forEach((provider) => {
             provider.postMessageToWebview({
                 command: WebviewMessageId.getState,

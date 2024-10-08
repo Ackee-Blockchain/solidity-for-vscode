@@ -36,7 +36,7 @@ export interface WakeBaseResponse {
 }
 
 interface WakeTransaction extends WakeBaseResponse {
-    receipt?: w3t.TransactionReceipt;
+    txReceipt?: w3t.TransactionReceipt;
     callTrace: WakeCallTrace;
 }
 
@@ -87,8 +87,8 @@ export interface WakeDeploymentResponse extends WakeTransaction {
 /* Call */
 
 export interface WakeCallRequestParams {
-    contractAddress: string;
-    sender: string;
+    contractAddress: w3t.Address;
+    sender: w3t.Address;
     calldata: string;
     value: number;
 }
@@ -104,7 +104,7 @@ export interface WakeTransactResponse extends WakeCallResponse {}
 /* Get Balances */
 
 export interface WakeGetBalancesRequestParams {
-    addresses: string[];
+    addresses: w3t.Address[];
 }
 
 export interface WakeGetBalancesResponse extends WakeBaseResponse {

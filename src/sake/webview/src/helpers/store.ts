@@ -116,6 +116,7 @@ export function setupListeners() {
                 }
 
                 if (stateId === StateId.Accounts) {
+                    console.log('got accounts', payload);
                     const _accounts = payload as AccountState;
                     const _selectedAccount = get(selectedAccount);
 

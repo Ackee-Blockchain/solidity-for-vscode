@@ -10,6 +10,7 @@ export class AccountStateProvider extends BaseStateProvider<AccountState> {
         if (this.includes(account.address)) {
             return;
         }
+        // console.log('adding account', account);
         this.state = [...this.state, account];
     }
 

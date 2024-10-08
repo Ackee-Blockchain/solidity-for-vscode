@@ -51,7 +51,7 @@
         vsCodeTag()
     );
 
-    import { openExternal, requestNewChain, restartWakeServer } from '../../helpers/api';
+    import { openExternal, requestNewProvider, restartWakeServer } from '../../helpers/api';
 
     let showLoading = true;
 
@@ -124,7 +124,7 @@
             <h3 class="uppercase font-bold text-base">No chains found</h3>
             <span>No chains set up. Please set up a chain first. </span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <vscode-button appearance="primary" on:click={requestNewChain}>
+            <vscode-button appearance="primary" on:click={requestNewProvider}>
                 Setup new chain
             </vscode-button>
         </div>

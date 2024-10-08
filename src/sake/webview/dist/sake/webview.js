@@ -19311,7 +19311,7 @@ var WebviewMessageId;
     WebviewMessageId["onOpenExternal"] = "onOpenExternal";
     WebviewMessageId["onOpenDeploymentInBrowser"] = "onOpenDeploymentInBrowser";
     WebviewMessageId["onGetBytecode"] = "onGetBytecode";
-    WebviewMessageId["onRequestNewChain"] = "onRequestNewChain";
+    WebviewMessageId["onrequestNewProvider"] = "onrequestNewProvider";
     WebviewMessageId["onRestartWakeServer"] = "onRestartWakeServer";
 })(WebviewMessageId || (WebviewMessageId = {}));
 // export type WebviewMessageRequest<T extends keyof WebviewMessageRequestPayload> = {
@@ -20497,6 +20497,7 @@ function setupListeners() {
                     return;
                 }
                 if (stateId === StateId.Accounts) {
+                    console.log('got accounts', payload);
                     const _accounts = payload;
                     const _selectedAccount = get_store_value(selectedAccount);
                     // update accounts store
@@ -20587,7 +20588,7 @@ async function compileContracts() {
         command: WebviewMessageId.onCompile,
         payload: undefined
     };
-    client.messageHandler.request(request.command, request.payload);
+    await client.messageHandler.request(request.command, request.payload);
 }
 async function removeDeployedContract(address) {
     const request = {
@@ -20645,9 +20646,9 @@ async function getBytecode(contractFqn) {
     };
     return await client.messageHandler.request(request.command, request.payload);
 }
-async function requestNewChain() {
+async function requestNewProvider() {
     const request = {
-        command: WebviewMessageId.onRequestNewChain,
+        command: WebviewMessageId.onrequestNewProvider,
         payload: undefined
     };
     client.messageHandler.send(request.command, request.payload);
@@ -31413,14 +31414,14 @@ function create_if_block_3(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Visit Anvil Installation Page";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 101, 12, 4468);
+			add_location(h3, file, 101, 12, 4474);
 			attr_dev(span0, "class", "italic");
-			add_location(span0, file, 103, 28, 4584);
-			add_location(span1, file, 102, 12, 4550);
+			add_location(span0, file, 103, 28, 4590);
+			add_location(span1, file, 102, 12, 4556);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 108, 12, 4904);
+			add_location(vscode_button, file, 108, 12, 4910);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 100, 8, 4404);
+			add_location(div, file, 100, 8, 4410);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -31482,12 +31483,12 @@ function create_if_block_2(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Restart Connection";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 89, 12, 3853);
-			add_location(span, file, 90, 12, 3939);
+			add_location(h3, file, 89, 12, 3859);
+			add_location(span, file, 90, 12, 3945);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 95, 12, 4197);
+			add_location(vscode_button, file, 95, 12, 4203);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 88, 8, 3789);
+			add_location(div, file, 88, 8, 3795);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -31537,10 +31538,10 @@ function create_if_block_1(ctx) {
 			t0 = space();
 			span = element("span");
 			span.textContent = "Connecting with Wake...";
-			add_location(vscode_progress_ring, file, 84, 12, 3629);
-			add_location(span, file, 85, 12, 3666);
+			add_location(vscode_progress_ring, file, 84, 12, 3635);
+			add_location(span, file, 85, 12, 3672);
 			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 83, 8, 3541);
+			add_location(div, file, 83, 8, 3547);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -31590,12 +31591,12 @@ function create_if_block(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Setup new chain";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 75, 12, 3149);
-			add_location(span, file, 76, 12, 3224);
+			add_location(h3, file, 75, 12, 3152);
+			add_location(span, file, 76, 12, 3227);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 78, 12, 3366);
+			add_location(vscode_button, file, 78, 12, 3369);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 74, 8, 3085);
+			add_location(div, file, 74, 8, 3088);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -31606,7 +31607,7 @@ function create_if_block(ctx) {
 			append_dev(div, vscode_button);
 
 			if (!mounted) {
-				dispose = listen_dev(vscode_button, "click", requestNewChain, false, false, false, false);
+				dispose = listen_dev(vscode_button, "click", requestNewProvider, false, false, false, false);
 				mounted = true;
 			}
 		},
@@ -31642,7 +31643,7 @@ function create_if_block_10(ctx) {
 			vscode_badge = element("vscode-badge");
 			t = text(t_value);
 			set_custom_element_data(vscode_badge, "appearance", "secondary");
-			add_location(vscode_badge, file, 116, 20, 5222);
+			add_location(vscode_badge, file, 116, 20, 5228);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, vscode_badge, anchor);
@@ -32201,9 +32202,9 @@ function create_if_block_4(ctx) {
 			t0 = space();
 			span = element("span");
 			span.textContent = "Compilation issues";
-			add_location(span, file, 150, 24, 6764);
+			add_location(span, file, 150, 24, 6770);
 			attr_dev(a, "class", "flex gap-1 cursor-pointer items-center");
-			add_location(a, file, 145, 20, 6530);
+			add_location(a, file, 145, 20, 6536);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, a, anchor);
@@ -32344,7 +32345,7 @@ function create_fragment(ctx) {
 			main = element("main");
 			if_block.c();
 			attr_dev(main, "class", "h-full my-0 overflow-hidden");
-			add_location(main, file, 72, 0, 2986);
+			add_location(main, file, 72, 0, 2989);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -32530,7 +32531,7 @@ function instance($$self, $$props, $$invalidate) {
 		RESTART_WAKE_SERVER_TIMEOUT,
 		RESTART_WAKE_SERVER_TRIES,
 		openExternal,
-		requestNewChain,
+		requestNewProvider,
 		restartWakeServer,
 		showLoading,
 		TabId,

@@ -23,16 +23,17 @@ class BaseOutputItem extends vscode.TreeItem {
 export class OutputViewManager {
     private static _instance: OutputViewManager;
     private static _context: vscode.ExtensionContext;
+    private _outputViewId: string = 'sake-output';
 
     provider: SakeOutputTreeProvider;
     treeView: vscode.TreeView<vscode.TreeItem>;
 
-    private constructor(context: vscode.ExtensionContext) {
+    private constructor() {
         this.provider = new SakeOutputTreeProvider();
-        this.treeView = vscode.window.createTreeView('sake-output', {
+        this.treeView = vscode.window.createTreeView(this._outputViewId, {
             treeDataProvider: this.provider
         });
-        this.treeView.context.subscriptions.push(this.treeView);
+        OutputViewManager._context.subscriptions.push(this.treeView);
     }
 
     public show() {
@@ -51,18 +52,15 @@ export class OutputViewManager {
             throw new Error('OutputViewManager not initialized');
         }
         if (!this._instance) {
-            this._instance = new OutputViewManager(this._context);
+            this._instance = new OutputViewManager();
         }
         return this._instance;
     }
 
     public set(data: TransactionResult) {
-        console.log('setting output view', data);
-        console.log('provider', this.provider);
-        console.log('tree view', this.treeView);
         this.provider.set(data);
         this._setMessage(data);
-        this.treeView;
+        vscode.commands.executeCommand(`${this._outputViewId}.focus`);
     }
 
     private _setMessage(data: TransactionResult): void {

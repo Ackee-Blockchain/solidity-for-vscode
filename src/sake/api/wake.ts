@@ -72,7 +72,10 @@ export class WakeApi {
                 throw new Error('No accounts returned');
             }
 
-            return result;
+            // @dev hotfix lower all addresses
+            const addresses = result.map((address) => address.toLowerCase());
+
+            return addresses;
         } catch (e) {
             throw new WakeApiError(
                 `Failed to get balances: ${e instanceof Error ? e.message : String(e)}`
@@ -83,7 +86,6 @@ export class WakeApi {
     async getBalances(
         requestParams: WakeGetBalancesRequestParams
     ): Promise<WakeGetBalancesResponse> {
-        console.log('getBalances', requestParams);
         try {
             const result = await this.sendWakeRequest<WakeGetBalancesResponse>(
                 'wake/sake/getBalances',
@@ -94,7 +96,18 @@ export class WakeApi {
                 throw new Error('No result returned');
             }
 
-            return result;
+            // @dev hotfix lower all addresses
+            const balances = Object.fromEntries(
+                Object.entries(result.balances).map(([address, balance]) => [
+                    address.toLowerCase(),
+                    balance
+                ])
+            );
+
+            return {
+                ...result,
+                balances
+            };
         } catch (e) {
             throw new WakeApiError(`[Wake API] ${e instanceof Error ? e.message : String(e)}`);
         }
@@ -192,6 +205,8 @@ export class WakeApi {
                 requestParams
             );
 
+            console.log('deploy result', result);
+
             if (result == null) {
                 throw new Error('No result returned');
             }
@@ -210,6 +225,8 @@ export class WakeApi {
                 'wake/sake/call',
                 requestParams
             );
+
+            console.log('call result', result);
 
             if (result == null) {
                 throw new Error('No result returned');

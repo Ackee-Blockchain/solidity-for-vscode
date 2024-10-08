@@ -119,14 +119,12 @@ export class SakeProviderManager {
         }
 
         this.provider?.onDeactivateProvider();
-
         this._selectedProviderId = id;
         this.provider?.onActivateProvider();
 
         this._updateStatusBar();
 
         // force update provider
-        console.log('forcing update', this.state);
         this.state?.sendToWebview();
 
         // notify webviews of the switch
@@ -149,7 +147,7 @@ export class SakeProviderManager {
         vscode.window.showQuickPick(providerOptions).then((selected) => {
             if (selected) {
                 if (selected.label === 'Request new chain') {
-                    this.requestNewChain();
+                    this.requestNewProvider();
                 } else {
                     this.setProvider(selected.label);
                 }
@@ -157,7 +155,7 @@ export class SakeProviderManager {
         });
     }
 
-    public async requestNewChain() {
+    public async requestNewProvider() {
         if (!this._webviewProvider) {
             throw new Error('Webview provider not set');
         }
@@ -172,24 +170,26 @@ export class SakeProviderManager {
             return;
         }
 
-        this.createNewLocalChain(chainName);
+        await this.createNewLocalChainProvider(chainName);
     }
 
-    public createNewLocalChain(name: string, forceSetProvider: boolean = false) {
+    public async createNewLocalChainProvider(name: string, forceSetProvider: boolean = false) {
         if (!this._webviewProvider) {
             throw new Error('Webview provider not set');
         }
 
         const providerId = 'local-chain-' + uuidv4();
 
-        this.addProvider(
-            new LocalNodeSakeProvider(
-                providerId,
-                name,
-                this._localNodeNetworkProvider,
-                this._webviewProvider
-            )
+        const provider = new LocalNodeSakeProvider(
+            providerId,
+            name,
+            this._localNodeNetworkProvider,
+            this._webviewProvider
         );
+
+        await provider.initialize();
+
+        this.addProvider(provider);
 
         if (forceSetProvider) {
             this.setProvider(providerId);
@@ -217,24 +217,4 @@ export class SakeProviderManager {
         this._statusBarItem.command = 'Tools-for-Solidity.sake.selectSakeProvider';
         this._updateStatusBar();
     }
-}
-
-// TODO add context if needed
-function showVSCodeMessageOnErrorWrapper<T, Args extends any[]>(
-    func: (...args: Args) => Promise<T>
-): (...args: Args) => Promise<T | undefined> {
-    return async (...args: Args) => {
-        try {
-            return await func(...args);
-        } catch (e) {
-            vscode.window.showErrorMessage(`${e instanceof Error ? e.message : String(e)}`);
-            return undefined;
-        }
-    };
-}
-
-function specifyCallType(func: AbiFunctionFragment): CallType {
-    return func.stateMutability === 'view' || func.stateMutability === 'pure'
-        ? CallType.Call
-        : CallType.Transact;
 }

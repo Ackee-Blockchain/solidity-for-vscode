@@ -101,10 +101,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 } as WebviewMessageResponse);
 
                 state?.sendToWebview();
+                break;
             }
 
             case WebviewMessageId.onInfo: {
-                vscode.window.showWarningMessage(message.payload);
+                vscode.window.showInformationMessage(message.payload);
                 break;
             }
 
@@ -224,8 +225,8 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.onRequestNewChain: {
-                this._sake.requestNewChain();
+            case WebviewMessageId.onrequestNewProvider: {
+                this._sake.requestNewProvider();
                 break;
             }
 
