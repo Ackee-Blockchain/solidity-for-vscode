@@ -71,3 +71,7 @@ export async function showTimedInfoMessage(message: string, milliseconds: number
         }
     );
 }
+
+export function showErrorMessage(message: string) {
+    vscode.window.showErrorMessage(message);
+}

@@ -1,10 +1,10 @@
-import { AbiFunctionFragment, CallType } from '../webview/shared/types';
+import { NetworkCreationConfiguration } from '../webview/shared/types';
 import { LocalNodeNetworkProvider } from '../network/networks';
 import { BaseWebviewProvider } from './BaseWebviewProvider';
 import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
 import * as vscode from 'vscode';
 import { v4 as uuidv4 } from 'uuid';
-import { getTextFromInputBox } from '../commands';
+import { getTextFromInputBox, showErrorMessage } from '../commands';
 import { LocalNodeSakeProvider, SakeProvider, SakeState } from './SakeProviders';
 import { WakeApi } from '../api/wake';
 
@@ -14,16 +14,14 @@ export class SakeProviderManager {
     private _selectedProviderId?: string;
     private _providers: Map<string, SakeProvider>;
     private _statusBarItem!: vscode.StatusBarItem;
-    private _localNodeNetworkProvider: LocalNodeNetworkProvider;
     private _webviewProvider: BaseWebviewProvider | undefined;
     private _chainsState: SharedChainStateProvider;
     private _wake: WakeApi;
 
     private constructor() {
         this._providers = new Map();
-        this._localNodeNetworkProvider = new LocalNodeNetworkProvider();
-        this._chainsState = SharedChainStateProvider.getInstance();
         this._wake = WakeApi.getInstance();
+        this._chainsState = SharedChainStateProvider.getInstance();
         this._initializeStatusBar();
         this._initializeChainsState();
     }
@@ -35,8 +33,8 @@ export class SakeProviderManager {
     }
 
     public async initializeWakeConnection(): Promise<boolean> {
-        // TODO
-        this._chainsState.setIsWakeServerRunning(true);
+        const isWakeServerRunning = await this._wake.ping();
+        this._chainsState.setIsWakeServerRunning(isWakeServerRunning);
 
         return true;
     }
@@ -176,41 +174,43 @@ export class SakeProviderManager {
         await this.createNewLocalChainProvider(chainName);
     }
 
-    public async createNewLocalChainProvider(name: string, forceSetProvider: boolean = false) {
+    public async createNewLocalChainProvider(
+        name: string,
+        networkConfig: NetworkCreationConfiguration | undefined = undefined,
+        forceSetProvider: boolean = false
+    ) {
         if (!this._webviewProvider) {
             throw new Error('Webview provider not set');
         }
 
-        const providerId = 'local-chain-' + uuidv4();
-
-        const provider = new LocalNodeSakeProvider(
-            providerId,
-            name,
-            this._localNodeNetworkProvider,
-            this._webviewProvider
-        );
-
-        console.log('creating new local chain provider');
-
-        // check if wake is running
-        const wakeInitialized = await this._wake
-            .ping()
-            .then((isRunning) => {
-                console.log('wake connected');
-                this._chainsState.setIsWakeServerRunning(isRunning);
-                return isRunning;
-            })
-            .catch((error) => {
-                console.error('Failed to ping Wake:', error);
-                this._chainsState.setIsWakeServerRunning(false);
-                return false;
-            });
-
-        console.log('wake initialized', wakeInitialized);
-
-        if (wakeInitialized) {
-            await provider.initialize();
+        // Check if Wake is running
+        try {
+            const serverRunning = await this._wake.ping();
+            this._chainsState.setIsWakeServerRunning(serverRunning);
+        } catch (error) {
+            console.error('Failed to ping Wake:', error);
+            this._chainsState.setIsWakeServerRunning(false);
+            showErrorMessage('Failed to create a new chain. Unable to connect to Wake.');
+            return;
         }
+
+        const sessionId = uuidv4();
+        const providerId = 'local-chain-' + sessionId;
+        let provider: LocalNodeSakeProvider;
+        try {
+            const { network, initializationResult } = await LocalNodeNetworkProvider.createNewChain(
+                {
+                    ...networkConfig,
+                    sessionId: sessionId
+                }
+            );
+            provider = new LocalNodeSakeProvider(providerId, name, network, this._webviewProvider);
+            await provider.initialize(initializationResult.accounts);
+        } catch (error) {
+            console.error('Failed to create new chain:', error);
+            return;
+        }
+
         this.addProvider(provider);
 
         if (forceSetProvider) {

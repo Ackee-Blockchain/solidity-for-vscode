@@ -31,14 +31,47 @@ export type WakeCompilationSkipped = { [key: string]: WakeSkippedInfo };
 
 /* Base */
 
+export interface WakeBaseRequestParams {
+    sessionId: string;
+}
+
 export interface WakeBaseResponse {
     success: boolean;
 }
 
 interface WakeTransaction extends WakeBaseResponse {
-    txReceipt?: w3t.TransactionReceipt;
     callTrace: WakeCallTrace;
 }
+
+/* Chain Management */
+
+export interface WakeCreateChainRequestParams {
+    sessionId: string;
+    accounts: number | null;
+    chainId: number | null;
+    fork: string | null;
+    hardfork: string | null;
+    minGasPrice: number | null;
+    blockBaseFeePerGas: number | null;
+}
+
+export interface WakeCreateChainResponse extends WakeBaseResponse {
+    accounts: string[];
+    uri?: string;
+    type: string;
+}
+
+export interface WakeConnectChainRequestParams extends WakeBaseRequestParams {
+    uri: string;
+}
+
+export interface WakeConnectChainResponse extends WakeCreateChainResponse {}
+
+export interface WakeDisconnectChainRequestParams extends WakeBaseRequestParams {}
+
+export interface WakeDisconnectChainResponse extends WakeBaseResponse {}
+
+/* State Management */
 
 /* Get Accounts */
 
@@ -55,7 +88,7 @@ export interface WakeCompilationResponse extends WakeBaseResponse {
 
 /* Deployment */
 
-export interface WakeDeploymentRequestParams {
+export interface WakeDeploymentRequestParams extends WakeBaseRequestParams {
     contractFqn: string;
     sender: string;
     calldata: string;
@@ -64,6 +97,9 @@ export interface WakeDeploymentRequestParams {
 
 export interface WakeDeploymentResponse extends WakeTransaction {
     contractAddress: w3t.Address;
+    txReceipt: w3t.TransactionReceipt;
+    rawError?: string;
+    error?: string;
 }
 
 // export interface WakeDeployedContract {
@@ -86,7 +122,7 @@ export interface WakeDeploymentResponse extends WakeTransaction {
 
 /* Call */
 
-export interface WakeCallRequestParams {
+export interface WakeCallRequestParams extends WakeBaseRequestParams {
     contractAddress: w3t.Address;
     sender: w3t.Address;
     calldata: string;
@@ -99,11 +135,14 @@ export interface WakeCallResponse extends WakeTransaction {
     returnValue: w3t.HexString; // might need to change to hex string
 }
 
-export interface WakeTransactResponse extends WakeCallResponse {}
+export interface WakeTransactResponse extends WakeCallResponse {
+    error?: string;
+    txReceipt: w3t.TransactionReceipt;
+}
 
 /* Get Balances */
 
-export interface WakeGetBalancesRequestParams {
+export interface WakeGetBalancesRequestParams extends WakeBaseRequestParams {
     addresses: w3t.Address[];
 }
 
@@ -113,7 +152,7 @@ export interface WakeGetBalancesResponse extends WakeBaseResponse {
 
 /* Set Balances */
 
-export interface WakeSetBalancesRequestParams {
+export interface WakeSetBalancesRequestParams extends WakeBaseRequestParams {
     balances: { [key: w3t.Address]: number };
 }
 
@@ -121,7 +160,7 @@ export interface WakeSetBalancesResponse extends WakeBaseResponse {}
 
 /* Set Label */
 
-export interface WakeSetLabelRequestParams {
+export interface WakeSetLabelRequestParams extends WakeBaseRequestParams {
     address: w3t.Address;
     label?: string;
 }
@@ -194,7 +233,7 @@ export interface TransactionCallResult extends TransactionResultBase {
 
 export type TransactionResult = TransactionDeploymentResult | TransactionCallResult;
 
-// TODO this should probably be moved to types
+// TODO this should probably be moved to types5
 export interface TransactionDecodedReturnValue {
     name: string;
     value: string;

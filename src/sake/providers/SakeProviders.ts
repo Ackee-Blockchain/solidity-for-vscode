@@ -16,7 +16,7 @@ import {
     TransactionDecodedReturnValue,
     TransactionDeploymentResult
 } from '../webview/shared/types';
-import { LocalNodeNetworkProvider, NetworkProvider } from '../network/networks';
+import { NetworkProvider } from '../network/networks';
 import { AccountStateProvider } from '../state/AccountStateProvider';
 import { DeploymentStateProvider } from '../state/DeploymentStateProvider';
 import { CompilationStateProvider } from '../state/CompilationStateProvider';
@@ -33,8 +33,7 @@ import {
     parseCompiledContracts
 } from '../utils/compilation';
 import { decodeCallReturnValue } from '../utils/call';
-import { v4 as uuidv4 } from 'uuid';
-import { getTextFromInputBox, showTimedInfoMessage } from '../commands';
+import { showTimedInfoMessage } from '../commands';
 
 export class SakeState {
     accounts: AccountStateProvider;
@@ -292,11 +291,13 @@ export class SakeProvider {
     async onActivateProvider() {
         // TODO save state
         this.state.subscribe();
+        this.network.onActivate();
     }
 
     async onDeactivateProvider() {
         // TODO save state
         this.state.unsubscribe();
+        this.network.onDeactivate();
     }
 }
 
@@ -314,8 +315,7 @@ export class LocalNodeSakeProvider extends SakeProvider {
         this._wake = WakeApi.getInstance();
     }
 
-    async initialize() {
-        const accounts = await this._wake.getAccounts();
+    async initialize(accounts: Address[]) {
         for (const account of accounts) {
             const accountDetails = await this.network.getAccountDetails(account);
             // console.log('account details', accountDetails);

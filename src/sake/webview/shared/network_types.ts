@@ -3,7 +3,8 @@ import type {
     WakeCallRequestParams,
     WakeCallTrace,
     WakeGetBytecodeResponse,
-    WakeGetBytecodeRequestParams
+    WakeGetBytecodeRequestParams,
+    WakeCreateChainRequestParams
 } from './wake_types';
 
 export type WalletDeploymentData = {
@@ -84,4 +85,27 @@ export interface TransactRequest extends CallRequest {}
 
 export interface TransactResponse extends CallResponse {}
 
-// }
+/* Network Configuration */
+
+export interface NetworkConfiguration {
+    sessionId: string;
+    type: string;
+    uri?: string;
+    chainId?: number;
+    fork?: string;
+    hardfork?: string;
+    minGasPrice?: number;
+    blockBaseFeePerGas?: number;
+}
+
+export interface NetworkCreationConfiguration extends Omit<CreateLocalChainRequest, 'sessionId'> {}
+
+export interface CreateLocalChainRequest {
+    sessionId: string;
+    accounts?: number;
+    chainId?: number;
+    fork?: string;
+    hardfork?: string;
+    minGasPrice?: number;
+    blockBaseFeePerGas?: number;
+}

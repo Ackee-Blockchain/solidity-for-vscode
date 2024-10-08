@@ -16,7 +16,13 @@ import {
     WakeTransactRequestParams,
     WakeTransactResponse,
     WakeGetBytecodeRequestParams,
-    WakeGetBytecodeResponse
+    WakeGetBytecodeResponse,
+    WakeCreateChainResponse,
+    WakeCreateChainRequestParams,
+    WakeConnectChainRequestParams,
+    WakeConnectChainResponse,
+    WakeDisconnectChainRequestParams,
+    WakeDisconnectChainResponse
 } from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
@@ -56,6 +62,77 @@ export class WakeApi {
             throw new Error('Client already set');
         }
         this._client = client;
+    }
+
+    async createChain(
+        requestParams: WakeCreateChainRequestParams
+    ): Promise<WakeCreateChainResponse> {
+        try {
+            const result = await this.sendWakeRequest<WakeCreateChainResponse>(
+                'wake/sake/createChain',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return {
+                ...result,
+                // @dev hotfix lower all addresses
+                accounts: result.accounts.map((address) => address.toLowerCase())
+            };
+        } catch (e) {
+            throw new WakeApiError(
+                `Failed to create chain: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
+    }
+
+    async connectChain(
+        requestParams: WakeConnectChainRequestParams
+    ): Promise<WakeConnectChainResponse> {
+        try {
+            const result = await this.sendWakeRequest<WakeConnectChainResponse>(
+                'wake/sake/connectChain',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return {
+                ...result,
+                // @dev hotfix lower all addresses
+                accounts: result.accounts.map((address) => address.toLowerCase())
+            };
+        } catch (e) {
+            throw new WakeApiError(
+                `Failed to connect chain: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
+    }
+
+    async disconnectChain(
+        requestParams: WakeDisconnectChainRequestParams
+    ): Promise<WakeDisconnectChainResponse> {
+        try {
+            const result = await this.sendWakeRequest<WakeDisconnectChainResponse>(
+                'wake/sake/disconnectChain',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(
+                `Failed to disconnect chain: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
     }
 
     async getAccounts(): Promise<WakeGetAccountsResponse> {
@@ -180,26 +257,29 @@ export class WakeApi {
     async getBytecode(
         requestParams: WakeGetBytecodeRequestParams
     ): Promise<WakeGetBytecodeResponse> {
-        try {
-            const result = await this.sendWakeRequest<WakeGetBytecodeResponse>(
-                'wake/sake/getBytecode',
-                requestParams
-            );
+        throw new Error('Not implemented'); // TODO add to wake first
+        // try {
+        //     const result = await this.sendWakeRequest<WakeGetBytecodeResponse>(
+        //         'wake/sake/getBytecode',
+        //         requestParams
+        //     );
 
-            if (result == null) {
-                throw new Error('No result returned');
-            }
+        //     if (result == null) {
+        //         throw new Error('No result returned');
+        //     }
 
-            return result;
-        } catch (e) {
-            throw new WakeApiError(
-                `Failed to get bytecode: ${e instanceof Error ? e.message : String(e)}`
-            );
-        }
+        //     return result;
+        // } catch (e) {
+        //     throw new WakeApiError(
+        //         `Failed to get bytecode: ${e instanceof Error ? e.message : String(e)}`
+        //     );
+        // }
     }
 
     async deploy(requestParams: WakeDeploymentRequestParams): Promise<WakeDeploymentResponse> {
         try {
+            console.log('deploying params', requestParams);
+
             const result = await this.sendWakeRequest<WakeDeploymentResponse>(
                 'wake/sake/deploy',
                 requestParams
@@ -213,6 +293,7 @@ export class WakeApi {
 
             return result;
         } catch (e) {
+            console.error('Deployment Error', e);
             throw new WakeApiError(
                 `Failed to deploy: ${e instanceof Error ? e.message : String(e)}`
             );
@@ -279,11 +360,12 @@ export class WakeApi {
             SharedChainState.setIsAnvilInstalled(true);
             return validateResponse ? validate(response) : response;
         } catch (e) {
+            console.error('Error sending Wake Request', e);
             const message = typeof e === 'string' ? e : (e as Error).message;
             if (message == 'Anvil executable not found') {
                 SharedChainState.setIsAnvilInstalled(false);
             }
-            throw new WakeAnvilNotFoundError(message);
+            throw new WakeApiError(message);
         }
     }
 }

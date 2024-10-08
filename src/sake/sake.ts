@@ -14,12 +14,16 @@ import { WakeApi } from './api/wake';
 import { OutputViewManager, SakeOutputItem } from './providers/OutputTreeProvider';
 import { copyToClipboardHandler } from '../commands';
 import { SakeProviderManager } from './providers/SakeProviderManager';
+import { SharedChainStateProvider } from './state/SharedChainStateProvider';
 
 export function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     /* Initializers */
     WakeApi.initialize(client);
     OutputViewManager.initialize(context);
     SakeProviderManager.initialize(context);
+
+    /* Initialize Chain State */
+    const chainsState = SharedChainStateProvider.getInstance();
 
     /* Initialize Sake Provider */
     const sake = SakeProviderManager.getInstance();
@@ -34,7 +38,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     sake._setWebviewProvider(sidebarSakeProvider);
 
     // Start with a default local chain
-    sake.createNewLocalChainProvider('Local Chain', true);
+    sake.createNewLocalChainProvider('Local Chain');
 
     /* Initialize Wallet Server */
     // const walletServer = new WalletServer(context);
