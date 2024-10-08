@@ -200,7 +200,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 throw error;
             }
         });
-        wakeProcess.on('exit', () => {
+        wakeProcess.on('close', () => {
             analytics.logCrash(EventType.ERROR_WAKE_CRASH, new Error(crashlog.join('\n')));
             printCrashlog(outputChannel);
             outputChannel.show(true);
