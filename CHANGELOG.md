@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.16.4]
+### Fixes
+- Fixed language server with conda installation crashing due to colliding Python packages being installed in user site-packages
+
 ## [1.16.3]
 ### Fixes
 - Fixed various compilation issues
