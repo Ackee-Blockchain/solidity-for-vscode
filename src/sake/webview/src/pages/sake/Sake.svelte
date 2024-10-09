@@ -22,12 +22,12 @@
         compilationIssuesVisible,
         activeTab,
         wakeState,
-        setupListeners
+        setupListeners,
+        txParametersExpanded
     } from '../../helpers/store';
     import Compile from './Compile.svelte';
     import Deploy from './Deploy.svelte';
     import Run from './Run.svelte';
-    import BlankIcon from '../../components/icons/BlankIcon.svelte';
     import BackIcon from '../../components/icons/BackIcon.svelte';
     import CompilationIssues from '../../components/CompilationIssues.svelte';
     // import '../../../shared/types'; // Importing types to avoid TS error
@@ -47,6 +47,9 @@
     );
 
     import { openExternal } from '../../helpers/api';
+    import ChevronRight from '../../components/icons/ChevronRight.svelte';
+    import ChevronDown from '../../components/icons/ChevronDown.svelte';
+    import BlankIcon from '../../components/icons/BlankIcon.svelte';
 
     let initLoading = true;
 
@@ -60,11 +63,11 @@
     let tabs: { id: any; label: string }[] = [
         {
             id: TabId.CompileDeploy,
-            label: 'Compile & Deploy'
+            label: 'Deploy'
         },
         {
             id: TabId.DeployedContracts,
-            label: 'Deployed contracts'
+            label: 'Interact'
         }
     ];
 
@@ -141,15 +144,18 @@
                     </vscode-badge>
                 {/if}
             </svelte:fragment>
-            <svelte:fragment slot="content-fixed">
+            <svelte:fragment slot="content-top">
                 {#if $activeTab == TabId.CompileDeploy}
-                    <CallSetup />
                     <Compile />
-                {:else if $activeTab == TabId.DeployedContracts}
-                    <CallSetup />
                 {/if}
             </svelte:fragment>
-            <svelte:fragment slot="content-scrollable">
+            <svelte:fragment slot="header-top">
+                {#if $activeTab == TabId.CompileDeploy}
+                    <BlankIcon />
+                    <span>Compile</span>
+                {/if}
+            </svelte:fragment>
+            <svelte:fragment slot="content-middle">
                 {#if $activeTab == TabId.CompileDeploy}
                     {#if $compilationIssuesVisible}
                         <CompilationIssues />
@@ -160,18 +166,44 @@
                     <Run />
                 {/if}
             </svelte:fragment>
-            <svelte:fragment slot="content-header">
-                {#if $compilationIssuesVisible && $activeTab === TabId.CompileDeploy}
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
-                    <!-- svelte-ignore a11y-missing-attribute -->
-                    <a
-                        on:click={() => compilationIssuesVisible.set(false)}
-                        class="flex gap-1 cursor-pointer items-center"
-                    >
-                        <BackIcon />
-                        <span>Compilation issues</span>
-                    </a>
+            <svelte:fragment slot="middle-header">
+                {#if $activeTab === TabId.CompileDeploy}
+                    {#if $compilationIssuesVisible}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <!-- svelte-ignore a11y-missing-attribute -->
+                        <a
+                            on:click={() => compilationIssuesVisible.set(false)}
+                            class="flex gap-1 cursor-pointer items-center"
+                        >
+                            <BackIcon />
+                            <span>Compilation issues</span>
+                        </a>
+                    {:else}
+                        <BlankIcon />
+                        <span>Deploy contracts</span>
+                    {/if}
+                {:else if $activeTab === TabId.DeployedContracts}
+                    <BlankIcon />
+                    <span>Interact with contracts</span>
                 {/if}
+            </svelte:fragment>
+            <svelte:fragment slot="bottom-header">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-missing-attribute -->
+                <a
+                    on:click={() => txParametersExpanded.set(!$txParametersExpanded)}
+                    class="flex gap-1 cursor-pointer items-center"
+                >
+                    {#if $txParametersExpanded}
+                        <ChevronDown />
+                    {:else}
+                        <ChevronRight />
+                    {/if}
+                    <span>Transaction Parameters</span>
+                </a>
+            </svelte:fragment>
+            <svelte:fragment slot="bottom-fixed">
+                <CallSetup />
             </svelte:fragment>
         </Tabs>
     {/if}

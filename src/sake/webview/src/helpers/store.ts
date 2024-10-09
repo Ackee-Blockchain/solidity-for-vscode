@@ -30,6 +30,7 @@ export const selectedValue = derived(selectedValueString, ($selectedValueString)
 });
 export const compilationIssuesVisible = writable<boolean>(false);
 export const activeTab = writable<number>();
+export const txParametersExpanded = writable<boolean>(false);
 
 /**
  * backend data
