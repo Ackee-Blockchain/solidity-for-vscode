@@ -52,3 +52,5 @@ export class SharedChainStateProvider extends BaseStateProvider<SharedChainState
         return this._state.chains.find((chain) => chain.chainId === chainId);
     }
 }
+
+// TODO this needs splitting into serverstate and chainsstate, possibly also add appstate?

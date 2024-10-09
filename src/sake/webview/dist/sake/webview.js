@@ -19291,6 +19291,11 @@ var CompilationIssueType;
     CompilationIssueType["Error"] = "Error";
     CompilationIssueType["Skipped"] = "Skipped";
 })(CompilationIssueType || (CompilationIssueType = {}));
+var NetworkType;
+(function (NetworkType) {
+    NetworkType["Local"] = "Local";
+    NetworkType["Remote"] = "Remote";
+})(NetworkType || (NetworkType = {}));
 
 var WebviewMessageId;
 (function (WebviewMessageId) {

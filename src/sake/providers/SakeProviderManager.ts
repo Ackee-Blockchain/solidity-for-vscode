@@ -5,8 +5,9 @@ import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
 import * as vscode from 'vscode';
 import { v4 as uuidv4 } from 'uuid';
 import { getTextFromInputBox, showErrorMessage } from '../commands';
-import { LocalNodeSakeProvider, SakeProvider, SakeState } from './SakeProviders';
+import { SakeProvider, SakeState } from './SakeProvider';
 import { WakeApi } from '../api/wake';
+import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 
 export class SakeProviderManager {
     private static _instance: SakeProviderManager;
@@ -142,13 +143,51 @@ export class SakeProviderManager {
         this._statusBarItem.show();
     }
 
-    public selectProvider() {
-        const providerOptions = Array.from(this._providers.keys()).map((id) => ({ label: id }));
-        providerOptions.unshift({ label: 'Request new chain' });
-        vscode.window.showQuickPick(providerOptions).then((selected) => {
+    public showProviderSelectionQuickPick() {
+        console.log('showProviderSelectionQuickPick');
+        const quickPickItems: vscode.QuickPickItem[] = [];
+
+        // extend with provider specific items
+        quickPickItems.push(
+            ...Array.from(this._providers.values()).map((provider: SakeProvider) =>
+                provider._getQuickPickItem()
+            )
+        );
+        // add separator
+        quickPickItems.push({
+            label: '',
+            kind: vscode.QuickPickItemKind.Separator
+        });
+
+        // add option to request new chain
+        quickPickItems.push({
+            iconPath: new vscode.ThemeIcon('plus'),
+            label: 'Create new local chain',
+            kind: vscode.QuickPickItemKind.Default
+        });
+
+        // add option to connect setup advanced local node
+        quickPickItems.push({
+            iconPath: new vscode.ThemeIcon('plus'),
+            label: 'Create new local chain (advanced)',
+            kind: vscode.QuickPickItemKind.Default
+        });
+
+        // add option to connect to remote node
+        quickPickItems.push({
+            iconPath: new vscode.ThemeIcon('cloud'),
+            label: 'Connect to remote node',
+            kind: vscode.QuickPickItemKind.Default
+        });
+
+        vscode.window.showQuickPick(quickPickItems).then((selected) => {
             if (selected) {
-                if (selected.label === 'Request new chain') {
+                if (selected.label === 'Create new local chain') {
                     this.requestNewProvider();
+                } else if (selected.label === 'Create new local chain (advanced)') {
+                    // pass
+                } else if (selected.label === 'Connect to remote node') {
+                    // pass
                 } else {
                     this.setProvider(selected.label);
                 }
@@ -190,8 +229,8 @@ export class SakeProviderManager {
         } catch (error) {
             console.error('Failed to ping Wake:', error);
             this._chainsState.setIsWakeServerRunning(false);
-            showErrorMessage('Failed to create a new chain. Unable to connect to Wake.');
-            return;
+            // showErrorMessage('Failed to create a new chain. Unable to connect to Wake.');
+            // return;
         }
 
         const sessionId = uuidv4();
@@ -233,7 +272,7 @@ export class SakeProviderManager {
         SakeProviderManager._context.subscriptions.push(
             vscode.commands.registerCommand(
                 'Tools-for-Solidity.sake.selectSakeProvider',
-                this.selectProvider.bind(this)
+                this.showProviderSelectionQuickPick.bind(this)
             )
         );
         this._statusBarItem.command = 'Tools-for-Solidity.sake.selectSakeProvider';

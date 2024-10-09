@@ -66,6 +66,11 @@ export interface SharedChainState {
     currentChainId: string | undefined;
 }
 
+export enum NetworkType {
+    Local = 'Local',
+    Remote = 'Remote'
+}
+
 export interface ChainState {
     chainId: string;
     network: string;

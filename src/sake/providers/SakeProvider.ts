@@ -92,7 +92,8 @@ export class SakeState {
 
 export class SakeError extends Error {}
 
-export class SakeProvider {
+// TODO consider renaming to BaseSakeProvider
+export abstract class SakeProvider {
     state: SakeState;
     network: NetworkProvider;
     protected output: OutputViewManager;
@@ -279,8 +280,6 @@ export class SakeProvider {
         // TODO consider check and update balance of caller and callee
     }
 
-    /* Helper functions */
-
     async fetchContractFromEtherscan(address: string) {
         throw new Error('Method not implemented.');
         // TODO
@@ -299,31 +298,14 @@ export class SakeProvider {
         this.state.unsubscribe();
         this.network.onDeactivate();
     }
-}
 
-export class LocalNodeSakeProvider extends SakeProvider {
-    private _wake: WakeApi;
-    constructor(
-        id: string,
-        displayName: string,
-        networkProvider: NetworkProvider,
-        webviewProvider: BaseWebviewProvider
-        // private wakeApi: WakeApi
-    ) {
-        super(id, displayName, networkProvider, webviewProvider);
-
-        this._wake = WakeApi.getInstance();
+    protected get chainState(): ChainState | undefined {
+        return this.state.chains.getChain(this.id);
     }
 
-    async initialize(accounts: Address[]) {
-        for (const account of accounts) {
-            const accountDetails = await this.network.getAccountDetails(account);
-            // console.log('account details', accountDetails);
-            if (accountDetails) {
-                this.state.accounts.add(accountDetails);
-            }
-        }
-    }
+    /* Helper functions */
+
+    abstract _getQuickPickItem(): vscode.QuickPickItem;
 }
 
 // TODO add context if needed
