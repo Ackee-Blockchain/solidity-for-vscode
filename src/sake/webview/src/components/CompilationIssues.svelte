@@ -8,7 +8,7 @@
         vsCodeCheckbox,
         vsCodeTextField
     } from '@vscode/webview-ui-toolkit';
-    import { compilationState } from '../helpers/store';
+    import { compilationState } from '../stores/sakeStore';
     import CompilationError from './CompilationError.svelte';
 
     provideVSCodeDesignSystem().register(

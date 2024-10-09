@@ -8,24 +8,13 @@
         vsCodeCheckbox,
         vsCodeTextField
     } from '@vscode/webview-ui-toolkit';
-    import CallSetup from '../../components/CallSetup.svelte';
-    import { messageHandler } from '@estruyf/vscode/dist/client';
-    import {
-        StateId,
-        WebviewMessage,
-        type CompilationStateData,
-        type CompiledContract,
-        type WakeDeploymentRequestParams,
-        CompilationIssueType
-    } from '../../../shared/types';
-    import { onMount } from 'svelte';
-    import Constructor from '../../components/Constructor.svelte';
-    import { compilationIssuesVisible, compilationState } from '../../helpers/store';
-    import TextContainer from '../../components/TextContainer.svelte';
-    import WarningIcon from '../../components/icons/WarningIcon.svelte';
-    import ErrorIcon from '../../components/icons/ErrorIcon.svelte';
-    import TextContainerDark from '../../components/TextContainerDark.svelte';
-    import { compileContracts } from '../../helpers/api';
+    import { CompilationIssueType } from '../../shared/types';
+    import { compilationState } from '../stores/sakeStore';
+    import TextContainer from '../components/TextContainer.svelte';
+    import WarningIcon from '../components/icons/WarningIcon.svelte';
+    import ErrorIcon from '../components/icons/ErrorIcon.svelte';
+    import { compileContracts } from '../helpers/api';
+    import { compilationIssuesVisible } from '../stores/appStore';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -52,7 +41,7 @@
     ).length;
 </script>
 
-<section>
+<section class="p-2">
     <!-- <p class="ml-1 text-sm">Compiler version</p>
     <vscode-dropdown position="below" class="w-full mb-3">
         <vscode-option>Auto-compile</vscode-option>

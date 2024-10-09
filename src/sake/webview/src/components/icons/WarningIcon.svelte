@@ -1,3 +1,6 @@
+<script lang="ts">
+</script>
+
 <svg
     width="16"
     height="16"
