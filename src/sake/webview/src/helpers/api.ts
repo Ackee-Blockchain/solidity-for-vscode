@@ -6,7 +6,7 @@ import {
     type WakeDeploymentRequestParams,
     type WakeSetBalancesRequestParams
 } from '../../shared/types';
-import { deployedContracts } from './store';
+import { deployedContracts } from '../stores/sakeStore';
 
 export function copyToClipboard(stringToCopy: string) {
     messageHandler.send(WebviewMessage.copyToClipboard, stringToCopy);

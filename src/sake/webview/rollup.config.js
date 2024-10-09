@@ -61,7 +61,7 @@ export default [
     //     ..._defaultConfig,
     // },
     {
-        input: 'src/pages/sake/page.ts',
+        input: 'src/app.ts',
         output: {
             sourcemap: true,
             format: 'cjs',

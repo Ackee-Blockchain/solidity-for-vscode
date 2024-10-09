@@ -10,31 +10,9 @@ import {
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import { parseComplexNumber } from '../../shared/validate';
+import { selectedAccount } from './appStore';
 
-/**
- * frontend svelte data
- */
-
-export const selectedAccount = writable<AccountStateData | null>(null);
-export const selectedValueString = writable<string | null>(null);
-// null indicated wrong stirng input
-export const selectedValue = derived(selectedValueString, ($selectedValueString) => {
-    if ($selectedValueString === null || $selectedValueString === '') {
-        return 0;
-    }
-    try {
-        return parseComplexNumber($selectedValueString);
-    } catch (e) {
-        return null;
-    }
-});
-export const compilationIssuesVisible = writable<boolean>(false);
-export const activeTab = writable<number>();
-export const txParametersExpanded = writable<boolean>(false);
-
-/**
- * backend data
- */
+/* Sake Stores */
 
 export const accounts = writable<AccountStateData[]>([]);
 export const deployedContracts = writable<DeploymentStateData[]>([]);

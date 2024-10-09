@@ -8,11 +8,12 @@
         vsCodeCheckbox,
         vsCodeTextField
     } from '@vscode/webview-ui-toolkit';
-    import { type CompiledContract } from '../../../shared/types';
-    import Constructor from '../../components/Constructor.svelte';
-    import { selectedAccount, selectedValue, compilationState } from '../../helpers/store';
-    import { deployContract, showErrorMessage } from '../../helpers/api';
-    import TextContainerDark from '../../components/TextContainerDark.svelte';
+    import { type CompiledContract } from '../../shared/types';
+    import Constructor from '../components/Constructor.svelte';
+    import { compilationState } from '../stores/sakeStore';
+    import { selectedAccount, selectedValue } from '../stores/appStore';
+    import { deployContract, showErrorMessage } from '../helpers/api';
+    import TextContainerDark from '../components/TextContainerDark.svelte';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -45,8 +46,9 @@
     };
 </script>
 
-{#if $compilationState.contracts.length > 0 || $compilationState.issues.length > 0}
-    <section class="w-full">
+<section class="p-2">
+    {#if $compilationState.contracts.length > 0 || $compilationState.issues.length > 0}
+        <!-- <section class="w-full flex-grow overflow-y-scroll"> -->
         <vscode-text-field
             class="w-full mb-2"
             placeholder="Filter compiled contracts"
@@ -81,9 +83,9 @@
                 />
             {/each}
         </div>
-    </section>
-{:else}
-    <section class="h-full w-full flex flex-col items-center justify-center gap-3">
+        <!-- </section> -->
+    {:else}
+        <!-- <section class="h-full w-full flex flex-col items-center justify-center gap-3"> -->
         <div class="flex flex-col gap-2 items-center text-vscodeInputForeground">
             <svg
                 width="16"
@@ -97,6 +99,7 @@
             >
             <span class="text-sm my-2 text-center text-secon">No compiled contracts </span>
         </div>
-    </section>
-    <!-- <p class="text-center">No contracts are compiled</p> -->
-{/if}
+        <!-- </section> -->
+        <!-- <p class="text-center">No contracts are compiled</p> -->
+    {/if}
+</section>
