@@ -18,7 +18,8 @@
         selectedValue,
         selectedValueString,
         selectedAccount,
-        accounts
+        accounts,
+        txParametersExpanded
     } from '../helpers/store';
     import {
         copyToClipboard,
@@ -77,59 +78,76 @@
 </script>
 
 {#if accounts !== undefined}
-    <section class="flex flex-col gap-1">
-        <div>
-            <vscode-dropdown position="below" class="w-full mb-2" on:change={handleAccountChange}>
-                {#each $accounts as account, i}
-                    <vscode-option value={i} selected={account.address == $selectedAccount?.address}
-                        >Account {i}</vscode-option
-                    >
-                {/each}
-                <!-- @dev hack to display selected account -->
-                <span slot="selected-value">
-                    {$selectedAccount?.nick ?? $selectedAccount?.address}
-                </span>
-            </vscode-dropdown>
+    {#if $txParametersExpanded}
+        <section class="flex flex-col gap-1">
+            <div>
+                <vscode-dropdown
+                    position="below"
+                    class="w-full mb-2"
+                    on:change={handleAccountChange}
+                >
+                    {#each $accounts as account, i}
+                        <vscode-option
+                            value={i}
+                            selected={account.address == $selectedAccount?.address}
+                            >Account {i}</vscode-option
+                        >
+                    {/each}
+                    <!-- @dev hack to display selected account -->
+                    <span slot="selected-value">
+                        {$selectedAccount?.nick ?? $selectedAccount?.address}
+                    </span>
+                </vscode-dropdown>
 
-            {#if $selectedAccount !== null}
-                <div class="w-full px-1 mb-3">
-                    <div class="w-full flex flex-row gap-1 items-center h-[20px]">
-                        <!-- <span class="flex-1 truncate text-sm">{$selectedAccount.address}</span> -->
-                        <!-- <span class="flex-1 truncate text-sm">{accounts[selectedAccountIndex].address}</span> -->
-                        <CopyableSpan
-                            text={$selectedAccount.address}
-                            className="flex-1 truncate text-sm"
-                        />
-                        <!-- <CopyButton callback={() => copyToClipboard($selectedAccount.address)} /> -->
+                {#if $selectedAccount !== null}
+                    <div class="w-full px-1 mb-3">
+                        <div class="w-full flex flex-row gap-1 items-center h-[20px]">
+                            <!-- <span class="flex-1 truncate text-sm">{$selectedAccount.address}</span> -->
+                            <!-- <span class="flex-1 truncate text-sm">{accounts[selectedAccountIndex].address}</span> -->
+                            <CopyableSpan
+                                text={$selectedAccount.address}
+                                className="flex-1 truncate text-sm"
+                            />
+                            <!-- <CopyButton callback={() => copyToClipboard($selectedAccount.address)} /> -->
+                        </div>
+                        <div class="w-full flex flex-row gap-1 items-center h-[20px]">
+                            <ClickableSpan className="text-sm flex-1" callback={topUp}>
+                                {displayEtherValue($selectedAccount.balance)}
+                            </ClickableSpan>
+                            <!-- <span class="text-sm flex-1">{accounts[selectedAccountIndex].balance}ETH</span> -->
+                            <!-- <IconButton callback={topUp}>+</IconButton> -->
+                        </div>
                     </div>
-                    <div class="w-full flex flex-row gap-1 items-center h-[20px]">
-                        <ClickableSpan className="text-sm flex-1" callback={topUp}>
-                            {displayEtherValue($selectedAccount.balance)}
-                        </ClickableSpan>
-                        <!-- <span class="text-sm flex-1">{accounts[selectedAccountIndex].balance}ETH</span> -->
-                        <!-- <IconButton callback={topUp}>+</IconButton> -->
+                {/if}
+            </div>
+
+            <div class="w-full flex flex-row gap-3">
+                <vscode-text-field
+                    placeholder="Value"
+                    class="w-full"
+                    value={$selectedValueString}
+                    on:change={handleValueChange}
+                >
+                    <div slot="end" class="flex items-center">
+                        {#if $selectedValue === null}
+                            <InputIssueIndicator type="danger">
+                                <span class="text-sm">Value could not be parsed</span>
+                            </InputIssueIndicator>
+                        {:else}
+                            <span slot="end" class="flex justify-center align-middle leading-5"
+                                >Ξ</span
+                            >
+                        {/if}
                     </div>
-                </div>
+                </vscode-text-field>
+            </div>
+        </section>
+    {:else}
+        <section class="flex flex-col gap-1">
+            <span>Sender: {$selectedAccount?.nick ?? $selectedAccount?.address}</span>
+            {#if $selectedValue !== null && $selectedValue > 0}
+                <span>Value: {$selectedValueString}</span>
             {/if}
-        </div>
-
-        <div class="w-full flex flex-row gap-3">
-            <vscode-text-field
-                placeholder="Value"
-                class="w-full"
-                value={$selectedValueString}
-                on:change={handleValueChange}
-            >
-                <div slot="end" class="flex items-center">
-                    {#if $selectedValue === null}
-                        <InputIssueIndicator type="danger">
-                            <span class="text-sm">Value could not be parsed</span>
-                        </InputIssueIndicator>
-                    {:else}
-                        <span slot="end" class="flex justify-center align-middle leading-5">Ξ</span>
-                    {/if}
-                </div>
-            </vscode-text-field>
-        </div>
-    </section>
+        </section>
+    {/if}
 {/if}

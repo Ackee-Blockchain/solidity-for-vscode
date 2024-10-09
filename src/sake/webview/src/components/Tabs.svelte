@@ -1,13 +1,18 @@
 <script lang="ts">
     import { activeTab } from '../helpers/store';
+    import { onMount } from 'svelte';
 
     export let tabs: { id: any; label: string }[];
+
+    onMount(() => {
+        console.log('Slots:', $$slots);
+    });
 </script>
 
 <div class="flex flex-col h-full w-full">
     <div class="w-full">
         <div class="overflow-x-auto">
-            <ul class="flex vscode-gap mb-4 monaco-nav">
+            <ul class="flex vscode-gap mb-4 monaco-nav justify-around">
                 {#each tabs as tab}
                     <li
                         class="text-sm uppercase whitespace-nowrap
@@ -27,24 +32,43 @@
                 {/each}
             </ul>
         </div>
-        <div class="w-full p-[10px] flex flex-col gap-4">
-            <slot name="content-fixed" />
-        </div>
     </div>
 
-    {#if $$slots['content-header']}
-        <div class="w-full mr-[1px] flex content-header">
-            <slot name="content-header" />
+    {#if $$slots['header-top']}
+        <div class="w-full mr-[1px] flex header">
+            <slot name="header-top" />
+        </div>
+    {/if}
+
+    {#if $$slots['content-top']}
+        <div class="w-full flex-shrink overflow-y-auto overflow-x-hidden p-[10px]">
+            <slot name="content-top" />
+        </div>
+    {/if}
+
+    {#if $$slots['middle-header']}
+        <div class="w-full mr-[1px] flex header">
+            <slot name="middle-header" />
         </div>
     {/if}
 
     <div class="w-full flex-1 overflow-y-auto overflow-x-hidden p-[10px]">
-        <slot name="content-scrollable" />
+        <slot name="content-middle" />
+    </div>
+
+    {#if $$slots['bottom-header']}
+        <div class="w-full mr-[1px] flex header">
+            <slot name="bottom-header" />
+        </div>
+    {/if}
+
+    <div class="w-full flex-shrink overflow-y-auto overflow-x-hidden p-[10px]">
+        <slot name="bottom-fixed" />
     </div>
 </div>
 
 <style>
-    .content-header {
+    .header {
         background: var(--vscode-sideBarSectionHeader-background);
         line-height: 22px;
         height: 22px;
@@ -61,7 +85,7 @@
         border-top: 1px solid var(--vscode-sideBar-dropBackground);
     }
 
-    .content-header:empty {
+    .middle-header:empty {
         height: 1px;
     }
 
