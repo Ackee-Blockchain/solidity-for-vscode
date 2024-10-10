@@ -14,15 +14,6 @@
 </script>
 
 <FlexContainer>
-    <ViewScrollable>
-        <svelte:fragment slot="header">
-            <BlankIcon />
-            <span>Interact with contracts</span>
-        </svelte:fragment>
-        <svelte:fragment slot="content">
-            <Run />
-        </svelte:fragment>
-    </ViewScrollable>
     <ViewStatic>
         <svelte:fragment slot="header">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -49,4 +40,13 @@
             <TransactionParameters />
         </svelte:fragment>
     </ViewStatic>
+    <ViewScrollable>
+        <svelte:fragment slot="header">
+            <BlankIcon />
+            <span>Interact with contracts</span>
+        </svelte:fragment>
+        <svelte:fragment slot="content">
+            <Run />
+        </svelte:fragment>
+    </ViewScrollable>
 </FlexContainer>
