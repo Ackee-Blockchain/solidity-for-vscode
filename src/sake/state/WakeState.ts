@@ -7,7 +7,8 @@ export class WakeState extends BaseState<WakeStateData> {
     private constructor() {
         super(StateId.Wake, {
             isAnvilInstalled: undefined,
-            isServerRunning: undefined
+            isServerRunning: undefined,
+            isOpenWorkspace: undefined
         });
     }
 
@@ -19,6 +20,7 @@ export class WakeState extends BaseState<WakeStateData> {
     }
 
     public setIsAnvilInstalled(isAnvilInstalled: boolean) {
+        console.log('setIsAnvilInstalled', isAnvilInstalled);
         this.state = {
             ...this._state,
             isAnvilInstalled: isAnvilInstalled
@@ -26,9 +28,18 @@ export class WakeState extends BaseState<WakeStateData> {
     }
 
     public setIsServerRunning(isServerRunning: boolean) {
+        console.log('setIsServerRunning', isServerRunning);
         this.state = {
             ...this._state,
             isServerRunning: isServerRunning
+        };
+    }
+
+    public setIsOpenWorkspace(isOpenWorkspace: 'open' | 'closed' | 'tooManyWorkspaces') {
+        console.log('setIsOpenWorkspace', isOpenWorkspace);
+        this.state = {
+            ...this._state,
+            isOpenWorkspace: isOpenWorkspace
         };
     }
 }

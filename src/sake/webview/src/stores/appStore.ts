@@ -21,4 +21,4 @@ export const selectedValue = derived(selectedValueString, ($selectedValueString)
 });
 export const compilationIssuesVisible = writable<boolean>(false);
 export const activeTabId = writable<number>();
-export const txParametersExpanded = writable<boolean>(false);
+export const txParametersExpanded = writable<boolean>(true);

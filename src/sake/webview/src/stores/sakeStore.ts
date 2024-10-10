@@ -23,7 +23,8 @@ export const compilationState = writable<CompilationStateData>({
 });
 export const wakeState = writable<WakeStateData>({
     isAnvilInstalled: undefined,
-    isServerRunning: undefined
+    isServerRunning: undefined,
+    isOpenWorkspace: undefined
 });
 
 /**
@@ -31,7 +32,8 @@ export const wakeState = writable<WakeStateData>({
  */
 
 export async function requestState() {
-    const a = await messageHandler.request(WebviewMessage.onGetAccounts);
+    await messageHandler.request(WebviewMessage.getState, StateId.Wake);
+    await messageHandler.request(WebviewMessage.onGetAccounts);
     await messageHandler.request(WebviewMessage.getState, StateId.DeployedContracts);
     await messageHandler.request(WebviewMessage.getState, StateId.CompiledContracts);
 }
@@ -100,6 +102,7 @@ export function setupListeners() {
                 }
 
                 if (stateId === StateId.Wake) {
+                    console.log('wake state', payload);
                     if (payload === undefined) {
                         return;
                     }

@@ -22,7 +22,13 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
     _doc?: vscode.TextDocument;
     _stateSubscriptions: Map<StateId, any> = new Map(); // TODO add type
 
-    constructor(private readonly _extensionUri: vscode.Uri, private readonly _targetPath: string) {}
+    constructor(private readonly _extensionUri: vscode.Uri, private readonly _targetPath: string) {
+        // Subscribe to states
+        DeploymentState.getInstance().subscribe(this);
+        CompilationState.getInstance().subscribe(this);
+        AccountState.getInstance().subscribe(this);
+        WakeState.getInstance().subscribe(this);
+    }
 
     public resolveWebviewView(webviewView: vscode.WebviewView) {
         this._view = webviewView;
@@ -35,12 +41,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
         // Set the webview's initial html content
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-
-        // Subscribe to states
-        DeploymentState.getInstance().subscribe(this);
-        CompilationState.getInstance().subscribe(this);
-        AccountState.getInstance().subscribe(this);
-        WakeState.getInstance().subscribe(this);
 
         // Handle messages from the webview
         webviewView.webview.onDidReceiveMessage(async (message) => {
