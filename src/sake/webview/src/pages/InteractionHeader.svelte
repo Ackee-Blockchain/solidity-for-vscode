@@ -2,7 +2,7 @@
     import { deployedContracts } from '../stores/sakeStore';
 </script>
 
-<span>Interaction</span>
+<span>Interact</span>
 <span class="font-normal">
     <vscode-badge appearance="secondary">
         <!-- style="padding:5px 3px;" -->
