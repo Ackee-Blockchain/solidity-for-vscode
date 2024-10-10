@@ -465,6 +465,11 @@
                 "icon": "$(refresh)"
             },
             {
+                "command": "Tools-for-Solidity.detections.toggle_detectors",
+                "title": "Solidity: Enable/Disable Detectors",
+                "icon": "$(checklist)"
+            },
+            {
                 "command": "Tools-for-Solidity.detections.open_docs",
                 "title": "Open Documentation",
                 "icon": "$(book)"
@@ -652,6 +657,11 @@
                     "submenu": "tools-for-solidity.detections.filter",
                     "when": "view == wake-detections",
                     "group": "navigation@2"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.toggle_detectors",
+                    "when": "view == wake-detections",
+                    "group": "navigation@4"
                 },
                 {
                     "command": "Tools-for-Solidity.detections.force_recompile",
