@@ -67,10 +67,9 @@ jobs:
             - name: Update publisher in package.json
               run: |
                   @echo off
-                  findstr /v "\"publisher\": \"ackeeblockchain\"" package.json > temp.json
-                  echo     "publisher": "AckeeBlockchainSecurity", >> temp.json
-                  findstr /v "}" temp.json > package.json
-                  echo } >> package.json
-                  del temp.json
+                    findstr /v "\"publisher\": \"ackeeblockchain\"" package.json > temp.json
+                    echo     "publisher": "AckeeBlockchainSecurity" >> temp.json
+                    type temp.json > package.json
+                    del temp.json
             - name: Publish to Open VSX Registry
               run: npx ovsx publish -p ${{ secrets.OPENVSX_TOKEN }}
