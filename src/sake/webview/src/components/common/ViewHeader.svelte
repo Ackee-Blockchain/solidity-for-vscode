@@ -10,6 +10,7 @@
         background: var(--vscode-sideBarSectionHeader-background);
         line-height: 22px;
         height: 22px;
+        min-height: 22px;
         overflow: hidden;
         font-weight: 700;
         font-size: 11px;
@@ -20,6 +21,7 @@
         text-transform: uppercase;
         color: var(--vscode-sideBarSectionHeader-foreground);
         padding: 0 2px;
-        border-top: 1px solid var(--vscode-sideBar-dropBackground);
+        border-top: 1px solid var(--vscode-tab-border);
+        border-right: 1px solid var(--vscode-tab-border);
     }
 </style>

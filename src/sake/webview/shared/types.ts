@@ -209,6 +209,7 @@ export interface AccountStateData {
 export interface WakeStateData {
     isAnvilInstalled: boolean | undefined;
     isServerRunning: boolean | undefined;
+    isOpenWorkspace: 'open' | 'closed' | 'tooManyWorkspaces' | undefined;
 }
 
 export type TxHistoryStateData = TxDeploymentOutput | TxCallOutput;

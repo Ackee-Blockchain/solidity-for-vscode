@@ -41,7 +41,7 @@
     ).length;
 </script>
 
-<section class="p-2">
+<section class="p-3">
     <!-- <p class="ml-1 text-sm">Compiler version</p>
     <vscode-dropdown position="below" class="w-full mb-3">
         <vscode-option>Auto-compile</vscode-option>

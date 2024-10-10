@@ -59,12 +59,12 @@
     let tabs: { id: any; label: string; content: ComponentType; header?: ComponentType }[] = [
         {
             id: TabId.CompileDeploy,
-            label: 'Deploy',
+            label: 'Deployment',
             content: Deployment
         },
         {
             id: TabId.DeployedContracts,
-            label: 'Interact',
+            label: 'Interaction',
             content: Interaction,
             header: InteractionHeader
         }
@@ -74,6 +74,7 @@
         startServer();
         setupListeners();
         activeTabId.set(tabs[0].id);
+        console.log('wake state', $wakeState);
     });
 
     const startServer = () => {
@@ -92,7 +93,7 @@
 
     const setServerRunning = (isRunning: boolean) => {
         wakeState.set({
-            isAnvilInstalled: $wakeState.isAnvilInstalled,
+            ...$wakeState,
             isServerRunning: isRunning
         });
     };
@@ -107,6 +108,22 @@
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
             <vscode-progress-ring />
             <span>Connecting with Wake...</span>
+        </div>
+    {:else if $wakeState.isOpenWorkspace === 'closed'}
+        <div class="flex flex-col gap-4 h-full w-full p-4">
+            <h3 class="uppercase font-bold text-base">No workspace opened</h3>
+            <span>
+                The Deploy and Interact UI requires an open workspace containing Solidity files.
+                Please open a project with Solidity contracts to use this feature.
+            </span>
+        </div>
+    {:else if $wakeState.isOpenWorkspace === 'tooManyWorkspaces'}
+        <div class="flex flex-col gap-4 h-full w-full p-4">
+            <h3 class="uppercase font-bold text-base">Too many workspaces opened</h3>
+            <span>
+                The Deploy and Interact UI can only be used with a single workspace opened. Please
+                close other workspaces to use this feature.
+            </span>
         </div>
     {:else if $wakeState.isServerRunning === false}
         <div class="flex flex-col gap-4 h-full w-full p-4">

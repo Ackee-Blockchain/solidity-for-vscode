@@ -29,6 +29,10 @@ export abstract class BaseState<T> {
     }
 
     private _sendUpdateMessage() {
+        console.log(
+            'state in ' + this._stateId + ' changed, calling subscribers',
+            this.subscriptions
+        );
         // console.log("state in " + this._stateId + " changed, calling subscribers", this.state)
         this.subscriptions.forEach((provider) => {
             provider.postMessageToWebview({

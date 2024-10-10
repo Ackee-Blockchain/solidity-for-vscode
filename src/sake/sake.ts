@@ -32,6 +32,7 @@ import {
 import { TxHistoryState } from './state/TxHistoryState';
 import { showTxFromHistory } from './utils/output';
 import { copyToClipboardHandler } from '../commands';
+import { WakeState } from './state/WakeState';
 
 export function activateSake(context: vscode.ExtensionContext, client: LanguageClient | undefined) {
     // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
@@ -64,6 +65,33 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     const compilationState = CompilationState.getInstance();
     const accountState = AccountState.getInstance();
     const txHistoryState = TxHistoryState.getInstance();
+    const wakeState = WakeState.getInstance();
+
+    console.log('sake', wakeState);
+
+    const workspaceWatcher = () => {
+        const workspaces = vscode.workspace.workspaceFolders;
+        console.log('workspaceWatcher', workspaces?.length);
+        if (workspaces === undefined || workspaces.length === 0) {
+            console.log('workspaceWatcher', 'closed');
+            wakeState.setIsOpenWorkspace('closed');
+            return;
+        } else if (workspaces.length > 1) {
+            console.log('workspaceWatcher', 'tooManyWorkspaces');
+            wakeState.setIsOpenWorkspace('tooManyWorkspaces');
+            return;
+        }
+
+        console.log('workspaceWatcher', 'open');
+        wakeState.setIsOpenWorkspace('open');
+    };
+
+    // check if workspace is open
+    vscode.workspace.onDidChangeWorkspaceFolders(() => {
+        workspaceWatcher();
+    });
+
+    workspaceWatcher();
 
     context.subscriptions.push(
         vscode.commands.registerCommand('sake.refresh', async () => {

@@ -17,15 +17,17 @@
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <!-- svelte-ignore a11y-missing-attribute -->
                         <a
-                            class="monaco-button flex gap-2"
+                            class="monaco-button flex gap-2 font-bold items-start"
                             class:active={$activeTabId === tab.id}
                             on:click={() => activeTabId.set(tab.id)}
                         >
-                            {#if tab.header}
-                                <svelte:component this={tab.header} />
-                            {:else}
-                                <span>{tab.label}</span>
-                            {/if}
+                            <span class="h-[18px]">
+                                {#if tab.header}
+                                    <svelte:component this={tab.header} />
+                                {:else}
+                                    <span>{tab.label}</span>
+                                {/if}
+                            </span>
                         </a>
                     </li>
                 {/each}
