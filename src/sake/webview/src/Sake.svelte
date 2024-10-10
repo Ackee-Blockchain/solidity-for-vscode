@@ -39,9 +39,6 @@
     );
 
     import { openExternal } from './helpers/api';
-    import ChevronRight from './components/icons/ChevronRight.svelte';
-    import ChevronDown from './components/icons/ChevronDown.svelte';
-    import BlankIcon from './components/icons/BlankIcon.svelte';
     import type { ComponentType, SvelteComponent } from 'svelte';
     import Interaction from './pages/Interaction.svelte';
     import Deployment from './pages/Deployment.svelte';
@@ -59,12 +56,12 @@
     let tabs: { id: any; label: string; content: ComponentType; header?: ComponentType }[] = [
         {
             id: TabId.CompileDeploy,
-            label: 'Deployment',
+            label: 'Deploy',
             content: Deployment
         },
         {
             id: TabId.DeployedContracts,
-            label: 'Interaction',
+            label: 'Interact',
             content: Interaction,
             header: InteractionHeader
         }

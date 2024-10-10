@@ -8,6 +8,7 @@
     import {
         compilationIssuesVisible,
         selectedAccount,
+        selectedValue,
         selectedValueString,
         txParametersExpanded
     } from '../stores/appStore';
@@ -18,6 +19,7 @@
     import ChevronRight from '../components/icons/ChevronRight.svelte';
     import ViewStatic from '../components/common/ViewStatic.svelte';
     import ViewScrollable from '../components/common/ViewScrollable.svelte';
+    import { displayEtherValue } from '../../shared/ether';
 </script>
 
 <FlexContainer>
@@ -56,7 +58,7 @@
 
                     <span class="text-xs text-vscodeForegroundSecondary font-normal ml-auto pr-2">
                         ({$selectedAccount?.nick ?? $selectedAccount?.address},
-                        {$selectedValueString ?? 0} ETH)
+                        {displayEtherValue($selectedValue)})
                     </span>
                 {/if}
             </a>
