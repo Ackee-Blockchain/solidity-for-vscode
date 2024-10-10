@@ -37,6 +37,7 @@ import { OutputViewManager, SakeOutputTreeProvider } from './providers/OutputTre
 import { TxHistoryState } from './state/TxHistoryState';
 import { validate } from './utils/validate';
 import { WakeState } from './state/WakeState';
+import { showTimedInfoMessage } from './commands';
 
 const accountState = AccountState.getInstance();
 const deploymentState = DeploymentState.getInstance();
@@ -256,6 +257,14 @@ export async function deploy(
         txHistoryState.addTx(txOutput);
         output.set(txOutput);
         vscode.commands.executeCommand('sake-output.focus');
+
+        if (result.success) {
+            showTimedInfoMessage(
+                `Successfully deployed ${_contractCompilationData?.name} to ${result.contractAddress}`
+            );
+        } else {
+            showTimedInfoMessage(`Failed to deploy ${_contractCompilationData?.name}`);
+        }
 
         // vscode.window.showInformationMessage('Deployment was successful!');
 

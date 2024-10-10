@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.16.5]
+### Features
+- Improved the UI of the Deploy and Interact tab
+
 ## [1.16.4]
 ### Fixes
 - Fixed language server with conda installation crashing due to colliding Python packages being installed in user site-packages

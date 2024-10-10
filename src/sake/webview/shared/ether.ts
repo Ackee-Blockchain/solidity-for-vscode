@@ -2,7 +2,11 @@ import { FunctionInputParseError } from './errors';
 
 export function displayEtherValue(value: number | null) {
     if (value === null) {
-        return 'N/A';
+        return '0 ETH';
+    }
+
+    if (value === 0) {
+        return '0 ETH';
     }
 
     if (10 ** 14 <= value && value < 10 ** 23) {
