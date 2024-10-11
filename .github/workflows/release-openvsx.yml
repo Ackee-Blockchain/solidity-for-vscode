@@ -1,0 +1,30 @@
+name: Open VSX Release
+
+on:
+    release:
+        types: [published]
+
+jobs:
+    publish-openvsx:
+        runs-on: windows-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Create env.ts file
+              run: echo "export const TELEMETRY_KEY = '${{ secrets.TELEMETRY_KEY }}'" > src/env.ts
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 'latest'
+            - name: Install dependencies
+              run: npm run clean-install
+            - name: Build project
+              run: npm run build
+            - name: Install ovsx
+              run: npm install -g ovsx
+            - name: Update publisher in package.json
+              run: |
+                  (Get-Content package.json) -replace '"publisher": "ackeeblockchain"', '"publisher": "AckeeBlockchainSecurity"' | Set-Content package.json
+              shell: pwsh
+            - name: Publish to Open VSX Registry
+              run: npx ovsx publish -p ${{ secrets.OPEN_VSIX_TOKEN }}
