@@ -106,8 +106,9 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
         const response: WakeSetBalancesResponse = await this._wake.setBalances({
             balances: {
                 [request.address]: request.balance
-            }
-        } as WakeSetBalancesRequestParams);
+            },
+            sessionId: this.config.sessionId
+        });
 
         return response;
     }
