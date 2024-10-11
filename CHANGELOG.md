@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.16.6]
+### Features
+- The extension is now being published also to the Open VSX Registry
+
+### Fixes
+- Minor UI fixes
+- Fixed the extension not being available on Open VSX
+
 ## [1.16.5]
 ### Features
 - Improved the UI of the Deploy and Interact tab
