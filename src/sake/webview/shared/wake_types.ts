@@ -73,6 +73,25 @@ export interface WakeDisconnectChainResponse extends WakeBaseResponse {}
 
 /* State Management */
 
+export interface WakeSakeStateMetadata {
+    labels: Record<string, string>;
+    deployedLibraries: Record<string, string[]>;
+}
+
+export interface WakeDumpStateRequestParams extends WakeBaseRequestParams {}
+
+export interface WakeDumpStateResponse extends WakeBaseResponse {
+    metadata: WakeSakeStateMetadata;
+    chainDump: string;
+}
+
+export interface WakeLoadStateRequestParams extends WakeBaseRequestParams {
+    metadata: WakeSakeStateMetadata;
+    chainDump: string;
+}
+
+export interface WakeLoadStateResponse extends WakeBaseResponse {}
+
 /* Get Accounts */
 
 export type WakeGetAccountsResponse = w3t.Address[];

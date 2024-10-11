@@ -20614,14 +20614,14 @@ function setLabel(address, nickname) {
 }
 async function requestLabel(address) {
     const nickname = await getInputFromTopBar('', 'New Label');
-    if (!nickname) {
+    if (!nickname || nickname.value === undefined) {
         return;
     }
     const request = {
         command: WebviewMessageId.onSetLabel,
         payload: {
             address,
-            nickname
+            nickname: nickname.value
         }
     };
     client.messageHandler.send(request.command, request.payload);
@@ -25242,7 +25242,7 @@ function get_each_context$6(ctx, list, i) {
 	return child_ctx;
 }
 
-// (41:4) {#if expandable}
+// (42:4) {#if expandable}
 function create_if_block_4$2(ctx) {
 	let div;
 	let current_block_type_index;
@@ -25264,7 +25264,7 @@ function create_if_block_4$2(ctx) {
 			div = element("div");
 			if_block.c();
 			attr_dev(div, "class", "self-start w-[26px]");
-			add_location(div, file$b, 41, 8, 1375);
+			add_location(div, file$b, 42, 8, 1455);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -25317,14 +25317,14 @@ function create_if_block_4$2(ctx) {
 		block,
 		id: create_if_block_4$2.name,
 		type: "if",
-		source: "(41:4) {#if expandable}",
+		source: "(42:4) {#if expandable}",
 		ctx
 	});
 
 	return block;
 }
 
-// (45:12) {:else}
+// (46:12) {:else}
 function create_else_block_2(ctx) {
 	let expandbutton;
 	let updating_expanded;
@@ -25384,14 +25384,14 @@ function create_else_block_2(ctx) {
 		block,
 		id: create_else_block_2.name,
 		type: "else",
-		source: "(45:12) {:else}",
+		source: "(46:12) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (43:12) {#if input.internalType === InputTypesInternal.LEAF}
+// (44:12) {#if input.internalType === InputTypesInternal.LEAF}
 function create_if_block_5$2(ctx) {
 	let iconspacer;
 	let current;
@@ -25424,14 +25424,14 @@ function create_if_block_5$2(ctx) {
 		block,
 		id: create_if_block_5$2.name,
 		type: "if",
-		source: "(43:12) {#if input.internalType === InputTypesInternal.LEAF}",
+		source: "(44:12) {#if input.internalType === InputTypesInternal.LEAF}",
 		ctx
 	});
 
 	return block;
 }
 
-// (91:4) {:else}
+// (92:4) {:else}
 function create_else_block$6(ctx) {
 	let div1;
 	let vscode_text_field;
@@ -25470,13 +25470,13 @@ function create_else_block$6(ctx) {
 			if_block.c();
 			attr_dev(div0, "slot", "end");
 			attr_dev(div0, "class", "flex items-center");
-			add_location(div0, file$b, 98, 16, 3677);
+			add_location(div0, file$b, 99, 16, 3757);
 			set_custom_element_data(vscode_text_field, "class", vscode_text_field_class_value = "flex-1 w-full " + (/*input*/ ctx[0].isInvalid() ? 'border-red-500' : ''));
 			set_custom_element_data(vscode_text_field, "placeholder", vscode_text_field_placeholder_value = /*input*/ ctx[0].description);
 			set_custom_element_data(vscode_text_field, "value", vscode_text_field_value_value = /*input*/ ctx[0].getString());
-			add_location(vscode_text_field, file$b, 92, 12, 3416);
+			add_location(vscode_text_field, file$b, 93, 12, 3496);
 			attr_dev(div1, "class", "w-full flex flex-1 flex-row gap-1");
-			add_location(div1, file$b, 91, 8, 3356);
+			add_location(div1, file$b, 92, 8, 3436);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div1, anchor);
@@ -25550,14 +25550,14 @@ function create_else_block$6(ctx) {
 		block,
 		id: create_else_block$6.name,
 		type: "else",
-		source: "(91:4) {:else}",
+		source: "(92:4) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (52:4) {#if expandable && input.expanded}
+// (53:4) {#if expandable && input.expanded}
 function create_if_block$8(ctx) {
 	let div1;
 	let div0;
@@ -25582,11 +25582,11 @@ function create_if_block$8(ctx) {
 			t2 = space();
 			key_block.c();
 			attr_dev(p, "class", "text-md flex-1");
-			add_location(p, file$b, 54, 16, 1813);
+			add_location(p, file$b, 55, 16, 1893);
 			attr_dev(div0, "class", "h-[28px] flex items-center");
-			add_location(div0, file$b, 53, 12, 1756);
+			add_location(div0, file$b, 54, 12, 1836);
 			attr_dev(div1, "class", "flex flex-col flex-1 gap-1");
-			add_location(div1, file$b, 52, 8, 1703);
+			add_location(div1, file$b, 53, 8, 1783);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div1, anchor);
@@ -25659,14 +25659,14 @@ function create_if_block$8(ctx) {
 		block,
 		id: create_if_block$8.name,
 		type: "if",
-		source: "(52:4) {#if expandable && input.expanded}",
+		source: "(53:4) {#if expandable && input.expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (112:20) {:else}
+// (113:20) {:else}
 function create_else_block_1$2(ctx) {
 	let div;
 	let span;
@@ -25682,16 +25682,16 @@ function create_else_block_1$2(ctx) {
 			svg = svg_element("svg");
 			path = svg_element("path");
 			attr_dev(path, "d", "M10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0z");
-			add_location(path, file$b, 120, 37, 4936);
+			add_location(path, file$b, 121, 37, 5016);
 			attr_dev(svg, "width", "16");
 			attr_dev(svg, "height", "16");
 			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
 			attr_dev(svg, "fill", "currentColor");
-			add_location(svg, file$b, 115, 32, 4672);
+			add_location(svg, file$b, 116, 32, 4752);
 			attr_dev(span, "class", "cursor-pointer");
-			add_location(span, file$b, 114, 28, 4575);
+			add_location(span, file$b, 115, 28, 4655);
 			attr_dev(div, "class", "relative inline-block");
-			add_location(div, file$b, 112, 24, 4426);
+			add_location(div, file$b, 113, 24, 4506);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -25718,14 +25718,14 @@ function create_else_block_1$2(ctx) {
 		block,
 		id: create_else_block_1$2.name,
 		type: "else",
-		source: "(112:20) {:else}",
+		source: "(113:20) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (108:52) 
+// (109:52) 
 function create_if_block_3$3(ctx) {
 	let inputissueindicator;
 	let current;
@@ -25774,14 +25774,14 @@ function create_if_block_3$3(ctx) {
 		block,
 		id: create_if_block_3$3.name,
 		type: "if",
-		source: "(108:52) ",
+		source: "(109:52) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (100:20) {#if input.isInvalid()}
+// (101:20) {#if input.isInvalid()}
 function create_if_block_2$4(ctx) {
 	let inputissueindicator;
 	let current;
@@ -25830,14 +25830,14 @@ function create_if_block_2$4(ctx) {
 		block,
 		id: create_if_block_2$4.name,
 		type: "if",
-		source: "(100:20) {#if input.isInvalid()}",
+		source: "(101:20) {#if input.isInvalid()}",
 		ctx
 	});
 
 	return block;
 }
 
-// (109:24) <InputIssueIndicator type="warning">
+// (110:24) <InputIssueIndicator type="warning">
 function create_default_slot_1$1(ctx) {
 	let span;
 
@@ -25846,7 +25846,7 @@ function create_default_slot_1$1(ctx) {
 			span = element("span");
 			span.textContent = "Input is missing some data";
 			attr_dev(span, "class", "text-sm");
-			add_location(span, file$b, 109, 28, 4271);
+			add_location(span, file$b, 110, 28, 4351);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -25861,14 +25861,14 @@ function create_default_slot_1$1(ctx) {
 		block,
 		id: create_default_slot_1$1.name,
 		type: "slot",
-		source: "(109:24) <InputIssueIndicator type=\\\"warning\\\">",
+		source: "(110:24) <InputIssueIndicator type=\\\"warning\\\">",
 		ctx
 	});
 
 	return block;
 }
 
-// (103:32) {#each input.errors as error}
+// (104:32) {#each input.errors as error}
 function create_each_block_1(ctx) {
 	let span;
 	let t_value = /*error*/ ctx[12] + "";
@@ -25879,7 +25879,7 @@ function create_each_block_1(ctx) {
 			span = element("span");
 			t = text(t_value);
 			attr_dev(span, "class", "text-sm");
-			add_location(span, file$b, 103, 36, 3970);
+			add_location(span, file$b, 104, 36, 4050);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -25897,14 +25897,14 @@ function create_each_block_1(ctx) {
 		block,
 		id: create_each_block_1.name,
 		type: "each",
-		source: "(103:32) {#each input.errors as error}",
+		source: "(104:32) {#each input.errors as error}",
 		ctx
 	});
 
 	return block;
 }
 
-// (102:28) {#key input.errors}
+// (103:28) {#key input.errors}
 function create_key_block_1(ctx) {
 	let each_1_anchor;
 	let each_value_1 = /*input*/ ctx[0].errors;
@@ -25967,14 +25967,14 @@ function create_key_block_1(ctx) {
 		block,
 		id: create_key_block_1.name,
 		type: "key",
-		source: "(102:28) {#key input.errors}",
+		source: "(103:28) {#key input.errors}",
 		ctx
 	});
 
 	return block;
 }
 
-// (101:24) <InputIssueIndicator type="danger">
+// (102:24) <InputIssueIndicator type="danger">
 function create_default_slot$5(ctx) {
 	let previous_key = /*input*/ ctx[0].errors;
 	let key_block_anchor;
@@ -26009,14 +26009,14 @@ function create_default_slot$5(ctx) {
 		block,
 		id: create_default_slot$5.name,
 		type: "slot",
-		source: "(101:24) <InputIssueIndicator type=\\\"danger\\\">",
+		source: "(102:24) <InputIssueIndicator type=\\\"danger\\\">",
 		ctx
 	});
 
 	return block;
 }
 
-// (69:16) {#if input.internalType == InputTypesInternal.DYNAMIC_LIST}
+// (70:16) {#if input.internalType == InputTypesInternal.DYNAMIC_LIST}
 function create_if_block_1$5(ctx) {
 	let plusbutton;
 	let t;
@@ -26075,14 +26075,14 @@ function create_if_block_1$5(ctx) {
 		block,
 		id: create_if_block_1$5.name,
 		type: "if",
-		source: "(69:16) {#if input.internalType == InputTypesInternal.DYNAMIC_LIST}",
+		source: "(70:16) {#if input.internalType == InputTypesInternal.DYNAMIC_LIST}",
 		ctx
 	});
 
 	return block;
 }
 
-// (86:16) {#each input.children as child}
+// (87:16) {#each input.children as child}
 function create_each_block$6(ctx) {
 	let contractfunctioninput;
 	let current;
@@ -26127,14 +26127,14 @@ function create_each_block$6(ctx) {
 		block,
 		id: create_each_block$6.name,
 		type: "each",
-		source: "(86:16) {#each input.children as child}",
+		source: "(87:16) {#each input.children as child}",
 		ctx
 	});
 
 	return block;
 }
 
-// (85:12) {#key input.children}
+// (86:12) {#key input.children}
 function create_key_block(ctx) {
 	let each_1_anchor;
 	let current;
@@ -26225,7 +26225,7 @@ function create_key_block(ctx) {
 		block,
 		id: create_key_block.name,
 		type: "key",
-		source: "(85:12) {#key input.children}",
+		source: "(86:12) {#key input.children}",
 		ctx
 	});
 
@@ -26257,7 +26257,7 @@ function create_fragment$d(ctx) {
 			t = space();
 			if_block1.c();
 			attr_dev(div, "class", "flex flex-1 flex-row items-end gap-1");
-			add_location(div, file$b, 38, 0, 1269);
+			add_location(div, file$b, 39, 0, 1349);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -26356,8 +26356,13 @@ function instance$d($$self, $$props, $$invalidate) {
 	let { expandable = true } = $$props;
 
 	const openFullTextInputEditor = async function () {
-		const newValue = await getInputFromTopBar('');
-		newValue && input.set(newValue);
+		var _a;
+		const newValue = await getInputFromTopBar('', input.description);
+
+		newValue && input.set((_a = newValue.value) !== null && _a !== void 0
+		? _a
+		: '');
+
 		$$invalidate(0, input);
 	};
 

@@ -113,14 +113,14 @@ export function setLabel(address: Address, nickname: string) {
 
 export async function requestLabel(address: Address) {
     const nickname = await getInputFromTopBar('', 'New Label');
-    if (!nickname) {
+    if (!nickname || nickname.value === undefined) {
         return;
     }
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.onSetLabel,
         payload: {
             address,
-            nickname
+            nickname: nickname.value
         }
     };
     messageHandler.send(request.command, request.payload);
