@@ -16,8 +16,8 @@
     export let expandable: boolean = true;
 
     const openFullTextInputEditor = async function () {
-        const newValue = await getInputFromTopBar('');
-        newValue && input.set(newValue);
+        const newValue = await getInputFromTopBar('', input.description);
+        newValue && input.set(newValue.value ?? '');
         input = input;
     };
 
