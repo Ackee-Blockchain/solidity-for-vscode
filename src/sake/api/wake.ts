@@ -28,7 +28,7 @@ import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
 import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
 
-const SharedChainState = SharedChainStateProvider.getInstance();
+const sharedChainState = SharedChainStateProvider.getInstance();
 
 /*
  * Get accounts and balances and save to state
@@ -357,13 +357,13 @@ export class WakeApi {
         }
         try {
             const response = await WakeApi._client.sendRequest<T>(method, params);
-            SharedChainState.setIsAnvilInstalled(true);
+            sharedChainState.setIsAnvilInstalled(true);
             return validateResponse ? validate(response) : response;
         } catch (e) {
             console.error('Error sending Wake Request', e);
             const message = typeof e === 'string' ? e : (e as Error).message;
             if (message == 'Anvil executable not found') {
-                SharedChainState.setIsAnvilInstalled(false);
+                sharedChainState.setIsAnvilInstalled(false);
             }
             throw new WakeApiError(message);
         }
