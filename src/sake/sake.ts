@@ -67,22 +67,16 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     const txHistoryState = TxHistoryState.getInstance();
     const wakeState = WakeState.getInstance();
 
-    console.log('sake', wakeState);
-
     const workspaceWatcher = () => {
         const workspaces = vscode.workspace.workspaceFolders;
-        console.log('workspaceWatcher', workspaces?.length);
         if (workspaces === undefined || workspaces.length === 0) {
-            console.log('workspaceWatcher', 'closed');
             wakeState.setIsOpenWorkspace('closed');
             return;
         } else if (workspaces.length > 1) {
-            console.log('workspaceWatcher', 'tooManyWorkspaces');
             wakeState.setIsOpenWorkspace('tooManyWorkspaces');
             return;
         }
 
-        console.log('workspaceWatcher', 'open');
         wakeState.setIsOpenWorkspace('open');
     };
 
