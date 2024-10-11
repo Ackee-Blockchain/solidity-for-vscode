@@ -44,13 +44,13 @@
             'Update balance of account'
         );
 
-        if (topUpValue === undefined) {
+        if (topUpValue === undefined || topUpValue.value === undefined) {
             return;
         }
 
         let parsedTopUpValue;
         try {
-            parsedTopUpValue = parseComplexNumber(topUpValue);
+            parsedTopUpValue = parseComplexNumber(topUpValue.value);
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
             showErrorMessage('Value could not be parsed: ' + errorMessage);

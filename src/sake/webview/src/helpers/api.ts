@@ -79,7 +79,9 @@ export async function getInputFromTopBar(
             title
         }
     };
-    return await messageHandler.request<string | undefined>(request.command, request.payload);
+    return await messageHandler.request<{
+        value?: string;
+    }>(request.command, request.payload);
 }
 
 export async function compileContracts() {

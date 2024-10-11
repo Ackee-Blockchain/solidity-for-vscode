@@ -18730,6 +18730,7 @@ function _validateIntType(value, type) {
  * @throws {FunctionInputParseError} If the value cannot be parsed as a complex integer.
  */
 function parseComplexNumber(value) {
+    console.log('parseComplexNumber', value);
     value = value.trim().replace('_', '');
     // return classic integer
     let match = value.match(/^(\d+)$/);
@@ -20880,22 +20881,22 @@ function create_if_block$c(ctx) {
 			div1 = element("div");
 			if_block1.c();
 			attr_dev(span, "slot", "selected-value");
-			add_location(span, file$l, 54, 16, 2223);
+			add_location(span, file$l, 54, 16, 2263);
 			set_custom_element_data(vscode_dropdown, "position", "below");
 			set_custom_element_data(vscode_dropdown, "class", "w-full mb-2");
-			add_location(vscode_dropdown, file$l, 47, 12, 1810);
-			add_location(div0, file$l, 46, 8, 1792);
+			add_location(vscode_dropdown, file$l, 47, 12, 1850);
+			add_location(div0, file$l, 46, 8, 1832);
 			attr_dev(div1, "slot", "end");
 			attr_dev(div1, "class", "flex items-center");
-			add_location(div1, file$l, 88, 16, 3927);
+			add_location(div1, file$l, 88, 16, 3967);
 			set_custom_element_data(vscode_text_field, "placeholder", "Value");
 			set_custom_element_data(vscode_text_field, "class", "w-full");
 			set_custom_element_data(vscode_text_field, "value", /*$selectedValueString*/ ctx[2]);
-			add_location(vscode_text_field, file$l, 82, 12, 3720);
+			add_location(vscode_text_field, file$l, 82, 12, 3760);
 			attr_dev(div2, "class", "w-full flex flex-row gap-3");
-			add_location(div2, file$l, 81, 8, 3667);
+			add_location(div2, file$l, 81, 8, 3707);
 			attr_dev(section, "class", "flex flex-col gap-1");
-			add_location(section, file$l, 45, 4, 1746);
+			add_location(section, file$l, 45, 4, 1786);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, section, anchor);
@@ -21051,7 +21052,7 @@ function create_each_block$8(ctx) {
 			t1 = text(/*i*/ ctx[9]);
 			set_custom_element_data(vscode_option, "value", /*i*/ ctx[9]);
 			set_custom_element_data(vscode_option, "selected", vscode_option_selected_value = /*account*/ ctx[7].address == /*$selectedAccount*/ ctx[0]?.address);
-			add_location(vscode_option, file$l, 49, 20, 1965);
+			add_location(vscode_option, file$l, 49, 20, 2005);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, vscode_option, anchor);
@@ -21116,11 +21117,11 @@ function create_if_block_2$6(ctx) {
 			div1 = element("div");
 			create_component(clickablespan.$$.fragment);
 			attr_dev(div0, "class", "w-full flex flex-row gap-1 items-center h-[20px]");
-			add_location(div0, file$l, 61, 20, 2493);
+			add_location(div0, file$l, 61, 20, 2533);
 			attr_dev(div1, "class", "w-full flex flex-row gap-1 items-center h-[20px]");
-			add_location(div1, file$l, 70, 20, 3123);
+			add_location(div1, file$l, 70, 20, 3163);
 			attr_dev(div2, "class", "w-full px-1 mb-3");
-			add_location(div2, file$l, 60, 16, 2442);
+			add_location(div2, file$l, 60, 16, 2482);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div2, anchor);
@@ -21213,7 +21214,7 @@ function create_else_block$8(ctx) {
 			span.textContent = "Ξ";
 			attr_dev(span, "slot", "end");
 			attr_dev(span, "class", "flex justify-center align-middle leading-5");
-			add_location(span, file$l, 94, 24, 4262);
+			add_location(span, file$l, 94, 24, 4302);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -21292,7 +21293,7 @@ function create_default_slot$a(ctx) {
 			span = element("span");
 			span.textContent = "Value could not be parsed";
 			attr_dev(span, "class", "text-sm");
-			add_location(span, file$l, 91, 28, 4108);
+			add_location(span, file$l, 91, 28, 4148);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -21409,14 +21410,14 @@ function instance$n($$self, $$props, $$invalidate) {
 			'Update balance of account'
 		);
 
-		if (topUpValue === undefined) {
+		if (topUpValue === undefined || topUpValue.value === undefined) {
 			return;
 		}
 
 		let parsedTopUpValue;
 
 		try {
-			parsedTopUpValue = parseComplexNumber(topUpValue);
+			parsedTopUpValue = parseComplexNumber(topUpValue.value);
 		} catch(e) {
 			const errorMessage = typeof e === 'string' ? e : e.message;
 			showErrorMessage('Value could not be parsed: ' + errorMessage);
