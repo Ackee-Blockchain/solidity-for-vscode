@@ -40,7 +40,7 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     // Start with a default local chain
     const localProvider = await SakeProviderFactory.createNewLocalProvider('Local Chain');
-    console.log('localProvider', localProvider);
+
     if (localProvider) {
         sake.addProvider(localProvider, false);
         sake.setProvider(localProvider.id);

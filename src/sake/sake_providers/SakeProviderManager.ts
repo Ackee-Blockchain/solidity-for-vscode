@@ -82,15 +82,15 @@ export class SakeProviderManager {
         }
 
         if (provider.id === this._selectedProviderId) {
-            // TPDP
-            throw new Error('Cannot remove the current provider');
+            this._selectedProviderId = undefined;
         }
 
         provider.onDeleteProvider();
 
         this._providers.delete(provider.id);
-
         this._chainsState.removeChain(provider.id);
+
+        this._updateStatusBar();
     }
 
     get provider(): SakeProvider<NetworkProvider> | undefined {
@@ -137,7 +137,13 @@ export class SakeProviderManager {
             return;
         }
 
-        this._statusBarItem.text = `$(cloud) ${this.provider.displayName}`;
+        // TODO icon
+        // TODO add screen describing that no chain i selected to sake
+        // const icon = this.provider.network.connected
+        //     ? new vscode.ThemeIcon('vm-active')
+        //     : new vscode.ThemeIcon('vm-outline');
+
+        this._statusBarItem.text = `$(cloud) ${this.provider?.displayName}`;
         this._statusBarItem.show();
     }
 
@@ -164,19 +170,19 @@ export class SakeProviderManager {
             kind: vscode.QuickPickItemKind.Default
         });
 
-        // add option to connect setup advanced local node
-        quickPickItems.push({
-            iconPath: new vscode.ThemeIcon('plus'),
-            label: 'Create new local chain (advanced)',
-            kind: vscode.QuickPickItemKind.Default
-        });
+        // // add option to connect setup advanced local node
+        // quickPickItems.push({
+        //     iconPath: new vscode.ThemeIcon('plus'),
+        //     label: 'Create new local chain (advanced)',
+        //     kind: vscode.QuickPickItemKind.Default
+        // });
 
-        // add option to connect to remote node
-        quickPickItems.push({
-            iconPath: new vscode.ThemeIcon('cloud'),
-            label: 'Connect to remote node',
-            kind: vscode.QuickPickItemKind.Default
-        });
+        // // add option to connect to remote node
+        // quickPickItems.push({
+        //     iconPath: new vscode.ThemeIcon('cloud'),
+        //     label: 'Connect to remote node',
+        //     kind: vscode.QuickPickItemKind.Default
+        // });
 
         let selectedItem: SakeProviderQuickPickItem | undefined;
 
@@ -197,25 +203,35 @@ export class SakeProviderManager {
             selectedItem = selectedItems[0];
         });
         providerSelector.onDidTriggerItemButton((event) => {
-            event.item.itemButtonClick?.(event.button, providerSelector);
+            try {
+                event.item.itemButtonClick?.(event.button);
+            } catch (e) {
+                showErrorMessage(`${e instanceof Error ? e.message : String(e)}`);
+            } finally {
+                providerSelector.dispose();
+            }
         });
         providerSelector.onDidAccept(() => {
-            console.log('selectedItem', selectedItem);
-            if (!selectedItem) {
-                return;
-            }
-            if (selectedItem.label === 'Create new local chain') {
-                this.requestNewProvider();
-            } else if (selectedItem.label === 'Create new local chain (advanced)') {
-                // pass
-            } else if (selectedItem.label === 'Connect to remote node') {
-                // pass
-            } else {
-                if (selectedItem.providerId) {
-                    this.setProvider(selectedItem.providerId);
+            try {
+                if (!selectedItem) {
+                    return;
                 }
+                if (selectedItem.label === 'Create new local chain') {
+                    this.requestNewProvider();
+                } else if (selectedItem.label === 'Create new local chain (advanced)') {
+                    // pass
+                } else if (selectedItem.label === 'Connect to remote node') {
+                    // pass
+                } else {
+                    if (selectedItem.providerId) {
+                        this.setProvider(selectedItem.providerId);
+                    }
+                }
+            } catch (e) {
+                showErrorMessage(`${e instanceof Error ? e.message : String(e)}`);
+            } finally {
+                providerSelector.dispose();
             }
-            providerSelector.dispose();
         });
         providerSelector.onDidHide(() => {
             providerSelector.dispose();
