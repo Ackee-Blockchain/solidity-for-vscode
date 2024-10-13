@@ -94,6 +94,8 @@ export interface WakeLoadStateResponse extends WakeBaseResponse {}
 
 /* Get Accounts */
 
+export interface WakeGetAccountsRequestParams extends WakeBaseRequestParams {}
+
 export type WakeGetAccountsResponse = w3t.Address[];
 
 /* Compilation */

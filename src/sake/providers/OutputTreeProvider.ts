@@ -7,6 +7,7 @@ import {
     TransactionResult,
     WakeCallTrace
 } from '../webview/shared/types';
+import { SakeContext } from '../context';
 
 class BaseOutputItem extends vscode.TreeItem {
     children: BaseOutputItem[] = [];
@@ -22,7 +23,6 @@ class BaseOutputItem extends vscode.TreeItem {
 
 export class OutputViewManager {
     private static _instance: OutputViewManager;
-    private static _context: vscode.ExtensionContext;
     private _outputViewId: string = 'sake-output';
 
     provider: SakeOutputTreeProvider;
@@ -33,24 +33,14 @@ export class OutputViewManager {
         this.treeView = vscode.window.createTreeView(this._outputViewId, {
             treeDataProvider: this.provider
         });
-        OutputViewManager._context.subscriptions.push(this.treeView);
+        this._context.subscriptions.push(this.treeView);
     }
 
-    public show() {
-        this;
-    }
-
-    public static initialize(context: vscode.ExtensionContext) {
-        if (this._context) {
-            throw new Error('OutputViewManager already initialized');
-        }
-        this._context = context;
+    private get _context(): vscode.ExtensionContext {
+        return SakeContext.getInstance().context;
     }
 
     static getInstance() {
-        if (!this._context) {
-            throw new Error('OutputViewManager not initialized');
-        }
         if (!this._instance) {
             this._instance = new OutputViewManager();
         }

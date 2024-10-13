@@ -1,30 +1,31 @@
 import { NetworkCreationConfiguration } from '../webview/shared/types';
-import { LocalNodeNetworkProvider } from '../network/networks';
-import { BaseWebviewProvider } from './BaseWebviewProvider';
 import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
 import * as vscode from 'vscode';
-import { v4 as uuidv4 } from 'uuid';
 import { getTextFromInputBox, showErrorMessage } from '../commands';
 import { SakeProvider, SakeState } from './SakeProvider';
 import { WakeApi } from '../api/wake';
+import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
+import { SakeContext } from '../context';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
+import { NetworkProvider } from '../network/NetworkProvider';
+import { SakeProviderFactory } from './SakeProviderFactory';
 
 export class SakeProviderManager {
     private static _instance: SakeProviderManager;
-    private static _context: vscode.ExtensionContext;
     private _selectedProviderId?: string;
-    private _providers: Map<string, SakeProvider>;
+    private _providers: Map<string, SakeProvider<NetworkProvider>>;
     private _statusBarItem!: vscode.StatusBarItem;
-    private _webviewProvider: BaseWebviewProvider | undefined;
     private _chainsState: SharedChainStateProvider;
-    private _wake: WakeApi;
 
     private constructor() {
         this._providers = new Map();
-        this._wake = WakeApi.getInstance();
         this._chainsState = SharedChainStateProvider.getInstance();
         this._initializeStatusBar();
         this._initializeChainsState();
+    }
+
+    private get _context(): vscode.ExtensionContext {
+        return SakeContext.getInstance().context;
     }
 
     private async _initializeChainsState() {
@@ -34,25 +35,13 @@ export class SakeProviderManager {
     }
 
     public async initializeWakeConnection(): Promise<boolean> {
-        const isWakeServerRunning = await this._wake.ping();
+        const isWakeServerRunning = await WakeApi.ping();
         this._chainsState.setIsWakeServerRunning(isWakeServerRunning);
 
         return true;
     }
 
-    static initialize(context: vscode.ExtensionContext) {
-        if (this._context) {
-            throw new Error('SakeProviderManager already initialized');
-        }
-
-        this._context = context;
-    }
-
     static getInstance(): SakeProviderManager {
-        if (!this._context) {
-            throw new Error('SakeProviderManager not initialized');
-        }
-
         if (!this._instance) {
             this._instance = new SakeProviderManager();
         }
@@ -60,14 +49,7 @@ export class SakeProviderManager {
         return this._instance;
     }
 
-    _setWebviewProvider(webviewProvider: BaseWebviewProvider) {
-        if (this._webviewProvider) {
-            throw new Error('Webview provider already set');
-        }
-        this._webviewProvider = webviewProvider;
-    }
-
-    addProvider(provider: SakeProvider) {
+    addProvider(provider: SakeProvider<NetworkProvider>, notifyUser: boolean = true) {
         if (this._providers.has(provider.id)) {
             throw new Error('Provider with id ' + provider.id + ' already exists');
         }
@@ -79,23 +61,39 @@ export class SakeProviderManager {
             network: provider.network.id,
             connected: false
         });
+
+        if (notifyUser) {
+            vscode.window
+                .showInformationMessage(
+                    `New local chain '${provider.displayName}' created.`,
+                    'Switch to chain'
+                )
+                .then((selected) => {
+                    if (selected === 'Switch to chain') {
+                        this.setProvider(provider.id);
+                    }
+                });
+        }
     }
 
-    removeProvider(id: string) {
-        if (!this._providers.has(id)) {
-            throw new Error('Provider with id ' + id + ' does not exist');
+    async removeProvider(provider: SakeProvider<NetworkProvider>) {
+        if (!this._providers.has(provider.id)) {
+            throw new Error('Provider with id ' + provider.id + ' does not exist');
         }
 
-        if (id === this._selectedProviderId) {
+        if (provider.id === this._selectedProviderId) {
+            // TPDP
             throw new Error('Cannot remove the current provider');
         }
 
-        this._providers.delete(id);
+        provider.onDeleteProvider();
 
-        this._chainsState.removeChain(id);
+        this._providers.delete(provider.id);
+
+        this._chainsState.removeChain(provider.id);
     }
 
-    get provider(): SakeProvider | undefined {
+    get provider(): SakeProvider<NetworkProvider> | undefined {
         if (!this._selectedProviderId) {
             return undefined;
         }
@@ -144,15 +142,15 @@ export class SakeProviderManager {
     }
 
     public showProviderSelectionQuickPick() {
-        console.log('showProviderSelectionQuickPick');
         const quickPickItems: vscode.QuickPickItem[] = [];
 
-        // extend with provider specific items
-        quickPickItems.push(
-            ...Array.from(this._providers.values()).map((provider: SakeProvider) =>
-                provider._getQuickPickItem()
-            )
+        const _providerItems = this.providers.map((provider: SakeProvider<NetworkProvider>) =>
+            provider._getQuickPickItem()
         );
+
+        // extend with provider specific items
+        quickPickItems.push(..._providerItems);
+
         // add separator
         quickPickItems.push({
             label: '',
@@ -180,26 +178,66 @@ export class SakeProviderManager {
             kind: vscode.QuickPickItemKind.Default
         });
 
-        vscode.window.showQuickPick(quickPickItems).then((selected) => {
-            if (selected) {
-                if (selected.label === 'Create new local chain') {
-                    this.requestNewProvider();
-                } else if (selected.label === 'Create new local chain (advanced)') {
-                    // pass
-                } else if (selected.label === 'Connect to remote node') {
-                    // pass
-                } else {
-                    this.setProvider(selected.label);
+        let selectedItem: SakeProviderQuickPickItem | undefined;
+
+        // Create quick pick
+        const providerSelector = vscode.window.createQuickPick<SakeProviderQuickPickItem>();
+        providerSelector.items = quickPickItems;
+
+        // Set active item
+        const activeProviderItem = _providerItems.find(
+            (item) => item.providerId === this._selectedProviderId
+        );
+        if (activeProviderItem) {
+            providerSelector.activeItems = [activeProviderItem];
+        }
+
+        // Event handlers
+        providerSelector.onDidChangeActive((selectedItems) => {
+            selectedItem = selectedItems[0];
+        });
+        providerSelector.onDidTriggerItemButton((event) => {
+            event.item.itemButtonClick?.(event.button, providerSelector);
+        });
+        providerSelector.onDidAccept(() => {
+            console.log('selectedItem', selectedItem);
+            if (!selectedItem) {
+                return;
+            }
+            if (selectedItem.label === 'Create new local chain') {
+                this.requestNewProvider();
+            } else if (selectedItem.label === 'Create new local chain (advanced)') {
+                // pass
+            } else if (selectedItem.label === 'Connect to remote node') {
+                // pass
+            } else {
+                if (selectedItem.providerId) {
+                    this.setProvider(selectedItem.providerId);
                 }
             }
+            providerSelector.dispose();
         });
+        providerSelector.onDidHide(() => {
+            providerSelector.dispose();
+        });
+        providerSelector.show();
+
+        // vscode.window.showQuickPick(quickPickItems).then((selected) => {
+        //     if (selected) {
+        //         if (selected.label === 'Create new local chain') {
+        //             this.requestNewProvider();
+        //         } else if (selected.label === 'Create new local chain (advanced)') {
+        //             // pass
+        //         } else if (selected.label === 'Connect to remote node') {
+        //             // pass
+        //         } else {
+        //             this.setProvider(selected.label);
+        //         }
+        //     }
+        // });
     }
 
     public async requestNewProvider() {
-        if (!this._webviewProvider) {
-            throw new Error('Webview provider not set');
-        }
-
         // get input from user
         const chainName = await getTextFromInputBox(
             'Select a name for the new chain',
@@ -210,66 +248,16 @@ export class SakeProviderManager {
             return;
         }
 
-        await this.createNewLocalChainProvider(chainName);
-    }
-
-    public async createNewLocalChainProvider(
-        name: string,
-        networkConfig: NetworkCreationConfiguration | undefined = undefined,
-        forceSetProvider: boolean = false
-    ) {
-        if (!this._webviewProvider) {
-            throw new Error('Webview provider not set');
+        const provider = await SakeProviderFactory.createNewLocalProvider(chainName);
+        if (provider) {
+            this.addProvider(provider);
         }
-
-        // Check if Wake is running
-        try {
-            const serverRunning = await this._wake.ping();
-            this._chainsState.setIsWakeServerRunning(serverRunning);
-        } catch (error) {
-            console.error('Failed to ping Wake:', error);
-            this._chainsState.setIsWakeServerRunning(false);
-            // showErrorMessage('Failed to create a new chain. Unable to connect to Wake.');
-            // return;
-        }
-
-        const sessionId = uuidv4();
-        const providerId = 'local-chain-' + sessionId;
-        let provider: LocalNodeSakeProvider;
-        try {
-            const { network, initializationResult } = await LocalNodeNetworkProvider.createNewChain(
-                {
-                    ...networkConfig,
-                    sessionId: sessionId
-                }
-            );
-            provider = new LocalNodeSakeProvider(providerId, name, network, this._webviewProvider);
-            await provider.initialize(initializationResult.accounts);
-        } catch (error) {
-            console.error('Failed to create new chain:', error);
-            return;
-        }
-
-        this.addProvider(provider);
-
-        if (forceSetProvider) {
-            this.setProvider(providerId);
-            return;
-        }
-
-        vscode.window
-            .showInformationMessage(`New local chain '${name}' created.`, 'Switch to chain')
-            .then((selected) => {
-                if (selected === 'Switch to chain') {
-                    this.setProvider(providerId);
-                }
-            });
     }
 
     private _initializeStatusBar() {
         this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
-        SakeProviderManager._context.subscriptions.push(this._statusBarItem);
-        SakeProviderManager._context.subscriptions.push(
+        this._context.subscriptions.push(this._statusBarItem);
+        this._context.subscriptions.push(
             vscode.commands.registerCommand(
                 'Tools-for-Solidity.sake.selectSakeProvider',
                 this.showProviderSelectionQuickPick.bind(this)
@@ -277,5 +265,9 @@ export class SakeProviderManager {
         );
         this._statusBarItem.command = 'Tools-for-Solidity.sake.selectSakeProvider';
         this._updateStatusBar();
+    }
+
+    get providers() {
+        return Array.from(this._providers.values());
     }
 }

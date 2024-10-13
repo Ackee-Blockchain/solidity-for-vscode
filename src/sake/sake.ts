@@ -10,23 +10,18 @@ import {
     GetBytecodeRequest
 } from './webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
-import { WakeApi } from './api/wake';
-import { OutputViewManager, SakeOutputItem } from './providers/OutputTreeProvider';
+import { SakeOutputItem } from './providers/OutputTreeProvider';
 import { copyToClipboardHandler } from '../commands';
-import { SakeProviderManager } from './providers/SakeProviderManager';
+import { SakeProviderManager } from './sake_providers/SakeProviderManager';
 import { SharedChainStateProvider } from './state/SharedChainStateProvider';
+import { SakeContext } from './context';
+import { SakeProviderFactory } from './sake_providers/SakeProviderFactory';
 
-export function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
-    /* Initializers */
-    WakeApi.initialize(client);
-    OutputViewManager.initialize(context);
-    SakeProviderManager.initialize(context);
-
-    /* Initialize Chain State */
-    const chainsState = SharedChainStateProvider.getInstance();
-
-    /* Initialize Sake Provider */
-    const sake = SakeProviderManager.getInstance();
+export async function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
+    /* Register Context */
+    const sakeContext = SakeContext.getInstance();
+    sakeContext.context = context;
+    sakeContext.client = client;
 
     /* Register Webview */
     const sidebarSakeProvider = new SakeWebviewProvider(context.extensionUri);
@@ -34,11 +29,22 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
         vscode.window.registerWebviewViewProvider('sake', sidebarSakeProvider)
     );
 
-    /* Set Webview Provider */
-    sake._setWebviewProvider(sidebarSakeProvider);
+    /* Register Webview Provider for Context */
+    sakeContext.webviewProvider = sidebarSakeProvider;
+
+    /* Initialize Chain State */
+    const chainsState = SharedChainStateProvider.getInstance();
+
+    /* Initialize Sake Provider */
+    const sake = SakeProviderManager.getInstance();
 
     // Start with a default local chain
-    sake.createNewLocalChainProvider('Local Chain', undefined, true);
+    const localProvider = await SakeProviderFactory.createNewLocalProvider('Local Chain');
+    console.log('localProvider', localProvider);
+    if (localProvider) {
+        sake.addProvider(localProvider, false);
+        sake.setProvider(localProvider.id);
+    }
 
     /* Initialize Wallet Server */
     // const walletServer = new WalletServer(context);

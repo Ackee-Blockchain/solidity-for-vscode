@@ -89,7 +89,7 @@ export interface TransactResponse extends CallResponse {}
 
 export interface NetworkConfiguration {
     sessionId: string;
-    type: string;
+    type?: string;
     uri?: string;
     chainId?: number;
     fork?: string;

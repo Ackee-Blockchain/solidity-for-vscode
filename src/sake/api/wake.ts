@@ -22,11 +22,13 @@ import {
     WakeConnectChainRequestParams,
     WakeConnectChainResponse,
     WakeDisconnectChainRequestParams,
-    WakeDisconnectChainResponse
+    WakeDisconnectChainResponse,
+    WakeGetAccountsRequestParams
 } from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
 import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
+import { SakeContext } from '../context';
 
 const sharedChainState = SharedChainStateProvider.getInstance();
 
@@ -42,33 +44,17 @@ export class WakeApiError extends WakeError {}
 export class WakeAnvilNotFoundError extends WakeError {}
 
 export class WakeApi {
-    private static _client: LanguageClient;
     private static _instance: WakeApi;
 
-    private constructor() {}
-
-    public static getInstance(): WakeApi {
-        if (!this._client) {
-            throw new Error('Failed to initialize Wake API without a language client set');
-        }
-        if (!this._instance) {
-            this._instance = new WakeApi();
-        }
-        return this._instance;
+    private static get _client(): LanguageClient {
+        return SakeContext.getInstance().client;
     }
 
-    public static initialize(client: LanguageClient) {
-        if (this._client) {
-            throw new Error('Client already set');
-        }
-        this._client = client;
-    }
-
-    async createChain(
+    static async createChain(
         requestParams: WakeCreateChainRequestParams
     ): Promise<WakeCreateChainResponse> {
         try {
-            const result = await this.sendWakeRequest<WakeCreateChainResponse>(
+            const result = await WakeApi.sendWakeRequest<WakeCreateChainResponse>(
                 'wake/sake/createChain',
                 requestParams
             );
@@ -89,7 +75,7 @@ export class WakeApi {
         }
     }
 
-    async connectChain(
+    static async connectChain(
         requestParams: WakeConnectChainRequestParams
     ): Promise<WakeConnectChainResponse> {
         try {
@@ -114,7 +100,7 @@ export class WakeApi {
         }
     }
 
-    async disconnectChain(
+    static async disconnectChain(
         requestParams: WakeDisconnectChainRequestParams
     ): Promise<WakeDisconnectChainResponse> {
         try {
@@ -135,10 +121,13 @@ export class WakeApi {
         }
     }
 
-    async getAccounts(): Promise<WakeGetAccountsResponse> {
+    static async getAccounts(
+        requestParams: WakeGetAccountsRequestParams
+    ): Promise<WakeGetAccountsResponse> {
         try {
             const result = await this.sendWakeRequest<WakeGetAccountsResponse>(
-                'wake/sake/getAccounts'
+                'wake/sake/getAccounts',
+                requestParams
             );
 
             if (result == null) {
@@ -160,7 +149,7 @@ export class WakeApi {
         }
     }
 
-    async getBalances(
+    static async getBalances(
         requestParams: WakeGetBalancesRequestParams
     ): Promise<WakeGetBalancesResponse> {
         try {
@@ -190,11 +179,11 @@ export class WakeApi {
         }
     }
 
-    async setBalances(
+    static async setBalances(
         requestParams: WakeSetBalancesRequestParams
     ): Promise<WakeSetBalancesResponse> {
         try {
-            const result = await this.sendWakeRequest<WakeSetBalancesResponse>(
+            const result = await WakeApi.sendWakeRequest<WakeSetBalancesResponse>(
                 'wake/sake/setBalances',
                 requestParams
             );
@@ -213,9 +202,9 @@ export class WakeApi {
         }
     }
 
-    async setLabel(requestParams: WakeSetLabelRequestParams): Promise<WakeSetLabelResponse> {
+    static async setLabel(requestParams: WakeSetLabelRequestParams): Promise<WakeSetLabelResponse> {
         try {
-            const result = await this.sendWakeRequest<WakeSetLabelResponse>(
+            const result = await WakeApi.sendWakeRequest<WakeSetLabelResponse>(
                 'wake/sake/setLabel',
                 requestParams
             );
@@ -234,9 +223,9 @@ export class WakeApi {
         }
     }
 
-    async compile(): Promise<WakeCompilationResponse> {
+    static async compile(): Promise<WakeCompilationResponse> {
         try {
-            const result = await this.sendWakeRequest<WakeCompilationResponse>(
+            const result = await WakeApi.sendWakeRequest<WakeCompilationResponse>(
                 'wake/sake/compile',
                 undefined,
                 false
@@ -254,7 +243,7 @@ export class WakeApi {
         }
     }
 
-    async getBytecode(
+    static async getBytecode(
         requestParams: WakeGetBytecodeRequestParams
     ): Promise<WakeGetBytecodeResponse> {
         throw new Error('Not implemented'); // TODO add to wake first
@@ -276,11 +265,13 @@ export class WakeApi {
         // }
     }
 
-    async deploy(requestParams: WakeDeploymentRequestParams): Promise<WakeDeploymentResponse> {
+    static async deploy(
+        requestParams: WakeDeploymentRequestParams
+    ): Promise<WakeDeploymentResponse> {
         try {
             console.log('deploying params', requestParams);
 
-            const result = await this.sendWakeRequest<WakeDeploymentResponse>(
+            const result = await WakeApi.sendWakeRequest<WakeDeploymentResponse>(
                 'wake/sake/deploy',
                 requestParams
             );
@@ -300,9 +291,9 @@ export class WakeApi {
         }
     }
 
-    async call(requestParams: WakeCallRequestParams): Promise<WakeCallResponse> {
+    static async call(requestParams: WakeCallRequestParams): Promise<WakeCallResponse> {
         try {
-            const result = await this.sendWakeRequest<WakeCallResponse>(
+            const result = await WakeApi.sendWakeRequest<WakeCallResponse>(
                 'wake/sake/call',
                 requestParams
             );
@@ -319,9 +310,9 @@ export class WakeApi {
         }
     }
 
-    async transact(requestParams: WakeTransactRequestParams): Promise<WakeTransactResponse> {
+    static async transact(requestParams: WakeTransactRequestParams): Promise<WakeTransactResponse> {
         try {
-            const result = await this.sendWakeRequest<WakeTransactResponse>(
+            const result = await WakeApi.sendWakeRequest<WakeTransactResponse>(
                 'wake/sake/transact',
                 requestParams
             );
@@ -338,16 +329,16 @@ export class WakeApi {
         }
     }
 
-    async ping(): Promise<boolean> {
+    static async ping(): Promise<boolean> {
         try {
-            const result = await this.sendWakeRequest<boolean>('wake/sake/ping');
+            const result = await WakeApi.sendWakeRequest<boolean>('wake/sake/ping');
             return result;
         } catch (e) {
             throw new WakeApiError(`Failed to ping: ${e instanceof Error ? e.message : String(e)}`);
         }
     }
 
-    private async sendWakeRequest<T>(
+    private static async sendWakeRequest<T>(
         method: string,
         params?: any,
         validateResponse: boolean = true

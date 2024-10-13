@@ -16,16 +16,16 @@ import {
     TransactionDecodedReturnValue,
     TransactionDeploymentResult
 } from '../webview/shared/types';
-import { NetworkProvider } from '../network/networks';
+import { NetworkProvider } from '../network/NetworkProvider';
 import { AccountStateProvider } from '../state/AccountStateProvider';
 import { DeploymentStateProvider } from '../state/DeploymentStateProvider';
 import { CompilationStateProvider } from '../state/CompilationStateProvider';
-import { BaseWebviewProvider } from './BaseWebviewProvider';
+import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
 import { TransactionHistoryStateProvider } from '../state/TransactionHistoryStateProvider';
 import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
 import * as vscode from 'vscode';
 import { WakeApi } from '../api/wake';
-import { OutputViewManager } from './OutputTreeProvider';
+import { OutputViewManager } from '../providers/OutputTreeProvider';
 import {
     getNameFromContractFqn,
     parseCompilationIssues,
@@ -34,6 +34,8 @@ import {
 } from '../utils/compilation';
 import { decodeCallReturnValue } from '../utils/call';
 import { showTimedInfoMessage } from '../commands';
+import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
+import { SakeContext } from '../context';
 
 export class SakeState {
     accounts: AccountStateProvider;
@@ -43,7 +45,11 @@ export class SakeState {
     chains: SharedChainStateProvider;
     subscribed: boolean;
 
-    constructor(private _webviewProvider: BaseWebviewProvider) {
+    private get _webviewProvider(): BaseWebviewProvider {
+        return SakeContext.getInstance().webviewProvider;
+    }
+
+    constructor() {
         // network-specific state
         this.accounts = new AccountStateProvider();
         this.deployment = new DeploymentStateProvider();
@@ -93,22 +99,13 @@ export class SakeState {
 export class SakeError extends Error {}
 
 // TODO consider renaming to BaseSakeProvider
-export abstract class SakeProvider {
+export abstract class SakeProvider<T extends NetworkProvider> {
     state: SakeState;
-    network: NetworkProvider;
     protected output: OutputViewManager;
-    protected wake: WakeApi;
 
-    constructor(
-        public id: string,
-        public displayName: string,
-        networkProvider: NetworkProvider,
-        webviewProvider: BaseWebviewProvider
-    ) {
-        this.state = new SakeState(webviewProvider);
-        this.network = networkProvider;
+    constructor(public id: string, public displayName: string, public network: T) {
+        this.state = new SakeState();
         this.output = OutputViewManager.getInstance();
-        this.wake = WakeApi.getInstance();
         this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
         this.setAccountLabel = showVSCodeMessageOnErrorWrapper(this.setAccountLabel.bind(this));
         this.refreshAccount = showVSCodeMessageOnErrorWrapper(this.refreshAccount.bind(this));
@@ -123,7 +120,7 @@ export abstract class SakeProvider {
     /* Compilation */
 
     async compile() {
-        const compilationResponse = await this.wake.compile();
+        const compilationResponse = await WakeApi.compile();
 
         if (!compilationResponse.success) {
             throw new SakeError('Compilation was unsuccessful');
@@ -138,7 +135,7 @@ export abstract class SakeProvider {
     }
 
     async getBytecode(request: GetBytecodeRequest): Promise<GetBytecodeResponse | undefined> {
-        const bytecodeResponse = await this.wake.getBytecode(request);
+        const bytecodeResponse = await WakeApi.getBytecode(request);
         return bytecodeResponse;
     }
 
@@ -305,7 +302,9 @@ export abstract class SakeProvider {
 
     /* Helper functions */
 
-    abstract _getQuickPickItem(): vscode.QuickPickItem;
+    abstract _getQuickPickItem(): SakeProviderQuickPickItem;
+
+    abstract onDeleteProvider(): Promise<void>;
 }
 
 // TODO add context if needed

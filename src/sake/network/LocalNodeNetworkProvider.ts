@@ -1,69 +1,36 @@
+import { WakeApi } from '../api/wake';
 import {
-    Account,
     CallRequest,
     CallResponse,
     CallType,
+    CreateLocalChainRequest,
     DeploymentRequest,
     DeploymentResponse,
-    SetAccountBalanceResponse,
-    SetAccountBalanceRequest,
-    WakeCallRequestParams,
-    WakeCallResponse,
-    WakeDeploymentRequestParams,
-    WakeDeploymentResponse,
-    WakeSetBalancesRequestParams,
-    WakeSetBalancesResponse,
     NetworkConfiguration,
-    WakeTransactResponse,
-    NetworkCreationConfiguration,
-    WakeCreateChainRequestParams,
-    WakeCreateChainResponse,
-    CreateLocalChainRequest
-} from '../webview/shared/types';
-import { WakeApi } from '../api/wake';
-
-export class NetworkError extends Error {}
-
-export abstract class NetworkProvider {
-    public abstract id: string;
-    abstract registerAccount(address: string): Promise<Account | undefined>;
-    abstract getAccountDetails(address: string): Promise<Account>;
-    abstract setAccountBalance(
-        request: SetAccountBalanceRequest
-    ): Promise<SetAccountBalanceResponse>;
-    abstract deploy(params: DeploymentRequest): Promise<DeploymentResponse>;
-    abstract call(params: CallRequest): Promise<CallResponse>;
-    abstract onActivate(): Promise<void>;
-    abstract onDeactivate(): Promise<void>;
-}
+    SetAccountBalanceRequest,
+    SetAccountBalanceResponse
+} from '../webview/shared/network_types';
+import { Account } from '../webview/shared/types';
+import {
+    WakeCallRequestParams,
+    WakeDeploymentResponse,
+    WakeGetAccountsResponse,
+    WakeSetBalancesResponse
+} from '../webview/shared/wake_types';
+import { NetworkError, NetworkProvider } from './NetworkProvider';
 
 export class LocalNodeNetworkProvider extends NetworkProvider implements NetworkProvider {
     public id: string = 'local-node';
-    private _wake: WakeApi;
+    connected: boolean = false;
 
     private constructor(public config: NetworkConfiguration) {
         super();
-        this._wake = WakeApi.getInstance();
     }
 
-    static async createNewChain(request: CreateLocalChainRequest): Promise<{
+    static async createNewChainProvider(request: CreateLocalChainRequest): Promise<{
         network: LocalNodeNetworkProvider;
-        initializationResult: WakeCreateChainResponse;
+        initialized: boolean;
     }> {
-        const result = await WakeApi.getInstance().createChain({
-            sessionId: request.sessionId,
-            accounts: request.accounts ?? null,
-            chainId: request.chainId ?? null,
-            fork: request.fork ?? null,
-            hardfork: request.hardfork ?? null,
-            minGasPrice: request.minGasPrice ?? null,
-            blockBaseFeePerGas: request.blockBaseFeePerGas ?? null
-        });
-
-        if (!result.success) {
-            throw new NetworkError('Failed to create new chain');
-        }
-
         const config: NetworkConfiguration = {
             sessionId: request.sessionId,
             chainId: request.chainId,
@@ -71,14 +38,56 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
             hardfork: request.hardfork,
             minGasPrice: request.minGasPrice,
             blockBaseFeePerGas: request.blockBaseFeePerGas,
-            type: result.type,
-            uri: result.uri
+            type: undefined,
+            uri: undefined
         };
 
+        const network = new LocalNodeNetworkProvider(config);
+
+        const initialized = await network
+            .initialize(request.accounts)
+            .then(() => {
+                return true;
+            })
+            .catch((e) => {
+                console.error('Failed to initialize chain', e);
+                return false;
+            });
+
         return {
-            network: new LocalNodeNetworkProvider(config),
-            initializationResult: result
+            network,
+            initialized
         };
+    }
+
+    async initialize(accounts?: number): Promise<void> {
+        const response = await WakeApi.createChain({
+            sessionId: this.config.sessionId,
+            accounts: accounts ?? null,
+            chainId: this.config.chainId ?? null,
+            fork: this.config.fork ?? null,
+            hardfork: this.config.hardfork ?? null,
+            minGasPrice: this.config.minGasPrice ?? null,
+            blockBaseFeePerGas: this.config.blockBaseFeePerGas ?? null
+        });
+
+        if (!response.success) {
+            throw new NetworkError('Failed to create new chain');
+        }
+
+        this.connected = true;
+        this.config.type = response.type;
+        this.config.uri = response.uri;
+    }
+
+    async deleteChain() {
+        const response = await WakeApi.disconnectChain({
+            sessionId: this.config.sessionId
+        });
+
+        if (!response.success) {
+            throw new NetworkError('Failed to delete chain');
+        }
     }
 
     async onActivate() {}
@@ -91,19 +100,19 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
     }
 
     async getAccountDetails(address: string): Promise<Account> {
-        const result = await this._wake.getBalances({
+        const response = await WakeApi.getBalances({
             addresses: [address],
             sessionId: this.config.sessionId
         });
 
         return {
             address,
-            balance: result.balances[address]
+            balance: response.balances[address]
         };
     }
 
     async setAccountBalance(request: SetAccountBalanceRequest): Promise<SetAccountBalanceResponse> {
-        const response: WakeSetBalancesResponse = await this._wake.setBalances({
+        const response: WakeSetBalancesResponse = await WakeApi.setBalances({
             balances: {
                 [request.address]: request.balance
             },
@@ -114,7 +123,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
     }
 
     async deploy(params: DeploymentRequest): Promise<DeploymentResponse> {
-        const response: WakeDeploymentResponse = await this._wake.deploy({
+        const response: WakeDeploymentResponse = await WakeApi.deploy({
             ...params,
             sessionId: this.config.sessionId
         });
@@ -141,7 +150,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
         let response;
         switch (params.callType) {
             case CallType.Call:
-                response = await this._wake.call(request);
+                response = await WakeApi.call(request);
 
                 return {
                     success: response.success,
@@ -149,7 +158,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
                     returnValue: response.returnValue
                 };
             case CallType.Transact:
-                response = await this._wake.transact(request);
+                response = await WakeApi.transact(request);
                 return {
                     success: response.success,
                     receipt: response.txReceipt,
@@ -162,11 +171,14 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
 
         // TODO include errors from response
     }
-}
 
-export const SupportedNetworks = [
-    {
-        defaultName: 'Local Node',
-        provider: LocalNodeNetworkProvider
+    /* Additional Methods */
+
+    async getAccounts(): Promise<string[]> {
+        const response: WakeGetAccountsResponse = await WakeApi.getAccounts({
+            sessionId: this.config.sessionId
+        });
+
+        return response;
     }
-];
+}

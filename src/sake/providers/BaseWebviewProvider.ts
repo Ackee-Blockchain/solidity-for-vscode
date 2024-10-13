@@ -12,7 +12,7 @@ import {
     WebviewMessageResponse
 } from '../webview/shared/types';
 import { BaseStateProvider } from '../state/BaseStateProvider';
-import { SakeProviderManager } from './SakeProviderManager';
+import { SakeProviderManager } from '../sake_providers/SakeProviderManager';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
