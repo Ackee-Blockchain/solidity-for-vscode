@@ -34,6 +34,13 @@ export class SharedChainStateProvider extends BaseStateProvider<SharedChainState
         };
     }
 
+    public setCurrentChainId(chainId: string | undefined) {
+        this.state = {
+            ...this._state,
+            currentChainId: chainId
+        };
+    }
+
     public addChain(chain: ChainState) {
         this.state = {
             ...this._state,

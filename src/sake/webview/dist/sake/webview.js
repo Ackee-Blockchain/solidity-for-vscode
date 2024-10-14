@@ -19319,6 +19319,7 @@ var WebviewMessageId;
     WebviewMessageId["onGetBytecode"] = "onGetBytecode";
     WebviewMessageId["onrequestNewProvider"] = "onrequestNewProvider";
     WebviewMessageId["onRestartWakeServer"] = "onRestartWakeServer";
+    WebviewMessageId["onSelectChain"] = "onSelectChain";
 })(WebviewMessageId || (WebviewMessageId = {}));
 // export type WebviewMessageRequest<T extends keyof WebviewMessageRequestPayload> = {
 //     command: T;
@@ -20654,6 +20655,13 @@ async function getBytecode(contractFqn) {
 async function requestNewProvider() {
     const request = {
         command: WebviewMessageId.onrequestNewProvider,
+        payload: undefined
+    };
+    client.messageHandler.send(request.command, request.payload);
+}
+async function selectChain(chainId) {
+    const request = {
+        command: WebviewMessageId.onSelectChain,
         payload: undefined
     };
     client.messageHandler.send(request.command, request.payload);
@@ -31330,7 +31338,7 @@ const { console: console_1 } = globals;
 
 const file = "src/pages/sake/Sake.svelte";
 
-// (113:4) {:else}
+// (122:4) {:else}
 function create_else_block(ctx) {
 	let tabs_1;
 	let current;
@@ -31388,15 +31396,15 @@ function create_else_block(ctx) {
 		block,
 		id: create_else_block.name,
 		type: "else",
-		source: "(113:4) {:else}",
+		source: "(122:4) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (100:50) 
-function create_if_block_3(ctx) {
+// (109:50) 
+function create_if_block_4(ctx) {
 	let div;
 	let h3;
 	let t1;
@@ -31424,14 +31432,14 @@ function create_if_block_3(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Visit Anvil Installation Page";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 101, 12, 4474);
+			add_location(h3, file, 110, 12, 4983);
 			attr_dev(span0, "class", "italic");
-			add_location(span0, file, 103, 28, 4590);
-			add_location(span1, file, 102, 12, 4556);
+			add_location(span0, file, 112, 28, 5099);
+			add_location(span1, file, 111, 12, 5065);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 108, 12, 4910);
+			add_location(vscode_button, file, 117, 12, 5419);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 100, 8, 4410);
+			add_location(div, file, 109, 8, 4919);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -31461,17 +31469,17 @@ function create_if_block_3(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3.name,
+		id: create_if_block_4.name,
 		type: "if",
-		source: "(100:50) ",
+		source: "(109:50) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (88:62) 
-function create_if_block_2(ctx) {
+// (97:62) 
+function create_if_block_3(ctx) {
 	let div;
 	let h3;
 	let t1;
@@ -31493,12 +31501,12 @@ function create_if_block_2(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Restart Connection";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 89, 12, 3859);
-			add_location(span, file, 90, 12, 3945);
+			add_location(h3, file, 98, 12, 4368);
+			add_location(span, file, 99, 12, 4454);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 95, 12, 4203);
+			add_location(vscode_button, file, 104, 12, 4712);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 88, 8, 3795);
+			add_location(div, file, 97, 8, 4304);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -31525,17 +31533,17 @@ function create_if_block_2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_2.name,
+		id: create_if_block_3.name,
 		type: "if",
-		source: "(88:62) ",
+		source: "(97:62) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (83:26) 
-function create_if_block_1(ctx) {
+// (92:26) 
+function create_if_block_2(ctx) {
 	let div;
 	let vscode_progress_ring;
 	let t0;
@@ -31548,10 +31556,10 @@ function create_if_block_1(ctx) {
 			t0 = space();
 			span = element("span");
 			span.textContent = "Connecting with Wake...";
-			add_location(vscode_progress_ring, file, 84, 12, 3635);
-			add_location(span, file, 85, 12, 3672);
+			add_location(vscode_progress_ring, file, 93, 12, 4144);
+			add_location(span, file, 94, 12, 4181);
 			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 83, 8, 3547);
+			add_location(div, file, 92, 8, 4056);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -31569,9 +31577,73 @@ function create_if_block_1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
+		id: create_if_block_2.name,
+		type: "if",
+		source: "(92:26) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (83:61) 
+function create_if_block_1(ctx) {
+	let div;
+	let h3;
+	let t1;
+	let span;
+	let t3;
+	let vscode_button;
+	let mounted;
+	let dispose;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			h3 = element("h3");
+			h3.textContent = "No chain selected";
+			t1 = space();
+			span = element("span");
+			span.textContent = "No chain selected. Please select a chain to get started.";
+			t3 = space();
+			vscode_button = element("vscode-button");
+			vscode_button.textContent = "Select chain";
+			attr_dev(h3, "class", "uppercase font-bold text-base");
+			add_location(h3, file, 84, 12, 3659);
+			add_location(span, file, 85, 12, 3736);
+			set_custom_element_data(vscode_button, "appearance", "primary");
+			add_location(vscode_button, file, 87, 12, 3888);
+			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
+			add_location(div, file, 83, 8, 3595);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, h3);
+			append_dev(div, t1);
+			append_dev(div, span);
+			append_dev(div, t3);
+			append_dev(div, vscode_button);
+
+			if (!mounted) {
+				dispose = listen_dev(vscode_button, "click", selectChain, false, false, false, false);
+				mounted = true;
+			}
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+			mounted = false;
+			dispose();
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
 		id: create_if_block_1.name,
 		type: "if",
-		source: "(83:26) ",
+		source: "(83:61) ",
 		ctx
 	});
 
@@ -31601,12 +31673,12 @@ function create_if_block(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Setup new chain";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 75, 12, 3152);
-			add_location(span, file, 76, 12, 3227);
+			add_location(h3, file, 75, 12, 3165);
+			add_location(span, file, 76, 12, 3240);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 78, 12, 3369);
+			add_location(vscode_button, file, 78, 12, 3382);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 74, 8, 3088);
+			add_location(div, file, 74, 8, 3101);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -31642,8 +31714,8 @@ function create_if_block(ctx) {
 	return block;
 }
 
-// (116:16) {#if tabId == TabId.DeployedContracts}
-function create_if_block_10(ctx) {
+// (125:16) {#if tabId == TabId.DeployedContracts}
+function create_if_block_11(ctx) {
 	let vscode_badge;
 	let t_value = /*$deployedContracts*/ ctx[5].length + "";
 	let t;
@@ -31653,7 +31725,7 @@ function create_if_block_10(ctx) {
 			vscode_badge = element("vscode-badge");
 			t = text(t_value);
 			set_custom_element_data(vscode_badge, "appearance", "secondary");
-			add_location(vscode_badge, file, 116, 20, 5228);
+			add_location(vscode_badge, file, 125, 20, 5737);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, vscode_badge, anchor);
@@ -31669,19 +31741,19 @@ function create_if_block_10(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_10.name,
+		id: create_if_block_11.name,
 		type: "if",
-		source: "(116:16) {#if tabId == TabId.DeployedContracts}",
+		source: "(125:16) {#if tabId == TabId.DeployedContracts}",
 		ctx
 	});
 
 	return block;
 }
 
-// (115:12) <svelte:fragment slot="tab-header" let:tabId>
+// (124:12) <svelte:fragment slot="tab-header" let:tabId>
 function create_tab_header_slot(ctx) {
 	let if_block_anchor;
-	let if_block = /*tabId*/ ctx[10] == /*TabId*/ ctx[1].DeployedContracts && create_if_block_10(ctx);
+	let if_block = /*tabId*/ ctx[10] == /*TabId*/ ctx[1].DeployedContracts && create_if_block_11(ctx);
 
 	const block = {
 		c: function create() {
@@ -31697,7 +31769,7 @@ function create_tab_header_slot(ctx) {
 				if (if_block) {
 					if_block.p(ctx, dirty);
 				} else {
-					if_block = create_if_block_10(ctx);
+					if_block = create_if_block_11(ctx);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -31716,15 +31788,15 @@ function create_tab_header_slot(ctx) {
 		block,
 		id: create_tab_header_slot.name,
 		type: "slot",
-		source: "(115:12) <svelte:fragment slot=\\\"tab-header\\\" let:tabId>",
+		source: "(124:12) <svelte:fragment slot=\\\"tab-header\\\" let:tabId>",
 		ctx
 	});
 
 	return block;
 }
 
-// (127:64) 
-function create_if_block_9(ctx) {
+// (136:64) 
+function create_if_block_10(ctx) {
 	let callsetup;
 	let current;
 	callsetup = new CallSetup({ $$inline: true });
@@ -31753,17 +31825,17 @@ function create_if_block_9(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_9.name,
+		id: create_if_block_10.name,
 		type: "if",
-		source: "(127:64) ",
+		source: "(136:64) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (124:16) {#if $activeTab == TabId.CompileDeploy}
-function create_if_block_8(ctx) {
+// (133:16) {#if $activeTab == TabId.CompileDeploy}
+function create_if_block_9(ctx) {
 	let callsetup;
 	let t;
 	let compile;
@@ -31803,22 +31875,22 @@ function create_if_block_8(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_8.name,
+		id: create_if_block_9.name,
 		type: "if",
-		source: "(124:16) {#if $activeTab == TabId.CompileDeploy}",
+		source: "(133:16) {#if $activeTab == TabId.CompileDeploy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (123:12) <svelte:fragment slot="content-fixed">
+// (132:12) <svelte:fragment slot="content-fixed">
 function create_content_fixed_slot(ctx) {
 	let current_block_type_index;
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block_8, create_if_block_9];
+	const if_block_creators = [create_if_block_9, create_if_block_10];
 	const if_blocks = [];
 
 	function select_block_type_3(ctx, dirty) {
@@ -31896,15 +31968,15 @@ function create_content_fixed_slot(ctx) {
 		block,
 		id: create_content_fixed_slot.name,
 		type: "slot",
-		source: "(123:12) <svelte:fragment slot=\\\"content-fixed\\\">",
+		source: "(132:12) <svelte:fragment slot=\\\"content-fixed\\\">",
 		ctx
 	});
 
 	return block;
 }
 
-// (138:64) 
-function create_if_block_7(ctx) {
+// (147:64) 
+function create_if_block_8(ctx) {
 	let run_1;
 	let current;
 	run_1 = new Run({ $$inline: true });
@@ -31934,22 +32006,22 @@ function create_if_block_7(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_7.name,
+		id: create_if_block_8.name,
 		type: "if",
-		source: "(138:64) ",
+		source: "(147:64) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (132:16) {#if $activeTab == TabId.CompileDeploy}
-function create_if_block_5(ctx) {
+// (141:16) {#if $activeTab == TabId.CompileDeploy}
+function create_if_block_6(ctx) {
 	let current_block_type_index;
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block_6, create_else_block_1];
+	const if_block_creators = [create_if_block_7, create_else_block_1];
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
@@ -32010,16 +32082,16 @@ function create_if_block_5(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_5.name,
+		id: create_if_block_6.name,
 		type: "if",
-		source: "(132:16) {#if $activeTab == TabId.CompileDeploy}",
+		source: "(141:16) {#if $activeTab == TabId.CompileDeploy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (135:20) {:else}
+// (144:20) {:else}
 function create_else_block_1(ctx) {
 	let deploy;
 	let current;
@@ -32051,15 +32123,15 @@ function create_else_block_1(ctx) {
 		block,
 		id: create_else_block_1.name,
 		type: "else",
-		source: "(135:20) {:else}",
+		source: "(144:20) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (133:20) {#if $compilationIssuesVisible}
-function create_if_block_6(ctx) {
+// (142:20) {#if $compilationIssuesVisible}
+function create_if_block_7(ctx) {
 	let compilationissues;
 	let current;
 	compilationissues = new CompilationIssues({ $$inline: true });
@@ -32088,22 +32160,22 @@ function create_if_block_6(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_6.name,
+		id: create_if_block_7.name,
 		type: "if",
-		source: "(133:20) {#if $compilationIssuesVisible}",
+		source: "(142:20) {#if $compilationIssuesVisible}",
 		ctx
 	});
 
 	return block;
 }
 
-// (131:12) <svelte:fragment slot="content-scrollable">
+// (140:12) <svelte:fragment slot="content-scrollable">
 function create_content_scrollable_slot(ctx) {
 	let current_block_type_index;
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block_5, create_if_block_7];
+	const if_block_creators = [create_if_block_6, create_if_block_8];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
@@ -32187,15 +32259,15 @@ function create_content_scrollable_slot(ctx) {
 		block,
 		id: create_content_scrollable_slot.name,
 		type: "slot",
-		source: "(131:12) <svelte:fragment slot=\\\"content-scrollable\\\">",
+		source: "(140:12) <svelte:fragment slot=\\\"content-scrollable\\\">",
 		ctx
 	});
 
 	return block;
 }
 
-// (143:16) {#if $compilationIssuesVisible && $activeTab === TabId.CompileDeploy}
-function create_if_block_4(ctx) {
+// (152:16) {#if $compilationIssuesVisible && $activeTab === TabId.CompileDeploy}
+function create_if_block_5(ctx) {
 	let a;
 	let backicon;
 	let t0;
@@ -32212,9 +32284,9 @@ function create_if_block_4(ctx) {
 			t0 = space();
 			span = element("span");
 			span.textContent = "Compilation issues";
-			add_location(span, file, 150, 24, 6770);
+			add_location(span, file, 159, 24, 7279);
 			attr_dev(a, "class", "flex gap-1 cursor-pointer items-center");
-			add_location(a, file, 145, 20, 6536);
+			add_location(a, file, 154, 20, 7045);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, a, anchor);
@@ -32248,20 +32320,20 @@ function create_if_block_4(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4.name,
+		id: create_if_block_5.name,
 		type: "if",
-		source: "(143:16) {#if $compilationIssuesVisible && $activeTab === TabId.CompileDeploy}",
+		source: "(152:16) {#if $compilationIssuesVisible && $activeTab === TabId.CompileDeploy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (142:12) <svelte:fragment slot="content-header">
+// (151:12) <svelte:fragment slot="content-header">
 function create_content_header_slot(ctx) {
 	let if_block_anchor;
 	let current;
-	let if_block = /*$compilationIssuesVisible*/ ctx[3] && /*$activeTab*/ ctx[4] === /*TabId*/ ctx[1].CompileDeploy && create_if_block_4(ctx);
+	let if_block = /*$compilationIssuesVisible*/ ctx[3] && /*$activeTab*/ ctx[4] === /*TabId*/ ctx[1].CompileDeploy && create_if_block_5(ctx);
 
 	const block = {
 		c: function create() {
@@ -32282,7 +32354,7 @@ function create_content_header_slot(ctx) {
 						transition_in(if_block, 1);
 					}
 				} else {
-					if_block = create_if_block_4(ctx);
+					if_block = create_if_block_5(ctx);
 					if_block.c();
 					transition_in(if_block, 1);
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
@@ -32316,7 +32388,7 @@ function create_content_header_slot(ctx) {
 		block,
 		id: create_content_header_slot.name,
 		type: "slot",
-		source: "(142:12) <svelte:fragment slot=\\\"content-header\\\">",
+		source: "(151:12) <svelte:fragment slot=\\\"content-header\\\">",
 		ctx
 	});
 
@@ -32334,6 +32406,7 @@ function create_fragment(ctx) {
 		create_if_block_1,
 		create_if_block_2,
 		create_if_block_3,
+		create_if_block_4,
 		create_else_block
 	];
 
@@ -32341,10 +32414,11 @@ function create_fragment(ctx) {
 
 	function select_block_type(ctx, dirty) {
 		if (/*$sharedChainState*/ ctx[2].chains.length === 0) return 0;
-		if (/*showLoading*/ ctx[0]) return 1;
-		if (/*$sharedChainState*/ ctx[2].isWakeServerRunning === false) return 2;
-		if (!/*$sharedChainState*/ ctx[2].isAnvilInstalled) return 3;
-		return 4;
+		if (/*$sharedChainState*/ ctx[2].currentChainId === undefined) return 1;
+		if (/*showLoading*/ ctx[0]) return 2;
+		if (/*$sharedChainState*/ ctx[2].isWakeServerRunning === false) return 3;
+		if (!/*$sharedChainState*/ ctx[2].isAnvilInstalled) return 4;
+		return 5;
 	}
 
 	current_block_type_index = select_block_type(ctx);
@@ -32355,7 +32429,7 @@ function create_fragment(ctx) {
 			main = element("main");
 			if_block.c();
 			attr_dev(main, "class", "h-full my-0 overflow-hidden");
-			add_location(main, file, 72, 0, 2989);
+			add_location(main, file, 72, 0, 3002);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -32543,6 +32617,7 @@ function instance($$self, $$props, $$invalidate) {
 		openExternal,
 		requestNewProvider,
 		restartWakeServer,
+		selectChain,
 		showLoading,
 		TabId,
 		tabs,

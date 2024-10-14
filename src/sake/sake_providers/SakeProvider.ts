@@ -304,6 +304,8 @@ export abstract class SakeProvider<T extends NetworkProvider> {
 
     abstract _getQuickPickItem(): SakeProviderQuickPickItem;
 
+    abstract _getStatusBarItemText(): string;
+
     abstract onDeleteProvider(): Promise<void>;
 }
 

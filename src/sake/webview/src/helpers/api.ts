@@ -166,6 +166,14 @@ export async function requestNewProvider() {
     messageHandler.send(request.command, request.payload);
 }
 
+export async function selectChain(chainId: string) {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.onSelectChain,
+        payload: undefined
+    };
+    messageHandler.send(request.command, request.payload);
+}
+
 export async function restartWakeServer(): Promise<boolean> {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.onRestartWakeServer,

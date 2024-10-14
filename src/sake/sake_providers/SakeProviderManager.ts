@@ -62,6 +62,14 @@ export class SakeProviderManager {
             connected: false
         });
 
+        if (this._selectedProviderId === undefined) {
+            this.setProvider(provider.id);
+            vscode.window.showInformationMessage(
+                `New local chain '${provider.displayName}' created.`
+            );
+            return;
+        }
+
         if (notifyUser) {
             vscode.window
                 .showInformationMessage(
@@ -83,6 +91,7 @@ export class SakeProviderManager {
 
         if (provider.id === this._selectedProviderId) {
             this._selectedProviderId = undefined;
+            this._chainsState.setCurrentChainId(undefined);
         }
 
         provider.onDeleteProvider();
@@ -124,6 +133,8 @@ export class SakeProviderManager {
 
         this._updateStatusBar();
 
+        this._chainsState.setCurrentChainId(id);
+
         // force update provider
         this.state?.sendToWebview();
 
@@ -132,18 +143,19 @@ export class SakeProviderManager {
     }
 
     private _updateStatusBar() {
+        // if (!this.provider) {
+        //     this._statusBarItem.hide();
+        //     return;
+        // }
         if (!this.provider) {
-            this._statusBarItem.hide();
-            return;
+            this._statusBarItem.text = '$(warning) No chain selected';
+            this._statusBarItem.tooltip =
+                'To use the Deploy & Intereact tab, please select a new chain or connect to an existing one.';
+        } else {
+            this._statusBarItem.text = this.provider._getStatusBarItemText();
+            this._statusBarItem.tooltip = undefined;
         }
 
-        // TODO icon
-        // TODO add screen describing that no chain i selected to sake
-        // const icon = this.provider.network.connected
-        //     ? new vscode.ThemeIcon('vm-active')
-        //     : new vscode.ThemeIcon('vm-outline');
-
-        this._statusBarItem.text = `$(cloud) ${this.provider?.displayName}`;
         this._statusBarItem.show();
     }
 

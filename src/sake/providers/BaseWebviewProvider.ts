@@ -230,6 +230,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
+            case WebviewMessageId.onSelectChain: {
+                this._sake.showProviderSelectionQuickPick();
+                break;
+            }
+
             case WebviewMessageId.onRestartWakeServer: {
                 const success = await this._sake.initializeWakeConnection();
 

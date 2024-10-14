@@ -71,4 +71,9 @@ export class LocalNodeSakeProvider extends SakeProvider<LocalNodeNetworkProvider
             }
         };
     }
+
+    _getStatusBarItemText() {
+        const icon = this.network.connected ? '$(vm-active)' : '$(vm-outline)';
+        return `${icon} ${this.displayName}`;
+    }
 }
