@@ -1,15 +1,16 @@
 import { decodeParameters } from 'web3-eth-abi';
-import { ContractFunction, TxDecodedReturnValue } from '../webview/shared/types';
+import { AbiFunctionFragment, TransactionDecodedReturnValue } from '../webview/shared/types';
+import { AbiInput } from 'web3-types';
 
 export function decodeCallReturnValue(
     returnValue: string,
-    func: ContractFunction
-): TxDecodedReturnValue[] {
+    func: AbiFunctionFragment
+): TransactionDecodedReturnValue[] {
     if (func.outputs === undefined) {
         return [];
     }
 
-    const decoded = decodeParameters(func.outputs, returnValue);
+    const decoded = decodeParameters(func.outputs as AbiInput[], returnValue);
     if (decoded.__length__ !== func.outputs.length) {
         throw new Error('Decoded length does not match function outputs length');
     }

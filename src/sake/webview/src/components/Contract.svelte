@@ -1,40 +1,25 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeTextField,
-        vsCodeButton
-    } from '@vscode/webview-ui-toolkit';
     import ContractFunction from './ContractFunction.svelte';
-    import IconButton from './IconButton.svelte';
     import ExpandButton from './icons/ExpandButton.svelte';
     import DeleteButton from './icons/DeleteButton.svelte';
-    import CopyButton from './icons/CopyButton.svelte';
-    import {
-        WebviewMessage,
-        type Contract,
-        type WakeCallRequestParams,
-        type ContractFunction as ContractFunctionType,
-        type DeploymentStateData
-    } from '../../shared/types';
-    import { messageHandler } from '@estruyf/vscode/dist/client';
-    import { copyToClipboard, removeContract, setLabel } from '../helpers/api';
+    import { type AbiFunctionFragment, type DeployedContract } from '../../shared/types';
+    import { removeDeployedContract, requestLabel, setLabel } from '../helpers/api';
     import CalldataBytes from './CalldataBytes.svelte';
-    import { filter } from '@renovatebot/pep440';
     import CopyableSpan from './CopyableSpan.svelte';
     import ClickableSpan from './ClickableSpan.svelte';
 
-    provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
-
-    export let contract: DeploymentStateData;
+    export let contract: DeployedContract;
     export let onFunctionCall: (
         calldata: string,
         contractAddress: string,
-        func: ContractFunctionType
+        func: AbiFunctionFragment
     ) => void;
     let expanded = false;
-    $: filteredAbi = contract.abi.filter((func: any) => func.type == 'function');
+    $: filteredAbi = contract.abi.filter(
+        (func: any) => func.type == 'function'
+    ) as AbiFunctionFragment[];
 
-    const _onFunctionCall = (calldata: string, func: ContractFunctionType) => {
+    const _onFunctionCall = (calldata: string, func: AbiFunctionFragment) => {
         onFunctionCall(calldata, contract.address, func);
     };
 </script>
@@ -46,12 +31,12 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div class="w-full flex flex-row gap-1 items-center justify-between">
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <ClickableSpan callback={() => setLabel(contract)}>
+                <ClickableSpan callback={() => requestLabel(contract.address)}>
                     {contract.nick ? `${contract.nick} (${contract.name})` : contract.name}
                 </ClickableSpan>
                 <DeleteButton
                     callback={() => {
-                        removeContract(contract);
+                        removeDeployedContract(contract.address);
                     }}
                 />
             </div>

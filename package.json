@@ -588,6 +588,10 @@
                 "command": "Tools-for-Solidity.sake.copyFromResults",
                 "title": "Solidity: Copy From Results",
                 "icon": "$(copy)"
+            },
+            {
+                "command": "Tools-for-Solidity.sake.serve",
+                "title": "Tools for Solidity: Serve Wallet"
             }
         ],
         "viewsContainers": {
@@ -955,7 +959,9 @@
                             "image": "./resources/walkthrough/detectors.png",
                             "altText": "Detectors"
                         },
-                        "completionEvents": ["onCommand:Tools-for-Solidity.open-detections-ui"]
+                        "completionEvents": [
+                            "onCommand:Tools-for-Solidity.open-detections-ui"
+                        ]
                     },
                     {
                         "id": "sake",
@@ -965,7 +971,9 @@
                             "image": "./resources/walkthrough/sake.png",
                             "altText": "Deploy & Interact"
                         },
-                        "completionEvents": ["onCommand:Tools-for-Solidity.open-sake-ui"]
+                        "completionEvents": [
+                            "onCommand:Tools-for-Solidity.open-sake-ui"
+                        ]
                     },
                     {
                         "id": "language-server",
@@ -1027,7 +1035,9 @@
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.1",
         "@types/node": "^16.18.97",
+        "@types/polka": "^0.5.7",
         "@types/tmp": "^0.2.6",
+        "@types/uuid": "^10.0.0",
         "@types/vscode": "^1.75.0",
         "@types/vscode-webview": "^1.57.5",
         "@typescript-eslint/eslint-plugin": "^5.30.0",
@@ -1041,7 +1051,7 @@
         "mocha": "^10.0.0",
         "run-parallel": "^1.2.0",
         "ts-loader": "^9.4.1",
-        "typescript": "^4.7.4",
+        "typescript": "^5.6.2",
         "webpack": "^5.88.2",
         "webpack-cli": "^4.10.0",
         "webpack-watch-external-files-plugin": "^3.1.0",
@@ -1055,12 +1065,15 @@
         "applicationinsights": "^2.9.0",
         "camelcase-keys": "^9.1.3",
         "execa": "^8.0.1",
-        "get-port": "<6.0.0",
+        "get-port": "^5.1.1",
         "node-fetch": "^3.3.2",
         "open": "^10.1.0",
         "pidtree": "^0.6.0",
+        "polka": "^0.5.2",
+        "sirv": "^2.0.4",
         "tar": "^7.4.0",
         "tmp": "^0.2.3",
+        "uuid": "^10.0.0",
         "vscode-languageclient": "^8.0.1",
         "wait-port": "^0.3.0",
         "web3-eth-abi": "^4.2.2",

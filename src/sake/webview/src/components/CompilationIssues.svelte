@@ -1,24 +1,6 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeDropdown,
-        vsCodeOption,
-        vsCodeDivider,
-        vsCodeCheckbox,
-        vsCodeTextField
-    } from '@vscode/webview-ui-toolkit';
     import { compilationState } from '../stores/sakeStore';
     import CompilationError from './CompilationError.svelte';
-
-    provideVSCodeDesignSystem().register(
-        vsCodeButton(),
-        vsCodeDropdown(),
-        vsCodeOption(),
-        vsCodeDivider(),
-        vsCodeCheckbox(),
-        vsCodeTextField()
-    );
 </script>
 
 {#if $compilationState.issues.length > 0}

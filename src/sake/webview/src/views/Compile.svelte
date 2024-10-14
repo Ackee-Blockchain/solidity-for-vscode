@@ -1,29 +1,10 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeDropdown,
-        vsCodeOption,
-        vsCodeDivider,
-        vsCodeCheckbox,
-        vsCodeTextField
-    } from '@vscode/webview-ui-toolkit';
-    import { CompilationIssueType } from '../../shared/types';
-    import { compilationState } from '../stores/sakeStore';
-    import TextContainer from '../components/TextContainer.svelte';
-    import WarningIcon from '../components/icons/WarningIcon.svelte';
-    import ErrorIcon from '../components/icons/ErrorIcon.svelte';
-    import { compileContracts } from '../helpers/api';
-    import { compilationIssuesVisible } from '../stores/appStore';
-
-    provideVSCodeDesignSystem().register(
-        vsCodeButton(),
-        vsCodeDropdown(),
-        vsCodeOption(),
-        vsCodeDivider(),
-        vsCodeCheckbox(),
-        vsCodeTextField()
-    );
+    import { CompilationIssueType } from '../../../shared/types';
+    import { compilationIssuesVisible, compilationState } from '../../helpers/store';
+    import TextContainer from '../../components/TextContainer.svelte';
+    import WarningIcon from '../../components/icons/WarningIcon.svelte';
+    import ErrorIcon from '../../components/icons/ErrorIcon.svelte';
+    import { compileContracts } from '../../helpers/api';
 
     let compiling = false;
 

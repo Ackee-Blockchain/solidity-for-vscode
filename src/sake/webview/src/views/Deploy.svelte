@@ -1,28 +1,10 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeDropdown,
-        vsCodeOption,
-        vsCodeDivider,
-        vsCodeCheckbox,
-        vsCodeTextField
-    } from '@vscode/webview-ui-toolkit';
     import { type CompiledContract } from '../../shared/types';
     import Constructor from '../components/Constructor.svelte';
     import { compilationState } from '../stores/sakeStore';
     import { selectedAccount, selectedValue } from '../stores/appStore';
     import { deployContract, showErrorMessage } from '../helpers/api';
     import TextContainerDark from '../components/TextContainerDark.svelte';
-
-    provideVSCodeDesignSystem().register(
-        vsCodeButton(),
-        vsCodeDropdown(),
-        vsCodeOption(),
-        vsCodeDivider(),
-        vsCodeCheckbox(),
-        vsCodeTextField()
-    );
 
     let filterString: string = '';
     $: filteredContracts = $compilationState.contracts.filter((contract) =>
@@ -36,9 +18,7 @@
             return;
         }
 
-        const _value = $selectedValue ?? 0;
-
-        deployContract(contract.fqn, _sender, calldata, _value);
+        deployContract(contract.fqn, _sender, calldata, $selectedValue ?? 0);
     };
 
     const handleFilter = function (e: any) {
@@ -80,6 +60,8 @@
                     abi={contract.abi}
                     name={contract.name}
                     onDeploy={(calldata) => deploy(contract, calldata)}
+                    onOpenDeploymentInBrowser={(calldata) =>
+                        openDeploymentInBrowser(contract, calldata, $selectedValue ?? 0)}
                 />
             {/each}
         </div>

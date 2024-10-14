@@ -1,26 +1,12 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeTextField,
-        vsCodeButton
-    } from '@vscode/webview-ui-toolkit';
-    import IconButton from './IconButton.svelte';
-    import ExpandButton from './icons/ExpandButton.svelte';
-    import DeleteButton from './icons/DeleteButton.svelte';
-    import CopyButton from './icons/CopyButton.svelte';
-    import type {
-        Contract,
-        ContractAbi,
-        ContractFunction as ContractFunctionType
-    } from '../../shared/types';
+    import type { ContractAbi, AbiConstructorFragment } from '../../shared/types';
     import ContractFunction from './ContractFunction.svelte';
-
-    provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
     export let abi: ContractAbi | undefined;
     export let onDeploy: (calldata: string) => void;
+    export let onOpenDeploymentInBrowser: (calldata: string) => void;
     export let name: string;
-    let constructor: ContractFunctionType | undefined;
+    let constructor: AbiConstructorFragment | undefined;
     let deployFunction: ContractFunction;
     $: getConstructor(abi);
 
@@ -30,7 +16,9 @@
             return;
         }
 
-        const constructors = _abi.filter((f) => f.type === 'constructor');
+        const constructors = _abi.filter(
+            (f) => f.type === 'constructor'
+        ) as AbiConstructorFragment[]; // TODO throws type errors
 
         if (constructors.length > 1) {
             constructor = undefined;
@@ -40,7 +28,6 @@
         if (constructors.length === 0) {
             constructor = {
                 inputs: [],
-                outputs: [],
                 stateMutability: 'unpayable',
                 type: 'constructor',
                 name: name
@@ -60,5 +47,6 @@
         func={constructor}
         onFunctionCall={onDeploy}
         isConstructor={true}
+        {onOpenDeploymentInBrowser}
     />
 {/if}

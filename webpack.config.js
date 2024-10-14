@@ -46,7 +46,12 @@ const config = {
     rules: [
       {
         test: /\.ts$/,
-        exclude: /node_modules/,
+        exclude: [
+            /node_modules/
+        ],
+        include: [
+            /src/
+        ],
         use: [
           {
             loader: 'ts-loader'
@@ -74,15 +79,21 @@ const config = {
             from: 'src/sake/media/vscode.css',
             to: 'sake/media/vscode.css'
         },
+        {
+            from: 'src/wallet/dist',
+            to: 'wallet'
+        }
       ],
     }),
     // @ts-ignore
     new WatchExternalFilesPlugin({
       files: [
         'src/sake/webview/dist/**/*',
+        'src/wallet/dist/**/*',
       ]
-    })
-  ]
+    }),
+  ],
+  // The 'exclude' property is not valid in this context, so it should be removed.
 };
 
 module.exports = config;

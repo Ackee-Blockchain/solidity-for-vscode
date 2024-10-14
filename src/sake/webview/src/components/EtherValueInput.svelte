@@ -1,11 +1,4 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeTextField,
-        vsCodeDropdown
-    } from '@vscode/webview-ui-toolkit';
-    provideVSCodeDesignSystem().register(vsCodeDropdown(), vsCodeTextField());
-
     let value: number | undefined;
 
     function handleValueChange(event: any) {

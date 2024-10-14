@@ -1,41 +1,90 @@
 import { writable, get, derived } from 'svelte/store';
 import {
     StateId,
-    WebviewMessage,
-    type AccountStateData,
-    type CompilationStateData,
-    type CompiledContract,
-    type DeploymentStateData,
-    type WakeStateData
+    WebviewMessageId,
+    type AccountState,
+    type CompilationState,
+    type DeploymentState,
+    type ExtendedAccount,
+    type SharedChainState
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import { parseComplexNumber } from '../../shared/validate';
-import { selectedAccount } from './appStore';
+import { REQUEST_STATE_TIMEOUT } from './constants';
 
-/* Sake Stores */
+/**
+ * frontend svelte data
+ */
 
-export const accounts = writable<AccountStateData[]>([]);
-export const deployedContracts = writable<DeploymentStateData[]>([]);
-export const compilationState = writable<CompilationStateData>({
+export const selectedAccount = writable<ExtendedAccount | null>(null);
+export const selectedValueString = writable<string | null>(null);
+// null indicated wrong stirng input
+export const selectedValue = derived(selectedValueString, ($selectedValueString) => {
+    if ($selectedValueString === null || $selectedValueString === '') {
+        return 0;
+    }
+    try {
+        return parseComplexNumber($selectedValueString);
+    } catch (e) {
+        return null;
+    }
+});
+export const compilationIssuesVisible = writable<boolean>(false);
+export const activeTab = writable<number>();
+
+/**
+ * backend data
+ */
+
+export const accounts = writable<AccountState>([]);
+export const deployedContracts = writable<DeploymentState>([]);
+export const compilationState = writable<CompilationState>({
     contracts: [],
     issues: [],
     dirty: true
 });
-export const wakeState = writable<WakeStateData>({
+export const sharedChainState = writable<SharedChainState>({
     isAnvilInstalled: undefined,
-    isServerRunning: undefined,
-    isOpenWorkspace: undefined
+    isWakeServerRunning: undefined,
+    chains: [],
+    currentChainId: undefined
 });
 
 /**
  * setup stores
  */
 
-export async function requestState() {
-    await messageHandler.request(WebviewMessage.getState, StateId.Wake);
-    await messageHandler.request(WebviewMessage.onGetAccounts);
-    await messageHandler.request(WebviewMessage.getState, StateId.DeployedContracts);
-    await messageHandler.request(WebviewMessage.getState, StateId.CompiledContracts);
+export async function requestState(): Promise<boolean> {
+    const timeout = new Promise<void>((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out')), REQUEST_STATE_TIMEOUT)
+    );
+
+    return await Promise.race([
+        Promise.all([
+            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.Accounts),
+            messageHandler.request<boolean>(
+                WebviewMessageId.requestState,
+                StateId.DeployedContracts
+            ),
+            messageHandler.request<boolean>(
+                WebviewMessageId.requestState,
+                StateId.CompiledContracts
+            ),
+            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.Chains)
+        ]),
+        timeout
+    ])
+        .then((results) => {
+            if (!(results as boolean[]).every((result) => result)) {
+                console.error('requestState failed');
+                return false;
+            }
+            return true;
+        })
+        .catch((_) => {
+            console.error('Requesting state from the extension timed out');
+            return false;
+        });
 }
 
 export function setupListeners() {
@@ -46,8 +95,10 @@ export function setupListeners() {
 
         const { command, payload, stateId } = event.data;
 
+        // console.log('received message', command, payload, stateId);
+
         switch (command) {
-            case WebviewMessage.getState: {
+            case WebviewMessageId.getState: {
                 if (stateId === StateId.DeployedContracts) {
                     if (payload === undefined) {
                         return;
@@ -56,6 +107,7 @@ export function setupListeners() {
                 }
 
                 if (stateId === StateId.CompiledContracts) {
+                    console.log('got compiled contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
@@ -64,7 +116,8 @@ export function setupListeners() {
                 }
 
                 if (stateId === StateId.Accounts) {
-                    const _accounts = payload as AccountStateData[];
+                    console.log('got accounts', payload);
+                    const _accounts = payload as AccountState;
                     const _selectedAccount = get(selectedAccount);
 
                     // update accounts store
@@ -101,12 +154,11 @@ export function setupListeners() {
                     return;
                 }
 
-                if (stateId === StateId.Wake) {
-                    console.log('wake state', payload);
+                if (stateId === StateId.Chains) {
                     if (payload === undefined) {
                         return;
                     }
-                    wakeState.set(payload);
+                    sharedChainState.set(payload);
                     return;
                 }
 

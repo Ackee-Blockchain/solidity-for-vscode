@@ -53,6 +53,7 @@ import { Installer } from './installers/installerInterface';
 import { PipxInstaller } from './installers/pipx';
 import { PipInstaller } from './installers/pip';
 import { ManualInstaller } from './installers/manual';
+import { WalletServer } from './serve';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ExecaChildProcess | undefined = undefined;
@@ -137,6 +138,9 @@ export async function activate(context: vscode.ExtensionContext) {
     } else {
         throw new Error(`Unknown installation method: ${installationMethod}`);
     }
+
+    // Create a Wallet Server
+    // const walletServer = new WalletServer(context);
 
     analytics = new Analytics(context, method);
     errorHandler = new ClientErrorHandler(outputChannel, analytics);

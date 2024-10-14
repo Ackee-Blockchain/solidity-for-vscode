@@ -19,22 +19,13 @@
     import { selectedAccount, selectedValue } from '../stores/appStore';
     import { functionCall, showErrorMessage } from '../helpers/api';
 
-    provideVSCodeDesignSystem().register(
-        vsCodeButton(),
-        vsCodeDropdown(),
-        vsCodeOption(),
-        vsCodeDivider(),
-        vsCodeCheckbox(),
-        vsCodeTextField()
-    );
-
     // let filterString: string = '';
 
     // @todo extract into a helper function
     const call = async function (
         calldata: string,
         contractAddress: string,
-        func: ContractFunctionType
+        func: AbiFunctionFragment
     ) {
         const _sender: string | undefined = $selectedAccount?.address;
         if (_sender === undefined) {
@@ -44,26 +35,16 @@
 
         const _value: number = $selectedValue ?? 0;
 
-        const requestParams: WakeCallRequestParams = {
-            contractAddress: contractAddress,
-            sender: _sender,
+        const payload: CallRequest = {
+            to: contractAddress,
+            from: _sender,
             calldata: calldata,
-            // @dev automatically set value to 0 if function is not payable
-            value: func.stateMutability === 'payable' ? _value : 0
-        };
-
-        const payload: CallPayload = {
-            func: func,
-            requestParams: requestParams
+            value: func.stateMutability === 'payable' ? _value : 0,
+            functionAbi: func
         };
 
         functionCall(payload);
     };
-
-    // const handleFilter = function (e: any) {
-    //     filterString = e.target?.value;
-    //     // console.log("filter string", _filterString);
-    // };
 </script>
 
 {#if $deployedContracts.length > 0}
@@ -116,7 +97,6 @@
             <span class="text-sm my-2 text-center text-secon">No deployed contracts</span>
         </div>
     </section>
-    <!-- <p class="text-center">No contracts are compiled</p> -->
 {/if}
 
 <style global>
