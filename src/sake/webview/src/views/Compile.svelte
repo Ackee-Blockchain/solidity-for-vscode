@@ -1,10 +1,11 @@
 <script lang="ts">
-    import { CompilationIssueType } from '../../../shared/types';
-    import { compilationIssuesVisible, compilationState } from '../../helpers/store';
-    import TextContainer from '../../components/TextContainer.svelte';
-    import WarningIcon from '../../components/icons/WarningIcon.svelte';
-    import ErrorIcon from '../../components/icons/ErrorIcon.svelte';
-    import { compileContracts } from '../../helpers/api';
+    import { CompilationIssueType } from '../../shared/state_types';
+    import ErrorIcon from '../components/icons/ErrorIcon.svelte';
+    import WarningIcon from '../components/icons/WarningIcon.svelte';
+    import TextContainer from '../components/TextContainer.svelte';
+    import { compileContracts } from '../helpers/api';
+    import { compilationIssuesVisible } from '../stores/appStore';
+    import { compilationState } from '../stores/sakeStore';
 
     let compiling = false;
 
@@ -57,6 +58,7 @@
                 </vscode-button>
             {/if}
         </div>
+        <!-- svelte-ignore missing-declaration -->
         {#if $compilationState.dirty}
             <TextContainer classList="flex gap-1 items-center text-sm h-[26px] justify-center">
                 <span class="truncate">Some files changed since last compilation</span>

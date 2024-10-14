@@ -64,9 +64,11 @@ export class SakeProviderManager {
 
         if (this._selectedProviderId === undefined) {
             this.setProvider(provider.id);
-            vscode.window.showInformationMessage(
-                `New local chain '${provider.displayName}' created.`
-            );
+            if (notifyUser) {
+                vscode.window.showInformationMessage(
+                    `New local chain '${provider.displayName}' created.`
+                );
+            }
             return;
         }
 
@@ -89,12 +91,18 @@ export class SakeProviderManager {
             throw new Error('Provider with id ' + provider.id + ' does not exist');
         }
 
+        try {
+            await provider.onDeleteProvider();
+        } catch (e) {
+            showErrorMessage(
+                `Failed to delete chain: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
+
         if (provider.id === this._selectedProviderId) {
             this._selectedProviderId = undefined;
             this._chainsState.setCurrentChainId(undefined);
         }
-
-        provider.onDeleteProvider();
 
         this._providers.delete(provider.id);
         this._chainsState.removeChain(provider.id);

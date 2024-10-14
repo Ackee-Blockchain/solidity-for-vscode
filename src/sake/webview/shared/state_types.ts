@@ -64,6 +64,7 @@ export interface SharedChainState {
     isWakeServerRunning?: boolean;
     chains: ChainState[];
     currentChainId: string | undefined;
+    isOpenWorkspace: 'open' | 'closed' | 'tooManyWorkspaces' | undefined;
 }
 
 export enum NetworkType {

@@ -1,8 +1,7 @@
 {
     "exclude":[
         "src/sake/webview/node_modules/**/*",
-        "src/sake/webview/src/**/*",
-        "src/wallet/**/*"
+        "src/sake/webview/src/**/*"
     ],
     "compilerOptions": {
         "module": "commonjs",

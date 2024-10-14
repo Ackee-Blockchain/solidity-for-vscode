@@ -16,18 +16,8 @@
     } from '@vscode/webview-ui-toolkit';
     import { onMount } from 'svelte';
     import Tabs from './components/common/Tabs.svelte';
-    import { deployedContracts, requestState, wakeState, setupListeners } from './stores/sakeStore';
-    import { compilationIssuesVisible, activeTabId, txParametersExpanded } from './stores/appStore';
-    import Compile from './views/Compile.svelte';
-    import Deploy from './views/Deploy.svelte';
-    import Run from './views/Run.svelte';
-    import BackIcon from './components/icons/BackIcon.svelte';
-    import CompilationIssues from './components/CompilationIssues.svelte';
-    import {
-        RESTART_WAKE_SERVER_TIMEOUT,
-        RESTART_WAKE_SERVER_TRIES
-    } from '../../helpers/constants';
-    // import '../../../shared/types'; // Importing types to avoid TS error
+    import { requestState, setupListeners, sharedChainState } from './stores/sakeStore';
+    import { RESTART_WAKE_SERVER_TIMEOUT, RESTART_WAKE_SERVER_TRIES } from './helpers/constants';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -79,27 +69,11 @@
     onMount(async () => {
         setupListeners(); // @dev listeners have to be set up before requesting state
         await requestState();
-        activeTab.set(tabs[0].id);
         showLoading = false;
     });
 
-    // const startServer = () => {
-    //     showLoading = true;
-    //     const timeout = setTimeout(() => {
-    //         showLoading = false;
-    //         setServerRunning(false);
-    //         console.log('Server not running', $sharedChainState);
-    //     }, SERVER_TIMEOUT);
-    //     requestState().then(() => {
-    //         clearTimeout(timeout);
-    //         setServerRunning(true);
-    //         showLoading = false;
-    //     });
-    // };
-
     const tryWakeServerRestart = (tries: number = 0) => {
         showLoading = true;
-        console.log('tryWakeServerRestart', tries);
         if (tries >= RESTART_WAKE_SERVER_TRIES) {
             showLoading = false;
             return;
@@ -111,7 +85,6 @@
 
         restartWakeServer().then((success) => {
             if (success) {
-                console.log('Wake server restarted');
                 clearTimeout(wakeServerRestartTimeout);
                 showLoading = false;
             }
@@ -147,7 +120,7 @@
             <vscode-progress-ring />
             <span>Connecting with Wake...</span>
         </div>
-    {:else if $wakeState.isOpenWorkspace === 'closed'}
+    {:else if $sharedChainState.isOpenWorkspace === 'closed'}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">No workspace opened</h3>
             <span>
@@ -155,7 +128,7 @@
                 Please open a project with Solidity contracts to use this feature.
             </span>
         </div>
-    {:else if $wakeState.isOpenWorkspace === 'tooManyWorkspaces'}
+    {:else if $sharedChainState.isOpenWorkspace === 'tooManyWorkspaces'}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Too many workspaces opened</h3>
             <span>

@@ -182,33 +182,3 @@ export async function restartWakeServer(): Promise<boolean> {
     };
     return await messageHandler.request<boolean>(request.command, request.payload);
 }
-
-export async function openDeploymentInBrowser(
-    contract: CompiledContract,
-    calldata: string,
-    value: number
-) {
-    const { success, bytecode } = await getBytecode(contract.fqn);
-
-    if (!success) {
-        return;
-    }
-
-    if (!bytecode) {
-        console.error('No bytecode found');
-        return;
-    }
-
-    const _params = {
-        name: contract.name,
-        abi: contract.abi,
-        bytecode: bytecode,
-        calldata: calldata,
-        value: value
-    };
-    // } as WalletDeploymentData; TODO: fix this
-
-    console.log('openDeploymentInBrowser params', _params);
-
-    messageHandler.send(WebviewMessageId.onOpenDeploymentInBrowser, _params);
-}

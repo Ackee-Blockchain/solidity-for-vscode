@@ -301,7 +301,6 @@ function _validateIntType(value: number, type: string): void {
  * @throws {FunctionInputParseError} If the value cannot be parsed as a complex integer.
  */
 export function parseComplexNumber(value: string): number {
-    console.log('parseComplexNumber', value);
     value = value.trim().replace('_', '');
 
     // return classic integer

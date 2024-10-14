@@ -60,8 +60,6 @@
                     abi={contract.abi}
                     name={contract.name}
                     onDeploy={(calldata) => deploy(contract, calldata)}
-                    onOpenDeploymentInBrowser={(calldata) =>
-                        openDeploymentInBrowser(contract, calldata, $selectedValue ?? 0)}
                 />
             {/each}
         </div>

@@ -1,23 +1,9 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeDropdown,
-        vsCodeOption,
-        vsCodeDivider,
-        vsCodeCheckbox,
-        vsCodeTextField
-    } from '@vscode/webview-ui-toolkit';
     import Contract from '../components/Contract.svelte';
-    import Divider from '../components/Divider.svelte';
-    import {
-        type CallPayload,
-        type WakeCallRequestParams,
-        type ContractFunction as ContractFunctionType
-    } from '../../shared/types';
     import { deployedContracts } from '../stores/sakeStore';
     import { selectedAccount, selectedValue } from '../stores/appStore';
     import { functionCall, showErrorMessage } from '../helpers/api';
+    import type { AbiFunctionFragment, CallRequest } from '../../shared/types';
 
     // let filterString: string = '';
 

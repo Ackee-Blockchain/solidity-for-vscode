@@ -1,36 +1,15 @@
-import { writable, get, derived } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import {
     StateId,
     WebviewMessageId,
     type AccountState,
     type CompilationState,
     type DeploymentState,
-    type ExtendedAccount,
     type SharedChainState
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
-import { parseComplexNumber } from '../../shared/validate';
-import { REQUEST_STATE_TIMEOUT } from './constants';
-
-/**
- * frontend svelte data
- */
-
-export const selectedAccount = writable<ExtendedAccount | null>(null);
-export const selectedValueString = writable<string | null>(null);
-// null indicated wrong stirng input
-export const selectedValue = derived(selectedValueString, ($selectedValueString) => {
-    if ($selectedValueString === null || $selectedValueString === '') {
-        return 0;
-    }
-    try {
-        return parseComplexNumber($selectedValueString);
-    } catch (e) {
-        return null;
-    }
-});
-export const compilationIssuesVisible = writable<boolean>(false);
-export const activeTab = writable<number>();
+import { REQUEST_STATE_TIMEOUT } from '../helpers/constants';
+import { selectedAccount, setSelectedAccount } from './appStore';
 
 /**
  * backend data
@@ -47,7 +26,8 @@ export const sharedChainState = writable<SharedChainState>({
     isAnvilInstalled: undefined,
     isWakeServerRunning: undefined,
     chains: [],
-    currentChainId: undefined
+    currentChainId: undefined,
+    isOpenWorkspace: undefined
 });
 
 /**
@@ -107,7 +87,6 @@ export function setupListeners() {
                 }
 
                 if (stateId === StateId.CompiledContracts) {
-                    console.log('got compiled contracts', payload);
                     if (payload === undefined) {
                         return;
                     }
@@ -116,7 +95,6 @@ export function setupListeners() {
                 }
 
                 if (stateId === StateId.Accounts) {
-                    console.log('got accounts', payload);
                     const _accounts = payload as AccountState;
                     const _selectedAccount = get(selectedAccount);
 
@@ -125,7 +103,7 @@ export function setupListeners() {
 
                     // if no accounts, reset selected account
                     if (_accounts.length === 0) {
-                        selectedAccount.set(null);
+                        setSelectedAccount(null);
                         return;
                     }
 
@@ -137,15 +115,15 @@ export function setupListeners() {
                                 (account) => account.address === _selectedAccount.address
                             ))
                     ) {
-                        selectedAccount.set(_accounts[0]);
+                        setSelectedAccount(0);
                         return;
                     }
 
                     // if selectedAccount is in payload, update selectedAccount
                     // @dev accounts.find should not return undefined, since checked above
                     if (_selectedAccount !== null) {
-                        selectedAccount.set(
-                            _accounts.find(
+                        setSelectedAccount(
+                            _accounts.findIndex(
                                 (account) => account.address === _selectedAccount.address
                             ) ?? null
                         );

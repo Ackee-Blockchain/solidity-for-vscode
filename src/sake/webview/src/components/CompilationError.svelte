@@ -1,9 +1,4 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeTextField,
-        vsCodeButton
-    } from '@vscode/webview-ui-toolkit';
     import IconSpacer from './icons/IconSpacer.svelte';
     import ExpandButton from './icons/ExpandButton.svelte';
     import type { CompilationIssue, CompilationErrorSpecific } from '../../shared/types';
@@ -13,8 +8,6 @@
     import ErrorIcon from './icons/ErrorIcon.svelte';
     import WarningIcon from './icons/WarningIcon.svelte';
     import ClickableSpan from './ClickableSpan.svelte';
-
-    provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
 
     export let issue: CompilationIssue;
     let expanded: boolean = false;

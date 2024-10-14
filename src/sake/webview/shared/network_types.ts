@@ -7,13 +7,6 @@ import type {
     WakeCreateChainRequestParams
 } from './wake_types';
 
-export type WalletDeploymentData = {
-    contractFqn: string;
-    sender: Address;
-    calldata: HexString;
-    value: number;
-};
-
 interface Transaction {
     success: boolean;
     receipt?: TransactionReceipt;

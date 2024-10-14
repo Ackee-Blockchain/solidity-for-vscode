@@ -9,7 +9,8 @@ export class SharedChainStateProvider extends BaseStateProvider<SharedChainState
             isAnvilInstalled: undefined,
             isWakeServerRunning: undefined,
             chains: [],
-            currentChainId: undefined
+            currentChainId: undefined,
+            isOpenWorkspace: undefined
         });
     }
 
@@ -57,6 +58,13 @@ export class SharedChainStateProvider extends BaseStateProvider<SharedChainState
 
     public getChain(chainId: string): ChainState | undefined {
         return this._state.chains.find((chain) => chain.chainId === chainId);
+    }
+
+    public setIsOpenWorkspace(isOpenWorkspace: 'open' | 'closed' | 'tooManyWorkspaces') {
+        this.state = {
+            ...this._state,
+            isOpenWorkspace: isOpenWorkspace
+        };
     }
 }
 

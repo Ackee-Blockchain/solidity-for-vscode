@@ -8,6 +8,7 @@
     import {
         compilationIssuesVisible,
         selectedAccount,
+        selectedAccountId,
         selectedValue,
         selectedValueString,
         txParametersExpanded
@@ -48,7 +49,9 @@
                     <span>Transaction Parameters</span>
 
                     <span class="text-xs text-vscodeForegroundSecondary font-normal ml-auto pr-2">
-                        ({$selectedAccount?.nick ?? $selectedAccount?.address},
+                        ({$selectedAccountId !== null
+                            ? ($selectedAccount?.nick ?? `Account ${$selectedAccountId}`)
+                            : 'No account selected'},
                         {displayEtherValue($selectedValue)})
                     </span>
                 {/if}

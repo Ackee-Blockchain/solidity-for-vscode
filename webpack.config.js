@@ -78,18 +78,13 @@ const config = {
         {
             from: 'src/sake/media/vscode.css',
             to: 'sake/media/vscode.css'
-        },
-        {
-            from: 'src/wallet/dist',
-            to: 'wallet'
         }
       ],
     }),
     // @ts-ignore
     new WatchExternalFilesPlugin({
       files: [
-        'src/sake/webview/dist/**/*',
-        'src/wallet/dist/**/*',
+        'src/sake/webview/dist/**/*'
       ]
     }),
   ],

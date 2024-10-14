@@ -55,23 +55,6 @@ export async function openExternal(path: string) {
     vscode.env.openExternal(vscode.Uri.parse(path));
 }
 
-export async function showTimedInfoMessage(message: string, milliseconds: number = 3000) {
-    await vscode.window.withProgress(
-        {
-            location: vscode.ProgressLocation.Notification,
-            title: message,
-            cancellable: false
-        },
-        async (progress) => {
-            // Set progress to 100% immediately
-            progress.report({ increment: 100 });
-
-            // Wait for 3 seconds (or the specified milliseconds)
-            await new Promise((resolve) => setTimeout(resolve, milliseconds));
-        }
-    );
-}
-
 export function showErrorMessage(message: string) {
     vscode.window.showErrorMessage(message);
 }

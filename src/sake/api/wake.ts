@@ -104,10 +104,13 @@ export class WakeApi {
         requestParams: WakeDisconnectChainRequestParams
     ): Promise<WakeDisconnectChainResponse> {
         try {
+            console.log('disconnectChain', requestParams);
             const result = await this.sendWakeRequest<WakeDisconnectChainResponse>(
                 'wake/sake/disconnectChain',
                 requestParams
             );
+
+            console.log('disconnectChain result', result);
 
             if (result == null) {
                 throw new Error('No result returned');
@@ -269,14 +272,10 @@ export class WakeApi {
         requestParams: WakeDeploymentRequestParams
     ): Promise<WakeDeploymentResponse> {
         try {
-            console.log('deploying params', requestParams);
-
             const result = await WakeApi.sendWakeRequest<WakeDeploymentResponse>(
                 'wake/sake/deploy',
                 requestParams
             );
-
-            console.log('deploy result', result);
 
             if (result == null) {
                 throw new Error('No result returned');
@@ -284,7 +283,6 @@ export class WakeApi {
 
             return result;
         } catch (e) {
-            console.error('Deployment Error', e);
             throw new WakeApiError(
                 `Failed to deploy: ${e instanceof Error ? e.message : String(e)}`
             );
@@ -297,8 +295,6 @@ export class WakeApi {
                 'wake/sake/call',
                 requestParams
             );
-
-            console.log('call result', result);
 
             if (result == null) {
                 throw new Error('No result returned');

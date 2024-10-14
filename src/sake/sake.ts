@@ -3,7 +3,6 @@ import { SakeWebviewProvider } from './providers/WebviewProviders';
 import { copyToClipboard, getTextFromInputBox } from './commands';
 import {
     CallRequest,
-    WalletDeploymentData,
     DeploymentRequest,
     SetAccountBalanceRequest,
     SetAccountLabelRequest,
@@ -12,7 +11,6 @@ import {
 import { LanguageClient } from 'vscode-languageclient/node';
 import { SakeOutputItem } from './providers/OutputTreeProvider';
 import { copyToClipboardHandler } from '../commands';
-import { WakeState } from './state/WakeState';
 import { SakeProviderManager } from './sake_providers/SakeProviderManager';
 import { SharedChainStateProvider } from './state/SharedChainStateProvider';
 import { SakeContext } from './context';
@@ -47,19 +45,27 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
         sake.setProvider(localProvider.id);
     }
 
-    /* Initialize Wallet Server */
-    // const walletServer = new WalletServer(context);
+    /* Workspace watcher */
 
-    /* Initialize Network (Chain) Providers */
+    const workspaceWatcher = () => {
+        const workspaces = vscode.workspace.workspaceFolders;
+        if (workspaces === undefined || workspaces.length === 0) {
+            chainsState.setIsOpenWorkspace('closed');
+            return;
+        } else if (workspaces.length > 1) {
+            chainsState.setIsOpenWorkspace('tooManyWorkspaces');
+            return;
+        }
 
-    // new LocalNodeSakeProvider(
-    //     'local-chain-1',
-    //     'Local Chain 1',
-    //     localNodeNetworkProvider,
-    //     sidebarSakeProvider
-    // );
+        chainsState.setIsOpenWorkspace('open');
+    };
 
-    // TODO remove unnecessary commands
+    // check if workspace is open
+    vscode.workspace.onDidChangeWorkspaceFolders(() => {
+        workspaceWatcher();
+    });
+
+    workspaceWatcher();
 
     // register commands
     context.subscriptions.push(
@@ -159,46 +165,6 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.copyFromResults',
             (context: SakeOutputItem) => copyToClipboard(context.value)
-        )
-    );
-
-    context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.serve', async () => {
-            // console.log(`start serve`);
-            // walletServer
-            //     .start()
-            //     .then((port) => {
-            //         console.log(`Wallet Server running on http://localhost:${port}`);
-            //     })
-            //     .then(() => {
-            //         walletServer.openInBrowser();
-            //     })
-            //     .catch((err) => {
-            //         console.error(err);
-            //     });
-        })
-    );
-
-    context.subscriptions.push(
-        vscode.commands.registerCommand(
-            'Tools-for-Solidity.sake.openDeploymentInBrowser',
-            async (deploymentData: WalletDeploymentData) => {
-                // console.log(`start serve`);
-                // walletServer
-                //     .start()
-                //     .then((port) => {
-                //         console.log(`Wallet Server running on http://localhost:${port}`);
-                //     })
-                //     .then(() => {
-                //         walletServer.setDeploymentData(deploymentData);
-                //     })
-                //     .then(() => {
-                //         walletServer.openInBrowser();
-                //     })
-                //     .catch((err) => {
-                //         console.error(err);
-                //     });
-            }
         )
     );
 

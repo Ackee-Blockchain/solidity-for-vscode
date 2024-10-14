@@ -588,10 +588,6 @@
                 "command": "Tools-for-Solidity.sake.copyFromResults",
                 "title": "Solidity: Copy From Results",
                 "icon": "$(copy)"
-            },
-            {
-                "command": "Tools-for-Solidity.sake.serve",
-                "title": "Tools for Solidity: Serve Wallet"
             }
         ],
         "viewsContainers": {

@@ -9,7 +9,6 @@
 
     export let func: AbiFunctionFragment;
     export let onFunctionCall: (calldata: string, func: AbiFunctionFragment) => void;
-    export let onOpenDeploymentInBrowser: ((calldata: string) => void) | undefined = undefined;
     export let isConstructor: boolean = false;
     export let isCalldata: boolean = false;
     let expanded: boolean = false;
@@ -43,19 +42,6 @@
         }
 
         onFunctionCall(_encodedInput, func);
-    }
-
-    async function _openDeploymentInBrowser() {
-        let _encodedInput: string;
-        try {
-            _encodedInput = getEncodedInput();
-        } catch (e) {
-            const errorMessage = typeof e === 'string' ? e : (e as Error).message;
-            const message = `Failed to encode input with error: ${errorMessage}`;
-            showErrorMessage(message);
-            return;
-        }
-        onOpenDeploymentInBrowser!(_encodedInput);
     }
 </script>
 
@@ -97,8 +83,5 @@
                 />
             {/if}
         </div>
-    {/if}
-    {#if isConstructor && onOpenDeploymentInBrowser}
-        <KebabButton callback={_openDeploymentInBrowser} />
     {/if}
 </div>

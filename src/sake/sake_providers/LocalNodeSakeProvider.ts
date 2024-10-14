@@ -33,7 +33,7 @@ export class LocalNodeSakeProvider extends SakeProvider<LocalNodeNetworkProvider
         }
     }
 
-    async onDeleteProvider() {
+    async onDeleteProvider(): Promise<void> {
         await this.network.deleteChain();
     }
 
@@ -61,9 +61,7 @@ export class LocalNodeSakeProvider extends SakeProvider<LocalNodeNetworkProvider
                 : new vscode.ThemeIcon('vm-outline'),
             buttons,
             itemButtonClick: (button: vscode.QuickInputButton) => {
-                console.log('itemButtonClick', button);
                 if (button.tooltip === 'Delete') {
-                    WakeApi.disconnectChain({ sessionId: this.id });
                     sake.removeProvider(this);
                 } else if (button.tooltip === 'Reconnect') {
                     this.tryReconnect();
