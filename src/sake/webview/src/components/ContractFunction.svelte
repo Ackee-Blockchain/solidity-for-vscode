@@ -1,56 +1,43 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeTextField
-    } from '@vscode/webview-ui-toolkit';
     import ContractFunctionInput from './ContractFunctionInput.svelte';
-    import { onMount } from 'svelte';
     import ExpandButton from './icons/ExpandButton.svelte';
     import KebabButton from './icons/KebabButton.svelte';
     import { buildTree, RootInputHandler } from '../helpers/FunctionInputsHandler';
     import IconSpacer from './icons/IconSpacer.svelte';
-    import { messageHandler } from '@estruyf/vscode/dist/client';
-    import {
-        type ContractFunction as ContractFunctionType,
-        type Contract,
-        type CallPayload,
-        WebviewMessage
-    } from '../../shared/types';
-    import { children } from 'svelte/internal';
+    import { type AbiFunctionFragment } from '../../shared/types';
+    import { showErrorMessage } from '../helpers/api';
 
-    provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField());
-
-    export let func: ContractFunctionType;
-    export let onFunctionCall: (calldata: string, func: ContractFunctionType) => void;
+    export let func: AbiFunctionFragment;
+    export let onFunctionCall: (calldata: string, func: AbiFunctionFragment) => void;
     export let isConstructor: boolean = false;
     export let isCalldata: boolean = false;
     let expanded: boolean = false;
     let inputRoot: RootInputHandler;
     $: funcChanged(func);
 
-    const funcChanged = (_func: ContractFunctionType) => {
+    const funcChanged = (_func: AbiFunctionFragment) => {
         inputRoot = buildTree(_func);
         expanded = false;
     };
 
-    async function submit() {
+    const getEncodedInput = () => {
+        if (isCalldata) {
+            return inputRoot.rawCalldata();
+        } else if (isConstructor) {
+            return inputRoot.encodedParameters();
+        } else {
+            return inputRoot.calldata();
+        }
+    };
+
+    async function _onFunctionCall() {
         let _encodedInput: string;
         try {
-            if (isCalldata) {
-                _encodedInput = inputRoot.rawCalldata();
-                // console.log('calldata', _encodedInput, func);
-            } else if (isConstructor) {
-                _encodedInput = inputRoot.encodedParameters();
-                // console.log('constructor', _encodedInput, func);
-            } else {
-                _encodedInput = inputRoot.calldata();
-                // console.log('function', _encodedInput, func);
-            }
+            _encodedInput = getEncodedInput();
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
             const message = `Failed to encode input with error: ${errorMessage}`;
-            messageHandler.send(WebviewMessage.onError, message);
+            showErrorMessage(message);
             return;
         }
 
@@ -69,7 +56,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <vscode-button
             class="flex-1 truncate"
-            on:click={submit}
+            on:click={_onFunctionCall}
             appearance={isCalldata ? 'secondary' : 'primary'}>{func.name}</vscode-button
         >
     </div>
@@ -97,5 +84,4 @@
             {/if}
         </div>
     {/if}
-    <!-- <KebabButton callback={openFullTextInputEditor} /> -->
 </div>

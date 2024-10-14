@@ -1,14 +1,13 @@
 import {
     CompilationIssue,
-    CompilationStateData,
+    CompilationState,
     CompiledContract,
-    ContractAbi,
     StateId
 } from '../webview/shared/types';
-import { BaseState } from './BaseState';
+import { BaseStateProvider } from './BaseStateProvider';
 
-export class CompilationState extends BaseState<CompilationStateData> {
-    private static _instance: CompilationState;
+export class CompilationStateProvider extends BaseStateProvider<CompilationState> {
+    private static _instance: CompilationStateProvider;
 
     private constructor() {
         super(StateId.CompiledContracts, {
@@ -18,9 +17,9 @@ export class CompilationState extends BaseState<CompilationStateData> {
         });
     }
 
-    public static getInstance(): CompilationState {
+    public static getInstance(): CompilationStateProvider {
         if (!this._instance) {
-            this._instance = new CompilationState();
+            this._instance = new CompilationStateProvider();
         }
         return this._instance;
     }
@@ -40,7 +39,7 @@ export class CompilationState extends BaseState<CompilationStateData> {
         };
     }
 
-    public setCompilation(contracts: Array<CompiledContract>): void {
+    public setCompilation(contracts: CompiledContract[]): void {
         this.state = {
             ...this.state,
             contracts: contracts,
@@ -62,7 +61,7 @@ export class CompilationState extends BaseState<CompilationStateData> {
         }, {} as Record<string, CompiledContract>);
     }
 
-    public getContract(fqn: string): CompiledContract | undefined {
-        return this.state.contracts.find((contract) => contract.fqn === fqn);
+    public get(contractFqn: string): CompiledContract | undefined {
+        return this.state.contracts.find((contract) => contract.fqn === contractFqn);
     }
 }

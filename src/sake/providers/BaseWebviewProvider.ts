@@ -2,32 +2,26 @@ import * as vscode from 'vscode';
 import { getNonce } from '../utils/getNonce';
 import { getBasePage } from '../utils/getBasePage';
 import { MessageHandlerData } from '@estruyf/vscode';
-import { BaseState } from '../state/BaseState';
-import { DeploymentState } from '../state/DeploymentState';
-import { copyToClipboard, loadSampleAbi } from '../commands';
+import { copyToClipboard, getTextFromInputBox, navigateTo, openExternal } from '../commands';
 import {
     StateId,
-    WebviewMessageData,
-    WebviewMessage,
-    WakeDeploymentRequestParams,
-    DeploymentStateData,
-    WakeSetLabelRequestParams
+    WebviewMessageId,
+    WakeGetBytecodeResponse,
+    GetBytecodeResponse,
+    WebviewMessageRequest,
+    WebviewMessageResponse
 } from '../webview/shared/types';
-import { CompilationState } from '../state/CompilationState';
-import { AccountState } from '../state/AccountState';
-import { WakeState } from '../state/WakeState';
+import { BaseStateProvider } from '../state/BaseStateProvider';
+import { SakeProviderManager } from '../sake_providers/SakeProviderManager';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
     _doc?: vscode.TextDocument;
-    _stateSubscriptions: Map<StateId, any> = new Map(); // TODO add type
+    _stateSubscriptions: Map<StateId, BaseStateProvider<any>> = new Map();
+    _sake: SakeProviderManager;
 
     constructor(private readonly _extensionUri: vscode.Uri, private readonly _targetPath: string) {
-        // Subscribe to states
-        DeploymentState.getInstance().subscribe(this);
-        CompilationState.getInstance().subscribe(this);
-        AccountState.getInstance().subscribe(this);
-        WakeState.getInstance().subscribe(this);
+        this._sake = SakeProviderManager.getInstance();
     }
 
     public resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -80,335 +74,179 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         );
     }
 
-    public postMessageToWebview(message: WebviewMessageData) {
+    public postMessageToWebview(message: any) {
+        // TODO set type
         this._view?.webview.postMessage(message);
     }
 
-    public setSubscribedState(subscribedState: BaseState<any>) {
+    public setSubscribedState(subscribedState: BaseStateProvider<any>) {
         this._stateSubscriptions.set(subscribedState.stateId, subscribedState);
     }
 
-    protected _setState(stateId: StateId, state: any) {
-        const subscribedState = this._stateSubscriptions.get(stateId);
-        subscribedState && (subscribedState.state = state);
+    public unsetSubscribedState(subscribedState: BaseStateProvider<any>) {
+        this._stateSubscriptions.delete(subscribedState.stateId);
     }
 
-    protected _getState(stateId: StateId) {
-        const subscribedState = this._stateSubscriptions.get(stateId);
-        return subscribedState?.state;
-    }
+    private async _handleMessage(message: WebviewMessageRequest, webviewView: vscode.WebviewView) {
+        switch (message.command) {
+            case WebviewMessageId.requestState: {
+                const state = this._stateSubscriptions.get(message.payload);
 
-    protected _getStateObject(stateId: StateId) {
-        return this._stateSubscriptions.get(stateId);
-    }
-
-    protected _getDeployedContracts(): DeploymentState {
-        return this._getStateObject(StateId.DeployedContracts);
-    }
-
-    private async _handleMessage(message: WebviewMessageData, webviewView: vscode.WebviewView) {
-        const { command, requestId, payload } = message;
-
-        switch (command) {
-            // TODO: change strings to enums
-            case 'onInfo': {
-                if (!payload) {
-                    return;
-                }
-                vscode.window.showWarningMessage(payload);
-                break;
-            }
-
-            case WebviewMessage.onError: {
-                if (!payload) {
-                    return;
-                }
-                vscode.window.showErrorMessage(payload);
-                break;
-            }
-
-            case WebviewMessage.getTextFromInputBox: {
-                const value = await vscode.window.showInputBox(payload);
                 webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    payload: value
-                } as MessageHandlerData<string>);
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success: state !== undefined
+                    }
+                } as WebviewMessageResponse);
+
+                state?.sendToWebview();
                 break;
             }
 
-            case WebviewMessage.copyToClipboard: {
-                if (!payload) {
-                    return;
-                }
-                copyToClipboard(payload);
+            case WebviewMessageId.onInfo: {
+                vscode.window.showInformationMessage(message.payload);
                 break;
             }
 
-            case 'setState': {
-                const _stateId = payload as StateId;
-                if (_stateId === undefined || !this._stateSubscriptions.has(_stateId)) {
-                    // console.error(`A provider ${this._targetPath} tried to set state which it does not subscribe to: ${stateId}`);
-                    // Send a response to the webview that the state was not set
-                    webviewView.webview.postMessage({
-                        command,
-                        requestId,
-                        payload: false
-                    } as MessageHandlerData<boolean>);
-                    break;
-                }
-
-                const state = this._stateSubscriptions.get(_stateId);
-                state && (state.state = payload);
-
-                // Send a response to the webview that the state was set
-                webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    stateId: _stateId,
-                    payload: true
-                } as MessageHandlerData<boolean>);
-
+            case WebviewMessageId.onError: {
+                vscode.window.showErrorMessage(message.payload);
                 break;
             }
 
-            case WebviewMessage.getState: {
-                const _stateId = payload as StateId;
-                if (_stateId === undefined || !this._stateSubscriptions.has(_stateId)) {
-                    webviewView.webview.postMessage({
-                        command,
-                        requestId,
-                        payload: undefined
-                    } as MessageHandlerData<any>);
-                    break;
-                }
-
-                const state = this._stateSubscriptions.get(_stateId);
-                webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    stateId: _stateId,
-                    payload: state?.state
-                } as MessageHandlerData<any>);
-                break;
-            }
-
-            case 'getSampleContractAbi': {
-                const sampleContractAbi = await loadSampleAbi();
-                webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    payload: sampleContractAbi
-                } as MessageHandlerData<string>);
-                break;
-            }
-
-            case WebviewMessage.onUndeployContract: {
-                if (!payload) {
-                    return;
-                }
-
-                this._getDeployedContracts().undeploy(payload);
-
-                break;
-            }
-
-            case WebviewMessage.onCompile: {
-                const success = await vscode.commands.executeCommand<boolean>(
-                    'Tools-for-Solidity.sake.compile'
+            case WebviewMessageId.getTextFromInputBox: {
+                const result = await getTextFromInputBox(
+                    message.payload.title,
+                    message.payload.value
                 );
 
                 webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    payload: success
-                } as MessageHandlerData<boolean>);
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        value: result
+                    }
+                } as WebviewMessageResponse);
 
                 break;
             }
 
-            case WebviewMessage.onDeploy: {
-                if (!payload) {
+            case WebviewMessageId.copyToClipboard: {
+                copyToClipboard(message.payload);
+                break;
+            }
+
+            case WebviewMessageId.onUndeployContract: {
+                this._sake.provider?.removeDeployedContract(message.payload);
+                break;
+            }
+
+            case WebviewMessageId.onCompile: {
+                await this._sake.provider?.compile();
+
+                webviewView.webview.postMessage({
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success: true // TODO returns true always
+                    }
+                } as WebviewMessageResponse);
+
+                break;
+            }
+
+            case WebviewMessageId.onDeploy: {
+                this._sake.provider?.deployContract(message.payload);
+                break;
+            }
+
+            case WebviewMessageId.onContractFunctionCall: {
+                this._sake.provider?.callContract(message.payload);
+                break;
+            }
+
+            case WebviewMessageId.onSetBalance: {
+                this._sake.provider?.setAccountBalance(message.payload);
+                break;
+            }
+
+            case WebviewMessageId.onSetLabel: {
+                this._sake.provider?.setAccountLabel(message.payload);
+                break;
+            }
+
+            case WebviewMessageId.onNavigate: {
+                navigateTo(
+                    message.payload.path,
+                    message.payload.startOffset,
+                    message.payload.endOffset
+                );
+                break;
+            }
+
+            case WebviewMessageId.onOpenExternal: {
+                openExternal(message.payload.path);
+                break;
+            }
+
+            case WebviewMessageId.onOpenDeploymentInBrowser: {
+                // TODO
+                if (!message.payload) {
                     console.error('No deployment params provided');
                     return;
                 }
 
                 const success = await vscode.commands.executeCommand<boolean>(
-                    'Tools-for-Solidity.sake.deploy',
-                    payload
+                    'Tools-for-Solidity.sake.openDeploymentInBrowser',
+                    message.payload
                 );
 
                 webviewView.webview.postMessage({
-                    command,
-                    requestId,
+                    command: message.command,
+                    requestId: message.requestId,
                     payload: success
                 } as MessageHandlerData<boolean>);
 
                 break;
             }
 
-            case WebviewMessage.onGetAccounts: {
-                const success = await vscode.commands.executeCommand<boolean>(
-                    'Tools-for-Solidity.sake.getAccounts'
-                );
+            case WebviewMessageId.onGetBytecode: {
+                const response: GetBytecodeResponse | undefined =
+                    await this._sake.provider?.getBytecode(message.payload);
 
                 webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    payload: success
-                } as MessageHandlerData<boolean>);
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        bytecode: response ? response.bytecode : undefined
+                    }
+                } as WebviewMessageResponse);
 
                 break;
             }
 
-            case WebviewMessage.onContractFunctionCall: {
-                if (!payload) {
-                    console.error('No function call params provided');
-                    return;
-                }
-
-                const success = await vscode.commands.executeCommand<boolean>(
-                    'Tools-for-Solidity.sake.call',
-                    payload
-                );
-
-                webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    payload: success
-                } as MessageHandlerData<boolean>);
-
+            case WebviewMessageId.onrequestNewProvider: {
+                this._sake.requestNewProvider();
                 break;
             }
 
-            case WebviewMessage.onGetBalances: {
-                if (!payload) {
-                    console.error('No get balance params provided'); // @todo rename
-                    return;
-                }
-
-                const success = await vscode.commands.executeCommand<boolean>(
-                    'Tools-for-Solidity.sake.getBalances',
-                    payload
-                );
-
-                webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    payload: success
-                } as MessageHandlerData<boolean>);
-
+            case WebviewMessageId.onSelectChain: {
+                this._sake.showProviderSelectionQuickPick();
                 break;
             }
 
-            case WebviewMessage.onSetBalances: {
-                if (!payload) {
-                    console.error('No set balance params provided'); // @todo rename
-                    return;
-                }
-
-                const success = await vscode.commands.executeCommand<boolean>(
-                    'Tools-for-Solidity.sake.setBalances',
-                    payload
-                );
+            case WebviewMessageId.onRestartWakeServer: {
+                const success = await this._sake.initializeWakeConnection();
 
                 webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    payload: success
-                } as MessageHandlerData<boolean>);
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success: success
+                    }
+                } as WebviewMessageResponse);
 
                 break;
-            }
-
-            case WebviewMessage.onsetLabel: {
-                if (!payload) {
-                    console.error('No set contract nick params provided');
-                    return;
-                }
-
-                const nick = await vscode.window.showInputBox({
-                    value: '',
-                    title: 'Set a contract nickname'
-                });
-
-                if (nick === undefined) {
-                    webviewView.webview.postMessage({
-                        command,
-                        requestId,
-                        payload: false
-                    } as MessageHandlerData<boolean>);
-                    return;
-                }
-
-                vscode.commands.executeCommand('Tools-for-Solidity.sake.setLabel', {
-                    address: (payload as DeploymentStateData).address,
-                    label: nick ? nick : null
-                } as WakeSetLabelRequestParams);
-
-                this._getDeployedContracts().updateContract({
-                    ...(payload as DeploymentStateData),
-                    nick: nick ? nick : null
-                });
-
-                webviewView.webview.postMessage({
-                    command,
-                    requestId,
-                    payload: true
-                } as MessageHandlerData<boolean>);
-            }
-
-            case WebviewMessage.onNavigate: {
-                if (!payload) {
-                    console.error('No navigate params provided');
-                    return;
-                }
-
-                const uri = vscode.Uri.parse(payload.path);
-
-                const doc = await vscode.workspace.openTextDocument(uri);
-                if (!doc) {
-                    return;
-                }
-
-                const editor = vscode.window.showTextDocument(doc);
-                if (!editor) {
-                    return;
-                }
-
-                if (!payload.startOffset || !payload.endOffset) {
-                    return;
-                }
-
-                const startPosition = doc.positionAt(payload.startOffset);
-                const endPosition = doc.positionAt(payload.endOffset);
-
-                const range = new vscode.Range(startPosition, endPosition);
-
-                if (vscode.window.activeTextEditor) {
-                    const target = new vscode.Selection(
-                        range.start.line,
-                        range.start.character,
-                        range.end.line,
-                        range.end.character
-                    );
-                    vscode.window.activeTextEditor.selection = target;
-                    vscode.window.activeTextEditor.revealRange(
-                        target,
-                        vscode.TextEditorRevealType.InCenter
-                    );
-                }
-            }
-
-            case WebviewMessage.onOpenExternal: {
-                if (!payload) {
-                    console.error('No external link provided');
-                    return;
-                }
-
-                const { path } = payload;
-
-                vscode.env.openExternal(vscode.Uri.parse(path));
             }
 
             default: {
@@ -417,8 +255,10 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
         }
     }
+
     /*
-     * This method is called when the webview receives a message from the extension
+     * This method is called when the webview receives a message from the extension and no matching case was found
+     * Expected to be overridden by inheriting classes
      */
-    protected async _onDidReceiveMessage(message: WebviewMessageData) {}
+    protected async _onDidReceiveMessage(message: WebviewMessageRequest) {}
 }

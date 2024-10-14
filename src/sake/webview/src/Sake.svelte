@@ -11,18 +11,13 @@
         vsCodePanelTab,
         vsCodeBadge,
         vsCodePanelView,
-        vsCodeProgressRing
+        vsCodeProgressRing,
+        vsCodeTag
     } from '@vscode/webview-ui-toolkit';
     import { onMount } from 'svelte';
     import Tabs from './components/common/Tabs.svelte';
-    import { deployedContracts, requestState, wakeState, setupListeners } from './stores/sakeStore';
-    import { compilationIssuesVisible, activeTabId, txParametersExpanded } from './stores/appStore';
-    import Compile from './views/Compile.svelte';
-    import Deploy from './views/Deploy.svelte';
-    import Run from './views/Run.svelte';
-    import BackIcon from './components/icons/BackIcon.svelte';
-    import CompilationIssues from './components/CompilationIssues.svelte';
-    // import '../../../shared/types'; // Importing types to avoid TS error
+    import { requestState, setupListeners, appState, chainState } from './stores/sakeStore';
+    import { RESTART_WAKE_SERVER_TIMEOUT, RESTART_WAKE_SERVER_TRIES } from './helpers/constants';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -35,18 +30,22 @@
         vsCodePanelTab(),
         vsCodeBadge(),
         vsCodePanelView(),
-        vsCodeProgressRing()
+        vsCodeProgressRing(),
+        vsCodeTag()
     );
 
-    import { openExternal } from './helpers/api';
+    import {
+        openExternal,
+        requestNewProvider,
+        restartWakeServer,
+        selectChain
+    } from './helpers/api';
     import type { ComponentType, SvelteComponent } from 'svelte';
     import Interaction from './pages/Interaction.svelte';
     import Deployment from './pages/Deployment.svelte';
     import InteractionHeader from './pages/InteractionHeader.svelte';
 
-    let initLoading = true;
-
-    const SERVER_TIMEOUT = 10_000;
+    let showLoading = true;
 
     enum TabId {
         CompileDeploy = 0,
@@ -68,30 +67,27 @@
     ];
 
     onMount(async () => {
-        startServer();
-        setupListeners();
-        activeTabId.set(tabs[0].id);
-        console.log('wake state', $wakeState);
+        setupListeners(); // @dev listeners have to be set up before requesting state
+        await requestState();
+        showLoading = false;
     });
 
-    const startServer = () => {
-        initLoading = true;
-        const timeout = setTimeout(() => {
-            initLoading = false;
-            setServerRunning(false);
-            console.log('Server not running', $wakeState);
-        }, SERVER_TIMEOUT);
-        requestState().then(() => {
-            clearTimeout(timeout);
-            setServerRunning(true);
-            initLoading = false;
-        });
-    };
+    const tryWakeServerRestart = (tries: number = 0) => {
+        showLoading = true;
+        if (tries >= RESTART_WAKE_SERVER_TRIES) {
+            showLoading = false;
+            return;
+        }
 
-    const setServerRunning = (isRunning: boolean) => {
-        wakeState.set({
-            ...$wakeState,
-            isServerRunning: isRunning
+        const wakeServerRestartTimeout = setTimeout(() => {
+            tryWakeServerRestart(tries + 1);
+        }, RESTART_WAKE_SERVER_TIMEOUT);
+
+        restartWakeServer().then((success) => {
+            if (success) {
+                clearTimeout(wakeServerRestartTimeout);
+                showLoading = false;
+            }
         });
     };
 
@@ -101,12 +97,35 @@
 </script>
 
 <main class="h-full my-0 overflow-hidden flex flex-col">
-    {#if initLoading}
+    {#if !$appState.isInitialized}
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
             <vscode-progress-ring />
-            <span>Connecting with Wake...</span>
+            <span>Setting up Deploy and Interact UI...</span>
         </div>
-    {:else if $wakeState.isOpenWorkspace === 'closed'}
+    {:else if showLoading}
+        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+            <vscode-progress-ring />
+            <span>Loading...</span>
+        </div>
+    {:else if $chainState.chains.length === 0}
+        <div class="flex flex-col gap-4 h-full w-full p-4">
+            <h3 class="uppercase font-bold text-base">No chains found</h3>
+            <span>No chains set up. Please set up a chain first. </span>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <vscode-button appearance="primary" on:click={requestNewProvider}>
+                Setup new chain
+            </vscode-button>
+        </div>
+    {:else if $chainState.currentChainId === undefined}
+        <div class="flex flex-col gap-4 h-full w-full p-4">
+            <h3 class="uppercase font-bold text-base">No chain selected</h3>
+            <span>No chain selected. Please select a chain to get started. </span>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <vscode-button appearance="primary" on:click={selectChain}>
+                Select chain
+            </vscode-button>
+        </div>
+    {:else if $appState.isOpenWorkspace === 'closed'}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">No workspace opened</h3>
             <span>
@@ -114,7 +133,7 @@
                 Please open a project with Solidity contracts to use this feature.
             </span>
         </div>
-    {:else if $wakeState.isOpenWorkspace === 'tooManyWorkspaces'}
+    {:else if $appState.isOpenWorkspace === 'tooManyWorkspaces'}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Too many workspaces opened</h3>
             <span>
@@ -122,7 +141,7 @@
                 close other workspaces to use this feature.
             </span>
         </div>
-    {:else if $wakeState.isServerRunning === false}
+    {:else if $appState.isWakeServerRunning === false}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Wake Server is not running</h3>
             <span
@@ -130,11 +149,11 @@
                 workspace with Solidity files open.
             </span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <vscode-button appearance="primary" on:click={startServer}>
+            <vscode-button appearance="primary" on:click={tryWakeServerRestart}>
                 Restart Connection
             </vscode-button>
         </div>
-    {:else if !$wakeState.isAnvilInstalled}
+    {:else if !$appState.isAnvilInstalled}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Anvil is not installed</h3>
             <span

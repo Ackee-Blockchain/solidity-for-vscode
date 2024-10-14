@@ -1,41 +1,76 @@
-import { writable, get, derived } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import {
     StateId,
-    WebviewMessage,
-    type AccountStateData,
-    type CompilationStateData,
-    type CompiledContract,
-    type DeploymentStateData,
-    type WakeStateData
+    WebviewMessageId,
+    type AccountState,
+    type AppState,
+    type ChainState,
+    type CompilationState,
+    type DeploymentState,
+    type WebviewMessageRequest,
+    type WebviewMessageResponse
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
-import { parseComplexNumber } from '../../shared/validate';
-import { selectedAccount } from './appStore';
+import { REQUEST_STATE_TIMEOUT } from '../helpers/constants';
+import { selectedAccount, setSelectedAccount } from './appStore';
 
-/* Sake Stores */
+/**
+ * backend data
+ */
 
-export const accounts = writable<AccountStateData[]>([]);
-export const deployedContracts = writable<DeploymentStateData[]>([]);
-export const compilationState = writable<CompilationStateData>({
+export const accounts = writable<AccountState>([]);
+export const deployedContracts = writable<DeploymentState>([]);
+export const compilationState = writable<CompilationState>({
     contracts: [],
     issues: [],
     dirty: true
 });
-export const wakeState = writable<WakeStateData>({
+export const appState = writable<AppState>({
     isAnvilInstalled: undefined,
-    isServerRunning: undefined,
+    isWakeServerRunning: undefined,
     isOpenWorkspace: undefined
 });
+export const chainState = writable<ChainState>({
+    chains: [],
+    currentChainId: undefined
+});
 
-/**
+export /**
  * setup stores
  */
 
-export async function requestState() {
-    await messageHandler.request(WebviewMessage.getState, StateId.Wake);
-    await messageHandler.request(WebviewMessage.onGetAccounts);
-    await messageHandler.request(WebviewMessage.getState, StateId.DeployedContracts);
-    await messageHandler.request(WebviewMessage.getState, StateId.CompiledContracts);
+async function requestState(): Promise<boolean> {
+    const timeout = new Promise<void>((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out')), REQUEST_STATE_TIMEOUT)
+    );
+
+    return await Promise.race([
+        Promise.all([
+            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.Accounts),
+            messageHandler.request<boolean>(
+                WebviewMessageId.requestState,
+                StateId.DeployedContracts
+            ),
+            messageHandler.request<boolean>(
+                WebviewMessageId.requestState,
+                StateId.CompiledContracts
+            ),
+            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.Chain),
+            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.App)
+        ]),
+        timeout
+    ])
+        .then((results) => {
+            if (!(results as boolean[]).every((result) => result)) {
+                console.error('requestState failed');
+                return false;
+            }
+            return true;
+        })
+        .catch((_) => {
+            console.error('Requesting state from the extension timed out');
+            return false;
+        });
 }
 
 export function setupListeners() {
@@ -44,27 +79,29 @@ export function setupListeners() {
             return;
         }
 
-        const { command, payload, stateId } = event.data;
+        const message = event.data as WebviewMessageResponse;
 
-        switch (command) {
-            case WebviewMessage.getState: {
-                if (stateId === StateId.DeployedContracts) {
-                    if (payload === undefined) {
+        // console.log('received message', command, payload, stateId);
+
+        switch (message.command) {
+            case WebviewMessageId.getState: {
+                if (message.stateId === StateId.DeployedContracts) {
+                    if (message.payload === undefined) {
                         return;
                     }
-                    deployedContracts.set(payload);
+                    deployedContracts.set(message.payload);
                 }
 
-                if (stateId === StateId.CompiledContracts) {
-                    if (payload === undefined) {
+                if (message.stateId === StateId.CompiledContracts) {
+                    if (message.payload === undefined) {
                         return;
                     }
-                    compilationState.set(payload);
+                    compilationState.set(message.payload);
                     return;
                 }
 
-                if (stateId === StateId.Accounts) {
-                    const _accounts = payload as AccountStateData[];
+                if (message.stateId === StateId.Accounts) {
+                    const _accounts = message.payload as AccountState;
                     const _selectedAccount = get(selectedAccount);
 
                     // update accounts store
@@ -72,7 +109,7 @@ export function setupListeners() {
 
                     // if no accounts, reset selected account
                     if (_accounts.length === 0) {
-                        selectedAccount.set(null);
+                        setSelectedAccount(null);
                         return;
                     }
 
@@ -84,15 +121,15 @@ export function setupListeners() {
                                 (account) => account.address === _selectedAccount.address
                             ))
                     ) {
-                        selectedAccount.set(_accounts[0]);
+                        setSelectedAccount(0);
                         return;
                     }
 
                     // if selectedAccount is in payload, update selectedAccount
                     // @dev accounts.find should not return undefined, since checked above
                     if (_selectedAccount !== null) {
-                        selectedAccount.set(
-                            _accounts.find(
+                        setSelectedAccount(
+                            _accounts.findIndex(
                                 (account) => account.address === _selectedAccount.address
                             ) ?? null
                         );
@@ -101,12 +138,19 @@ export function setupListeners() {
                     return;
                 }
 
-                if (stateId === StateId.Wake) {
-                    console.log('wake state', payload);
-                    if (payload === undefined) {
+                if (message.stateId === StateId.Chain) {
+                    if (message.payload === undefined) {
                         return;
                     }
-                    wakeState.set(payload);
+                    chainState.set(message.payload);
+                    return;
+                }
+
+                if (message.stateId === StateId.App) {
+                    if (message.payload === undefined) {
+                        return;
+                    }
+                    appState.set(message.payload);
                     return;
                 }
 

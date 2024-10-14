@@ -1,36 +1,23 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeTextField,
-        vsCodeTag
-    } from '@vscode/webview-ui-toolkit';
-    import { onMount } from 'svelte';
     import ExpandButton from './icons/ExpandButton.svelte';
     import PlusButton from './icons/PlusButton.svelte';
     import MinusButton from './icons/MinusButton.svelte';
     import IconSpacer from './icons/IconSpacer.svelte';
-    import { messageHandler } from '@estruyf/vscode/dist/client';
     import {
         DynamicListInputHandler,
         InputHandler,
         InputTypesInternal
     } from '../helpers/FunctionInputsHandler';
-    import { WebviewMessage } from '../../shared/types';
     import InputIssueIndicator from './InputIssueIndicator.svelte';
-
-    provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField(), vsCodeTag());
+    import { getInputFromTopBar } from '../helpers/api';
 
     export let input: InputHandler;
     export let onInputStateChange: () => void;
     export let expandable: boolean = true;
 
     const openFullTextInputEditor = async function () {
-        const newValue = await messageHandler.request<string>(
-            WebviewMessage.getTextFromInputBox,
-            ''
-        );
-        newValue && input.set(newValue);
+        const newValue = await getInputFromTopBar('', input.description);
+        newValue && input.set(newValue.value ?? '');
         input = input;
     };
 

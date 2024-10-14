@@ -1,32 +1,9 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeButton,
-        vsCodeDropdown,
-        vsCodeOption,
-        vsCodeDivider,
-        vsCodeCheckbox,
-        vsCodeTextField
-    } from '@vscode/webview-ui-toolkit';
     import Contract from '../components/Contract.svelte';
-    import Divider from '../components/Divider.svelte';
-    import {
-        type CallPayload,
-        type WakeCallRequestParams,
-        type ContractFunction as ContractFunctionType
-    } from '../../shared/types';
     import { deployedContracts } from '../stores/sakeStore';
     import { selectedAccount, selectedValue } from '../stores/appStore';
     import { functionCall, showErrorMessage } from '../helpers/api';
-
-    provideVSCodeDesignSystem().register(
-        vsCodeButton(),
-        vsCodeDropdown(),
-        vsCodeOption(),
-        vsCodeDivider(),
-        vsCodeCheckbox(),
-        vsCodeTextField()
-    );
+    import type { AbiFunctionFragment, CallRequest } from '../../shared/types';
 
     // let filterString: string = '';
 
@@ -34,7 +11,7 @@
     const call = async function (
         calldata: string,
         contractAddress: string,
-        func: ContractFunctionType
+        func: AbiFunctionFragment
     ) {
         const _sender: string | undefined = $selectedAccount?.address;
         if (_sender === undefined) {
@@ -44,26 +21,16 @@
 
         const _value: number = $selectedValue ?? 0;
 
-        const requestParams: WakeCallRequestParams = {
-            contractAddress: contractAddress,
-            sender: _sender,
+        const payload: CallRequest = {
+            to: contractAddress,
+            from: _sender,
             calldata: calldata,
-            // @dev automatically set value to 0 if function is not payable
-            value: func.stateMutability === 'payable' ? _value : 0
-        };
-
-        const payload: CallPayload = {
-            func: func,
-            requestParams: requestParams
+            value: func.stateMutability === 'payable' ? _value : 0,
+            functionAbi: func
         };
 
         functionCall(payload);
     };
-
-    // const handleFilter = function (e: any) {
-    //     filterString = e.target?.value;
-    //     // console.log("filter string", _filterString);
-    // };
 </script>
 
 {#if $deployedContracts.length > 0}
@@ -116,7 +83,6 @@
             <span class="text-sm my-2 text-center text-secon">No deployed contracts</span>
         </div>
     </section>
-    <!-- <p class="text-center">No contracts are compiled</p> -->
 {/if}
 
 <style global>

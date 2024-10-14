@@ -1,83 +1,63 @@
 import * as vscode from 'vscode';
+import { SakeWebviewProvider } from './providers/WebviewProviders';
+import { copyToClipboard, getTextFromInputBox } from './commands';
 import {
-    DeployWebviewProvider,
-    CompilerWebviewProvider,
-    RunWebviewProvider,
-    SakeWebviewProvider
-} from './providers/WebviewProviders';
-import { StatusBarEnvironmentProvider } from './providers/StatusBarEnvironmentProvider';
-import { copyToClipboard, loadSampleAbi, getTextFromInputBox } from './commands';
-import { DeploymentState } from './state/DeploymentState';
-import { CompilationState } from './state/CompilationState';
-import {
-    WakeCompilationResponse,
-    Contract,
-    WakeDeploymentRequestParams,
-    WakeCallRequestParams,
-    CallPayload,
-    WakeGetBalancesRequestParams,
-    WakeSetBalancesRequestParams,
-    DeploymentStateData,
-    WakeSetLabelRequestParams
+    CallRequest,
+    DeploymentRequest,
+    SetAccountBalanceRequest,
+    SetAccountLabelRequest,
+    GetBytecodeRequest
 } from './webview/shared/types';
-import { LanguageClient, State } from 'vscode-languageclient/node';
-import { parseCompiledContracts } from './utils/compilation';
-import { call, compile, deploy, getAccounts, getBalances, setBalances, setLabel } from './api';
-import { AccountState } from './state/AccountState';
-import {
-    OutputViewManager,
-    SakeOutputItem,
-    SakeOutputTreeProvider
-} from './providers/OutputTreeProvider';
-import { TxHistoryState } from './state/TxHistoryState';
-import { showTxFromHistory } from './utils/output';
+import { LanguageClient } from 'vscode-languageclient/node';
+import { SakeOutputItem } from './providers/OutputTreeProvider';
 import { copyToClipboardHandler } from '../commands';
-import { WakeState } from './state/WakeState';
+import { SakeProviderManager } from './sake_providers/SakeProviderManager';
+import { AppStateProvider } from './state/AppStateProvider';
+import { SakeContext } from './context';
+import { SakeProviderFactory } from './sake_providers/SakeProviderFactory';
 
-export function activateSake(context: vscode.ExtensionContext, client: LanguageClient | undefined) {
-    // const sakeOutputChannel = vscode.window.createOutputChannel("Sake", "tools-for-solidity-sake-output");
-    const sakeOutputProvider = new SakeOutputTreeProvider(context);
-    const treeView = vscode.window.createTreeView('sake-output', {
-        treeDataProvider: sakeOutputProvider
-    });
-    // context.subscriptions.push(
-    //     vscode.window.registerTreeDataProvider('sake-output', sakeOutputProvider)
-    // );
+export async function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
+    /* Register Context */
+    const sakeContext = SakeContext.getInstance();
+    sakeContext.context = context;
+    sakeContext.client = client;
 
-    const outputViewManager = new OutputViewManager(sakeOutputProvider, treeView);
-
-    // const sidebarDeployProvider = new DeployWebviewProvider(context.extensionUri);
-    // context.subscriptions.push(
-    //     vscode.window.registerWebviewViewProvider('sake-compile-deploy', sidebarDeployProvider)
-    // );
-
-    // const sidebarRunProvider = new RunWebviewProvider(context.extensionUri);
-    // context.subscriptions.push(
-    //     vscode.window.registerWebviewViewProvider('sake-run', sidebarRunProvider)
-    // );
-
+    /* Register Webview */
     const sidebarSakeProvider = new SakeWebviewProvider(context.extensionUri);
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider('sake', sidebarSakeProvider)
     );
 
-    const deploymentState = DeploymentState.getInstance();
-    const compilationState = CompilationState.getInstance();
-    const accountState = AccountState.getInstance();
-    const txHistoryState = TxHistoryState.getInstance();
-    const wakeState = WakeState.getInstance();
+    /* Register Webview Provider for Context */
+    sakeContext.webviewProvider = sidebarSakeProvider;
+
+    /* Initialize Chain State */
+    const appState = AppStateProvider.getInstance();
+
+    /* Initialize Sake Provider */
+    const sake = SakeProviderManager.getInstance();
+
+    // Start with a default local chain
+    const localProvider = await SakeProviderFactory.createNewLocalProvider('Local Chain');
+
+    if (localProvider) {
+        sake.addProvider(localProvider, false);
+        sake.setProvider(localProvider.id);
+    }
+
+    /* Workspace watcher */
 
     const workspaceWatcher = () => {
         const workspaces = vscode.workspace.workspaceFolders;
         if (workspaces === undefined || workspaces.length === 0) {
-            wakeState.setIsOpenWorkspace('closed');
+            appState.setIsOpenWorkspace('closed');
             return;
         } else if (workspaces.length > 1) {
-            wakeState.setIsOpenWorkspace('tooManyWorkspaces');
+            appState.setIsOpenWorkspace('tooManyWorkspaces');
             return;
         }
 
-        wakeState.setIsOpenWorkspace('open');
+        appState.setIsOpenWorkspace('open');
     };
 
     // check if workspace is open
@@ -87,18 +67,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     workspaceWatcher();
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('sake.refresh', async () => {
-            // TODO: change helloworld to sake
-            // HelloWorldPanel.kill();
-            // HelloWorldPanel.createOrShow(context.extensionUri);
-        })
-    );
-
-    // // register status bar
-    // const statusBarEnvironmentProvider = new StatusBarEnvironmentProvider();
-    // context.subscriptions.push(statusBarEnvironmentProvider.registerCommand());
-    // context.subscriptions.push(statusBarEnvironmentProvider.getStatusBarItem());
+    appState.setIsInitialized(true);
 
     // register commands
     context.subscriptions.push(
@@ -134,52 +103,63 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
     // );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.compile', () => compile(client))
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.compile', () =>
+            sake.provider?.compile()
+        )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.deploy',
-            (params: WakeDeploymentRequestParams) => deploy(params, client, outputViewManager)
+            (request: DeploymentRequest) => sake.provider?.deployContract(request)
         )
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.getAccounts', () =>
-            getAccounts(client)
-        )
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.getAccounts', () => {
+            // TODO possibly remove
+        })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.call', (params: CallPayload) =>
-            call(params, client, outputViewManager)
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.call', (request: CallRequest) =>
+            sake.provider?.callContract(request)
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.show_history', () =>
-            showTxFromHistory(sakeOutputProvider)
+            sake.state?.history.show()
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.setBalances',
-            (params: WakeSetBalancesRequestParams) => setBalances(params, client)
+            (request: SetAccountBalanceRequest) => sake.provider?.setAccountBalance(request)
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.getBalances',
-            (params: WakeGetBalancesRequestParams) => getBalances(params, client)
+            () => {}
+            // TODO possibly remove
+            // TODO add refresh account
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.setLabel',
-            (params: WakeSetLabelRequestParams) => setLabel(params, client)
+            (request: SetAccountLabelRequest) => sake.provider?.setAccountLabel(request)
+        )
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.sake.getBytecode',
+            (request: GetBytecodeRequest) => sake.provider?.getBytecode(request)
         )
     );
 
@@ -192,8 +172,7 @@ export function activateSake(context: vscode.ExtensionContext, client: LanguageC
 
     vscode.workspace.onDidChangeTextDocument((e) => {
         if (e.document.languageId == 'solidity' && !e.document.isDirty) {
-            console.log('.sol file changed, set compilation state dirty');
-            compilationState.makeDirty();
+            sake.state?.compilation.makeDirty();
         }
         // TODO might need to rework using vscode.workspace.createFileSystemWatcher
     });

@@ -1,34 +1,20 @@
 <script lang="ts">
-    import {
-        provideVSCodeDesignSystem,
-        vsCodeTextField,
-        vsCodeDropdown,
-        vsCodeOption
-    } from '@vscode/webview-ui-toolkit';
-    import IconButton from '../components/IconButton.svelte';
-    import CopyButton from '../components/icons/CopyButton.svelte';
     import ClickableSpan from '../components/ClickableSpan.svelte';
     import { parseComplexNumber } from '../../shared/validate';
     import { displayEtherValue } from '../../shared/ether';
     import InputIssueIndicator from '../components/InputIssueIndicator.svelte';
 
-    provideVSCodeDesignSystem().register(vsCodeDropdown(), vsCodeOption(), vsCodeTextField());
-
     import { accounts } from '../stores/sakeStore';
     import {
         selectedAccount,
+        selectedAccountId,
         selectedValue,
         selectedValueString,
+        setSelectedAccount,
         txParametersExpanded
     } from '../stores/appStore';
-    import {
-        copyToClipboard,
-        getInputFromTopBar,
-        setBalance,
-        showErrorMessage
-    } from '../helpers/api';
+    import { getInputFromTopBar, setBalance, showErrorMessage } from '../helpers/api';
     import CopyableSpan from '../components/CopyableSpan.svelte';
-    import BlankIcon from '../components/icons/BlankIcon.svelte';
     import WarningIcon from '../components/icons/WarningIcon.svelte';
 
     function handleAccountChange(event: any) {
@@ -39,11 +25,11 @@
             _selectedAccountIndex < 0 ||
             _selectedAccountIndex >= $accounts.length
         ) {
-            selectedAccount.set(null);
+            setSelectedAccount(null);
             return;
         }
 
-        selectedAccount.set($accounts[_selectedAccountIndex]);
+        setSelectedAccount(_selectedAccountIndex);
     }
 
     function handleValueChange(event: any) {
@@ -61,14 +47,13 @@
             $selectedAccount!.balance?.toString(),
             'Update balance of account'
         );
-
-        if (topUpValue === undefined) {
+        if (topUpValue === undefined || topUpValue.value === undefined) {
             return;
         }
 
         let parsedTopUpValue;
         try {
-            parsedTopUpValue = parseComplexNumber(topUpValue);
+            parsedTopUpValue = parseComplexNumber(topUpValue.value);
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
             showErrorMessage('Value could not be parsed: ' + errorMessage);
@@ -99,7 +84,9 @@
                     {/each}
                     <!-- @dev hack to display selected account -->
                     <span slot="selected-value">
-                        {$selectedAccount?.nick ?? $selectedAccount?.address}
+                        {#if $selectedAccountId !== null}
+                            {$selectedAccount?.label ?? `Account ${$selectedAccountId}`}
+                        {/if}
                     </span>
                 </vscode-dropdown>
 

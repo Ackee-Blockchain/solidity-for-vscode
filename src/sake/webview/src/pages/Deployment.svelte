@@ -1,15 +1,10 @@
 <script lang="ts">
     import FlexContainer from '../components/common/FlexContainer.svelte';
-    import ViewShrink from '../components/common/ViewShrink.svelte';
-    import BackIcon from '../components/icons/BackIcon.svelte';
     import TransactionParameters from '../views/TransactionParameters.svelte';
-    import ViewGrow from '../components/common/ViewScrollable.svelte';
-    import ViewHeader from '../components/common/ViewHeader.svelte';
     import {
-        compilationIssuesVisible,
         selectedAccount,
+        selectedAccountId,
         selectedValue,
-        selectedValueString,
         txParametersExpanded
     } from '../stores/appStore';
     import Compile from '../views/Compile.svelte';
@@ -48,7 +43,9 @@
                     <span>Transaction Parameters</span>
 
                     <span class="text-xs text-vscodeForegroundSecondary font-normal ml-auto pr-2">
-                        ({$selectedAccount?.nick ?? $selectedAccount?.address},
+                        ({$selectedAccountId !== null
+                            ? ($selectedAccount?.label ?? `Account ${$selectedAccountId}`)
+                            : 'No account selected'},
                         {displayEtherValue($selectedValue)})
                     </span>
                 {/if}
