@@ -3,8 +3,6 @@
     import ViewStatic from '../components/common/ViewStatic.svelte';
     import TransactionParameters from '../views/TransactionParameters.svelte';
     import ViewScrollable from '../components/common/ViewScrollable.svelte';
-    import ViewHeader from '../components/common/ViewHeader.svelte';
-    import Compile from '../views/Compile.svelte';
     import BlankIcon from '../components/icons/BlankIcon.svelte';
     import Run from '../views/Run.svelte';
     import { selectedAccount, selectedValue, txParametersExpanded } from '../stores/appStore';
@@ -30,7 +28,9 @@
                     <span>Transaction Parameters</span>
 
                     <span class="text-xs text-vscodeForegroundSecondary font-normal ml-auto pr-2">
-                        ({$selectedAccount?.nick ?? $selectedAccount?.address},
+                        ({$selectedAccount !== null
+                            ? ($selectedAccount?.label ?? `Account ${$selectedAccount}`)
+                            : 'No account selected'},
                         {displayEtherValue($selectedValue)})
                     </span>
                 {/if}

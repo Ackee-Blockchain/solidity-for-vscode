@@ -5,7 +5,9 @@ export enum StateId {
     CompiledContracts = 'CompiledContracts',
     Accounts = 'Accounts',
     TransactionHistory = 'TransactionHistory',
-    Chains = 'Chains'
+    Chain = 'Chain',
+    App = 'App',
+    Sake = 'Sake'
 }
 
 /* Account */
@@ -16,7 +18,7 @@ export type AccountState = ExtendedAccount[];
 
 export interface DeployedContract extends ExtendedAccount {
     abi: ContractAbi;
-    nick?: string;
+    label?: string;
     name: string;
 }
 
@@ -59,12 +61,11 @@ export interface CompilationState {
 
 /* Chain */
 
-export interface SharedChainState {
+export interface AppState {
     isAnvilInstalled?: boolean;
     isWakeServerRunning?: boolean;
-    chains: ChainState[];
-    currentChainId: string | undefined;
     isOpenWorkspace: 'open' | 'closed' | 'tooManyWorkspaces' | undefined;
+    isInitialized?: boolean;
 }
 
 export enum NetworkType {
@@ -73,10 +74,22 @@ export enum NetworkType {
 }
 
 export interface ChainState {
+    chains: ChainInfo[];
+    currentChainId: string | undefined;
+}
+
+export interface ChainInfo {
     chainId: string;
     network: string;
-    connected: boolean;
+    status: ChainStatus;
 }
+
+export enum ChainStatus {
+    Connected = 'connected',
+    Disconnected = 'disconnected'
+}
+
+export interface SakeState {}
 
 /* Transaction History */
 

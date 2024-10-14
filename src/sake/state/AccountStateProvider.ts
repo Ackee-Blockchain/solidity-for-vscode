@@ -44,10 +44,10 @@ export class AccountStateProvider extends BaseStateProvider<AccountState> {
         });
     }
 
-    public setNickname(address: Address, nickname: string) {
+    public setLabel(address: Address, label?: string) {
         this.state = this.state.map((a) => {
             if (a.address === address) {
-                a.nick = nickname;
+                a.label = label;
             }
             return a;
         });

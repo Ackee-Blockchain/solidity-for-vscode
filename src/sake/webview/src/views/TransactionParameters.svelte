@@ -85,7 +85,7 @@
                     <!-- @dev hack to display selected account -->
                     <span slot="selected-value">
                         {#if $selectedAccountId !== null}
-                            {$selectedAccount?.nick ?? `Account ${$selectedAccountId}`}
+                            {$selectedAccount?.label ?? `Account ${$selectedAccountId}`}
                         {/if}
                     </span>
                 </vscode-dropdown>

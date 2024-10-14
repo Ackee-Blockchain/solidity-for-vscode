@@ -1,7 +1,7 @@
 import { WakeApi } from '../api/wake';
 import { showErrorMessage } from '../commands';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
-import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
+import { AppStateProvider } from '../state/AppStateProvider';
 import { NetworkCreationConfiguration } from '../webview/shared/network_types';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,7 +11,7 @@ export class SakeProviderFactory {
         displayName: string,
         networkConfig?: NetworkCreationConfiguration
     ): Promise<LocalNodeSakeProvider | undefined> {
-        const chainsState = SharedChainStateProvider.getInstance();
+        const chainsState = AppStateProvider.getInstance();
 
         await WakeApi.ping()
             .then((serverRunning) => {

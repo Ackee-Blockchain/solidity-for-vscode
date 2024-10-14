@@ -3,9 +3,12 @@ import {
     StateId,
     WebviewMessageId,
     type AccountState,
+    type AppState,
+    type ChainState,
     type CompilationState,
     type DeploymentState,
-    type SharedChainState
+    type WebviewMessageRequest,
+    type WebviewMessageResponse
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import { REQUEST_STATE_TIMEOUT } from '../helpers/constants';
@@ -22,19 +25,21 @@ export const compilationState = writable<CompilationState>({
     issues: [],
     dirty: true
 });
-export const sharedChainState = writable<SharedChainState>({
+export const appState = writable<AppState>({
     isAnvilInstalled: undefined,
     isWakeServerRunning: undefined,
-    chains: [],
-    currentChainId: undefined,
     isOpenWorkspace: undefined
 });
+export const chainState = writable<ChainState>({
+    chains: [],
+    currentChainId: undefined
+});
 
-/**
+export /**
  * setup stores
  */
 
-export async function requestState(): Promise<boolean> {
+async function requestState(): Promise<boolean> {
     const timeout = new Promise<void>((_, reject) =>
         setTimeout(() => reject(new Error('Request timed out')), REQUEST_STATE_TIMEOUT)
     );
@@ -50,7 +55,8 @@ export async function requestState(): Promise<boolean> {
                 WebviewMessageId.requestState,
                 StateId.CompiledContracts
             ),
-            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.Chains)
+            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.Chain),
+            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.App)
         ]),
         timeout
     ])
@@ -73,29 +79,29 @@ export function setupListeners() {
             return;
         }
 
-        const { command, payload, stateId } = event.data;
+        const message = event.data as WebviewMessageResponse;
 
         // console.log('received message', command, payload, stateId);
 
-        switch (command) {
+        switch (message.command) {
             case WebviewMessageId.getState: {
-                if (stateId === StateId.DeployedContracts) {
-                    if (payload === undefined) {
+                if (message.stateId === StateId.DeployedContracts) {
+                    if (message.payload === undefined) {
                         return;
                     }
-                    deployedContracts.set(payload);
+                    deployedContracts.set(message.payload);
                 }
 
-                if (stateId === StateId.CompiledContracts) {
-                    if (payload === undefined) {
+                if (message.stateId === StateId.CompiledContracts) {
+                    if (message.payload === undefined) {
                         return;
                     }
-                    compilationState.set(payload);
+                    compilationState.set(message.payload);
                     return;
                 }
 
-                if (stateId === StateId.Accounts) {
-                    const _accounts = payload as AccountState;
+                if (message.stateId === StateId.Accounts) {
+                    const _accounts = message.payload as AccountState;
                     const _selectedAccount = get(selectedAccount);
 
                     // update accounts store
@@ -132,11 +138,19 @@ export function setupListeners() {
                     return;
                 }
 
-                if (stateId === StateId.Chains) {
-                    if (payload === undefined) {
+                if (message.stateId === StateId.Chain) {
+                    if (message.payload === undefined) {
                         return;
                     }
-                    sharedChainState.set(payload);
+                    chainState.set(message.payload);
+                    return;
+                }
+
+                if (message.stateId === StateId.App) {
+                    if (message.payload === undefined) {
+                        return;
+                    }
+                    appState.set(message.payload);
                     return;
                 }
 

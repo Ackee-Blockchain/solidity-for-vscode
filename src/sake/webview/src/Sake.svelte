@@ -16,7 +16,7 @@
     } from '@vscode/webview-ui-toolkit';
     import { onMount } from 'svelte';
     import Tabs from './components/common/Tabs.svelte';
-    import { requestState, setupListeners, sharedChainState } from './stores/sakeStore';
+    import { requestState, setupListeners, appState, chainState } from './stores/sakeStore';
     import { RESTART_WAKE_SERVER_TIMEOUT, RESTART_WAKE_SERVER_TRIES } from './helpers/constants';
 
     provideVSCodeDesignSystem().register(
@@ -97,7 +97,17 @@
 </script>
 
 <main class="h-full my-0 overflow-hidden flex flex-col">
-    {#if $sharedChainState.chains.length === 0}
+    {#if !$appState.isInitialized}
+        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+            <vscode-progress-ring />
+            <span>Setting up Deploy and Interact UI...</span>
+        </div>
+    {:else if showLoading}
+        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+            <vscode-progress-ring />
+            <span>Loading...</span>
+        </div>
+    {:else if $chainState.chains.length === 0}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">No chains found</h3>
             <span>No chains set up. Please set up a chain first. </span>
@@ -106,7 +116,7 @@
                 Setup new chain
             </vscode-button>
         </div>
-    {:else if $sharedChainState.currentChainId === undefined}
+    {:else if $chainState.currentChainId === undefined}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">No chain selected</h3>
             <span>No chain selected. Please select a chain to get started. </span>
@@ -115,12 +125,7 @@
                 Select chain
             </vscode-button>
         </div>
-    {:else if showLoading}
-        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
-            <vscode-progress-ring />
-            <span>Connecting with Wake...</span>
-        </div>
-    {:else if $sharedChainState.isOpenWorkspace === 'closed'}
+    {:else if $appState.isOpenWorkspace === 'closed'}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">No workspace opened</h3>
             <span>
@@ -128,7 +133,7 @@
                 Please open a project with Solidity contracts to use this feature.
             </span>
         </div>
-    {:else if $sharedChainState.isOpenWorkspace === 'tooManyWorkspaces'}
+    {:else if $appState.isOpenWorkspace === 'tooManyWorkspaces'}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Too many workspaces opened</h3>
             <span>
@@ -136,7 +141,7 @@
                 close other workspaces to use this feature.
             </span>
         </div>
-    {:else if $sharedChainState.isWakeServerRunning === false}
+    {:else if $appState.isWakeServerRunning === false}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Wake Server is not running</h3>
             <span
@@ -148,7 +153,7 @@
                 Restart Connection
             </vscode-button>
         </div>
-    {:else if !$sharedChainState.isAnvilInstalled}
+    {:else if !$appState.isAnvilInstalled}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Anvil is not installed</h3>
             <span

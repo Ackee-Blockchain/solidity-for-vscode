@@ -1,4 +1,9 @@
-import { AbiFunctionFragment, Address, CallType } from '../webview/shared/types';
+import {
+    AbiFunctionFragment,
+    Address,
+    CallType,
+    SetAccountLabelRequest
+} from '../webview/shared/types';
 import { NetworkProvider } from '../network/NetworkProvider';
 import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
 import * as vscode from 'vscode';
@@ -73,5 +78,16 @@ export class LocalNodeSakeProvider extends SakeProvider<LocalNodeNetworkProvider
     _getStatusBarItemText() {
         const icon = this.network.connected ? '$(vm-active)' : '$(vm-outline)';
         return `${icon} ${this.displayName}`;
+    }
+
+    /* Overrides */
+
+    async setAccountLabel(request: SetAccountLabelRequest) {
+        super.setAccountLabel(request);
+        try {
+            await this.network.setAccountLabel(request);
+        } catch (e) {
+            console.log('Set account label error', e);
+        }
     }
 }

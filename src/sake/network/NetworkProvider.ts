@@ -5,13 +5,15 @@ import {
     DeploymentRequest,
     DeploymentResponse,
     SetAccountBalanceResponse,
-    SetAccountBalanceRequest
+    SetAccountBalanceRequest,
+    NetworkId
 } from '../webview/shared/types';
 
 export class NetworkError extends Error {}
 
 export abstract class NetworkProvider {
-    public abstract id: string;
+    public abstract type: NetworkId;
+    public abstract connected: boolean;
     abstract registerAccount(address: string): Promise<Account | undefined>;
     abstract getAccountDetails(address: string): Promise<Account>;
     abstract setAccountBalance(

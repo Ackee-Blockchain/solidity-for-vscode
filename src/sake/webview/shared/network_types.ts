@@ -41,7 +41,7 @@ export interface SetAccountBalanceResponse {
 
 export interface SetAccountLabelRequest {
     address: Address;
-    nickname: string;
+    label?: string;
 }
 
 /* Deployment */
@@ -101,4 +101,8 @@ export interface CreateLocalChainRequest {
     hardfork?: string;
     minGasPrice?: number;
     blockBaseFeePerGas?: number;
+}
+
+export enum NetworkId {
+    LocalNode = 'LocalNode'
 }

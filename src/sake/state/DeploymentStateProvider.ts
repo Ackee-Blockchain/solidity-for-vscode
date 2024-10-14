@@ -27,6 +27,15 @@ export class DeploymentStateProvider extends BaseStateProvider<DeploymentState> 
         this.state = _state;
     }
 
+    public setLabel(address: Address, label?: string) {
+        this.state = this.state.map((c) => {
+            if (c.address === address) {
+                c.label = label;
+            }
+            return c;
+        });
+    }
+
     // TODO remove
     // public getDict() {
     //     return this.state.reduce((acc, contract) => {

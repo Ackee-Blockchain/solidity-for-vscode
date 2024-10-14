@@ -1,5 +1,5 @@
-import { NetworkCreationConfiguration } from '../webview/shared/types';
-import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
+import { ChainStatus, NetworkCreationConfiguration } from '../webview/shared/types';
+import { AppStateProvider } from '../state/AppStateProvider';
 import * as vscode from 'vscode';
 import { getTextFromInputBox, showErrorMessage } from '../commands';
 import { SakeProvider, SakeState } from './SakeProvider';
@@ -9,17 +9,20 @@ import { SakeContext } from '../context';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 import { NetworkProvider } from '../network/NetworkProvider';
 import { SakeProviderFactory } from './SakeProviderFactory';
+import { ChainStateProvider } from '../state/ChainStateProvider';
 
 export class SakeProviderManager {
     private static _instance: SakeProviderManager;
     private _selectedProviderId?: string;
     private _providers: Map<string, SakeProvider<NetworkProvider>>;
     private _statusBarItem!: vscode.StatusBarItem;
-    private _chainsState: SharedChainStateProvider;
+    private _chains: ChainStateProvider;
+    private _app: AppStateProvider;
 
     private constructor() {
         this._providers = new Map();
-        this._chainsState = SharedChainStateProvider.getInstance();
+        this._chains = ChainStateProvider.getInstance();
+        this._app = AppStateProvider.getInstance();
         this._initializeStatusBar();
         this._initializeChainsState();
     }
@@ -36,7 +39,7 @@ export class SakeProviderManager {
 
     public async initializeWakeConnection(): Promise<boolean> {
         const isWakeServerRunning = await WakeApi.ping();
-        this._chainsState.setIsWakeServerRunning(isWakeServerRunning);
+        this._app.setIsWakeServerRunning(isWakeServerRunning);
 
         return true;
     }
@@ -56,10 +59,10 @@ export class SakeProviderManager {
 
         this._providers.set(provider.id, provider);
 
-        this._chainsState.addChain({
+        this._chains.addChain({
             chainId: provider.id,
-            network: provider.network.id,
-            connected: false
+            network: provider.network.type,
+            status: provider.network.connected ? ChainStatus.Connected : ChainStatus.Disconnected
         });
 
         if (this._selectedProviderId === undefined) {
@@ -101,11 +104,11 @@ export class SakeProviderManager {
 
         if (provider.id === this._selectedProviderId) {
             this._selectedProviderId = undefined;
-            this._chainsState.setCurrentChainId(undefined);
+            this._chains.setCurrentChainId(undefined);
         }
 
         this._providers.delete(provider.id);
-        this._chainsState.removeChain(provider.id);
+        this._chains.removeChain(provider.id);
 
         this._updateStatusBar();
     }
@@ -141,7 +144,7 @@ export class SakeProviderManager {
 
         this._updateStatusBar();
 
-        this._chainsState.setCurrentChainId(id);
+        this._chains.setCurrentChainId(id);
 
         // force update provider
         this.state?.sendToWebview();

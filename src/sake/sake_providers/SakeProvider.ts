@@ -5,7 +5,7 @@ import {
     CallOperation,
     CallRequest,
     CallType,
-    ChainState,
+    AppState,
     DeploymentRequest,
     DeploymentResponse,
     GetBytecodeRequest,
@@ -22,7 +22,7 @@ import { DeploymentStateProvider } from '../state/DeploymentStateProvider';
 import { CompilationStateProvider } from '../state/CompilationStateProvider';
 import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
 import { TransactionHistoryStateProvider } from '../state/TransactionHistoryStateProvider';
-import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
+import { AppStateProvider } from '../state/AppStateProvider';
 import * as vscode from 'vscode';
 import { WakeApi } from '../api/wake';
 import { OutputViewManager } from '../providers/OutputTreeProvider';
@@ -36,13 +36,15 @@ import { decodeCallReturnValue } from '../utils/call';
 import { showTimedInfoMessage } from '../commands';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import { SakeContext } from '../context';
+import { ChainStateProvider } from '../state/ChainStateProvider';
 
 export class SakeState {
     accounts: AccountStateProvider;
     deployment: DeploymentStateProvider;
     compilation: CompilationStateProvider;
     history: TransactionHistoryStateProvider;
-    chains: SharedChainStateProvider;
+    chains: ChainStateProvider;
+    app: AppStateProvider;
     subscribed: boolean;
 
     private get _webviewProvider(): BaseWebviewProvider {
@@ -57,7 +59,8 @@ export class SakeState {
 
         // shared state
         this.compilation = CompilationStateProvider.getInstance();
-        this.chains = SharedChainStateProvider.getInstance();
+        this.chains = ChainStateProvider.getInstance();
+        this.app = AppStateProvider.getInstance();
 
         this.subscribed = false;
     }
@@ -68,6 +71,7 @@ export class SakeState {
         this.history.subscribe(this._webviewProvider);
         this.chains.subscribe(this._webviewProvider);
         this.compilation.subscribe(this._webviewProvider);
+        this.app.subscribe(this._webviewProvider);
 
         this.subscribed = true;
     }
@@ -78,6 +82,7 @@ export class SakeState {
         this.history.unsubscribe(this._webviewProvider);
         this.chains.unsubscribe(this._webviewProvider);
         this.compilation.unsubscribe(this._webviewProvider);
+        this.app.unsubscribe(this._webviewProvider);
 
         this.subscribed = false;
     }
@@ -168,7 +173,8 @@ export abstract class SakeProvider<T extends NetworkProvider> {
     }
 
     async setAccountLabel(request: SetAccountLabelRequest) {
-        this.state.accounts.setNickname(request.address, request.nickname);
+        this.state.accounts.setLabel(request.address, request.label);
+        this.state.deployment.setLabel(request.address, request.label);
     }
 
     async refreshAccount(address: string) {
@@ -181,7 +187,7 @@ export abstract class SakeProvider<T extends NetworkProvider> {
         if (this.state.accounts.includes(address)) {
             this.state.accounts.update({
                 ...account,
-                nick: this.state.accounts.get(address)?.nick
+                label: this.state.accounts.get(address)?.label
             });
         } else {
             this.state.accounts.add(account);
@@ -294,10 +300,6 @@ export abstract class SakeProvider<T extends NetworkProvider> {
         // TODO save state
         this.state.unsubscribe();
         this.network.onDeactivate();
-    }
-
-    protected get chainState(): ChainState | undefined {
-        return this.state.chains.getChain(this.id);
     }
 
     /* Helper functions */

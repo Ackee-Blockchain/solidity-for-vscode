@@ -28,7 +28,7 @@ export interface Account {
 }
 
 export interface ExtendedAccount extends Account {
-    nick?: string;
+    label?: string;
 }
 
 export interface Contract extends Account {

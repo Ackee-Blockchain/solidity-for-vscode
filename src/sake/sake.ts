@@ -12,7 +12,7 @@ import { LanguageClient } from 'vscode-languageclient/node';
 import { SakeOutputItem } from './providers/OutputTreeProvider';
 import { copyToClipboardHandler } from '../commands';
 import { SakeProviderManager } from './sake_providers/SakeProviderManager';
-import { SharedChainStateProvider } from './state/SharedChainStateProvider';
+import { AppStateProvider } from './state/AppStateProvider';
 import { SakeContext } from './context';
 import { SakeProviderFactory } from './sake_providers/SakeProviderFactory';
 
@@ -32,7 +32,7 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     sakeContext.webviewProvider = sidebarSakeProvider;
 
     /* Initialize Chain State */
-    const chainsState = SharedChainStateProvider.getInstance();
+    const appState = AppStateProvider.getInstance();
 
     /* Initialize Sake Provider */
     const sake = SakeProviderManager.getInstance();
@@ -50,14 +50,14 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     const workspaceWatcher = () => {
         const workspaces = vscode.workspace.workspaceFolders;
         if (workspaces === undefined || workspaces.length === 0) {
-            chainsState.setIsOpenWorkspace('closed');
+            appState.setIsOpenWorkspace('closed');
             return;
         } else if (workspaces.length > 1) {
-            chainsState.setIsOpenWorkspace('tooManyWorkspaces');
+            appState.setIsOpenWorkspace('tooManyWorkspaces');
             return;
         }
 
-        chainsState.setIsOpenWorkspace('open');
+        appState.setIsOpenWorkspace('open');
     };
 
     // check if workspace is open
@@ -66,6 +66,8 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     });
 
     workspaceWatcher();
+
+    appState.setIsInitialized(true);
 
     // register commands
     context.subscriptions.push(

@@ -101,27 +101,29 @@ export async function removeDeployedContract(address: Address) {
     messageHandler.send(request.command, request.payload);
 }
 
-export function setLabel(address: Address, nickname: string) {
+export function setLabel(address: Address, label: string) {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.onSetLabel,
         payload: {
             address,
-            nickname
+            label
         }
     };
     messageHandler.send(request.command, request.payload);
 }
 
 export async function requestLabel(address: Address) {
-    const nickname = await getInputFromTopBar('', 'New Label');
-    if (!nickname || nickname.value === undefined) {
+    console.log('requestLabel', address);
+    const label = await getInputFromTopBar('', 'New Label');
+    if (!label || label.value === undefined) {
         return;
     }
+    console.log('requestLabel label', label);
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.onSetLabel,
         payload: {
             address,
-            nickname: nickname.value
+            label: label.value
         }
     };
     messageHandler.send(request.command, request.payload);

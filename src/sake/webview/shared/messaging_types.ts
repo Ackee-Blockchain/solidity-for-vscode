@@ -137,6 +137,7 @@ export type WebviewMessageResponse =
     | ({
           command: WebviewMessageId.getState;
           payload: any;
+          stateId: StateId;
       } & BaseWebviewMessageResponse)
     | ({
           command: WebviewMessageId.requestState;

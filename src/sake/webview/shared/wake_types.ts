@@ -183,7 +183,7 @@ export interface WakeSetBalancesResponse extends WakeBaseResponse {}
 
 export interface WakeSetLabelRequestParams extends WakeBaseRequestParams {
     address: w3t.Address;
-    label?: string;
+    label: string | null;
 }
 
 export interface WakeSetLabelResponse extends WakeBaseResponse {}

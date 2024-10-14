@@ -1,4 +1,5 @@
 import { WakeApi } from '../api/wake';
+import { ChainStateProvider } from '../state/ChainStateProvider';
 import {
     CallRequest,
     CallResponse,
@@ -7,10 +8,12 @@ import {
     DeploymentRequest,
     DeploymentResponse,
     NetworkConfiguration,
+    NetworkId,
     SetAccountBalanceRequest,
-    SetAccountBalanceResponse
+    SetAccountBalanceResponse,
+    SetAccountLabelRequest
 } from '../webview/shared/network_types';
-import { Account } from '../webview/shared/types';
+import { Account, ChainStatus } from '../webview/shared/types';
 import {
     WakeCallRequestParams,
     WakeDeploymentResponse,
@@ -20,8 +23,8 @@ import {
 import { NetworkError, NetworkProvider } from './NetworkProvider';
 
 export class LocalNodeNetworkProvider extends NetworkProvider implements NetworkProvider {
-    public id: string = 'local-node';
-    connected: boolean = false;
+    public type = NetworkId.LocalNode;
+    private _connected: boolean = false;
 
     private constructor(public config: NetworkConfiguration) {
         super();
@@ -174,11 +177,32 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
 
     /* Additional Methods */
 
+    async setAccountLabel(request: SetAccountLabelRequest) {
+        const response = await WakeApi.setLabel({
+            address: request.address,
+            label: request.label ?? null,
+            sessionId: this.config.sessionId
+        });
+
+        return response;
+    }
+
     async getAccounts(): Promise<string[]> {
         const response: WakeGetAccountsResponse = await WakeApi.getAccounts({
             sessionId: this.config.sessionId
         });
 
         return response;
+    }
+
+    set connected(connected: boolean) {
+        this._connected = connected;
+        // if (!connected) {
+        //     ChainStateProvider.getInstance().setLocalNodesDisconnectedStatus();
+        // }
+    }
+
+    get connected(): boolean {
+        return this._connected;
     }
 }

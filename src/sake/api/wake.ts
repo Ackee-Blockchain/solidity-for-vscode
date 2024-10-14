@@ -27,10 +27,10 @@ import {
 } from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
-import { SharedChainStateProvider } from '../state/SharedChainStateProvider';
+import { AppStateProvider } from '../state/AppStateProvider';
 import { SakeContext } from '../context';
 
-const sharedChainState = SharedChainStateProvider.getInstance();
+const appState = AppStateProvider.getInstance();
 
 /*
  * Get accounts and balances and save to state
@@ -344,13 +344,13 @@ export class WakeApi {
         }
         try {
             const response = await WakeApi._client.sendRequest<T>(method, params);
-            sharedChainState.setIsAnvilInstalled(true);
+            appState.setIsAnvilInstalled(true);
             return validateResponse ? validate(response) : response;
         } catch (e) {
             console.error('Error sending Wake Request', e);
             const message = typeof e === 'string' ? e : (e as Error).message;
             if (message == 'Anvil executable not found') {
-                sharedChainState.setIsAnvilInstalled(false);
+                appState.setIsAnvilInstalled(false);
             }
             throw new WakeApiError(message);
         }
@@ -485,7 +485,7 @@ function specifyCallType(func: AbiFunctionFragment): CallType {
 //                 address: result.contractAddress!,
 //                 abi: _contractCompilationData.abi,
 //                 balance: null,
-//                 nick: null
+//                 label: null
 //             };
 
 //             deploymentState.deploy(_deploymentData);

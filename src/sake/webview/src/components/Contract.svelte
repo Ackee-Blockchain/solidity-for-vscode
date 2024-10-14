@@ -32,13 +32,9 @@
             <div class="w-full flex flex-row gap-1 items-center justify-between">
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <ClickableSpan callback={() => requestLabel(contract.address)}>
-                    {contract.nick ? `${contract.nick} (${contract.name})` : contract.name}
+                    {contract.label ? `${contract.label} (${contract.name})` : contract.name}
                 </ClickableSpan>
-                <DeleteButton
-                    callback={() => {
-                        removeDeployedContract(contract.address);
-                    }}
-                />
+                <DeleteButton callback={() => removeDeployedContract(contract.address)} />
             </div>
 
             {#if expanded}
