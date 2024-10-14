@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.16.7]
+### Features
+- Added support for multiple chain sessions
+- Refactored the extension's architecture
+- Added new error messages to the UI
+
+### Fixes
+- Minor fixes
+
 ## [1.16.6]
 ### Features
 - The extension is now being published also to the Open VSX Registry
