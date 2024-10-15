@@ -5,7 +5,12 @@
     import ViewScrollable from '../components/common/ViewScrollable.svelte';
     import BlankIcon from '../components/icons/BlankIcon.svelte';
     import Run from '../views/Run.svelte';
-    import { selectedAccount, selectedValue, txParametersExpanded } from '../stores/appStore';
+    import {
+        selectedAccount,
+        selectedAccountId,
+        selectedValue,
+        txParametersExpanded
+    } from '../stores/appStore';
     import ChevronDown from '../components/icons/ChevronDown.svelte';
     import ChevronRight from '../components/icons/ChevronRight.svelte';
     import { displayEtherValue } from '../../shared/ether';
@@ -28,8 +33,8 @@
                     <span>Transaction Parameters</span>
 
                     <span class="text-xs text-vscodeForegroundSecondary font-normal ml-auto pr-2">
-                        ({$selectedAccount !== null
-                            ? ($selectedAccount?.label ?? `Account ${$selectedAccount}`)
+                        ({$selectedAccountId !== null
+                            ? ($selectedAccount?.label ?? `Account ${$selectedAccountId}`)
                             : 'No account selected'},
                         {displayEtherValue($selectedValue)})
                     </span>
