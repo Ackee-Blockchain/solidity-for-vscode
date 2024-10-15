@@ -56,7 +56,7 @@
             </span>
         </vscode-text-field> -->
 
-        <div class="flex flex-col gap-">
+        <div class="flex flex-col gap-3">
             {#each $deployedContracts as contract, i}
                 <!-- {#if i > 0}
                     <Divider />
