@@ -11,7 +11,7 @@ export class StorageHandler {
         return state != undefined;
     }
 
-    static async loadExtensionState() {
+    static async loadExtensionState(notifyUser: boolean = true) {
         const state = await this.loadFromWorkspaceFolder('state.json')
             .then((state) => {
                 if (state == undefined) {
@@ -20,9 +20,12 @@ export class StorageHandler {
                 return JSON.parse(state);
             })
             .catch((e) => {
-                vscode.window.showErrorMessage(
-                    `Failed to load state: ${e instanceof Error ? e.message : String(e)}`
-                );
+                console.log('Failed to load state:', e);
+                if (notifyUser) {
+                    vscode.window.showErrorMessage(
+                        `Failed to load state: ${e instanceof Error ? e.message : String(e)}`
+                    );
+                }
                 return undefined;
             });
 
@@ -30,16 +33,18 @@ export class StorageHandler {
             return;
         }
 
-        await SakeProviderManager.getInstance().loadState(state);
+        await SakeProviderManager.getInstance().loadState(state, notifyUser);
     }
 
-    static async saveExtensionState() {
+    static async saveExtensionState(notifyUser: boolean = true) {
         const state = await SakeProviderManager.getInstance()
             .dumpState()
             .catch((e) => {
-                vscode.window.showErrorMessage(
-                    `Failed to dump state: ${e instanceof Error ? e.message : String(e)}`
-                );
+                if (notifyUser) {
+                    vscode.window.showErrorMessage(
+                        `Failed to dump state: ${e instanceof Error ? e.message : String(e)}`
+                    );
+                }
                 return undefined;
             });
 
@@ -57,9 +62,11 @@ export class StorageHandler {
         try {
             await this.saveToWorkspaceFolder('state.json', encodedState);
         } catch (e) {
-            vscode.window.showErrorMessage(
-                `Failed to save state: ${e instanceof Error ? e.message : String(e)}`
-            );
+            if (notifyUser) {
+                vscode.window.showErrorMessage(
+                    `Failed to save state: ${e instanceof Error ? e.message : String(e)}`
+                );
+            }
         }
     }
 
