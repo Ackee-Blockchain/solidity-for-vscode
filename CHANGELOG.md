@@ -3,6 +3,7 @@
 ## [1.16.7]
 ### Features
 - Added support for multiple chain sessions
+- The extension automatically saves chain state when deactivated, and restores it on VS Code activation
 - Refactored the extension's architecture
 - Added new error messages to the UI
 
