@@ -1,31 +1,8 @@
 # Solidity by Ackee Blockchain Security
 
-<picture>
-  <source
-    media="(prefers-color-scheme: dark)"
-    srcset="https://img.shields.io/discord/867746290678104064?colorA=21262d&colorB=0000FF&style=flat">
-  <img
-    src="https://img.shields.io/discord/867746290678104064?colorA=f6f8fa&colorB=0000FF&style=flat"
-    alt="Get help on Discord">
-</picture>
-
-<picture>
-  <source
-    media="(prefers-color-scheme: dark)"
-    srcset="https://img.shields.io/visual-studio-marketplace/d/AckeeBlockchain.tools-for-solidity?colorA=21262d&colorB=0000FF&style=flat">
-  <img
-    src="https://img.shields.io/visual-studio-marketplace/d/AckeeBlockchain.tools-for-solidity?colorA=f6f8fa&colorB=0000FF&style=flat"
-    alt="Visual Studio Marketplace Downloads">
-</picture>
-
-<picture>
-  <source
-    media="(prefers-color-scheme: dark)"
-    srcset="https://img.shields.io/badge/Follow%20on%20X-for%20release%20updates-0000FF?colorA=21262d&style=flat">
-  <img
-    src="https://img.shields.io/badge/Follow%20on%20X-for%20release%20updates-0000FF?colorA=f6f8fa&style=flat"
-    alt="Follow on X for release updates">
-</picture><br></br>
+[![Discord Badge](https://img.shields.io/discord/867746290678104064?colorA=21262d&colorB=0000FF&style=flat)](https://discord.gg/x7qXXnGCsa)
+[![Visual Studio Marketplace Badge](https://img.shields.io/visual-studio-marketplace/d/AckeeBlockchain.tools-for-solidity?colorA=21262d&colorB=0000FF&style=flat)](https://marketplace.visualstudio.com/items?itemName=AckeeBlockchain.tools-for-solidity)
+[![Follow on X Badge](https://img.shields.io/badge/Follow%20on%20X-for%20release%20updates-0000FF?colorA=21262d&style=flat)](https://x.com/WakeFramework)
 
 ![Solidity for VS Code](images/readme/solidity_for_vscode.gif)
 
