@@ -40,7 +40,7 @@ export interface WakeBaseResponse {
 }
 
 interface WakeTransaction extends WakeBaseResponse {
-    callTrace: WakeCallTrace;
+    callTrace: WakeCallTrace | null; // @hotfix: this is currently undefined in the response
 }
 
 /* Chain Management */
@@ -235,7 +235,7 @@ export interface TransactionResultBase {
     success: boolean;
     from: string;
     receipt?: w3t.TransactionReceipt;
-    callTrace?: WakeCallTrace;
+    callTrace: WakeCallTrace | null; // @hotfix: this is currently undefined in the response
 }
 
 export interface TransactionDeploymentResult extends TransactionResultBase {

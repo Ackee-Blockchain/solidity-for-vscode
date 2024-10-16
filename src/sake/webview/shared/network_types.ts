@@ -7,12 +7,12 @@ import type {
     WakeCreateChainRequestParams
 } from './wake_types';
 import type { Account } from './types';
-import type { NetworkState } from './storage_types';
+import type { NetworkState, WakeChainDump } from './storage_types';
 
 interface Transaction {
     success: boolean;
     receipt?: TransactionReceipt;
-    callTrace?: WakeCallTrace;
+    callTrace: WakeCallTrace | null; // @hotfix: this is currently undefined in the response
 }
 
 export enum CallType {
@@ -121,5 +121,5 @@ export interface NetworkProvider {
     onDeactivate(): Promise<void>;
     /* Helper Functions */
     dumpState(): Promise<NetworkState>;
-    loadState(state: any): Promise<void>;
+    loadState(state: any): Promise<void>; // TODO: add specific type
 }

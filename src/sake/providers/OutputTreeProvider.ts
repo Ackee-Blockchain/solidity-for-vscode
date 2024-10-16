@@ -227,7 +227,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         }
 
         // add calltrace
-        if (data.callTrace !== undefined) {
+        if (data.callTrace != null) {
             const callTraceNode = new SakeOutputItem(
                 'Call Trace',
                 undefined,
@@ -327,7 +327,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         }
 
         // add calltrace
-        if (data.callTrace !== undefined) {
+        if (data.callTrace != null) {
             const callTraceNode = new SakeOutputItem(
                 'Call Trace',
                 undefined,
@@ -419,6 +419,7 @@ class CallTraceItem extends BaseOutputItem {
 }
 
 function parseCallTrace(callTrace: WakeCallTrace) {
+    console.log('callTrace status', callTrace);
     const _parseCallTrace = (callTrace: WakeCallTrace): CallTraceItem => {
         const _string = `${callTrace.status === '✗' ? '✗' : ''}  ${buildFunctionString(callTrace)}`;
         const root = new CallTraceItem(_string);
