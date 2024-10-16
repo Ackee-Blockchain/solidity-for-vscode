@@ -96,13 +96,14 @@ export class SakeState {
     static dumpSharedState() {
         // app state is not dumped, since it is loaded on extension activation
         return {
-            chains: ChainStateProvider.getInstance().state,
-            compilation: CompilationStateProvider.getInstance().state
+            chains: ChainStateProvider.getInstance().state
+            // compilation: CompilationStateProvider.getInstance().state
         };
     }
 
     static loadSharedState(state: SharedState) {
         ChainStateProvider.getInstance().state = state.chains;
-        CompilationStateProvider.getInstance().state = state.compilation;
+        // @hotfix: compilation state is not loaded until wake is able to save it in state dump
+        // CompilationStateProvider.getInstance().state = state.compilation;
     }
 }

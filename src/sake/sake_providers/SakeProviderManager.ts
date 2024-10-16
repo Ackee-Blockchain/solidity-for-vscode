@@ -358,9 +358,6 @@ export class SakeProviderManager {
                 }
 
                 this.addProvider(provider, silent);
-                console.log('Added provider:', provider.displayName);
-                // print out state
-                console.log(provider.state?.chains);
             })
         );
     }
