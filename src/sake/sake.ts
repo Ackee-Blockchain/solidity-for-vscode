@@ -39,7 +39,7 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     // Check if there is was any state saved
     if (await StorageHandler.hasAnySavedState()) {
-        StorageHandler.loadExtensionState();
+        StorageHandler.loadExtensionState(false);
     } else {
         // Start with a default local chain
         const localProvider = await SakeProviderFactory.createNewLocalProvider('Local Chain');
@@ -196,6 +196,6 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 }
 
 export function deactivateSake() {
-    StorageHandler.saveExtensionState();
+    StorageHandler.saveExtensionState(false);
     // TODO save state
 }

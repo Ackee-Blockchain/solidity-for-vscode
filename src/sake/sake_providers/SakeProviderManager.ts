@@ -335,13 +335,20 @@ export class SakeProviderManager {
         };
     }
 
-    async loadState(state: StoredSakeState) {
+    async loadState(state: StoredSakeState, silent: boolean = false) {
         SakeState.loadSharedState(state.sharedState);
         await Promise.all(
             state.providerStates.map(async (providerState) => {
                 const provider = await SakeProviderFactory.createFromState(providerState).catch(
                     (error) => {
                         console.error('Failed to create provider from state:', error);
+                        if (!silent) {
+                            vscode.window.showErrorMessage(
+                                `Failed to create provider from state: ${
+                                    error instanceof Error ? error.message : String(error)
+                                }`
+                            );
+                        }
                         return undefined;
                     }
                 );
@@ -350,7 +357,7 @@ export class SakeProviderManager {
                     return;
                 }
 
-                this.addProvider(provider);
+                this.addProvider(provider, silent);
                 console.log('Added provider:', provider.displayName);
                 // print out state
                 console.log(provider.state?.chains);
