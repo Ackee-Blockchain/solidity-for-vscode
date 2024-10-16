@@ -6,6 +6,11 @@ export class StorageHandler {
     // USE EITHER CONTEXT.workspaceState OR CONTEXT.storageUri
     static readonly storageFolder = ['.wake', 'extension'];
 
+    static async hasAnySavedState() {
+        const state = await this.loadFromWorkspaceFolder('state.json');
+        return state != undefined;
+    }
+
     static async loadExtensionState() {
         const state = await this.loadFromWorkspaceFolder('state.json')
             .then((state) => {
@@ -25,7 +30,7 @@ export class StorageHandler {
             return;
         }
 
-        SakeProviderManager.getInstance().loadState(state);
+        await SakeProviderManager.getInstance().loadState(state);
     }
 
     static async saveExtensionState() {

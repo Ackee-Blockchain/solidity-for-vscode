@@ -16,7 +16,6 @@ import { AppStateProvider } from './state/AppStateProvider';
 import { SakeContext } from './context';
 import { SakeProviderFactory } from './sake_providers/SakeProviderFactory';
 import { StorageHandler } from './storage/StorageHandler';
-
 export async function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     /* Register Context */
     const sakeContext = SakeContext.getInstance();
@@ -38,12 +37,17 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     /* Initialize Sake Provider */
     const sake = SakeProviderManager.getInstance();
 
-    // Start with a default local chain
-    const localProvider = await SakeProviderFactory.createNewLocalProvider('Local Chain');
+    // Check if there is was any state saved
+    if (await StorageHandler.hasAnySavedState()) {
+        StorageHandler.loadExtensionState();
+    } else {
+        // Start with a default local chain
+        const localProvider = await SakeProviderFactory.createNewLocalProvider('Local Chain');
 
-    if (localProvider) {
-        sake.addProvider(localProvider, false);
-        sake.setProvider(localProvider.id);
+        if (localProvider) {
+            sake.addProvider(localProvider, false);
+            sake.setProvider(localProvider.id);
+        }
     }
 
     /* Workspace watcher */

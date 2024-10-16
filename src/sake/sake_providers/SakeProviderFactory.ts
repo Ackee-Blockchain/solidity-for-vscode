@@ -64,7 +64,7 @@ export class SakeProviderFactory {
         }
 
         const provider = new LocalNodeSakeProvider(state.id, state.displayName, network);
-        provider.loadState(state);
+        await provider.loadState(state);
 
         return provider;
     }

@@ -65,7 +65,7 @@ export class LocalNodeNetworkProvider implements NetworkProvider {
     }
 
     static async createFromState(state: LocalNodeNetworkState): Promise<LocalNodeNetworkProvider> {
-        const network = new LocalNodeNetworkProvider(state.config);
+        const { network } = await this.createNewChainProvider(state.config);
 
         return network;
     }
@@ -233,13 +233,11 @@ export class LocalNodeNetworkProvider implements NetworkProvider {
     }
 
     async loadState(wakeDump: WakeChainDump) {
-        console.log('Loading state:', wakeDump);
         const response = await WakeApi.loadState({
             metadata: wakeDump.metadata,
             chainDump: wakeDump.chainDump,
             sessionId: this.config.sessionId
         });
-        console.log('Response:', response);
 
         if (!response.success) {
             throw new NetworkError('Failed to load state');
