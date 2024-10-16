@@ -23,7 +23,11 @@ import {
     WakeConnectChainResponse,
     WakeDisconnectChainRequestParams,
     WakeDisconnectChainResponse,
-    WakeGetAccountsRequestParams
+    WakeGetAccountsRequestParams,
+    WakeDumpStateRequestParams,
+    WakeDumpStateResponse,
+    WakeLoadStateResponse,
+    WakeLoadStateRequestParams
 } from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
@@ -308,6 +312,8 @@ export class WakeApi {
 
     static async transact(requestParams: WakeTransactRequestParams): Promise<WakeTransactResponse> {
         try {
+            console.log('transact', requestParams);
+
             const result = await WakeApi.sendWakeRequest<WakeTransactResponse>(
                 'wake/sake/transact',
                 requestParams
@@ -331,6 +337,48 @@ export class WakeApi {
             return result;
         } catch (e) {
             throw new WakeApiError(`Failed to ping: ${e instanceof Error ? e.message : String(e)}`);
+        }
+    }
+
+    static async dumpState(
+        requestParams: WakeDumpStateRequestParams
+    ): Promise<WakeDumpStateResponse> {
+        try {
+            const result = await WakeApi.sendWakeRequest<WakeDumpStateResponse>(
+                'wake/sake/dumpState',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(
+                `Failed to dump state: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
+    }
+
+    static async loadState(
+        requestParams: WakeLoadStateRequestParams
+    ): Promise<WakeLoadStateResponse> {
+        try {
+            const result = await WakeApi.sendWakeRequest<WakeLoadStateResponse>(
+                'wake/sake/loadState',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            throw new WakeApiError(
+                `Failed to load state: ${e instanceof Error ? e.message : String(e)}`
+            );
         }
     }
 

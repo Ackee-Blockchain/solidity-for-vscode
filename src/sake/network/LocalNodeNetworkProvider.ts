@@ -1,5 +1,6 @@
 import { WakeApi } from '../api/wake';
 import { ChainStateProvider } from '../state/ChainStateProvider';
+import { NetworkError } from '../webview/shared/error_types';
 import {
     CallRequest,
     CallResponse,
@@ -9,26 +10,26 @@ import {
     DeploymentResponse,
     NetworkConfiguration,
     NetworkId,
+    NetworkProvider,
     SetAccountBalanceRequest,
     SetAccountBalanceResponse,
     SetAccountLabelRequest
 } from '../webview/shared/network_types';
+import { LocalNodeNetworkState, WakeChainDump } from '../webview/shared/storage_types';
 import { Account, ChainStatus } from '../webview/shared/types';
 import {
     WakeCallRequestParams,
     WakeDeploymentResponse,
+    WakeDumpStateResponse,
     WakeGetAccountsResponse,
     WakeSetBalancesResponse
 } from '../webview/shared/wake_types';
-import { NetworkError, NetworkProvider } from './NetworkProvider';
 
-export class LocalNodeNetworkProvider extends NetworkProvider implements NetworkProvider {
+export class LocalNodeNetworkProvider implements NetworkProvider {
     public type = NetworkId.LocalNode;
     private _connected: boolean = false;
 
-    private constructor(public config: NetworkConfiguration) {
-        super();
-    }
+    private constructor(public config: NetworkConfiguration) {}
 
     static async createNewChainProvider(request: CreateLocalChainRequest): Promise<{
         network: LocalNodeNetworkProvider;
@@ -61,6 +62,12 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
             network,
             initialized
         };
+    }
+
+    static async createFromState(state: LocalNodeNetworkState): Promise<LocalNodeNetworkProvider> {
+        const network = new LocalNodeNetworkProvider(state.config);
+
+        return network;
     }
 
     async initialize(accounts?: number): Promise<void> {
@@ -204,5 +211,40 @@ export class LocalNodeNetworkProvider extends NetworkProvider implements Network
 
     get connected(): boolean {
         return this._connected;
+    }
+
+    async dumpState(): Promise<LocalNodeNetworkState> {
+        const response: WakeDumpStateResponse = await WakeApi.dumpState({
+            sessionId: this.config.sessionId
+        });
+
+        if (!response.success) {
+            throw new NetworkError('Failed to dump state');
+        }
+
+        return {
+            wakeDump: {
+                metadata: response.metadata,
+                chainDump: response.chainDump
+            },
+            type: this.type,
+            config: this.config
+        };
+    }
+
+    async loadState(wakeDump: WakeChainDump) {
+        console.log('Loading state:', wakeDump);
+        const response = await WakeApi.loadState({
+            metadata: wakeDump.metadata,
+            chainDump: wakeDump.chainDump,
+            sessionId: this.config.sessionId
+        });
+        console.log('Response:', response);
+
+        if (!response.success) {
+            throw new NetworkError('Failed to load state');
+        }
+
+        this.connected = true;
     }
 }

@@ -89,8 +89,6 @@ export enum ChainStatus {
     Disconnected = 'disconnected'
 }
 
-export interface SakeState {}
-
 /* Transaction History */
 
 export type TransactionHistoryState = TransactionResult[];

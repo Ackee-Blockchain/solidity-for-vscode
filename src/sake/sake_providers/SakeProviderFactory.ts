@@ -2,7 +2,8 @@ import { WakeApi } from '../api/wake';
 import { showErrorMessage } from '../commands';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
 import { AppStateProvider } from '../state/AppStateProvider';
-import { NetworkCreationConfiguration } from '../webview/shared/network_types';
+import { NetworkCreationConfiguration, NetworkId } from '../webview/shared/network_types';
+import { ProviderState } from '../webview/shared/storage_types';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -41,6 +42,29 @@ export class SakeProviderFactory {
                     console.error('Failed to create new chain:', error);
                     return undefined;
                 });
+
+        return provider;
+    }
+
+    static async createFromState(state: ProviderState): Promise<LocalNodeSakeProvider | undefined> {
+        const network = await (async () => {
+            switch (state.network.type) {
+                case NetworkId.LocalNode:
+                    return await LocalNodeNetworkProvider.createFromState(state.network);
+                default:
+                    return undefined;
+            }
+        })().catch((error) => {
+            console.error('Failed to create network from state:', error);
+            return undefined;
+        });
+
+        if (network == undefined) {
+            return undefined;
+        }
+
+        const provider = new LocalNodeSakeProvider(state.id, state.displayName, network);
+        provider.loadState(state);
 
         return provider;
     }
