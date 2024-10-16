@@ -254,7 +254,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
 
     async loadState(providerState: ProviderState) {
         this.state.loadProviderState(providerState.state);
-        await this.network.loadState(providerState.network);
+        await this.network.loadState(providerState.network.wakeDump);
     }
 
     /* Helper functions */

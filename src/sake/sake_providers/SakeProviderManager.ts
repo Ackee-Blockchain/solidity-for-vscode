@@ -335,22 +335,26 @@ export class SakeProviderManager {
         };
     }
 
-    loadState(state: StoredSakeState) {
+    async loadState(state: StoredSakeState) {
         SakeState.loadSharedState(state.sharedState);
-        state.providerStates.forEach(async (providerState) => {
-            const provider = await SakeProviderFactory.createFromState(providerState).catch(
-                (error) => {
-                    console.error('Failed to create provider from state:', error);
-                    return undefined;
+        await Promise.all(
+            state.providerStates.map(async (providerState) => {
+                const provider = await SakeProviderFactory.createFromState(providerState).catch(
+                    (error) => {
+                        console.error('Failed to create provider from state:', error);
+                        return undefined;
+                    }
+                );
+
+                if (provider == undefined) {
+                    return;
                 }
-            );
 
-            if (provider == undefined) {
-                return;
-            }
-
-            this.addProvider(provider);
-            console.log('Added provider:', provider.displayName);
-        });
+                this.addProvider(provider);
+                console.log('Added provider:', provider.displayName);
+                // print out state
+                console.log(provider.state?.chains);
+            })
+        );
     }
 }

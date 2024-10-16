@@ -304,6 +304,8 @@ export class WakeApi {
                 throw new Error('No result returned');
             }
 
+            console.log('call result', result);
+
             return result;
         } catch (e) {
             throw new WakeApiError(`Failed to call: ${e instanceof Error ? e.message : String(e)}`);
@@ -312,8 +314,6 @@ export class WakeApi {
 
     static async transact(requestParams: WakeTransactRequestParams): Promise<WakeTransactResponse> {
         try {
-            console.log('transact', requestParams);
-
             const result = await WakeApi.sendWakeRequest<WakeTransactResponse>(
                 'wake/sake/transact',
                 requestParams
@@ -322,6 +322,8 @@ export class WakeApi {
             if (result == null) {
                 throw new Error('No result returned');
             }
+
+            console.log('transact result', result);
 
             return result;
         } catch (e) {
@@ -365,6 +367,8 @@ export class WakeApi {
         requestParams: WakeLoadStateRequestParams
     ): Promise<WakeLoadStateResponse> {
         try {
+            // console.log('loadState', requestParams);
+
             const result = await WakeApi.sendWakeRequest<WakeLoadStateResponse>(
                 'wake/sake/loadState',
                 requestParams
