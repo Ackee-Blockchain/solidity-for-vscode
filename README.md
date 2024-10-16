@@ -4,7 +4,7 @@
 [![Visual Studio Marketplace Badge](https://img.shields.io/visual-studio-marketplace/d/AckeeBlockchain.tools-for-solidity?colorA=21262d&colorB=0000FF&style=flat)](https://marketplace.visualstudio.com/items?itemName=AckeeBlockchain.tools-for-solidity)
 [![Follow on X Badge](https://img.shields.io/badge/Follow%20on%20X-for%20release%20updates-0000FF?colorA=21262d&style=flat)](https://x.com/WakeFramework)
 
-![Solidity for VS Code](images/readme/solidity_for_vscode.gif)
+![Solidity for VS Code](images/readme/solidity_wake.gif)
 
 Ethereum Solidity and local node testing with security features for Visual Studio Code.
 
