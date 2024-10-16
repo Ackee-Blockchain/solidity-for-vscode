@@ -29,7 +29,8 @@ export interface ProviderState {
 
 export interface SharedState {
     chains: ChainState;
-    compilation: CompilationState;
+    // @hotfix: compilation state is not loaded until wake is able to save it in state dump
+    // compilation: CompilationState;
 }
 
 export type NetworkState = LocalNodeNetworkState; // | other network types
