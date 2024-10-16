@@ -28857,19 +28857,19 @@ function create_else_block$4(ctx) {
 			attr_dev(path, "fill-rule", "evenodd");
 			attr_dev(path, "clip-rule", "evenodd");
 			attr_dev(path, "d", "M14.491 1c-3.598.004-6.654 1.983-8.835 4H1.5l-.5.5v3l.147.354.991.991.001.009 4 4 .009.001.999.999L7.5 15h3l.5-.5v-4.154c2.019-2.178 3.996-5.233 3.992-8.846l-.501-.5zM2 6h2.643a23.828 23.828 0 0 0-2.225 2.71L2 8.294V6zm5.7 8l-.42-.423a23.59 23.59 0 0 0 2.715-2.216V14H7.7zm-1.143-1.144L3.136 9.437C4.128 8 8.379 2.355 13.978 2.016c-.326 5.612-5.987 9.853-7.421 10.84zM4 15v-1H2v-2H1v3h3zm6.748-7.667a1.5 1.5 0 1 0-2.496-1.666 1.5 1.5 0 0 0 2.495 1.666z");
-			add_location(path, file$a, 65, 17, 2498);
+			add_location(path, file$a, 65, 17, 2499);
 			attr_dev(svg, "width", "16");
 			attr_dev(svg, "height", "16");
 			attr_dev(svg, "viewBox", "0 0 16 16");
 			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
 			attr_dev(svg, "fill", "currentColor");
-			add_location(svg, file$a, 59, 12, 2298);
+			add_location(svg, file$a, 59, 12, 2299);
 			attr_dev(span, "class", "text-sm my-2 text-center text-secon");
-			add_location(span, file$a, 71, 12, 3111);
+			add_location(span, file$a, 71, 12, 3112);
 			attr_dev(div, "class", "flex flex-col gap-2 items-center");
-			add_location(div, file$a, 58, 8, 2239);
+			add_location(div, file$a, 58, 8, 2240);
 			attr_dev(section, "class", "h-full w-full flex flex-col items-center justify-center gap-3 p-2");
-			add_location(section, file$a, 57, 4, 2147);
+			add_location(section, file$a, 57, 4, 2148);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, section, anchor);
@@ -28924,7 +28924,7 @@ function create_if_block$6(ctx) {
 				each_blocks[i].c();
 			}
 
-			attr_dev(div, "class", "flex flex-col gap-");
+			attr_dev(div, "class", "flex flex-col gap-3");
 			add_location(div, file$a, 47, 8, 1845);
 			attr_dev(section, "class", "p-3 w-full");
 			add_location(section, file$a, 25, 4, 1009);
@@ -29374,13 +29374,13 @@ function create_else_block$3(ctx) {
 	let span1;
 	let t3;
 
-	let t4_value = (/*$selectedAccount*/ ctx[1] !== null
-	? /*$selectedAccount*/ ctx[1]?.label ?? `Account ${/*$selectedAccount*/ ctx[1]}`
+	let t4_value = (/*$selectedAccountId*/ ctx[1] !== null
+	? /*$selectedAccount*/ ctx[2]?.label ?? `Account ${/*$selectedAccountId*/ ctx[1]}`
 	: 'No account selected') + "";
 
 	let t4;
 	let t5;
-	let t6_value = displayEtherValue(/*$selectedValue*/ ctx[2]) + "";
+	let t6_value = displayEtherValue(/*$selectedValue*/ ctx[3]) + "";
 	let t6;
 	let t7;
 	let current;
@@ -29399,9 +29399,9 @@ function create_else_block$3(ctx) {
 			t5 = text(",\n                        ");
 			t6 = text(t6_value);
 			t7 = text(")");
-			add_location(span0, file$7, 26, 20, 1293);
+			add_location(span0, file$7, 26, 20, 1312);
 			attr_dev(span1, "class", "text-xs text-vscodeForegroundSecondary font-normal ml-auto pr-2");
-			add_location(span1, file$7, 28, 20, 1350);
+			add_location(span1, file$7, 28, 20, 1369);
 		},
 		m: function mount(target, anchor) {
 			mount_component(chevronright, target, anchor);
@@ -29417,11 +29417,11 @@ function create_else_block$3(ctx) {
 			current = true;
 		},
 		p: function update(ctx, dirty) {
-			if ((!current || dirty & /*$selectedAccount*/ 2) && t4_value !== (t4_value = (/*$selectedAccount*/ ctx[1] !== null
-			? /*$selectedAccount*/ ctx[1]?.label ?? `Account ${/*$selectedAccount*/ ctx[1]}`
+			if ((!current || dirty & /*$selectedAccountId, $selectedAccount*/ 6) && t4_value !== (t4_value = (/*$selectedAccountId*/ ctx[1] !== null
+			? /*$selectedAccount*/ ctx[2]?.label ?? `Account ${/*$selectedAccountId*/ ctx[1]}`
 			: 'No account selected') + "")) set_data_dev(t4, t4_value);
 
-			if ((!current || dirty & /*$selectedValue*/ 4) && t6_value !== (t6_value = displayEtherValue(/*$selectedValue*/ ctx[2]) + "")) set_data_dev(t6, t6_value);
+			if ((!current || dirty & /*$selectedValue*/ 8) && t6_value !== (t6_value = displayEtherValue(/*$selectedValue*/ ctx[3]) + "")) set_data_dev(t6, t6_value);
 		},
 		i: function intro(local) {
 			if (current) return;
@@ -29466,7 +29466,7 @@ function create_if_block$5(ctx) {
 			t0 = space();
 			span = element("span");
 			span.textContent = "Transaction Parameters";
-			add_location(span, file$7, 23, 20, 1176);
+			add_location(span, file$7, 23, 20, 1195);
 		},
 		m: function mount(target, anchor) {
 			mount_component(chevrondown, target, anchor);
@@ -29526,7 +29526,7 @@ function create_header_slot_1$1(ctx) {
 			a = element("a");
 			if_block.c();
 			attr_dev(a, "class", "flex gap-1 cursor-pointer items-center w-full");
-			add_location(a, file$7, 17, 12, 907);
+			add_location(a, file$7, 17, 12, 926);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, a, anchor);
@@ -29534,7 +29534,7 @@ function create_header_slot_1$1(ctx) {
 			current = true;
 
 			if (!mounted) {
-				dispose = listen_dev(a, "click", /*click_handler*/ ctx[3], false, false, false, false);
+				dispose = listen_dev(a, "click", /*click_handler*/ ctx[4], false, false, false, false);
 				mounted = true;
 			}
 		},
@@ -29646,7 +29646,7 @@ function create_header_slot$1(ctx) {
 			t0 = space();
 			span = element("span");
 			span.textContent = "Interact with contracts";
-			add_location(span, file$7, 44, 12, 2002);
+			add_location(span, file$7, 44, 12, 2025);
 		},
 		m: function mount(target, anchor) {
 			mount_component(blankicon, target, anchor);
@@ -29765,14 +29765,14 @@ function create_default_slot$3(ctx) {
 		p: function update(ctx, dirty) {
 			const viewstatic_changes = {};
 
-			if (dirty & /*$$scope, $txParametersExpanded, $selectedValue, $selectedAccount*/ 23) {
+			if (dirty & /*$$scope, $txParametersExpanded, $selectedValue, $selectedAccountId, $selectedAccount*/ 47) {
 				viewstatic_changes.$$scope = { dirty, ctx };
 			}
 
 			viewstatic.$set(viewstatic_changes);
 			const viewscrollable_changes = {};
 
-			if (dirty & /*$$scope*/ 16) {
+			if (dirty & /*$$scope*/ 32) {
 				viewscrollable_changes.$$scope = { dirty, ctx };
 			}
 
@@ -29833,7 +29833,7 @@ function create_fragment$8(ctx) {
 		p: function update(ctx, [dirty]) {
 			const flexcontainer_changes = {};
 
-			if (dirty & /*$$scope, $txParametersExpanded, $selectedValue, $selectedAccount*/ 23) {
+			if (dirty & /*$$scope, $txParametersExpanded, $selectedValue, $selectedAccountId, $selectedAccount*/ 47) {
 				flexcontainer_changes.$$scope = { dirty, ctx };
 			}
 
@@ -29866,14 +29866,17 @@ function create_fragment$8(ctx) {
 
 function instance$8($$self, $$props, $$invalidate) {
 	let $txParametersExpanded;
+	let $selectedAccountId;
 	let $selectedAccount;
 	let $selectedValue;
 	validate_store(txParametersExpanded, 'txParametersExpanded');
 	component_subscribe($$self, txParametersExpanded, $$value => $$invalidate(0, $txParametersExpanded = $$value));
+	validate_store(selectedAccountId, 'selectedAccountId');
+	component_subscribe($$self, selectedAccountId, $$value => $$invalidate(1, $selectedAccountId = $$value));
 	validate_store(selectedAccount, 'selectedAccount');
-	component_subscribe($$self, selectedAccount, $$value => $$invalidate(1, $selectedAccount = $$value));
+	component_subscribe($$self, selectedAccount, $$value => $$invalidate(2, $selectedAccount = $$value));
 	validate_store(selectedValue, 'selectedValue');
-	component_subscribe($$self, selectedValue, $$value => $$invalidate(2, $selectedValue = $$value));
+	component_subscribe($$self, selectedValue, $$value => $$invalidate(3, $selectedValue = $$value));
 	let { $$slots: slots = {}, $$scope } = $$props;
 	validate_slots('Interaction', slots, []);
 	const writable_props = [];
@@ -29892,17 +29895,25 @@ function instance$8($$self, $$props, $$invalidate) {
 		BlankIcon,
 		Run,
 		selectedAccount,
+		selectedAccountId,
 		selectedValue,
 		txParametersExpanded,
 		ChevronDown,
 		ChevronRight,
 		displayEtherValue,
 		$txParametersExpanded,
+		$selectedAccountId,
 		$selectedAccount,
 		$selectedValue
 	});
 
-	return [$txParametersExpanded, $selectedAccount, $selectedValue, click_handler];
+	return [
+		$txParametersExpanded,
+		$selectedAccountId,
+		$selectedAccount,
+		$selectedValue,
+		click_handler
+	];
 }
 
 class Interaction extends SvelteComponentDev {

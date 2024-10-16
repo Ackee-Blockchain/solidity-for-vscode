@@ -1,20 +1,28 @@
-import { ChainStatus, NetworkCreationConfiguration } from '../webview/shared/types';
+import {
+    AccountState,
+    ChainStatus,
+    DeploymentState,
+    NetworkCreationConfiguration,
+    NetworkProvider,
+    TransactionHistoryState
+} from '../webview/shared/types';
 import { AppStateProvider } from '../state/AppStateProvider';
 import * as vscode from 'vscode';
 import { getTextFromInputBox, showErrorMessage } from '../commands';
-import { SakeProvider, SakeState } from './SakeProvider';
+import { BaseSakeProvider } from './SakeProvider';
 import { WakeApi } from '../api/wake';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import { SakeContext } from '../context';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
-import { NetworkProvider } from '../network/NetworkProvider';
 import { SakeProviderFactory } from './SakeProviderFactory';
 import { ChainStateProvider } from '../state/ChainStateProvider';
+import { StoredSakeState } from '../webview/shared/storage_types';
+import { SakeState } from './SakeState';
 
 export class SakeProviderManager {
     private static _instance: SakeProviderManager;
     private _selectedProviderId?: string;
-    private _providers: Map<string, SakeProvider<NetworkProvider>>;
+    private _providers: Map<string, BaseSakeProvider<NetworkProvider>>;
     private _statusBarItem!: vscode.StatusBarItem;
     private _chains: ChainStateProvider;
     private _app: AppStateProvider;
@@ -52,7 +60,7 @@ export class SakeProviderManager {
         return this._instance;
     }
 
-    addProvider(provider: SakeProvider<NetworkProvider>, notifyUser: boolean = true) {
+    addProvider(provider: BaseSakeProvider<NetworkProvider>, notifyUser: boolean = true) {
         if (this._providers.has(provider.id)) {
             throw new Error('Provider with id ' + provider.id + ' already exists');
         }
@@ -89,7 +97,7 @@ export class SakeProviderManager {
         }
     }
 
-    async removeProvider(provider: SakeProvider<NetworkProvider>) {
+    async removeProvider(provider: BaseSakeProvider<NetworkProvider>) {
         if (!this._providers.has(provider.id)) {
             throw new Error('Provider with id ' + provider.id + ' does not exist');
         }
@@ -113,7 +121,7 @@ export class SakeProviderManager {
         this._updateStatusBar();
     }
 
-    get provider(): SakeProvider<NetworkProvider> | undefined {
+    get provider(): BaseSakeProvider<NetworkProvider> | undefined {
         if (!this._selectedProviderId) {
             return undefined;
         }
@@ -173,7 +181,7 @@ export class SakeProviderManager {
     public showProviderSelectionQuickPick() {
         const quickPickItems: vscode.QuickPickItem[] = [];
 
-        const _providerItems = this.providers.map((provider: SakeProvider<NetworkProvider>) =>
+        const _providerItems = this.providers.map((provider: BaseSakeProvider<NetworkProvider>) =>
             provider._getQuickPickItem()
         );
 
@@ -308,5 +316,41 @@ export class SakeProviderManager {
 
     get providers() {
         return Array.from(this._providers.values());
+    }
+
+    /* State Handling */
+
+    async dumpState(): Promise<StoredSakeState> {
+        // Load all providers
+        const providerStates = await Promise.all(
+            this.providers.map((provider) => provider.dumpState())
+        );
+
+        // Load shared state
+        const sharedState = SakeState.dumpSharedState();
+
+        return {
+            sharedState: sharedState,
+            providerStates
+        };
+    }
+
+    loadState(state: StoredSakeState) {
+        SakeState.loadSharedState(state.sharedState);
+        state.providerStates.forEach(async (providerState) => {
+            const provider = await SakeProviderFactory.createFromState(providerState).catch(
+                (error) => {
+                    console.error('Failed to create provider from state:', error);
+                    return undefined;
+                }
+            );
+
+            if (provider == undefined) {
+                return;
+            }
+
+            this.addProvider(provider);
+            console.log('Added provider:', provider.displayName);
+        });
     }
 }

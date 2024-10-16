@@ -15,6 +15,7 @@ import { SakeProviderManager } from './sake_providers/SakeProviderManager';
 import { AppStateProvider } from './state/AppStateProvider';
 import { SakeContext } from './context';
 import { SakeProviderFactory } from './sake_providers/SakeProviderFactory';
+import { StorageHandler } from './storage/StorageHandler';
 
 export async function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     /* Register Context */
@@ -176,6 +177,21 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
         }
         // TODO might need to rework using vscode.workspace.createFileSystemWatcher
     });
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.test-save-state', () =>
+            StorageHandler.saveExtensionState()
+        )
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.test-load-state', () =>
+            StorageHandler.loadExtensionState()
+        )
+    );
 }
 
-export function deactivateSake() {}
+export function deactivateSake() {
+    StorageHandler.saveExtensionState();
+    // TODO save state
+}

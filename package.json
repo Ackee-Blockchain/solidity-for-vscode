@@ -588,6 +588,14 @@
                 "command": "Tools-for-Solidity.sake.copyFromResults",
                 "title": "Solidity: Copy From Results",
                 "icon": "$(copy)"
+            },
+            {
+                "command": "Tools-for-Solidity.sake.test-save-state",
+                "title": "Solidity: Test Dump State"
+            },
+            {
+                "command": "Tools-for-Solidity.sake.test-load-state",
+                "title": "Solidity: Test Load State"
             }
         ],
         "viewsContainers": {

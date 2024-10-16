@@ -4,17 +4,16 @@ import {
     CallType,
     SetAccountLabelRequest
 } from '../webview/shared/types';
-import { NetworkProvider } from '../network/NetworkProvider';
 import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
 import * as vscode from 'vscode';
 import { WakeApi } from '../api/wake';
-import { SakeProvider } from './SakeProvider';
+import { BaseSakeProvider } from './SakeProvider';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import { SakeProviderManager } from './SakeProviderManager';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
 import { showErrorMessage } from '../commands';
 
-export class LocalNodeSakeProvider extends SakeProvider<LocalNodeNetworkProvider> {
+export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProvider> {
     constructor(id: string, displayName: string, network: LocalNodeNetworkProvider) {
         super(id, displayName, network);
     }

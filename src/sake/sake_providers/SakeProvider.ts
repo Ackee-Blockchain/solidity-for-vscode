@@ -14,9 +14,9 @@ import {
     SetAccountLabelRequest,
     TransactionCallResult,
     TransactionDecodedReturnValue,
-    TransactionDeploymentResult
+    TransactionDeploymentResult,
+    NetworkProvider
 } from '../webview/shared/types';
-import { NetworkProvider } from '../network/NetworkProvider';
 import { AccountStateProvider } from '../state/AccountStateProvider';
 import { DeploymentStateProvider } from '../state/DeploymentStateProvider';
 import { CompilationStateProvider } from '../state/CompilationStateProvider';
@@ -37,74 +37,13 @@ import { showTimedInfoMessage } from '../commands';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import { SakeContext } from '../context';
 import { ChainStateProvider } from '../state/ChainStateProvider';
-
-export class SakeState {
-    accounts: AccountStateProvider;
-    deployment: DeploymentStateProvider;
-    compilation: CompilationStateProvider;
-    history: TransactionHistoryStateProvider;
-    chains: ChainStateProvider;
-    app: AppStateProvider;
-    subscribed: boolean;
-
-    private get _webviewProvider(): BaseWebviewProvider {
-        return SakeContext.getInstance().webviewProvider;
-    }
-
-    constructor() {
-        // network-specific state
-        this.accounts = new AccountStateProvider();
-        this.deployment = new DeploymentStateProvider();
-        this.history = new TransactionHistoryStateProvider();
-
-        // shared state
-        this.compilation = CompilationStateProvider.getInstance();
-        this.chains = ChainStateProvider.getInstance();
-        this.app = AppStateProvider.getInstance();
-
-        this.subscribed = false;
-    }
-
-    subscribe() {
-        this.accounts.subscribe(this._webviewProvider);
-        this.deployment.subscribe(this._webviewProvider);
-        this.history.subscribe(this._webviewProvider);
-        this.chains.subscribe(this._webviewProvider);
-        this.compilation.subscribe(this._webviewProvider);
-        this.app.subscribe(this._webviewProvider);
-
-        this.subscribed = true;
-    }
-
-    unsubscribe() {
-        this.accounts.unsubscribe(this._webviewProvider);
-        this.deployment.unsubscribe(this._webviewProvider);
-        this.history.unsubscribe(this._webviewProvider);
-        this.chains.unsubscribe(this._webviewProvider);
-        this.compilation.unsubscribe(this._webviewProvider);
-        this.app.unsubscribe(this._webviewProvider);
-
-        this.subscribed = false;
-    }
-
-    sendToWebview() {
-        if (!this.subscribed) {
-            console.error('Cannot force state update, webview not subscribed');
-            return;
-        }
-
-        this.accounts.sendToWebview();
-        this.deployment.sendToWebview();
-        this.history.sendToWebview();
-        this.chains.sendToWebview();
-        this.compilation.sendToWebview();
-    }
-}
+import { ProviderState, SharedState } from '../webview/shared/storage_types';
+import { SakeState } from './SakeState';
 
 export class SakeError extends Error {}
 
 // TODO consider renaming to BaseSakeProvider
-export abstract class SakeProvider<T extends NetworkProvider> {
+export abstract class BaseSakeProvider<T extends NetworkProvider> {
     state: SakeState;
     protected output: OutputViewManager;
 
@@ -300,6 +239,22 @@ export abstract class SakeProvider<T extends NetworkProvider> {
         // TODO save state
         this.state.unsubscribe();
         this.network.onDeactivate();
+    }
+
+    /* State Handling */
+
+    async dumpState() {
+        return {
+            id: this.id,
+            displayName: this.displayName,
+            state: this.state.dumpProviderState(),
+            network: await this.network.dumpState()
+        };
+    }
+
+    async loadState(providerState: ProviderState) {
+        this.state.loadProviderState(providerState.state);
+        await this.network.loadState(providerState.network);
     }
 
     /* Helper functions */

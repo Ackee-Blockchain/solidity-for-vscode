@@ -6,6 +6,8 @@ import type {
     WakeGetBytecodeRequestParams,
     WakeCreateChainRequestParams
 } from './wake_types';
+import type { Account } from './types';
+import type { NetworkState } from './storage_types';
 
 interface Transaction {
     success: boolean;
@@ -105,4 +107,19 @@ export interface CreateLocalChainRequest {
 
 export enum NetworkId {
     LocalNode = 'LocalNode'
+}
+
+export interface NetworkProvider {
+    type: NetworkId;
+    connected: boolean;
+    registerAccount(address: string): Promise<Account | undefined>;
+    getAccountDetails(address: string): Promise<Account>;
+    setAccountBalance(request: SetAccountBalanceRequest): Promise<SetAccountBalanceResponse>;
+    deploy(params: DeploymentRequest): Promise<DeploymentResponse>;
+    call(params: CallRequest): Promise<CallResponse>;
+    onActivate(): Promise<void>;
+    onDeactivate(): Promise<void>;
+    /* Helper Functions */
+    dumpState(): Promise<NetworkState>;
+    loadState(state: any): Promise<void>;
 }
