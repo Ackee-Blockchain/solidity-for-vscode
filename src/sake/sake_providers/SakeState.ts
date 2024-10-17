@@ -44,9 +44,6 @@ export class SakeState {
         this.accounts.subscribe(this._webviewProvider);
         this.deployment.subscribe(this._webviewProvider);
         this.history.subscribe(this._webviewProvider);
-        this.chains.subscribe(this._webviewProvider);
-        this.compilation.subscribe(this._webviewProvider);
-        this.app.subscribe(this._webviewProvider);
 
         this.subscribed = true;
     }
@@ -55,9 +52,6 @@ export class SakeState {
         this.accounts.unsubscribe(this._webviewProvider);
         this.deployment.unsubscribe(this._webviewProvider);
         this.history.unsubscribe(this._webviewProvider);
-        this.chains.unsubscribe(this._webviewProvider);
-        this.compilation.unsubscribe(this._webviewProvider);
-        this.app.unsubscribe(this._webviewProvider);
 
         this.subscribed = false;
     }

@@ -1,6 +1,5 @@
 import {
     AccountState,
-    ChainStatus,
     DeploymentState,
     NetworkCreationConfiguration,
     NetworkProvider,
@@ -32,24 +31,24 @@ export class SakeProviderManager {
         this._chains = ChainStateProvider.getInstance();
         this._app = AppStateProvider.getInstance();
         this._initializeStatusBar();
-        this._initializeChainsState();
+        this._initializeState();
     }
 
     private get _context(): vscode.ExtensionContext {
         return SakeContext.getInstance().context;
     }
 
-    private async _initializeChainsState() {
-        // check if wake is running
-        // TODO
-        this.initializeWakeConnection();
+    private async _initializeState() {
+        this.pingWakeServer();
     }
 
-    public async initializeWakeConnection(): Promise<boolean> {
-        const isWakeServerRunning = await WakeApi.ping();
-        this._app.setIsWakeServerRunning(isWakeServerRunning);
+    public async pingWakeServer(): Promise<void> {
+        const isWakeServerRunning = await WakeApi.ping().catch((e) => {
+            console.log('Failed to connect to wake server:', e);
+            return false;
+        });
 
-        return true;
+        this._app.setIsWakeServerRunning(isWakeServerRunning);
     }
 
     static getInstance(): SakeProviderManager {
@@ -69,8 +68,7 @@ export class SakeProviderManager {
 
         this._chains.addChain({
             chainId: provider.id,
-            network: provider.network.type,
-            status: provider.network.connected ? ChainStatus.Connected : ChainStatus.Disconnected
+            network: provider.network.type
         });
 
         if (this._selectedProviderId === undefined) {
@@ -336,6 +334,7 @@ export class SakeProviderManager {
     }
 
     async loadState(state: StoredSakeState, silent: boolean = false) {
+        console.log('Loading state', state);
         SakeState.loadSharedState(state.sharedState);
         await Promise.all(
             state.providerStates.map(async (providerState) => {

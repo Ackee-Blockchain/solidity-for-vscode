@@ -49,18 +49,18 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
                 tooltip: 'Delete'
             }
         ];
-        if (!this.network.connected) {
-            buttons.push({
-                iconPath: new vscode.ThemeIcon('refresh'),
-                tooltip: 'Reconnect'
-            });
-        }
+        // if (!this.network.connected) {
+        //     buttons.push({
+        //         iconPath: new vscode.ThemeIcon('refresh'),
+        //         tooltip: 'Reconnect'
+        //     });
+        // }
         return {
             providerId: this.id,
             label: this.displayName,
             detail: this.id,
-            description: this.network.connected ? 'Connected' : 'Disconnected',
-            iconPath: this.network.connected
+            description: this.network.type,
+            iconPath: this.state.app.state.isWakeServerRunning
                 ? new vscode.ThemeIcon('vm-active')
                 : new vscode.ThemeIcon('vm-outline'),
             buttons,
@@ -75,7 +75,7 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
     }
 
     _getStatusBarItemText() {
-        const icon = this.network.connected ? '$(vm-active)' : '$(vm-outline)';
+        const icon = this.state.app.state.isWakeServerRunning ? '$(vm-active)' : '$(vm-outline)';
         return `${icon} ${this.displayName}`;
     }
 

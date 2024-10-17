@@ -46,22 +46,31 @@ async function requestState(): Promise<boolean> {
 
     return await Promise.race([
         Promise.all([
-            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.Accounts),
-            messageHandler.request<boolean>(
-                WebviewMessageId.requestState,
-                StateId.DeployedContracts
-            ),
-            messageHandler.request<boolean>(
-                WebviewMessageId.requestState,
-                StateId.CompiledContracts
-            ),
-            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.Chain),
-            messageHandler.request<boolean>(WebviewMessageId.requestState, StateId.App)
+            messageHandler.request<{
+                success: boolean;
+            }>(WebviewMessageId.requestState, StateId.Accounts),
+            messageHandler.request<{
+                success: boolean;
+            }>(WebviewMessageId.requestState, StateId.DeployedContracts),
+            messageHandler.request<{
+                success: boolean;
+            }>(WebviewMessageId.requestState, StateId.CompiledContracts),
+            messageHandler.request<{
+                success: boolean;
+            }>(WebviewMessageId.requestState, StateId.Chain),
+            messageHandler.request<{
+                success: boolean;
+            }>(WebviewMessageId.requestState, StateId.App)
         ]),
         timeout
     ])
         .then((results) => {
-            if (!(results as boolean[]).every((result) => result)) {
+            console.log(
+                'results',
+                results,
+                !(results as { success: boolean }[]).every((result) => result.success)
+            );
+            if (!(results as { success: boolean }[]).every((result) => result.success)) {
                 console.error('requestState failed');
                 return false;
             }
@@ -75,13 +84,9 @@ async function requestState(): Promise<boolean> {
 
 export function setupListeners() {
     window.addEventListener('message', (event) => {
-        if (!event.data.command) {
-            return;
-        }
-
         const message = event.data as WebviewMessageResponse;
 
-        // console.log('received message', command, payload, stateId);
+        console.log('received message', message);
 
         switch (message.command) {
             case WebviewMessageId.getState: {
@@ -150,6 +155,7 @@ export function setupListeners() {
                     if (message.payload === undefined) {
                         return;
                     }
+                    console.log('setting app state', message.payload);
                     appState.set(message.payload);
                     return;
                 }

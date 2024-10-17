@@ -37,6 +37,8 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     /* Initialize Sake Provider */
     const sake = SakeProviderManager.getInstance();
 
+    console.log('Checkpoint 1');
+
     // Check if there is was any state saved
     if (await StorageHandler.hasAnySavedState()) {
         StorageHandler.loadExtensionState(false);

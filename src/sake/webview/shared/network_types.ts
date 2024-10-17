@@ -111,7 +111,6 @@ export enum NetworkId {
 
 export interface NetworkProvider {
     type: NetworkId;
-    connected: boolean;
     registerAccount(address: string): Promise<Account | undefined>;
     getAccountDetails(address: string): Promise<Account>;
     setAccountBalance(request: SetAccountBalanceRequest): Promise<SetAccountBalanceResponse>;

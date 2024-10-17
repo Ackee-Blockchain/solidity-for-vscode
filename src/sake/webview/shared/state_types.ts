@@ -81,12 +81,6 @@ export interface ChainState {
 export interface ChainInfo {
     chainId: string;
     network: string;
-    status: ChainStatus;
-}
-
-export enum ChainStatus {
-    Connected = 'connected',
-    Disconnected = 'disconnected'
 }
 
 /* Transaction History */
