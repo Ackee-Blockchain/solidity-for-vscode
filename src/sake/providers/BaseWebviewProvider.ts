@@ -13,6 +13,9 @@ import {
 } from '../webview/shared/types';
 import { BaseStateProvider } from '../state/BaseStateProvider';
 import { SakeProviderManager } from '../sake_providers/SakeProviderManager';
+import { CompilationStateProvider } from '../state/CompilationStateProvider';
+import { ChainStateProvider } from '../state/ChainStateProvider';
+import { AppStateProvider } from '../state/AppStateProvider';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -22,6 +25,15 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
     constructor(private readonly _extensionUri: vscode.Uri, private readonly _targetPath: string) {
         this._sake = SakeProviderManager.getInstance();
+
+        // Subscribe to shared state
+        this._subscribeToSharedState();
+    }
+
+    private _subscribeToSharedState() {
+        CompilationStateProvider.getInstance().subscribe(this);
+        ChainStateProvider.getInstance().subscribe(this);
+        AppStateProvider.getInstance().subscribe(this);
     }
 
     public resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -91,6 +103,8 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         switch (message.command) {
             case WebviewMessageId.requestState: {
                 const state = this._stateSubscriptions.get(message.payload);
+                console.log('requesting state', message.payload, state);
+                console.log('success', state !== undefined);
 
                 webviewView.webview.postMessage({
                     command: message.command,
@@ -236,13 +250,13 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.onRestartWakeServer: {
-                const success = await this._sake.initializeWakeConnection();
+                await this._sake.pingWakeServer();
 
                 webviewView.webview.postMessage({
                     command: message.command,
                     requestId: message.requestId,
                     payload: {
-                        success: success
+                        success: true
                     }
                 } as WebviewMessageResponse);
 
