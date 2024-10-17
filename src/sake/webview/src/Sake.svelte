@@ -17,7 +17,7 @@
     import { onMount } from 'svelte';
     import Tabs from './components/common/Tabs.svelte';
     import { requestState, setupListeners, appState, chainState } from './stores/sakeStore';
-    import { RESTART_WAKE_SERVER_TIMEOUT, RESTART_WAKE_SERVER_TRIES } from './helpers/constants';
+    import { RESTART_WAKE_SERVER_TIMEOUT } from './helpers/constants';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -36,11 +36,12 @@
 
     import {
         openExternal,
+        openSettings,
         requestNewProvider,
         restartWakeServer,
         selectChain
     } from './helpers/api';
-    import type { ComponentType, SvelteComponent } from 'svelte';
+    import type { ComponentType } from 'svelte';
     import Interaction from './pages/Interaction.svelte';
     import Deployment from './pages/Deployment.svelte';
     import InteractionHeader from './pages/InteractionHeader.svelte';
@@ -66,31 +67,30 @@
         }
     ];
 
-    onMount(async () => {
-        setupListeners(); // @dev listeners have to be set up before requesting state
-        const success = await requestState();
-        if (!success) {
-            showLoading = false;
-        }
-    });
-
-    const tryWakeServerRestart = (tries: number = 0) => {
+    const showLoadingFor = (seconds: number = 5) => {
         showLoading = true;
-        if (tries >= RESTART_WAKE_SERVER_TRIES) {
+        const timeout = setTimeout(() => {
             showLoading = false;
-            return;
-        }
-
-        const wakeServerRestartTimeout = setTimeout(() => {
-            tryWakeServerRestart(tries + 1);
-        }, RESTART_WAKE_SERVER_TIMEOUT);
-
-        restartWakeServer().then((success) => {
-            if (success) {
-                clearTimeout(wakeServerRestartTimeout);
+        }, seconds);
+        return {
+            finish: () => {
+                clearTimeout(timeout);
                 showLoading = false;
             }
-        });
+        };
+    };
+
+    onMount(async () => {
+        const loadingMessage = showLoadingFor(5);
+        setupListeners(); // @dev listeners have to be set up before requesting state
+        const success = await requestState();
+        loadingMessage.finish();
+    });
+
+    const tryWakeServerRestart = async () => {
+        const loadingMessage = showLoadingFor(5);
+        const success = await restartWakeServer();
+        loadingMessage.finish();
     };
 
     const installAnvil = () => {
@@ -146,9 +146,17 @@
     {:else if $appState.isWakeServerRunning === false}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Wake Server is not running</h3>
-            <span
-                >The Wake LSP server does not seem to be running. Please make sure that you have a
-                workspace with Solidity files open.
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <span>
+                The Wake LSP server is not responding. Please ensure Wake is properly installed and
+                running. If issues persist,
+                <span
+                    class="cursor-pointer underline"
+                    on:click={() => openSettings('Tools-for-Solidity.Wake.installationMethod')}
+                >
+                    try changing its installation method</span
+                >.
             </span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <vscode-button appearance="primary" on:click={tryWakeServerRestart}>
