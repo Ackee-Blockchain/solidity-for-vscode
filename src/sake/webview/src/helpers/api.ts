@@ -151,6 +151,14 @@ export async function openExternal(url: string) {
     messageHandler.send(request.command, request.payload);
 }
 
+export async function openSettings(settingsUrl: string) {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.onOpenSettings,
+        payload: settingsUrl
+    };
+    messageHandler.send(request.command, request.payload);
+}
+
 export async function getBytecode(contractFqn: string): Promise<GetBytecodeResponse> {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.onGetBytecode,
