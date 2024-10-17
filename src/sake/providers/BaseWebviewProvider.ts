@@ -2,7 +2,13 @@ import * as vscode from 'vscode';
 import { getNonce } from '../utils/getNonce';
 import { getBasePage } from '../utils/getBasePage';
 import { MessageHandlerData } from '@estruyf/vscode';
-import { copyToClipboard, getTextFromInputBox, navigateTo, openExternal } from '../commands';
+import {
+    copyToClipboard,
+    getTextFromInputBox,
+    navigateTo,
+    openExternal,
+    openSettings
+} from '../commands';
 import {
     StateId,
     WebviewMessageId,
@@ -103,8 +109,8 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         switch (message.command) {
             case WebviewMessageId.requestState: {
                 const state = this._stateSubscriptions.get(message.payload);
-                console.log('requesting state', message.payload, state);
-                console.log('success', state !== undefined);
+
+                state?.sendToWebview();
 
                 webviewView.webview.postMessage({
                     command: message.command,
@@ -114,7 +120,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     }
                 } as WebviewMessageResponse);
 
-                state?.sendToWebview();
                 break;
             }
 
@@ -260,6 +265,16 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     }
                 } as WebviewMessageResponse);
 
+                break;
+            }
+
+            case WebviewMessageId.onOpenSettings: {
+                if (!message.payload) {
+                    console.error('Cannot open settings, no settings URL provided');
+                    return;
+                }
+
+                openSettings(message.payload);
                 break;
             }
 

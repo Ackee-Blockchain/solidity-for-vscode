@@ -36,3 +36,5 @@ export const txParametersExpanded = writable<boolean>(true);
 export const setSelectedAccount = (accountId: number | null) => {
     selectedAccountId.set(accountId);
 };
+
+export const loadedState = writable<boolean>(false);

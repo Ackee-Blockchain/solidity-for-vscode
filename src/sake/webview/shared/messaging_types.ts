@@ -35,7 +35,8 @@ export enum WebviewMessageId {
     onGetBytecode = 'onGetBytecode',
     onrequestNewProvider = 'onrequestNewProvider',
     onRestartWakeServer = 'onRestartWakeServer',
-    onSelectChain = 'onSelectChain'
+    onSelectChain = 'onSelectChain',
+    onOpenSettings = 'onOpenSettings'
 }
 
 export type SpecificWebviewMessageResponse<T extends WebviewMessageId> = {
@@ -131,6 +132,10 @@ export type WebviewMessageRequest =
     | ({
           command: WebviewMessageId.onSelectChain;
           payload: undefined;
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.onOpenSettings;
+          payload: string;
       } & BaseWebviewMessageRequest);
 
 export type WebviewMessageResponse =

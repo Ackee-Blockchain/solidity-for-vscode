@@ -75,3 +75,7 @@ export function showTimedInfoMessage(message: string, milliseconds: number = 500
         }
     );
 }
+
+export function openSettings(settingsUrl: string) {
+    vscode.commands.executeCommand('workbench.action.openSettings', settingsUrl);
+}

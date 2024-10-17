@@ -2,7 +2,6 @@ import {
     AccountState,
     DeploymentState,
     NetworkCreationConfiguration,
-    NetworkProvider,
     TransactionHistoryState
 } from '../webview/shared/types';
 import { AppStateProvider } from '../state/AppStateProvider';
@@ -17,6 +16,8 @@ import { SakeProviderFactory } from './SakeProviderFactory';
 import { ChainStateProvider } from '../state/ChainStateProvider';
 import { StoredSakeState } from '../webview/shared/storage_types';
 import { SakeState } from './SakeState';
+import { NetworkProvider } from '../network/NetworkProvider';
+import { NetworkManager } from '../network/NetworkManager';
 
 export class SakeProviderManager {
     private static _instance: SakeProviderManager;
@@ -30,8 +31,8 @@ export class SakeProviderManager {
         this._providers = new Map();
         this._chains = ChainStateProvider.getInstance();
         this._app = AppStateProvider.getInstance();
-        this._initializeStatusBar();
         this._initializeState();
+        this._initializeStatusBar();
     }
 
     private get _context(): vscode.ExtensionContext {
@@ -43,12 +44,17 @@ export class SakeProviderManager {
     }
 
     public async pingWakeServer(): Promise<void> {
+        console.log('Pinging wake server');
         const isWakeServerRunning = await WakeApi.ping().catch((e) => {
-            console.log('Failed to connect to wake server:', e);
+            // console.log('Failed to connect to wake server:', e);
             return false;
         });
 
         this._app.setIsWakeServerRunning(isWakeServerRunning);
+
+        if (!isWakeServerRunning) {
+            NetworkManager.getInstance().disconnectLocalProviders();
+        }
     }
 
     static getInstance(): SakeProviderManager {

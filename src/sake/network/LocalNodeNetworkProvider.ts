@@ -1,16 +1,13 @@
 import { WakeApi } from '../api/wake';
-import { ChainStateProvider } from '../state/ChainStateProvider';
-import { NetworkError } from '../webview/shared/error_types';
+import { NetworkError } from '../webview/shared/errors';
 import {
     CallRequest,
     CallResponse,
     CallType,
-    CreateLocalChainRequest,
     DeploymentRequest,
     DeploymentResponse,
     NetworkConfiguration,
     NetworkId,
-    NetworkProvider,
     SetAccountBalanceRequest,
     SetAccountBalanceResponse,
     SetAccountLabelRequest
@@ -24,51 +21,14 @@ import {
     WakeGetAccountsResponse,
     WakeSetBalancesResponse
 } from '../webview/shared/wake_types';
+import { NetworkProvider } from './NetworkProvider';
 
-export class LocalNodeNetworkProvider implements NetworkProvider {
-    public type = NetworkId.LocalNode;
-
-    private constructor(public config: NetworkConfiguration) {}
-
-    static async createNewChainProvider(
-        request: CreateLocalChainRequest,
-        initialize: boolean = true
-    ): Promise<{
-        network: LocalNodeNetworkProvider;
-        initialized: boolean;
-    }> {
-        const config: NetworkConfiguration = {
-            sessionId: request.sessionId,
-            chainId: request.chainId,
-            fork: request.fork,
-            hardfork: request.hardfork,
-            minGasPrice: request.minGasPrice,
-            blockBaseFeePerGas: request.blockBaseFeePerGas,
-            type: undefined,
-            uri: undefined
-        };
-
-        const network = new LocalNodeNetworkProvider(config);
-
-        const initialized = initialize
-            ? await network
-                  .initialize(request.accounts)
-                  .then(() => {
-                      return true;
-                  })
-                  .catch((e) => {
-                      console.error('Failed to initialize chain', e);
-                      return false;
-                  })
-            : false;
-
-        return {
-            network,
-            initialized
-        };
+export class LocalNodeNetworkProvider extends NetworkProvider {
+    constructor(public config: NetworkConfiguration) {
+        super(NetworkId.LocalNode, config.sessionId);
     }
 
-    async initialize(accounts?: number): Promise<void> {
+    async createChain(accounts?: number): Promise<void> {
         const response = await WakeApi.createChain({
             sessionId: this.config.sessionId,
             accounts: accounts ?? null,
@@ -87,7 +47,11 @@ export class LocalNodeNetworkProvider implements NetworkProvider {
         this.config.uri = response.uri;
     }
 
-    async deleteChain() {
+    async onDeleteChain() {
+        if (!this.connected) {
+            return;
+        }
+
         const response = await WakeApi.disconnectChain({
             sessionId: this.config.sessionId
         });

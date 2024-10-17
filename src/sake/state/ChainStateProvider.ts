@@ -42,6 +42,20 @@ export class ChainStateProvider extends BaseStateProvider<ChainState> {
             currentChainId: chainId
         };
     }
+
+    public setChainConnectionStatus(chainId: string, connected: boolean) {
+        // check if chain exists
+        const chain = this._state.chains.find((chain) => chain.chainId === chainId);
+        if (!chain) {
+            return;
+        }
+        this.state = {
+            ...this._state,
+            chains: this._state.chains.map((chain) =>
+                chain.chainId === chainId ? { ...chain, connected } : chain
+            )
+        };
+    }
 }
 
 // TODO this needs splitting into serverstate and chainsstate, possibly also add appstate?

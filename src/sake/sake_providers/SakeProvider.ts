@@ -14,15 +14,8 @@ import {
     SetAccountLabelRequest,
     TransactionCallResult,
     TransactionDecodedReturnValue,
-    TransactionDeploymentResult,
-    NetworkProvider
+    TransactionDeploymentResult
 } from '../webview/shared/types';
-import { AccountStateProvider } from '../state/AccountStateProvider';
-import { DeploymentStateProvider } from '../state/DeploymentStateProvider';
-import { CompilationStateProvider } from '../state/CompilationStateProvider';
-import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
-import { TransactionHistoryStateProvider } from '../state/TransactionHistoryStateProvider';
-import { AppStateProvider } from '../state/AppStateProvider';
 import * as vscode from 'vscode';
 import { WakeApi } from '../api/wake';
 import { OutputViewManager } from '../providers/OutputTreeProvider';
@@ -35,19 +28,22 @@ import {
 import { decodeCallReturnValue } from '../utils/call';
 import { showTimedInfoMessage } from '../commands';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
-import { SakeContext } from '../context';
-import { ChainStateProvider } from '../state/ChainStateProvider';
-import { ProviderState, SharedState } from '../webview/shared/storage_types';
+import { SakeProviderInitializationRequest, SharedState } from '../webview/shared/storage_types';
 import { SakeState } from './SakeState';
-
-export class SakeError extends Error {}
+import { SakeError } from '../webview/shared/errors';
+import { NetworkProvider } from '../network/NetworkProvider';
 
 // TODO consider renaming to BaseSakeProvider
 export abstract class BaseSakeProvider<T extends NetworkProvider> {
     state: SakeState;
     protected output: OutputViewManager;
 
-    constructor(public id: string, public displayName: string, public network: T) {
+    constructor(
+        public id: string,
+        public displayName: string,
+        public network: T,
+        protected initializationRequest: SakeProviderInitializationRequest
+    ) {
         this.state = new SakeState();
         this.output = OutputViewManager.getInstance();
         this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
@@ -59,6 +55,16 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         );
         this.callContract = showVSCodeMessageOnErrorWrapper(this.callContract.bind(this));
         // this.transactContract = showVSCodeMessageOnErrorWrapper(this.transactContract.bind(this));
+    }
+
+    abstract connect(): Promise<void>;
+
+    set connected(value: boolean) {
+        this.network.connected = value;
+    }
+
+    get connected(): boolean {
+        return this.network.connected;
     }
 
     /* Compilation */
@@ -252,10 +258,10 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         };
     }
 
-    async loadState(providerState: ProviderState) {
-        this.state.loadProviderState(providerState.state);
-        await this.network.loadState(providerState.network.wakeDump);
-    }
+    // async loadState(providerState: ProviderState) {
+    //     // TODO
+    //     throw new Error('Method not implemented.');
+    // }
 
     /* Helper functions */
 

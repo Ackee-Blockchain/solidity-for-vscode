@@ -82,6 +82,8 @@ export interface TransactResponse extends CallResponse {}
 
 /* Network Configuration */
 
+// TODO these are all specific to LocalNodeNetworkProvider, although naming suggests general use
+
 export interface NetworkConfiguration {
     sessionId: string;
     type?: string;
@@ -106,19 +108,5 @@ export interface CreateLocalChainRequest {
 }
 
 export enum NetworkId {
-    LocalNode = 'LocalNode'
-}
-
-export interface NetworkProvider {
-    type: NetworkId;
-    registerAccount(address: string): Promise<Account | undefined>;
-    getAccountDetails(address: string): Promise<Account>;
-    setAccountBalance(request: SetAccountBalanceRequest): Promise<SetAccountBalanceResponse>;
-    deploy(params: DeploymentRequest): Promise<DeploymentResponse>;
-    call(params: CallRequest): Promise<CallResponse>;
-    onActivate(): Promise<void>;
-    onDeactivate(): Promise<void>;
-    /* Helper Functions */
-    dumpState(): Promise<NetworkState>;
-    loadState(state: any): Promise<void>; // TODO: add specific type
+    LocalNode = 'Anvil'
 }

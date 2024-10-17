@@ -11,3 +11,17 @@ export class FunctionInputParseError extends Error {
         this.name = 'FunctionInputParseError';
     }
 }
+
+export class NetworkError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'NetworkError';
+    }
+}
+
+export class SakeError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'SakeError';
+    }
+}

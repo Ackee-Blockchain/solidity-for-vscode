@@ -35,11 +35,31 @@ export const chainState = writable<ChainState>({
     currentChainId: undefined
 });
 
-export /**
+/**
  * setup stores
  */
 
-async function requestState(): Promise<boolean> {
+export async function restartWakeServer(): Promise<boolean> {
+    const timeout = new Promise<void>((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out')), REQUEST_STATE_TIMEOUT)
+    );
+
+    return await Promise.race([
+        messageHandler.request<{
+            success: boolean;
+        }>(WebviewMessageId.onRestartWakeServer, {}),
+        timeout
+    ])
+        .then((result) => {
+            return (result as { success: boolean }).success;
+        })
+        .catch((_) => {
+            console.error('Requesting state from the extension timed out');
+            return false;
+        });
+}
+
+export async function requestState(): Promise<boolean> {
     const timeout = new Promise<void>((_, reject) =>
         setTimeout(() => reject(new Error('Request timed out')), REQUEST_STATE_TIMEOUT)
     );
@@ -65,13 +85,8 @@ async function requestState(): Promise<boolean> {
         timeout
     ])
         .then((results) => {
-            console.log(
-                'results',
-                results,
-                !(results as { success: boolean }[]).every((result) => result.success)
-            );
             if (!(results as { success: boolean }[]).every((result) => result.success)) {
-                console.error('requestState failed');
+                console.error('Requesting state from the extension failed');
                 return false;
             }
             return true;
@@ -155,7 +170,7 @@ export function setupListeners() {
                     if (message.payload === undefined) {
                         return;
                     }
-                    console.log('setting app state', message.payload);
+
                     appState.set(message.payload);
                     return;
                 }

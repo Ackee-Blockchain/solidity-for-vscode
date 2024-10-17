@@ -399,10 +399,14 @@ export class WakeApi {
             appState.setIsAnvilInstalled(true);
             return validateResponse ? validate(response) : response;
         } catch (e) {
-            console.error('Error sending Wake Request', e);
+            // console.error('Error sending Wake Request', e);
+            // console.log('Error from method and params', method, params);
             const message = typeof e === 'string' ? e : (e as Error).message;
             if (message == 'Anvil executable not found') {
                 appState.setIsAnvilInstalled(false);
+            }
+            if (message == 'Client is not running') {
+                appState.setIsWakeServerRunning(false);
             }
             throw new WakeApiError(message);
         }
