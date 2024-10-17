@@ -16,7 +16,7 @@ import {
     SetAccountLabelRequest
 } from '../webview/shared/network_types';
 import { LocalNodeNetworkState, WakeChainDump } from '../webview/shared/storage_types';
-import { Account, ChainStatus } from '../webview/shared/types';
+import { Account } from '../webview/shared/types';
 import {
     WakeCallRequestParams,
     WakeDeploymentResponse,
@@ -27,11 +27,13 @@ import {
 
 export class LocalNodeNetworkProvider implements NetworkProvider {
     public type = NetworkId.LocalNode;
-    private _connected: boolean = false;
 
     private constructor(public config: NetworkConfiguration) {}
 
-    static async createNewChainProvider(request: CreateLocalChainRequest): Promise<{
+    static async createNewChainProvider(
+        request: CreateLocalChainRequest,
+        initialize: boolean = true
+    ): Promise<{
         network: LocalNodeNetworkProvider;
         initialized: boolean;
     }> {
@@ -48,26 +50,22 @@ export class LocalNodeNetworkProvider implements NetworkProvider {
 
         const network = new LocalNodeNetworkProvider(config);
 
-        const initialized = await network
-            .initialize(request.accounts)
-            .then(() => {
-                return true;
-            })
-            .catch((e) => {
-                console.error('Failed to initialize chain', e);
-                return false;
-            });
+        const initialized = initialize
+            ? await network
+                  .initialize(request.accounts)
+                  .then(() => {
+                      return true;
+                  })
+                  .catch((e) => {
+                      console.error('Failed to initialize chain', e);
+                      return false;
+                  })
+            : false;
 
         return {
             network,
             initialized
         };
-    }
-
-    static async createFromState(state: LocalNodeNetworkState): Promise<LocalNodeNetworkProvider> {
-        const { network } = await this.createNewChainProvider(state.config);
-
-        return network;
     }
 
     async initialize(accounts?: number): Promise<void> {
@@ -85,7 +83,6 @@ export class LocalNodeNetworkProvider implements NetworkProvider {
             throw new NetworkError('Failed to create new chain');
         }
 
-        this.connected = true;
         this.config.type = response.type;
         this.config.uri = response.uri;
     }
@@ -202,17 +199,6 @@ export class LocalNodeNetworkProvider implements NetworkProvider {
         return response;
     }
 
-    set connected(connected: boolean) {
-        this._connected = connected;
-        // if (!connected) {
-        //     ChainStateProvider.getInstance().setLocalNodesDisconnectedStatus();
-        // }
-    }
-
-    get connected(): boolean {
-        return this._connected;
-    }
-
     async dumpState(): Promise<LocalNodeNetworkState> {
         const response: WakeDumpStateResponse = await WakeApi.dumpState({
             sessionId: this.config.sessionId
@@ -242,7 +228,5 @@ export class LocalNodeNetworkProvider implements NetworkProvider {
         if (!response.success) {
             throw new NetworkError('Failed to load state');
         }
-
-        this.connected = true;
     }
 }
