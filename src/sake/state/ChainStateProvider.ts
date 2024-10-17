@@ -1,11 +1,4 @@
-import {
-    StateId,
-    ChainState,
-    AppState,
-    ChainInfo,
-    ChainStatus,
-    NetworkId
-} from '../webview/shared/types';
+import { StateId, ChainState, AppState, ChainInfo, NetworkId } from '../webview/shared/types';
 import { BaseStateProvider } from './BaseStateProvider';
 
 export class ChainStateProvider extends BaseStateProvider<ChainState> {
@@ -43,33 +36,10 @@ export class ChainStateProvider extends BaseStateProvider<ChainState> {
         return this._state.chains.find((chain) => chain.chainId === chainId);
     }
 
-    public setChainStatus(chainId: string, status: ChainStatus) {
-        this.state = {
-            ...this._state,
-            chains: this._state.chains.map((chain) =>
-                chain.chainId === chainId ? { ...chain, status: status } : chain
-            )
-        };
-    }
-
     public setCurrentChainId(chainId: string | undefined) {
         this.state = {
             ...this._state,
             currentChainId: chainId
-        };
-    }
-
-    public setLocalNodesDisconnectedStatus() {
-        this.state = {
-            ...this._state,
-            chains: this._state.chains.filter((chain) =>
-                chain.network === NetworkId.LocalNode
-                    ? {
-                          ...chain,
-                          status: ChainStatus.Disconnected
-                      }
-                    : chain
-            )
         };
     }
 }

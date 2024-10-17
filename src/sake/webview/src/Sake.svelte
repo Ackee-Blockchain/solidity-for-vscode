@@ -68,8 +68,10 @@
 
     onMount(async () => {
         setupListeners(); // @dev listeners have to be set up before requesting state
-        await requestState();
-        showLoading = false;
+        const success = await requestState();
+        if (!success) {
+            showLoading = false;
+        }
     });
 
     const tryWakeServerRestart = (tries: number = 0) => {
@@ -97,15 +99,15 @@
 </script>
 
 <main class="h-full my-0 overflow-hidden flex flex-col">
-    {#if !$appState.isInitialized}
-        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
-            <vscode-progress-ring />
-            <span>Setting up Deploy and Interact UI...</span>
-        </div>
-    {:else if showLoading}
+    {#if showLoading}
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
             <vscode-progress-ring />
             <span>Loading...</span>
+        </div>
+    {:else if !$appState.isInitialized}
+        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+            <vscode-progress-ring />
+            <span>Setting up Deploy and Interact UI...</span>
         </div>
     {:else if $chainState.chains.length === 0}
         <div class="flex flex-col gap-4 h-full w-full p-4">

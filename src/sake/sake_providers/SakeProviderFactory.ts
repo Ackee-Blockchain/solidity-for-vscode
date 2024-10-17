@@ -12,17 +12,6 @@ export class SakeProviderFactory {
         displayName: string,
         networkConfig?: NetworkCreationConfiguration
     ): Promise<LocalNodeSakeProvider | undefined> {
-        const chainsState = AppStateProvider.getInstance();
-
-        await WakeApi.ping()
-            .then((serverRunning) => {
-                chainsState.setIsWakeServerRunning(serverRunning);
-            })
-            .catch(() => {
-                console.error('Failed to ping wake server');
-                chainsState.setIsWakeServerRunning(false);
-            });
-
         const providerId = 'local-chain-' + this.getNewProviderId();
 
         const provider: LocalNodeSakeProvider | undefined =
@@ -50,7 +39,11 @@ export class SakeProviderFactory {
         const network = await (async () => {
             switch (state.network.type) {
                 case NetworkId.LocalNode:
-                    return await LocalNodeNetworkProvider.createFromState(state.network);
+                    const { network } = await LocalNodeNetworkProvider.createNewChainProvider(
+                        state.network.config,
+                        false
+                    );
+                    return network;
                 default:
                     return undefined;
             }
