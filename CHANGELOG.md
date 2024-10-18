@@ -3,11 +3,12 @@
 ## [1.16.7]
 ### Features
 - Added support for multiple chain sessions
-- The extension automatically saves chain state when deactivated, and restores it on VS Code activation
+- Added automatic chain state saving when extension is deactivated, and restoring it on activation
 - Refactored the extension's architecture
 - Added new error messages to the UI
 
 ### Fixes
+- Improved error handling on unexpected LSP server crashes
 - Minor fixes
 
 ## [1.16.6]
