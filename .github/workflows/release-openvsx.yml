@@ -22,9 +22,5 @@ jobs:
               run: npm run build
             - name: Install ovsx
               run: npm install -g ovsx
-            - name: Update publisher in package.json
-              run: |
-                  (Get-Content package.json) -replace '"publisher": "ackeeblockchain"', '"publisher": "AckeeBlockchainSecurity"' | Set-Content package.json
-              shell: pwsh
             - name: Publish to Open VSX Registry
               run: npx ovsx publish -p ${{ secrets.OPEN_VSIX_TOKEN }}
