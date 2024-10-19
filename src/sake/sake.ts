@@ -184,12 +184,14 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
         // TODO might need to rework using vscode.workspace.createFileSystemWatcher
     });
 
+    // TODO remove
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.test-save-state', () =>
             StorageHandler.saveExtensionState()
         )
     );
 
+    // TODO remove
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.test-load-state', () =>
             StorageHandler.loadExtensionState()

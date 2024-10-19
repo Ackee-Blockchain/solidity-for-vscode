@@ -419,6 +419,10 @@
         ],
         "commands": [
             {
+                "command": "Tools-for-Solidity.wake.restart_client",
+                "title": "Solidity: Restart Wake LSP Client"
+            },
+            {
                 "command": "Tools-for-Solidity.generate.imports_graph",
                 "title": "Solidity: Generate Imports Graph"
             },

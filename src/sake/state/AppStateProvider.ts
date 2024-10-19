@@ -1,3 +1,5 @@
+import { State } from 'vscode-languageclient';
+import { SakeContext } from '../context';
 import { StateId, AppState } from '../webview/shared/types';
 import { BaseStateProvider } from './BaseStateProvider';
 
@@ -11,6 +13,21 @@ export class AppStateProvider extends BaseStateProvider<AppState> {
             isOpenWorkspace: undefined,
             isInitialized: undefined
         });
+
+        const _client = SakeContext.getInstance().client;
+        if (!_client) {
+            throw new Error('Client not set');
+        }
+
+        _client.onDidChangeState((state) => {
+            if (state.newState === State.Running) {
+                this.setIsWakeServerRunning(true);
+                return;
+            }
+            this.setIsWakeServerRunning(false);
+        });
+
+        this.setIsWakeServerRunning(_client.state === State.Running);
     }
 
     public static getInstance(): AppStateProvider {
