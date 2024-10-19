@@ -53,6 +53,7 @@ import { Installer } from './installers/installerInterface';
 import { PipxInstaller } from './installers/pipx';
 import { PipInstaller } from './installers/pip';
 import { ManualInstaller } from './installers/manual';
+import { WakeStatusBarProvider } from './helpers/WakeStatusProvider';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ExecaChildProcess | undefined = undefined;
@@ -324,6 +325,10 @@ export async function activate(context: vscode.ExtensionContext) {
     initCoverage(outputChannel);
 
     client.start();
+
+    // Create the Wake status bar item
+    const statusBarProvider = new WakeStatusBarProvider(client);
+
     analytics.logActivate();
 
     // force show walkthrough on new release

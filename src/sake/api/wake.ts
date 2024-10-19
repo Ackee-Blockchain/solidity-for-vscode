@@ -34,8 +34,6 @@ import { validate } from '../utils/validate';
 import { AppStateProvider } from '../state/AppStateProvider';
 import { SakeContext } from '../context';
 
-const appState = AppStateProvider.getInstance();
-
 /*
  * Get accounts and balances and save to state
  *
@@ -50,7 +48,7 @@ export class WakeAnvilNotFoundError extends WakeError {}
 export class WakeApi {
     private static _instance: WakeApi;
 
-    private static get _client(): LanguageClient {
+    private static get _client(): LanguageClient | undefined {
         return SakeContext.getInstance().client;
     }
 
@@ -396,17 +394,17 @@ export class WakeApi {
         }
         try {
             const response = await WakeApi._client.sendRequest<T>(method, params);
-            appState.setIsAnvilInstalled(true);
+            AppStateProvider.getInstance().setIsAnvilInstalled(true);
             return validateResponse ? validate(response) : response;
         } catch (e) {
             // console.error('Error sending Wake Request', e);
             // console.log('Error from method and params', method, params);
             const message = typeof e === 'string' ? e : (e as Error).message;
             if (message == 'Anvil executable not found') {
-                appState.setIsAnvilInstalled(false);
+                AppStateProvider.getInstance().setIsAnvilInstalled(false);
             }
             if (message == 'Client is not running') {
-                appState.setIsWakeServerRunning(false);
+                AppStateProvider.getInstance().setIsWakeServerRunning(false);
             }
             throw new WakeApiError(message);
         }

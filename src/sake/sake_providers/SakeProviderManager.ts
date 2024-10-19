@@ -36,7 +36,11 @@ export class SakeProviderManager {
     }
 
     private get _context(): vscode.ExtensionContext {
-        return SakeContext.getInstance().context;
+        const context = SakeContext.getInstance().context;
+        if (!context) {
+            throw new Error('Context not set');
+        }
+        return context;
     }
 
     private async _initializeState() {
