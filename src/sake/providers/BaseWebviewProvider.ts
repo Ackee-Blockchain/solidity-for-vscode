@@ -22,6 +22,8 @@ import { SakeProviderManager } from '../sake_providers/SakeProviderManager';
 import { CompilationStateProvider } from '../state/CompilationStateProvider';
 import { ChainStateProvider } from '../state/ChainStateProvider';
 import { AppStateProvider } from '../state/AppStateProvider';
+import { restartWakeClient } from '../../commands';
+import { SakeContext } from '../context';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -255,7 +257,13 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.onRestartWakeServer: {
-                await this._sake.pingWakeServer();
+                const client = SakeContext.getInstance().client;
+                if (!client) {
+                    console.error('Cannot restart Wake server, no client found');
+                    return;
+                }
+
+                await restartWakeClient(client);
 
                 webviewView.webview.postMessage({
                     command: message.command,

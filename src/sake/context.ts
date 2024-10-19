@@ -17,10 +17,7 @@ export class SakeContext {
         return this._instance;
     }
 
-    get context(): vscode.ExtensionContext {
-        if (!this._context) {
-            throw new Error('Context not set');
-        }
+    get context(): vscode.ExtensionContext | undefined {
         return this._context;
     }
 
@@ -28,10 +25,7 @@ export class SakeContext {
         this._context = context;
     }
 
-    get client(): LanguageClient {
-        if (!this._client) {
-            throw new Error('Client not set');
-        }
+    get client(): LanguageClient | undefined {
         return this._client;
     }
 
@@ -39,10 +33,7 @@ export class SakeContext {
         this._client = client;
     }
 
-    get webviewProvider(): BaseWebviewProvider {
-        if (!this._webviewProvider) {
-            throw new Error('Webview provider not set');
-        }
+    get webviewProvider(): BaseWebviewProvider | undefined {
         return this._webviewProvider;
     }
 

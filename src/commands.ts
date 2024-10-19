@@ -1,8 +1,9 @@
 import { execFileSync } from 'child_process';
 import * as vscode from 'vscode';
-import { URI, Position } from 'vscode-languageclient/node';
+import { URI, Position, LanguageClient, State } from 'vscode-languageclient/node';
 import * as os from 'os';
 import { GraphvizPreviewGenerator } from './graphviz/GraphvizPreviewGenerator';
+import { SakeContext } from './sake/context';
 
 const fs = require('fs');
 
@@ -202,4 +203,15 @@ export async function newPrinter(global: boolean) {
     if (res !== undefined && res !== '') {
         await vscode.window.showTextDocument(vscode.Uri.parse('file://' + res));
     }
+}
+
+export async function restartWakeClient(client: LanguageClient) {
+    console.log('Restarting Wake client');
+    if (client.state === State.Running) {
+        console.log('Stopping Wake client');
+        await client.stop(3000);
+    }
+    console.log('Starting Wake client');
+    await client.start();
+    console.log('Started Wake client');
 }
