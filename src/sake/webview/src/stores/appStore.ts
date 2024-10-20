@@ -32,6 +32,7 @@ export const selectedValue = derived(selectedValueString, ($selectedValueString)
 export const compilationIssuesVisible = writable<boolean>(false);
 export const activeTabId = writable<number>(0);
 export const txParametersExpanded = writable<boolean>(true);
+export const chainStatusExpanded = writable<boolean>(false);
 
 export const setSelectedAccount = (accountId: number | null) => {
     selectedAccountId.set(accountId);
