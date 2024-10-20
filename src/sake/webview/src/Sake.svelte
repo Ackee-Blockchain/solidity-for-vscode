@@ -196,11 +196,9 @@
             </vscode-button>
         </div>
     {:else}
-        <div class="flex flex-col">
-            <ChainStatus />
-            <div class="flex-grow">
-                <Tabs {tabs}></Tabs>
-            </div>
+        <ChainStatus />
+        <div class="flex-grow overflow-hidden">
+            <Tabs {tabs}></Tabs>
         </div>
     {/if}
 </main>
