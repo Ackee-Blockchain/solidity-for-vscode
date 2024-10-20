@@ -28250,7 +28250,7 @@ function create_if_block_2$2(ctx) {
 			div = element("div");
 			create_component(copyablespan.$$.fragment);
 			attr_dev(div, "class", "w-full flex flex-row gap-1 items-center justify-between pb-1");
-			add_location(div, file$d, 31, 16, 1512);
+			add_location(div, file$d, 31, 16, 1511);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -28392,7 +28392,7 @@ function create_if_block_1$3(ctx) {
 			}
 
 			attr_dev(div, "class", "flex flex-col gap-1");
-			add_location(div, file$d, 45, 12, 2173);
+			add_location(div, file$d, 45, 12, 2172);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -28585,13 +28585,13 @@ function create_fragment$e(ctx) {
 			t3 = space();
 			if (if_block1) if_block1.c();
 			attr_dev(div0, "class", "w-full flex flex-row gap-1 items-center justify-between");
-			add_location(div0, file$d, 22, 12, 1008);
+			add_location(div0, file$d, 22, 12, 1007);
 			attr_dev(div1, "class", "flex-1 overflow-x-hidden rounded ps-2 bg-vscodeInputBackground flex flex-col");
-			add_location(div1, file$d, 20, 8, 836);
+			add_location(div1, file$d, 20, 8, 835);
 			attr_dev(div2, "class", "flex flex-row gap-1");
-			add_location(div2, file$d, 18, 4, 755);
+			add_location(div2, file$d, 18, 4, 754);
 			attr_dev(div3, "class", "flex flex-col gap-1");
-			add_location(div3, file$d, 17, 0, 717);
+			add_location(div3, file$d, 17, 0, 716);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -28724,7 +28724,7 @@ function instance$e($$self, $$props, $$invalidate) {
 	validate_slots('Contract', slots, []);
 	let { contract } = $$props;
 	let { onFunctionCall } = $$props;
-	let expanded = false;
+	let expanded = true;
 
 	const _onFunctionCall = (calldata, func) => {
 		onFunctionCall(calldata, contract.address, func);
