@@ -78,6 +78,7 @@ export class SakeProviderManager {
 
         this._chains.addChain({
             chainId: provider.id,
+            chainName: provider.displayName,
             network: provider.network.type
         });
 

@@ -23,7 +23,11 @@ export class SakeState {
     subscribed: boolean;
 
     private get _webviewProvider(): BaseWebviewProvider {
-        return SakeContext.getInstance().webviewProvider;
+        const _webviewProvider = SakeContext.getInstance().webviewProvider;
+        if (_webviewProvider === undefined) {
+            throw Error();
+        }
+        return _webviewProvider;
     }
 
     constructor() {

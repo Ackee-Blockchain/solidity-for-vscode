@@ -70,24 +70,24 @@ export class StorageHandler {
         }
     }
 
-    private static async saveToStorageUri(json: string) {
-        // files will be save to .solidity folder
+    // private static async saveToStorageUri(json: string) {
+    //     // files will be save to .solidity folder
 
-        if (this.context.storageUri == undefined) {
-            throw new Error('Storage URI is undefined');
-        }
+    //     if (this.context.storageUri == undefined) {
+    //         throw new Error('Storage URI is undefined');
+    //     }
 
-        // create .solidity folder if it doesn't exist
-        const solidityFolder = vscode.Uri.joinPath(this.context.storageUri, '.solidity');
-        await vscode.workspace.fs.createDirectory(solidityFolder);
+    //     // create .solidity folder if it doesn't exist
+    //     const solidityFolder = vscode.Uri.joinPath(this.context.storageUri, '.solidity');
+    //     await vscode.workspace.fs.createDirectory(solidityFolder);
 
-        // save to vscode storage
-        const file = vscode.Uri.joinPath(solidityFolder, 'chains.json');
-        await vscode.workspace.fs.writeFile(file, new TextEncoder().encode(json));
+    //     // save to vscode storage
+    //     const file = vscode.Uri.joinPath(solidityFolder, 'chains.json');
+    //     await vscode.workspace.fs.writeFile(file, new TextEncoder().encode(json));
 
-        // print where
-        console.log(`Saved state to ${file.path}`);
-    }
+    //     // print where
+    //     console.log(`Saved state to ${file.path}`);
+    // }
 
     private static async saveToWorkspaceFolder(filename: string, json: string) {
         // save to workspace folder
@@ -114,8 +114,13 @@ export class StorageHandler {
 
         const solidityFolder = vscode.Uri.joinPath(workspaceFolder, ...this.storageFolder);
         const file = vscode.Uri.joinPath(solidityFolder, filename);
-        const content = await vscode.workspace.fs.readFile(file);
-        return new TextDecoder().decode(content);
+
+        try {
+            const content = await vscode.workspace.fs.readFile(file);
+            return new TextDecoder().decode(content);
+        } catch (e) {
+            return undefined;
+        }
     }
 
     private static get context() {
