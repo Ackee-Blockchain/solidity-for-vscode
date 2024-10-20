@@ -14,7 +14,7 @@
         contractAddress: string,
         func: AbiFunctionFragment
     ) => void;
-    let expanded = false;
+    let expanded = true;
     $: filteredAbi = contract.abi.filter(
         (func: any) => func.type == 'function'
     ) as AbiFunctionFragment[];
