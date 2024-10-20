@@ -45,8 +45,12 @@
     import Interaction from './pages/Interaction.svelte';
     import Deployment from './pages/Deployment.svelte';
     import InteractionHeader from './pages/InteractionHeader.svelte';
+    import ChainStatus from './components/ChainStatus.svelte';
+    import { loadedState } from './stores/appStore';
 
-    let showLoading = true;
+    setupListeners();
+
+    let showLoading = false;
 
     enum TabId {
         CompileDeploy = 0,
@@ -69,6 +73,7 @@
 
     const showLoadingFor = (seconds: number = 5) => {
         showLoading = true;
+        const callbacks: (() => void)[] = [];
         const timeout = setTimeout(() => {
             showLoading = false;
         }, seconds);
@@ -76,15 +81,25 @@
             finish: () => {
                 clearTimeout(timeout);
                 showLoading = false;
+                callbacks.forEach((callback) => callback());
             }
         };
     };
 
-    onMount(async () => {
-        const loadingMessage = showLoadingFor(5);
-        setupListeners(); // @dev listeners have to be set up before requesting state
-        const success = await requestState();
-        loadingMessage.finish();
+    onMount(() => {
+        requestState().then((success) => {
+            if (success) {
+                loadedState.set(true);
+                return;
+            }
+            setTimeout(async () => {
+                const loading = showLoadingFor(5);
+                // @dev listeners have to be set up before requesting state
+                const success = await requestState();
+                loading.finish();
+                loadedState.set(success);
+            }, 5000);
+        });
     });
 
     const tryWakeServerRestart = async () => {
@@ -103,6 +118,10 @@
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
             <vscode-progress-ring />
             <span>Loading...</span>
+        </div>
+    {:else if $loadedState === false}
+        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+            <span>Failed to load state from the extension. Please try restarting VS Code.</span>
         </div>
     {:else if !$appState.isInitialized}
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
@@ -177,7 +196,12 @@
             </vscode-button>
         </div>
     {:else}
-        <Tabs {tabs}></Tabs>
+        <div class="flex flex-col">
+            <ChainStatus />
+            <div class="flex-grow">
+                <Tabs {tabs}></Tabs>
+            </div>
+        </div>
     {/if}
 </main>
 

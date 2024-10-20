@@ -37,11 +37,11 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     /* Initialize Sake Provider */
     const sake = SakeProviderManager.getInstance();
 
-    console.log('Checkpoint 1');
-
     // Check if there is was any state saved
     if (await StorageHandler.hasAnySavedState()) {
-        StorageHandler.loadExtensionState(false);
+        StorageHandler.loadExtensionState(false).catch((e) => {
+            console.error('Failed to load saved state', e);
+        });
     } else {
         // Start with a default local chain
         const localProvider = await SakeProviderFactory.createNewLocalProvider('Local Chain');

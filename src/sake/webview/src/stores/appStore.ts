@@ -37,4 +37,4 @@ export const setSelectedAccount = (accountId: number | null) => {
     selectedAccountId.set(accountId);
 };
 
-export const loadedState = writable<boolean>(false);
+export const loadedState = writable<boolean | undefined>(undefined);

@@ -19,6 +19,9 @@ export class ChainStateProvider extends BaseStateProvider<ChainState> {
     }
 
     public addChain(chain: ChainInfo) {
+        if (this._state.chains.find((c) => c.chainId === chain.chainId)) {
+            throw new Error('Chain already added');
+        }
         this.state = {
             ...this._state,
             chains: [...this._state.chains, chain]

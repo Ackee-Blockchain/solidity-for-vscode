@@ -37,7 +37,11 @@ export class OutputViewManager {
     }
 
     private get _context(): vscode.ExtensionContext {
-        return SakeContext.getInstance().context;
+        const _context = SakeContext.getInstance().context;
+        if (_context === undefined) {
+            throw Error();
+        }
+        return _context;
     }
 
     static getInstance() {

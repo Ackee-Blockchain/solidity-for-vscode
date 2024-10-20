@@ -192,3 +192,11 @@ export async function restartWakeServer(): Promise<boolean> {
     };
     return await messageHandler.request<boolean>(request.command, request.payload);
 }
+
+export function openChainsQuickPick() {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.onOpenChainsQuickPick,
+        payload: undefined
+    };
+    messageHandler.send(request.command, request.payload);
+}
