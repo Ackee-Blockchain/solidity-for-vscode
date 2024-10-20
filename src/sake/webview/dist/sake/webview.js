@@ -32559,10 +32559,9 @@ const file = "src/Sake.svelte";
 
 // (154:4) {:else}
 function create_else_block(ctx) {
-	let div1;
 	let chainstatus;
 	let t;
-	let div0;
+	let div;
 	let tabs_1;
 	let current;
 	chainstatus = new ChainStatus({ $$inline: true });
@@ -32574,22 +32573,18 @@ function create_else_block(ctx) {
 
 	const block = {
 		c: function create() {
-			div1 = element("div");
 			create_component(chainstatus.$$.fragment);
 			t = space();
-			div0 = element("div");
+			div = element("div");
 			create_component(tabs_1.$$.fragment);
-			attr_dev(div0, "class", "flex-grow");
-			add_location(div0, file, 156, 12, 7064);
-			attr_dev(div1, "class", "flex flex-col");
-			add_location(div1, file, 154, 8, 6996);
+			attr_dev(div, "class", "flex-grow overflow-hidden");
+			add_location(div, file, 155, 8, 7020);
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, div1, anchor);
-			mount_component(chainstatus, div1, null);
-			append_dev(div1, t);
-			append_dev(div1, div0);
-			mount_component(tabs_1, div0, null);
+			mount_component(chainstatus, target, anchor);
+			insert_dev(target, t, anchor);
+			insert_dev(target, div, anchor);
+			mount_component(tabs_1, div, null);
 			current = true;
 		},
 		p: noop,
@@ -32605,8 +32600,9 @@ function create_else_block(ctx) {
 			current = false;
 		},
 		d: function destroy(detaching) {
-			if (detaching) detach_dev(div1);
-			destroy_component(chainstatus);
+			destroy_component(chainstatus, detaching);
+			if (detaching) detach_dev(t);
+			if (detaching) detach_dev(div);
 			destroy_component(tabs_1);
 		}
 	};
