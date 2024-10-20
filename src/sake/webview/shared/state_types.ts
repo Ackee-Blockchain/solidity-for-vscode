@@ -53,7 +53,7 @@ export interface CompiledContract {
 }
 
 export interface CompilationState {
-    contracts: Array<CompiledContract>;
+    contracts: CompiledContract[];
     issues: CompilationIssue[];
     dirty: boolean;
     // TODO add isDirty
@@ -80,6 +80,7 @@ export interface ChainState {
 
 export interface ChainInfo {
     chainId: string;
+    chainName: string;
     network: string;
 }
 

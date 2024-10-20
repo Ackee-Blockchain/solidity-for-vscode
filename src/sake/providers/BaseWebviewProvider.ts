@@ -286,6 +286,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
+            case WebviewMessageId.onOpenChainsQuickPick: {
+                this._sake.showProviderSelectionQuickPick();
+                break;
+            }
+
             default: {
                 // Pass the message to the inheriting class
                 this._onDidReceiveMessage(message);

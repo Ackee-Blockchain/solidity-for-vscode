@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { writable, get, derived } from 'svelte/store';
 import {
     StateId,
     WebviewMessageId,
@@ -12,7 +12,7 @@ import {
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import { REQUEST_STATE_TIMEOUT } from '../helpers/constants';
-import { selectedAccount, setSelectedAccount } from './appStore';
+import { loadedState, selectedAccount, setSelectedAccount } from './appStore';
 
 /**
  * backend data
@@ -33,6 +33,9 @@ export const appState = writable<AppState>({
 export const chainState = writable<ChainState>({
     chains: [],
     currentChainId: undefined
+});
+export const currentChain = derived(chainState, ($chainState) => {
+    return $chainState.chains.find((chain) => chain.chainId === $chainState.currentChainId);
 });
 
 /**
@@ -86,13 +89,11 @@ export async function requestState(): Promise<boolean> {
     ])
         .then((results) => {
             if (!(results as { success: boolean }[]).every((result) => result.success)) {
-                console.error('Requesting state from the extension failed');
                 return false;
             }
             return true;
         })
         .catch((_) => {
-            console.error('Requesting state from the extension timed out');
             return false;
         });
 }
