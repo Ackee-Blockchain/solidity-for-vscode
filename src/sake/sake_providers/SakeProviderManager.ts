@@ -48,7 +48,6 @@ export class SakeProviderManager {
     }
 
     public async pingWakeServer(): Promise<void> {
-        console.log('Pinging wake server');
         const isWakeServerRunning = await WakeApi.ping().catch((e) => {
             // console.log('Failed to connect to wake server:', e);
             return false;
@@ -79,7 +78,8 @@ export class SakeProviderManager {
         this._chains.addChain({
             chainId: provider.id,
             chainName: provider.displayName,
-            network: provider.network.type
+            network: provider.network.type,
+            connected: provider.connected
         });
 
         if (this._selectedProviderId === undefined) {
@@ -327,6 +327,16 @@ export class SakeProviderManager {
         return Array.from(this._providers.values());
     }
 
+    reconnectChain(all: boolean = false) {
+        if (all) {
+            this.providers.forEach((provider) => {
+                provider.connect();
+            });
+        } else {
+            this.provider?.connect();
+        }
+    }
+
     /* State Handling */
 
     async dumpState(): Promise<StoredSakeState> {
@@ -345,30 +355,23 @@ export class SakeProviderManager {
     }
 
     async loadState(state: StoredSakeState, silent: boolean = false) {
-        console.log('Loading state', state);
         SakeState.loadSharedState(state.sharedState);
-        await Promise.all(
-            state.providerStates.map(async (providerState) => {
-                const provider = await SakeProviderFactory.createFromState(providerState).catch(
-                    (error) => {
-                        console.error('Failed to create provider from state:', error);
-                        if (!silent) {
-                            vscode.window.showErrorMessage(
-                                `Failed to create provider from state: ${
-                                    error instanceof Error ? error.message : String(error)
-                                }`
-                            );
-                        }
-                        return undefined;
-                    }
-                );
-
-                if (provider == undefined) {
-                    return;
+        for (const providerState of state.providerStates) {
+            try {
+                const provider = await SakeProviderFactory.createFromState(providerState);
+                if (provider) {
+                    this.addProvider(provider, silent);
                 }
-
-                this.addProvider(provider, silent);
-            })
-        );
+            } catch (error) {
+                console.error('Failed to create provider from state:', error);
+                if (!silent) {
+                    vscode.window.showErrorMessage(
+                        `Failed to create provider from state: ${
+                            error instanceof Error ? error.message : String(error)
+                        }`
+                    );
+                }
+            }
+        }
     }
 }

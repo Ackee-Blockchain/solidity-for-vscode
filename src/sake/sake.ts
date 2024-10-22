@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { SakeWebviewProvider } from './providers/WebviewProviders';
-import { copyToClipboard, getTextFromInputBox } from './commands';
+import { copyToClipboard, getTextFromInputBox, showErrorMessage } from './commands';
 import {
     CallRequest,
     DeploymentRequest,
@@ -39,7 +39,8 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     // Check if there is was any state saved
     if (await StorageHandler.hasAnySavedState()) {
-        StorageHandler.loadExtensionState(false).catch((e) => {
+        await StorageHandler.loadExtensionState(false).catch((e) => {
+            showErrorMessage('Something went wrong trying to load extension state');
             console.error('Failed to load saved state', e);
         });
     } else {
@@ -186,15 +187,8 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     // TODO remove
     context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.test-save-state', () =>
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.save-state', () =>
             StorageHandler.saveExtensionState()
-        )
-    );
-
-    // TODO remove
-    context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.test-load-state', () =>
-            StorageHandler.loadExtensionState()
         )
     );
 }

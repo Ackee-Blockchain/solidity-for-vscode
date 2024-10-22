@@ -423,7 +423,6 @@ class CallTraceItem extends BaseOutputItem {
 }
 
 function parseCallTrace(callTrace: WakeCallTrace) {
-    console.log('callTrace status', callTrace);
     const _parseCallTrace = (callTrace: WakeCallTrace): CallTraceItem => {
         const _string = `${callTrace.status === '✗' ? '✗' : ''}  ${buildFunctionString(callTrace)}`;
         const root = new CallTraceItem(_string);

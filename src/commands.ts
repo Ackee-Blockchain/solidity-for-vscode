@@ -208,10 +208,7 @@ export async function newPrinter(global: boolean) {
 export async function restartWakeClient(client: LanguageClient) {
     console.log('Restarting Wake client');
     if (client.state === State.Running) {
-        console.log('Stopping Wake client');
         await client.stop(3000);
     }
-    console.log('Starting Wake client');
     await client.start();
-    console.log('Started Wake client');
 }
