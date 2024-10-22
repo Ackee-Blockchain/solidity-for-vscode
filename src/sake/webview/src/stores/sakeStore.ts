@@ -67,33 +67,40 @@ export async function requestState(): Promise<boolean> {
         setTimeout(() => reject(new Error('Request timed out')), REQUEST_STATE_TIMEOUT)
     );
 
+    const wrapper = async (stateId: StateId) => {
+        const result = await messageHandler.request<{
+            success: boolean;
+        }>(WebviewMessageId.requestState, stateId);
+        return { ...result, stateId };
+    };
+
     return await Promise.race([
         Promise.all([
-            messageHandler.request<{
-                success: boolean;
-            }>(WebviewMessageId.requestState, StateId.Accounts),
-            messageHandler.request<{
-                success: boolean;
-            }>(WebviewMessageId.requestState, StateId.DeployedContracts),
-            messageHandler.request<{
-                success: boolean;
-            }>(WebviewMessageId.requestState, StateId.CompiledContracts),
-            messageHandler.request<{
-                success: boolean;
-            }>(WebviewMessageId.requestState, StateId.Chain),
-            messageHandler.request<{
-                success: boolean;
-            }>(WebviewMessageId.requestState, StateId.App)
+            wrapper(StateId.Accounts),
+            wrapper(StateId.DeployedContracts),
+            wrapper(StateId.CompiledContracts),
+            wrapper(StateId.Chain),
+            wrapper(StateId.App)
         ]),
         timeout
     ])
         .then((results) => {
-            if (!(results as { success: boolean }[]).every((result) => result.success)) {
+            if (
+                !(results as { success: boolean; stateId: StateId }[]).every(
+                    (result) => result.success
+                )
+            ) {
+                for (const result of results as { success: boolean; stateId: StateId }[]) {
+                    if (!result.success) {
+                        console.error('Failed to load state', result.stateId);
+                    }
+                }
                 return false;
             }
             return true;
         })
         .catch((_) => {
+            console.error('Requesting state from the extension timed out');
             return false;
         });
 }
@@ -102,7 +109,7 @@ export function setupListeners() {
     window.addEventListener('message', (event) => {
         const message = event.data as WebviewMessageResponse;
 
-        console.log('received message', message);
+        // console.log('received message', message);
 
         switch (message.command) {
             case WebviewMessageId.getState: {

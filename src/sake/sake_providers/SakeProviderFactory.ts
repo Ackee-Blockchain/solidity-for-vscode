@@ -63,7 +63,6 @@ export class SakeProviderFactory {
 
     // TODO: generalize to support other network providers
     static async createFromState(state: ProviderState): Promise<LocalNodeSakeProvider> {
-        console.log('Creating provider from state', state);
         switch (state.network.type) {
             case NetworkId.LocalNode:
                 return await this._newLocalProvider(

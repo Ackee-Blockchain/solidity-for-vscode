@@ -113,12 +113,10 @@ export function setLabel(address: Address, label: string) {
 }
 
 export async function requestLabel(address: Address) {
-    console.log('requestLabel', address);
     const label = await getInputFromTopBar('', 'New Label');
     if (!label || label.value === undefined) {
         return;
     }
-    console.log('requestLabel label', label);
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.onSetLabel,
         payload: {
@@ -190,6 +188,7 @@ export async function restartWakeServer(): Promise<boolean> {
         command: WebviewMessageId.onRestartWakeServer,
         payload: undefined
     };
+    // TODO this can be send, does not neet to be a request
     return await messageHandler.request<boolean>(request.command, request.payload);
 }
 
@@ -197,6 +196,16 @@ export function openChainsQuickPick() {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.onOpenChainsQuickPick,
         payload: undefined
+    };
+    messageHandler.send(request.command, request.payload);
+}
+
+export function reconnectChain(all: boolean = false) {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.onReconnectChain,
+        payload: {
+            all
+        }
     };
     messageHandler.send(request.command, request.payload);
 }

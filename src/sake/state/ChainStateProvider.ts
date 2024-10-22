@@ -59,6 +59,11 @@ export class ChainStateProvider extends BaseStateProvider<ChainState> {
             )
         };
     }
+
+    public set state(_state: ChainState) {
+        this._state = _state;
+        this._sendUpdateMessage();
+    }
 }
 
 // TODO this needs splitting into serverstate and chainsstate, possibly also add appstate?

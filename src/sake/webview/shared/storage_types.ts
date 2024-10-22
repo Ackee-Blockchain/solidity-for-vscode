@@ -29,7 +29,7 @@ export interface ProviderState {
 }
 
 export interface SharedState {
-    chains: ChainState;
+    // chains: ChainState;
     // @hotfix: compilation state is not loaded until wake is able to save it in state dump
     // compilation: CompilationState;
 }
