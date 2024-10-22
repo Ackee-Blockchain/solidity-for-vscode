@@ -7,7 +7,8 @@ import {
     getTextFromInputBox,
     navigateTo,
     openExternal,
-    openSettings
+    openSettings,
+    showErrorMessage
 } from '../commands';
 import {
     StateId,
@@ -288,6 +289,15 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
             case WebviewMessageId.onOpenChainsQuickPick: {
                 this._sake.showProviderSelectionQuickPick();
+                break;
+            }
+
+            case WebviewMessageId.onReconnectChain: {
+                try {
+                    this._sake.provider?.connect();
+                } catch (error) {
+                    showErrorMessage(error as string);
+                }
                 break;
             }
 

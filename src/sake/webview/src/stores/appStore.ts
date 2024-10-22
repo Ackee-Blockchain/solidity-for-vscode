@@ -1,7 +1,7 @@
-import { writable, get, derived } from 'svelte/store';
+import { writable, get, derived, readable } from 'svelte/store';
 import type { AccountState, ExtendedAccount } from '../../shared/types';
 import { parseComplexNumber } from '../../shared/validate';
-import { accounts } from './sakeStore';
+import { accounts, appState } from './sakeStore';
 
 /**
  * App Stores
@@ -38,3 +38,20 @@ export const setSelectedAccount = (accountId: number | null) => {
 };
 
 export const loadedState = writable<boolean | undefined>(undefined);
+
+export const extensionInitialized = (() => {
+    const { subscribe, set } = writable<boolean | undefined>(undefined);
+
+    return {
+        subscribe,
+        update: () => {
+            const currentState = get({ subscribe });
+            const currentAppState = get(appState);
+
+            if (currentState === undefined && currentAppState.isInitialized) {
+                loadedState.set(true);
+                set(true);
+            }
+        }
+    };
+})();

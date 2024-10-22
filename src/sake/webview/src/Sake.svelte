@@ -16,7 +16,13 @@
     } from '@vscode/webview-ui-toolkit';
     import { onMount } from 'svelte';
     import Tabs from './components/common/Tabs.svelte';
-    import { requestState, setupListeners, appState, chainState } from './stores/sakeStore';
+    import {
+        requestState,
+        setupListeners,
+        appState,
+        chainState,
+        currentChain
+    } from './stores/sakeStore';
     import { RESTART_WAKE_SERVER_TIMEOUT } from './helpers/constants';
 
     provideVSCodeDesignSystem().register(
@@ -37,16 +43,18 @@
     import {
         openExternal,
         openSettings,
+        reconnectChain,
         requestNewProvider,
         restartWakeServer,
-        selectChain
+        selectChain,
+        showErrorMessage
     } from './helpers/api';
     import type { ComponentType } from 'svelte';
     import Interaction from './pages/Interaction.svelte';
     import Deployment from './pages/Deployment.svelte';
     import InteractionHeader from './pages/InteractionHeader.svelte';
     import ChainStatus from './components/ChainStatus.svelte';
-    import { loadedState } from './stores/appStore';
+    import { extensionInitialized, loadedState } from './stores/appStore';
 
     setupListeners();
 
@@ -86,7 +94,7 @@
         };
     };
 
-    onMount(() => {
+    const loadState = async () => {
         requestState().then((success) => {
             if (success) {
                 loadedState.set(true);
@@ -100,11 +108,25 @@
                 loadedState.set(success);
             }, 5000);
         });
+    };
+
+    onMount(() => {
+        extensionInitialized.subscribe((initialized) => {
+            if (initialized) {
+                loadState();
+            }
+        });
     });
 
     const tryWakeServerRestart = async () => {
-        const loadingMessage = showLoadingFor(5);
-        const success = await restartWakeServer();
+        const loadingMessage = showLoadingFor(10);
+        try {
+            await restartWakeServer();
+            await reconnectChain(true);
+            await loadState();
+        } catch (error) {
+            showErrorMessage('Failed to restart Wake server');
+        }
         loadingMessage.finish();
     };
 
@@ -182,7 +204,7 @@
                 Restart Connection
             </vscode-button>
         </div>
-    {:else if !$appState.isAnvilInstalled}
+    {:else if $appState.isAnvilInstalled === false}
         <div class="flex flex-col gap-4 h-full w-full p-4">
             <h3 class="uppercase font-bold text-base">Anvil is not installed</h3>
             <span
@@ -198,7 +220,17 @@
     {:else}
         <ChainStatus />
         <div class="flex-grow overflow-hidden">
-            <Tabs {tabs}></Tabs>
+            {#if $currentChain?.connected}
+                <Tabs {tabs}></Tabs>
+            {:else}
+                <div class="flex flex-col gap-4 h-full w-full p-4">
+                    <h3 class="uppercase text-base">Chain is not connected to network</h3>
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <vscode-button appearance="primary" on:click={reconnectChain}>
+                        Try to reconnect
+                    </vscode-button>
+                </div>
+            {/if}
         </div>
     {/if}
 </main>

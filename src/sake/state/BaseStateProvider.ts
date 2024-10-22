@@ -38,7 +38,7 @@ export abstract class BaseStateProvider<T> {
         this._sendUpdateMessage();
     }
 
-    private _sendUpdateMessage() {
+    protected _sendUpdateMessage() {
         // console.log('sending update message', this._stateId, this._state);
         // console.log('subscriptions', this.subscriptions);
         this.subscriptions.forEach((provider) => {

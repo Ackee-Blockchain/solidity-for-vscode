@@ -106,13 +106,10 @@ export class WakeApi {
         requestParams: WakeDisconnectChainRequestParams
     ): Promise<WakeDisconnectChainResponse> {
         try {
-            console.log('disconnectChain', requestParams);
             const result = await this.sendWakeRequest<WakeDisconnectChainResponse>(
                 'wake/sake/disconnectChain',
                 requestParams
             );
-
-            console.log('disconnectChain result', result);
 
             if (result == null) {
                 throw new Error('No result returned');
@@ -301,8 +298,6 @@ export class WakeApi {
             if (result == null) {
                 throw new Error('No result returned');
             }
-
-            console.log('call result', result);
 
             return result;
         } catch (e) {
