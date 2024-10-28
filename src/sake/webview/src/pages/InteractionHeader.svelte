@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { deployedContracts } from '../stores/sakeStore';
+    import { deployedContracts } from '../helpers/stores';
 </script>
 
 <span>Interact</span>

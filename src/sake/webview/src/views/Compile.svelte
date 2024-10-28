@@ -4,8 +4,8 @@
     import WarningIcon from '../components/icons/WarningIcon.svelte';
     import TextContainer from '../components/TextContainer.svelte';
     import { compileContracts } from '../helpers/api';
-    import { compilationIssuesVisible } from '../stores/appStore';
-    import { compilationState } from '../stores/sakeStore';
+    import { compilationIssuesVisible } from '../helpers/stores';
+    import { compilationState } from '../helpers/stores';
 
     let compiling = false;
 

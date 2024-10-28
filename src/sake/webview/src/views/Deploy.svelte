@@ -1,8 +1,8 @@
 <script lang="ts">
     import { type CompiledContract } from '../../shared/types';
     import Constructor from '../components/Constructor.svelte';
-    import { compilationState } from '../stores/sakeStore';
-    import { selectedAccount, selectedValue } from '../stores/appStore';
+    import { compilationState } from '../helpers/stores';
+    import { selectedAccount, selectedValue } from '../helpers/stores';
     import { deployContract, showErrorMessage } from '../helpers/api';
     import TextContainerDark from '../components/TextContainerDark.svelte';
 

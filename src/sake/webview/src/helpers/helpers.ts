@@ -1,4 +1,4 @@
-import { loadingMessage, loadingShown } from '../stores/appStore';
+import { loadingMessage, loadingShown } from '../helpers/stores';
 
 export const withTimeout = async (request: Promise<any>, seconds: number = 5) => {
     const timeout = new Promise((_, reject) => {

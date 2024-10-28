@@ -11,7 +11,7 @@ import {
     type DeployedContract,
     type GetBytecodeResponse
 } from '../../shared/types';
-import { deployedContracts } from '../stores/sakeStore';
+import { deployedContracts } from './stores';
 
 export function ping(): Promise<boolean> {
     const request: WebviewMessageRequest = {
@@ -31,7 +31,7 @@ export function copyToClipboard(stringToCopy: string) {
 
 export function setBalance(address: string, balance: number) {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onSetBalance,
+        command: WebviewMessageId.setBalance,
         payload: {
             address,
             balance
@@ -43,7 +43,7 @@ export function setBalance(address: string, balance: number) {
 
 export function functionCall(payload: CallRequest) {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onContractFunctionCall,
+        command: WebviewMessageId.contractFunctionCall,
         payload: payload
     };
 
@@ -57,7 +57,7 @@ export function deployContract(
     value: number = 0
 ) {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onDeploy,
+        command: WebviewMessageId.deploy,
         payload: {
             contractFqn,
             sender,
@@ -70,11 +70,11 @@ export function deployContract(
 }
 
 export function showErrorMessage(message: string) {
-    messageHandler.send(WebviewMessageId.onError, message);
+    messageHandler.send(WebviewMessageId.showError, message);
 }
 
 export function showInfoMessage(message: string) {
-    messageHandler.send(WebviewMessageId.onInfo, message);
+    messageHandler.send(WebviewMessageId.showInfo, message);
 }
 
 export async function getInputFromTopBar(
@@ -95,7 +95,7 @@ export async function getInputFromTopBar(
 
 export async function compileContracts() {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onCompile,
+        command: WebviewMessageId.compile,
         payload: undefined
     };
     await messageHandler.request(request.command, request.payload);
@@ -103,7 +103,7 @@ export async function compileContracts() {
 
 export async function removeDeployedContract(address: Address) {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onUndeployContract,
+        command: WebviewMessageId.undeployContract,
         payload: address
     };
     messageHandler.send(request.command, request.payload);
@@ -111,7 +111,7 @@ export async function removeDeployedContract(address: Address) {
 
 export function setLabel(address: Address, label: string) {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onSetLabel,
+        command: WebviewMessageId.setLabel,
         payload: {
             address,
             label
@@ -126,7 +126,7 @@ export async function requestLabel(address: Address) {
         return;
     }
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onSetLabel,
+        command: WebviewMessageId.setLabel,
         payload: {
             address,
             label: label.value
@@ -141,7 +141,7 @@ export async function navigateTo(
     endOffset: number | undefined
 ) {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onNavigate,
+        command: WebviewMessageId.navigate,
         payload: { path, startOffset, endOffset }
     };
     messageHandler.send(request.command, request.payload);
@@ -149,7 +149,7 @@ export async function navigateTo(
 
 export async function openExternal(url: string) {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onOpenExternal,
+        command: WebviewMessageId.openExternal,
         payload: {
             path: url
         }
@@ -159,7 +159,7 @@ export async function openExternal(url: string) {
 
 export async function openSettings(settingsUrl: string) {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onOpenSettings,
+        command: WebviewMessageId.openSettings,
         payload: settingsUrl
     };
     messageHandler.send(request.command, request.payload);
@@ -167,7 +167,7 @@ export async function openSettings(settingsUrl: string) {
 
 export async function getBytecode(contractFqn: string): Promise<GetBytecodeResponse> {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onGetBytecode,
+        command: WebviewMessageId.getBytecode,
         payload: {
             contractFqn
         }
@@ -177,7 +177,7 @@ export async function getBytecode(contractFqn: string): Promise<GetBytecodeRespo
 
 export async function requestNewProvider() {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onRequestNewProvider,
+        command: WebviewMessageId.requestNewProvider,
         payload: undefined
     };
     messageHandler.send(request.command, request.payload);
@@ -185,7 +185,7 @@ export async function requestNewProvider() {
 
 export async function selectChain(chainId: string) {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onSelectChain,
+        command: WebviewMessageId.selectChain,
         payload: undefined
     };
     messageHandler.send(request.command, request.payload);
@@ -193,7 +193,7 @@ export async function selectChain(chainId: string) {
 
 export async function restartWakeServer(): Promise<boolean> {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onRestartWakeServer,
+        command: WebviewMessageId.restartWakeServer,
         payload: undefined
     };
     // TODO this can be send, does not neet to be a request
@@ -202,7 +202,7 @@ export async function restartWakeServer(): Promise<boolean> {
 
 export function openChainsQuickPick() {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onOpenChainsQuickPick,
+        command: WebviewMessageId.openChainsQuickPick,
         payload: undefined
     };
     messageHandler.send(request.command, request.payload);
@@ -210,7 +210,7 @@ export function openChainsQuickPick() {
 
 export async function reconnectChain(): Promise<boolean> {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onReconnectChain,
+        command: WebviewMessageId.reconnectChain,
         payload: undefined
     };
     return await messageHandler.request<boolean>(request.command, request.payload);

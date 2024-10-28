@@ -10,7 +10,7 @@
         selectedAccountId,
         selectedValue,
         txParametersExpanded
-    } from '../stores/appStore';
+    } from '../helpers/stores';
     import ChevronDown from '../components/icons/ChevronDown.svelte';
     import ChevronRight from '../components/icons/ChevronRight.svelte';
     import { displayEtherValue } from '../../shared/ether';

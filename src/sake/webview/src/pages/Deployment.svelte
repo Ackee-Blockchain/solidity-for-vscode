@@ -6,7 +6,7 @@
         selectedAccountId,
         selectedValue,
         txParametersExpanded
-    } from '../stores/appStore';
+    } from '../helpers/stores';
     import Compile from '../views/Compile.svelte';
     import BlankIcon from '../components/icons/BlankIcon.svelte';
     import Deploy from '../views/Deploy.svelte';

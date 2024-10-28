@@ -4,7 +4,7 @@
     import { displayEtherValue } from '../../shared/ether';
     import InputIssueIndicator from '../components/InputIssueIndicator.svelte';
 
-    import { accounts } from '../stores/sakeStore';
+    import { accounts } from '../helpers/stores';
     import {
         selectedAccount,
         selectedAccountId,
@@ -12,7 +12,7 @@
         selectedValueString,
         setSelectedAccount,
         txParametersExpanded
-    } from '../stores/appStore';
+    } from '../helpers/stores';
     import { getInputFromTopBar, setBalance, showErrorMessage } from '../helpers/api';
     import CopyableSpan from '../components/CopyableSpan.svelte';
     import WarningIcon from '../components/icons/WarningIcon.svelte';

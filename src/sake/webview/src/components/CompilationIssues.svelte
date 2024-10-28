@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { compilationState } from '../stores/sakeStore';
+    import { compilationState } from '../helpers/stores';
     import CompilationError from './CompilationError.svelte';
 </script>
 

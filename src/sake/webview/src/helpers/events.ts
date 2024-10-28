@@ -1,67 +1,22 @@
-import { writable, get, derived } from 'svelte/store';
-import {
-    StateId,
-    WebviewMessageId,
-    type AccountState,
-    type AppState,
-    type ChainState,
-    type CompilationState,
-    type DeploymentState,
-    type WebviewMessageRequest,
-    type WebviewMessageResponse
-} from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
-import { REQUEST_STATE_TIMEOUT } from '../helpers/constants';
-import { selectedAccount, setSelectedAccount } from './appStore';
-
-/**
- * backend data
- */
-
-export const accounts = writable<AccountState>([]);
-export const deployedContracts = writable<DeploymentState>([]);
-export const compilationState = writable<CompilationState>({
-    contracts: [],
-    issues: [],
-    dirty: true
-});
-export const appState = writable<AppState>({
-    isAnvilInstalled: undefined,
-    isWakeServerRunning: undefined,
-    isOpenWorkspace: undefined,
-    initializationState: undefined
-});
-export const chainState = writable<ChainState>({
-    chains: [],
-    currentChainId: undefined
-});
-export const currentChain = derived(chainState, ($chainState) => {
-    return $chainState.chains.find((chain) => chain.chainId === $chainState.currentChainId);
-});
-
-/**
- * setup stores
- */
-
-export async function restartWakeServer(): Promise<boolean> {
-    const timeout = new Promise<void>((_, reject) =>
-        setTimeout(() => reject(new Error('Request timed out')), REQUEST_STATE_TIMEOUT)
-    );
-
-    return await Promise.race([
-        messageHandler.request<{
-            success: boolean;
-        }>(WebviewMessageId.onRestartWakeServer, {}),
-        timeout
-    ])
-        .then((result) => {
-            return (result as { success: boolean }).success;
-        })
-        .catch((_) => {
-            console.error('Requesting state from the extension timed out');
-            return false;
-        });
-}
+import { withTimeout } from './helpers';
+import {
+    SignalType,
+    WebviewMessageId,
+    type WebviewMessageResponse
+} from '../../shared/messaging_types';
+import { RESTART_WAKE_SERVER_TIMEOUT } from './constants';
+import {
+    accounts,
+    appState,
+    chainState,
+    compilationState,
+    deployedContracts,
+    selectedAccount,
+    setSelectedAccount
+} from './stores';
+import { StateId, type AccountState } from '../../shared/state_types';
+import { get } from 'svelte/store';
 
 export function requestAppState(): Promise<boolean> {
     return requestState([StateId.App]);
@@ -112,7 +67,20 @@ export function setupListeners() {
         // console.log('received message', message);
 
         switch (message.command) {
-            case WebviewMessageId.getState: {
+            case WebviewMessageId.onSignal: {
+                if (message.payload === undefined) {
+                    return;
+                }
+
+                const { signal } = message.payload;
+
+                if (signal === SignalType.showAdvancedLocalChainSetup) {
+                    // showAdvancedLocalChainSetup();
+                }
+                break;
+            }
+
+            case WebviewMessageId.onGetState: {
                 if (message.stateId === StateId.DeployedContracts) {
                     if (message.payload === undefined) {
                         return;
@@ -146,7 +114,8 @@ export function setupListeners() {
                         _selectedAccount === null ||
                         (_selectedAccount !== null &&
                             !_accounts.some(
-                                (account) => account.address === _selectedAccount.address
+                                (account: { address: any }) =>
+                                    account.address === _selectedAccount.address
                             ))
                     ) {
                         setSelectedAccount(0);
@@ -158,7 +127,8 @@ export function setupListeners() {
                     if (_selectedAccount !== null) {
                         setSelectedAccount(
                             _accounts.findIndex(
-                                (account) => account.address === _selectedAccount.address
+                                (account: { address: any }) =>
+                                    account.address === _selectedAccount.address
                             ) ?? null
                         );
                     }
@@ -188,4 +158,20 @@ export function setupListeners() {
             }
         }
     });
+}
+
+export async function restartWakeServer(): Promise<boolean> {
+    return withTimeout(
+        messageHandler.request<{
+            success: boolean;
+        }>(WebviewMessageId.restartWakeServer, {}),
+        RESTART_WAKE_SERVER_TIMEOUT
+    )
+        .then((result) => {
+            return (result as { success: boolean }).success;
+        })
+        .catch((_) => {
+            console.error('Requesting state from the extension timed out');
+            return false;
+        });
 }

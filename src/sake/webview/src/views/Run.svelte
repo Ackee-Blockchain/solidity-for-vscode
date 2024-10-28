@@ -1,7 +1,7 @@
 <script lang="ts">
     import Contract from '../components/Contract.svelte';
-    import { deployedContracts } from '../stores/sakeStore';
-    import { selectedAccount, selectedValue } from '../stores/appStore';
+    import { deployedContracts } from '../helpers/stores';
+    import { selectedAccount, selectedValue } from '../helpers/stores';
     import { functionCall, showErrorMessage } from '../helpers/api';
     import type { AbiFunctionFragment, CallRequest } from '../../shared/types';
 
