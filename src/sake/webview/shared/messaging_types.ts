@@ -33,12 +33,13 @@ export enum WebviewMessageId {
     onOpenExternal = 'onOpenExternal',
     onOpenDeploymentInBrowser = 'onOpenDeploymentInBrowser',
     onGetBytecode = 'onGetBytecode',
-    onrequestNewProvider = 'onrequestNewProvider',
+    onRequestNewProvider = 'onRequestNewProvider',
     onRestartWakeServer = 'onRestartWakeServer',
     onSelectChain = 'onSelectChain',
     onOpenSettings = 'onOpenSettings',
     onOpenChainsQuickPick = 'onOpenChainsQuickPick',
-    onReconnectChain = 'onReconnectChain'
+    onReconnectChain = 'onReconnectChain',
+    ping = 'ping'
 }
 
 export type SpecificWebviewMessageResponse<T extends WebviewMessageId> = {
@@ -124,7 +125,7 @@ export type WebviewMessageRequest =
           payload: GetBytecodeRequest;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onrequestNewProvider;
+          command: WebviewMessageId.onRequestNewProvider;
           payload: undefined;
       } & BaseWebviewMessageRequest)
     | ({
@@ -144,10 +145,12 @@ export type WebviewMessageRequest =
           payload: undefined;
       } & BaseWebviewMessageRequest)
     | ({
+          command: WebviewMessageId.ping;
+          payload: undefined;
+      } & BaseWebviewMessageRequest)
+    | ({
           command: WebviewMessageId.onReconnectChain;
-          payload: {
-              all: boolean;
-          };
+          payload: undefined;
       } & BaseWebviewMessageRequest);
 
 export type WebviewMessageResponse =
@@ -182,6 +185,18 @@ export type WebviewMessageResponse =
       } & BaseWebviewMessageResponse)
     | ({
           command: WebviewMessageId.onCompile;
+          payload: {
+              success: boolean;
+          };
+      } & BaseWebviewMessageResponse)
+    | ({
+          command: WebviewMessageId.ping;
+          payload: {
+              success: boolean;
+          };
+      } & BaseWebviewMessageResponse)
+    | ({
+          command: WebviewMessageId.onReconnectChain;
           payload: {
               success: boolean;
           };

@@ -1,7 +1,7 @@
 import { Account, AccountState, Address, ExtendedAccount, StateId } from '../webview/shared/types';
-import { BaseStateProvider } from './BaseStateProvider';
+import BaseStateProvider from './BaseStateProvider';
 
-export class AccountStateProvider extends BaseStateProvider<AccountState> {
+export default class AccountStateProvider extends BaseStateProvider<AccountState> {
     constructor() {
         super(StateId.Accounts, []);
     }

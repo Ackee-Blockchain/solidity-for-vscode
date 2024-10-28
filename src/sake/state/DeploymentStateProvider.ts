@@ -1,7 +1,7 @@
 import { Address, DeployedContract, DeploymentState, StateId } from '../webview/shared/types';
-import { BaseStateProvider } from './BaseStateProvider';
+import BaseStateProvider from './BaseStateProvider';
 
-export class DeploymentStateProvider extends BaseStateProvider<DeploymentState> {
+export default class DeploymentStateProvider extends BaseStateProvider<DeploymentState> {
     constructor() {
         super(StateId.DeployedContracts, []);
     }

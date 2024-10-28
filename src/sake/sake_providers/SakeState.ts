@@ -1,11 +1,11 @@
-import { AccountStateProvider } from '../state/AccountStateProvider';
-import { DeploymentStateProvider } from '../state/DeploymentStateProvider';
-import { CompilationStateProvider } from '../state/CompilationStateProvider';
+import AccountStateProvider from '../state/AccountStateProvider';
+import DeploymentStateProvider from '../state/DeploymentStateProvider';
+import CompilationStateProvider from '../state/CompilationStateProvider';
 import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
-import { TransactionHistoryStateProvider } from '../state/TransactionHistoryStateProvider';
-import { AppStateProvider } from '../state/AppStateProvider';
+import TransactionHistoryStateProvider from '../state/TransactionHistoryStateProvider';
+import AppStateProvider from '../state/AppStateProvider';
 import { SakeContext } from '../context';
-import { ChainStateProvider } from '../state/ChainStateProvider';
+import ChainStateProvider from '../state/ChainStateProvider';
 import { ProviderState, SharedState } from '../webview/shared/storage_types';
 import {
     AccountState,
@@ -13,7 +13,7 @@ import {
     TransactionHistoryState
 } from '../webview/shared/state_types';
 
-export class SakeState {
+export default class SakeState {
     accounts: AccountStateProvider;
     deployment: DeploymentStateProvider;
     compilation: CompilationStateProvider;

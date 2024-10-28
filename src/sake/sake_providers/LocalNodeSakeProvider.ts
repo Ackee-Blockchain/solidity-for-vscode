@@ -2,7 +2,7 @@ import { SetAccountLabelRequest } from '../webview/shared/types';
 import * as vscode from 'vscode';
 import { BaseSakeProvider } from './SakeProvider';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
-import { SakeProviderManager } from './SakeProviderManager';
+import SakeProviderManager from './SakeProviderManager';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
 import {
     SakeLocalNodeProviderInitializationRequest,

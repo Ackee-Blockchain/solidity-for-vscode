@@ -13,6 +13,14 @@ import {
 } from '../../shared/types';
 import { deployedContracts } from '../stores/sakeStore';
 
+export function ping(): Promise<boolean> {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.ping,
+        payload: undefined
+    };
+    return messageHandler.request<boolean>(request.command, request.payload);
+}
+
 export function copyToClipboard(stringToCopy: string) {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.copyToClipboard,
@@ -169,7 +177,7 @@ export async function getBytecode(contractFqn: string): Promise<GetBytecodeRespo
 
 export async function requestNewProvider() {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.onrequestNewProvider,
+        command: WebviewMessageId.onRequestNewProvider,
         payload: undefined
     };
     messageHandler.send(request.command, request.payload);
@@ -200,12 +208,10 @@ export function openChainsQuickPick() {
     messageHandler.send(request.command, request.payload);
 }
 
-export function reconnectChain(all: boolean = false) {
+export async function reconnectChain(): Promise<boolean> {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.onReconnectChain,
-        payload: {
-            all
-        }
+        payload: undefined
     };
-    messageHandler.send(request.command, request.payload);
+    return await messageHandler.request<boolean>(request.command, request.payload);
 }

@@ -1,7 +1,7 @@
 import { StateId, ChainState, AppState, ChainInfo, NetworkId } from '../webview/shared/types';
-import { BaseStateProvider } from './BaseStateProvider';
+import BaseStateProvider from './BaseStateProvider';
 
-export class ChainStateProvider extends BaseStateProvider<ChainState> {
+export default class ChainStateProvider extends BaseStateProvider<ChainState> {
     private static _instance: ChainStateProvider;
 
     private constructor() {

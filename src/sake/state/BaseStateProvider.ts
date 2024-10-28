@@ -2,11 +2,14 @@ import * as vscode from 'vscode';
 import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
 import { StateId, WebviewMessageId } from '../webview/shared/types';
 
-export abstract class BaseStateProvider<T> {
+export default abstract class BaseStateProvider<T> {
     subscriptions: BaseWebviewProvider[] = [];
     _state: T;
 
-    protected constructor(private readonly _stateId: StateId, initialState: T) {
+    protected constructor(
+        private readonly _stateId: StateId,
+        initialState: T
+    ) {
         this._state = initialState;
     }
 

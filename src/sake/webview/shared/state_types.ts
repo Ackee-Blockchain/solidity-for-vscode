@@ -65,7 +65,7 @@ export interface AppState {
     isAnvilInstalled?: boolean;
     isWakeServerRunning?: boolean;
     isOpenWorkspace: 'open' | 'closed' | 'tooManyWorkspaces' | undefined;
-    isInitialized?: boolean;
+    initializationState: 'initializing' | 'loadingChains' | 'ready' | undefined;
 }
 
 export enum NetworkType {

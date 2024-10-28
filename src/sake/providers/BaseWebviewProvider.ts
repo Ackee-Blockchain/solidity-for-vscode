@@ -18,11 +18,11 @@ import {
     WebviewMessageRequest,
     WebviewMessageResponse
 } from '../webview/shared/types';
-import { BaseStateProvider } from '../state/BaseStateProvider';
-import { SakeProviderManager } from '../sake_providers/SakeProviderManager';
-import { CompilationStateProvider } from '../state/CompilationStateProvider';
-import { ChainStateProvider } from '../state/ChainStateProvider';
-import { AppStateProvider } from '../state/AppStateProvider';
+import BaseStateProvider from '../state/BaseStateProvider';
+import SakeProviderManager from '../sake_providers/SakeProviderManager';
+import CompilationStateProvider from '../state/CompilationStateProvider';
+import ChainStateProvider from '../state/ChainStateProvider';
+import AppStateProvider from '../state/AppStateProvider';
 import { restartWakeClient } from '../../commands';
 import { SakeContext } from '../context';
 
@@ -32,7 +32,10 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
     _stateSubscriptions: Map<StateId, BaseStateProvider<any>> = new Map();
     _sake: SakeProviderManager;
 
-    constructor(private readonly _extensionUri: vscode.Uri, private readonly _targetPath: string) {
+    constructor(
+        private readonly _extensionUri: vscode.Uri,
+        private readonly _targetPath: string
+    ) {
         this._sake = SakeProviderManager.getInstance();
 
         // Subscribe to shared state
@@ -54,13 +57,13 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             localResourceRoots: [this._extensionUri]
         };
 
-        // Set the webview's initial html content
-        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-
         // Handle messages from the webview
         webviewView.webview.onDidReceiveMessage(async (message) => {
             await this._handleMessage(message, webviewView);
         });
+
+        // Set the webview's initial html content
+        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
     }
 
     public revive(panel: vscode.WebviewView) {
@@ -247,7 +250,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.onrequestNewProvider: {
+            case WebviewMessageId.onRequestNewProvider: {
                 this._sake.requestNewProvider();
                 break;
             }
@@ -265,6 +268,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 }
 
                 await restartWakeClient(client);
+
+                try {
+                    await this._sake.provider?.connect();
+                } catch (error) {
+                    showErrorMessage(error as string);
+                }
 
                 webviewView.webview.postMessage({
                     command: message.command,
@@ -293,11 +302,33 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.onReconnectChain: {
+                let success = true;
                 try {
-                    this._sake.provider?.connect();
+                    await this._sake.provider?.connect();
                 } catch (error) {
+                    success = false;
                     showErrorMessage(error as string);
                 }
+
+                webviewView.webview.postMessage({
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success
+                    }
+                } as WebviewMessageResponse);
+
+                break;
+            }
+
+            case WebviewMessageId.ping: {
+                webviewView.webview.postMessage({
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success: true
+                    }
+                } as WebviewMessageResponse);
                 break;
             }
 

@@ -1,9 +1,9 @@
 import { State } from 'vscode-languageclient';
 import { SakeContext } from '../context';
 import { StateId, AppState } from '../webview/shared/types';
-import { BaseStateProvider } from './BaseStateProvider';
+import BaseStateProvider from './BaseStateProvider';
 
-export class AppStateProvider extends BaseStateProvider<AppState> {
+export default class AppStateProvider extends BaseStateProvider<AppState> {
     private static _instance: AppStateProvider;
 
     private constructor() {
@@ -11,7 +11,7 @@ export class AppStateProvider extends BaseStateProvider<AppState> {
             isAnvilInstalled: undefined,
             isWakeServerRunning: undefined,
             isOpenWorkspace: undefined,
-            isInitialized: undefined
+            initializationState: undefined
         });
 
         const _client = SakeContext.getInstance().client;
@@ -47,14 +47,14 @@ export class AppStateProvider extends BaseStateProvider<AppState> {
     public setIsWakeServerRunning(isWakeServerRunning: boolean) {
         this.state = {
             ...this._state,
-            isWakeServerRunning: isWakeServerRunning
+            isWakeServerRunning
         };
     }
 
-    public setIsInitialized(isInitialized: boolean) {
+    public setInitializationState(initializationState: 'initializing' | 'loadingChains' | 'ready') {
         this.state = {
             ...this._state,
-            isInitialized: isInitialized
+            initializationState: initializationState
         };
     }
 
