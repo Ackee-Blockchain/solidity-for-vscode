@@ -12,7 +12,7 @@ import {
 } from '../../shared/types';
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import { REQUEST_STATE_TIMEOUT } from '../helpers/constants';
-import { loadedState, selectedAccount, setSelectedAccount } from './appStore';
+import { selectedAccount, setSelectedAccount } from './appStore';
 
 /**
  * backend data
@@ -28,7 +28,8 @@ export const compilationState = writable<CompilationState>({
 export const appState = writable<AppState>({
     isAnvilInstalled: undefined,
     isWakeServerRunning: undefined,
-    isOpenWorkspace: undefined
+    isOpenWorkspace: undefined,
+    initializationState: undefined
 });
 export const chainState = writable<ChainState>({
     chains: [],
@@ -62,11 +63,23 @@ export async function restartWakeServer(): Promise<boolean> {
         });
 }
 
-export async function requestState(): Promise<boolean> {
-    const timeout = new Promise<void>((_, reject) =>
-        setTimeout(() => reject(new Error('Request timed out')), REQUEST_STATE_TIMEOUT)
-    );
+export function requestAppState(): Promise<boolean> {
+    return requestState([StateId.App]);
+}
 
+export function requestChainState(): Promise<boolean> {
+    return requestState([StateId.Chain]);
+}
+
+export function requestSharedState(): Promise<boolean> {
+    return requestState([StateId.Chain, StateId.App]);
+}
+
+export function requestLocalState(): Promise<boolean> {
+    return requestState([StateId.Accounts, StateId.DeployedContracts, StateId.CompiledContracts]);
+}
+
+async function requestState(stateIds: StateId[]): Promise<boolean> {
     const wrapper = async (stateId: StateId) => {
         const result = await messageHandler.request<{
             success: boolean;
@@ -74,22 +87,9 @@ export async function requestState(): Promise<boolean> {
         return { ...result, stateId };
     };
 
-    return await Promise.race([
-        Promise.all([
-            wrapper(StateId.Accounts),
-            wrapper(StateId.DeployedContracts),
-            wrapper(StateId.CompiledContracts),
-            wrapper(StateId.Chain),
-            wrapper(StateId.App)
-        ]),
-        timeout
-    ])
+    return await Promise.all(stateIds.map((id) => wrapper(id)))
         .then((results) => {
-            if (
-                !(results as { success: boolean; stateId: StateId }[]).every(
-                    (result) => result.success
-                )
-            ) {
+            if (!results.every((result) => result.success)) {
                 for (const result of results as { success: boolean; stateId: StateId }[]) {
                     if (!result.success) {
                         console.error('Failed to load state', result.stateId);
@@ -175,6 +175,7 @@ export function setupListeners() {
                 }
 
                 if (message.stateId === StateId.App) {
+                    // console.log('received appState', message.payload);
                     if (message.payload === undefined) {
                         return;
                     }

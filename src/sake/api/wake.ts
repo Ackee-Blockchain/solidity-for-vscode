@@ -31,7 +31,7 @@ import {
 } from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
-import { AppStateProvider } from '../state/AppStateProvider';
+import AppStateProvider from '../state/AppStateProvider';
 import { SakeContext } from '../context';
 
 /*

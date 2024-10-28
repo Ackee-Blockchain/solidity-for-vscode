@@ -4,7 +4,7 @@ import {
     NetworkCreationConfiguration,
     TransactionHistoryState
 } from '../webview/shared/types';
-import { AppStateProvider } from '../state/AppStateProvider';
+import AppStateProvider from '../state/AppStateProvider';
 import * as vscode from 'vscode';
 import { getTextFromInputBox, showErrorMessage } from '../commands';
 import { BaseSakeProvider } from './SakeProvider';
@@ -13,13 +13,13 @@ import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import { SakeContext } from '../context';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 import { SakeProviderFactory } from './SakeProviderFactory';
-import { ChainStateProvider } from '../state/ChainStateProvider';
+import ChainStateProvider from '../state/ChainStateProvider';
 import { StoredSakeState } from '../webview/shared/storage_types';
-import { SakeState } from './SakeState';
+import SakeState from './SakeState';
 import { NetworkProvider } from '../network/NetworkProvider';
 import { NetworkManager } from '../network/NetworkManager';
 
-export class SakeProviderManager {
+export default class SakeProviderManager {
     private static _instance: SakeProviderManager;
     private _selectedProviderId?: string;
     private _providers: Map<string, BaseSakeProvider<NetworkProvider>>;

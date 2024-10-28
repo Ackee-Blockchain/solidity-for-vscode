@@ -29,7 +29,7 @@ import { decodeCallReturnValue } from '../utils/call';
 import { showTimedInfoMessage } from '../commands';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import { SakeProviderInitializationRequest, SharedState } from '../webview/shared/storage_types';
-import { SakeState } from './SakeState';
+import SakeState from './SakeState';
 import { SakeError } from '../webview/shared/errors';
 import { NetworkProvider } from '../network/NetworkProvider';
 

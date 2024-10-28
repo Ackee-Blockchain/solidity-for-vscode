@@ -8,11 +8,11 @@ import {
     SetAccountLabelRequest,
     GetBytecodeRequest
 } from './webview/shared/types';
-import { LanguageClient } from 'vscode-languageclient/node';
+import { LanguageClient, State } from 'vscode-languageclient/node';
 import { SakeOutputItem } from './providers/OutputTreeProvider';
 import { copyToClipboardHandler } from '../commands';
-import { SakeProviderManager } from './sake_providers/SakeProviderManager';
-import { AppStateProvider } from './state/AppStateProvider';
+import SakeProviderManager from './sake_providers/SakeProviderManager';
+import AppStateProvider from './state/AppStateProvider';
 import { SakeContext } from './context';
 import { SakeProviderFactory } from './sake_providers/SakeProviderFactory';
 import { StorageHandler } from './storage/StorageHandler';
@@ -22,6 +22,13 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     sakeContext.context = context;
     sakeContext.client = client;
 
+    /* Initialize Chain State */
+    const appState = AppStateProvider.getInstance();
+    appState.setInitializationState('initializing');
+
+    /* Initialize Sake Provider */
+    const sake = SakeProviderManager.getInstance();
+
     /* Register Webview */
     const sidebarSakeProvider = new SakeWebviewProvider(context.extensionUri);
     context.subscriptions.push(
@@ -30,28 +37,6 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     /* Register Webview Provider for Context */
     sakeContext.webviewProvider = sidebarSakeProvider;
-
-    /* Initialize Chain State */
-    const appState = AppStateProvider.getInstance();
-
-    /* Initialize Sake Provider */
-    const sake = SakeProviderManager.getInstance();
-
-    // Check if there is was any state saved
-    if (await StorageHandler.hasAnySavedState()) {
-        await StorageHandler.loadExtensionState(false).catch((e) => {
-            showErrorMessage('Something went wrong trying to load extension state');
-            console.error('Failed to load saved state', e);
-        });
-    } else {
-        // Start with a default local chain
-        const localProvider = await SakeProviderFactory.createNewLocalProvider('Local Chain');
-
-        if (localProvider) {
-            sake.addProvider(localProvider, false);
-            sake.setProvider(localProvider.id);
-        }
-    }
 
     /* Workspace watcher */
 
@@ -75,8 +60,41 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     workspaceWatcher();
 
-    appState.setIsInitialized(true);
+    registerCommands(context, sake);
 
+    appState.setInitializationState('loadingChains');
+
+    await loadChains(sake);
+
+    appState.setInitializationState('ready');
+}
+
+export function deactivateSake() {
+    StorageHandler.saveExtensionState(false);
+    // TODO save state
+}
+
+async function loadChains(sake: SakeProviderManager) {
+    // Check if there is was any state saved
+    if (await StorageHandler.hasAnySavedState()) {
+        await StorageHandler.loadExtensionState(false).catch((e) => {
+            showErrorMessage(
+                'Saved extension state could not be loaded. Chain state save file was found but seems to be corrupted and could not be loaded.'
+            );
+            console.error('Failed to load saved state', e);
+        });
+    } else {
+        // Start with a default local chain
+        const localProvider = await SakeProviderFactory.createNewLocalProvider('Local Chain');
+
+        if (localProvider) {
+            sake.addProvider(localProvider, false);
+            sake.setProvider(localProvider.id);
+        }
+    }
+}
+
+function registerCommands(context: vscode.ExtensionContext, sake: SakeProviderManager) {
     // register commands
     context.subscriptions.push(
         vscode.commands.registerCommand(
@@ -191,9 +209,4 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
             StorageHandler.saveExtensionState()
         )
     );
-}
-
-export function deactivateSake() {
-    StorageHandler.saveExtensionState(false);
-    // TODO save state
 }

@@ -17,19 +17,20 @@
     import { onMount } from 'svelte';
     import Tabs from './components/common/Tabs.svelte';
     import {
-        requestState,
         setupListeners,
         appState,
         chainState,
-        currentChain
+        currentChain,
+        requestSharedState,
+        requestAppState,
+        requestLocalState
     } from './stores/sakeStore';
-    import { RESTART_WAKE_SERVER_TIMEOUT } from './helpers/constants';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
-        vsCodeDropdown(),
         vsCodeOption(),
         vsCodeDivider(),
+        vsCodeDropdown(),
         vsCodeCheckbox(),
         vsCodeTextField(),
         vsCodePanels(),
@@ -43,6 +44,7 @@
     import {
         openExternal,
         openSettings,
+        ping,
         reconnectChain,
         requestNewProvider,
         restartWakeServer,
@@ -54,18 +56,22 @@
     import Deployment from './pages/Deployment.svelte';
     import InteractionHeader from './pages/InteractionHeader.svelte';
     import ChainStatus from './components/ChainStatus.svelte';
-    import { extensionInitialized, loadedState } from './stores/appStore';
+    import {
+        extensionConnectionState,
+        loadingMessage,
+        loadingShown,
+        stateLoadState
+    } from './stores/appStore';
+    import { loadWithTimeout, withTimeout } from './helpers/helpers';
 
     setupListeners();
-
-    let showLoading = false;
 
     enum TabId {
         CompileDeploy = 0,
         DeployedContracts = 1
     }
 
-    let tabs: { id: any; label: string; content: ComponentType; header?: ComponentType }[] = [
+    let tabs: { id: TabId; label: string; content: ComponentType; header?: ComponentType }[] = [
         {
             id: TabId.CompileDeploy,
             label: 'Deploy',
@@ -79,55 +85,63 @@
         }
     ];
 
-    const showLoadingFor = (seconds: number = 5) => {
-        showLoading = true;
-        const callbacks: (() => void)[] = [];
-        const timeout = setTimeout(() => {
-            showLoading = false;
-        }, seconds);
-        return {
-            finish: () => {
-                clearTimeout(timeout);
-                showLoading = false;
-                callbacks.forEach((callback) => callback());
-            }
-        };
-    };
-
     const loadState = async () => {
-        requestState().then((success) => {
-            if (success) {
-                loadedState.set(true);
-                return;
+        await requestSharedState();
+        await requestLocalState();
+        console.log('loadState done');
+    };
+
+    const retryPing = async () => {
+        await loadWithTimeout(ping(), 5).then((result: boolean) => {
+            if (result) {
+                extensionConnectionState.set('connected');
+                requestAppState();
             }
-            setTimeout(async () => {
-                const loading = showLoadingFor(5);
-                // @dev listeners have to be set up before requesting state
-                const success = await requestState();
-                loading.finish();
-                loadedState.set(success);
-            }, 5000);
         });
     };
 
-    onMount(() => {
-        extensionInitialized.subscribe((initialized) => {
-            if (initialized) {
-                loadState();
-            }
-        });
+    onMount(async () => {
+        await withTimeout(ping(), 5)
+            .then((result: boolean) => {
+                if (result) {
+                    extensionConnectionState.set('connected');
+                    requestAppState().then((success) => {
+                        stateLoadState.set(success ? 'loaded' : 'failed');
+                    });
+                } else {
+                    throw new Error('Pinging extension failed');
+                }
+            })
+            .catch(() => {
+                extensionConnectionState.set('failed');
+            });
     });
 
-    const tryWakeServerRestart = async () => {
-        const loadingMessage = showLoadingFor(10);
-        try {
-            await restartWakeServer();
-            await reconnectChain(true);
-            await loadState();
-        } catch (error) {
-            showErrorMessage('Failed to restart Wake server');
-        }
-        loadingMessage.finish();
+    // Load state when appState is ready
+    $: extensionInitializationState = $appState.initializationState;
+    $: extensionInitializationState === 'ready' && loadState();
+
+    const tryWakeServerRestart = () => {
+        loadWithTimeout(restartWakeServer(), 15, 'Restarting Wake server...')
+            .then(async () => {
+                const result = await loadWithTimeout(
+                    reconnectChain(),
+                    15,
+                    'Reconnecting to chain...'
+                );
+                if (!result) {
+                    throw new Error('Reconnecting to chain failed');
+                }
+            })
+            .then(async () => {
+                const result = await loadWithTimeout(loadState(), 15, 'Loading state...');
+                if (!result) {
+                    throw new Error('Loading state failed');
+                }
+            })
+            .catch((e) => {
+                showErrorMessage(typeof e === 'string' ? e : (e as Error).message);
+            });
     };
 
     const installAnvil = () => {
@@ -136,19 +150,29 @@
 </script>
 
 <main class="h-full my-0 overflow-hidden flex flex-col">
-    {#if showLoading}
+    {#if $loadingShown}
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
             <vscode-progress-ring />
-            <span>Loading...</span>
+            <span>{$loadingMessage ?? 'Loading...'}</span>
         </div>
-    {:else if $loadedState === false}
+    {:else if $stateLoadState === 'loading' || $extensionConnectionState === 'connecting'}
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
-            <span>Failed to load state from the extension. Please try restarting VS Code.</span>
+            <span>Initializing extension...</span>
         </div>
-    {:else if !$appState.isInitialized}
+    {:else if $stateLoadState === 'failed' || $extensionConnectionState === 'failed'}
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+            <span
+                >Unexpected error loading state from the extension. Please try restarting VS Code.</span
+            >
+        </div>
+        <!-- {:else if !$appState.isInitialized} -->
+        <!-- <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
             <vscode-progress-ring />
             <span>Setting up Deploy and Interact UI...</span>
+        </div> -->
+    {:else if $appState.initializationState === 'loadingChains'}
+        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+            <span>Loading chains...</span>
         </div>
     {:else if $chainState.chains.length === 0}
         <div class="flex flex-col gap-4 h-full w-full p-4">

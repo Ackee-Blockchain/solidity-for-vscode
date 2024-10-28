@@ -5,10 +5,10 @@ import {
     TransactionHistoryState,
     TransactionResult
 } from '../webview/shared/types';
-import { BaseStateProvider } from './BaseStateProvider';
+import BaseStateProvider from './BaseStateProvider';
 import * as vscode from 'vscode';
 
-export class TransactionHistoryStateProvider extends BaseStateProvider<TransactionHistoryState> {
+export default class TransactionHistoryStateProvider extends BaseStateProvider<TransactionHistoryState> {
     private output: OutputViewManager;
 
     constructor() {

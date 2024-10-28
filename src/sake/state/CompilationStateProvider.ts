@@ -4,9 +4,9 @@ import {
     CompiledContract,
     StateId
 } from '../webview/shared/types';
-import { BaseStateProvider } from './BaseStateProvider';
+import BaseStateProvider from './BaseStateProvider';
 
-export class CompilationStateProvider extends BaseStateProvider<CompilationState> {
+export default class CompilationStateProvider extends BaseStateProvider<CompilationState> {
     private static _instance: CompilationStateProvider;
 
     private constructor() {
@@ -55,10 +55,13 @@ export class CompilationStateProvider extends BaseStateProvider<CompilationState
     }
 
     public getDict() {
-        return this.state.contracts.reduce((dict, contract) => {
-            dict[contract.fqn] = contract;
-            return dict;
-        }, {} as Record<string, CompiledContract>);
+        return this.state.contracts.reduce(
+            (dict, contract) => {
+                dict[contract.fqn] = contract;
+                return dict;
+            },
+            {} as Record<string, CompiledContract>
+        );
     }
 
     public get(contractFqn: string): CompiledContract | undefined {

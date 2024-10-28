@@ -1,5 +1,5 @@
 import { SakeContext } from '../context';
-import { SakeProviderManager } from '../sake_providers/SakeProviderManager';
+import SakeProviderManager from '../sake_providers/SakeProviderManager';
 import * as vscode from 'vscode';
 
 export class StorageHandler {

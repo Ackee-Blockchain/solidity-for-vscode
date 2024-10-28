@@ -1,7 +1,9 @@
 import { writable, get, derived, readable } from 'svelte/store';
 import type { AccountState, ExtendedAccount } from '../../shared/types';
 import { parseComplexNumber } from '../../shared/validate';
-import { accounts, appState } from './sakeStore';
+import { accounts, appState, requestAppState } from './sakeStore';
+import { REQUEST_STATE_TIMEOUT } from '../helpers/constants';
+import { withTimeout } from '../helpers/helpers';
 
 /**
  * App Stores
@@ -38,21 +40,30 @@ export const setSelectedAccount = (accountId: number | null) => {
     selectedAccountId.set(accountId);
 };
 
-export const loadedState = writable<boolean | undefined>(undefined);
+/* Loading */
+export const loadingShown = writable<boolean>(false);
+export const loadingMessage = writable<string | null>(null);
 
-export const extensionInitialized = (() => {
-    const { subscribe, set } = writable<boolean | undefined>(undefined);
+// Extension connection state
+// 'connecting' - waiting for communication with extension is established
+// 'ready' - extension returned true to get AppState request
+// 'timedOut' - communication with extension timed out
+type ExtensionConnectionState = 'connecting' | 'connected' | 'failed';
+export const extensionConnectionState = (() => {
+    const { subscribe, set } = writable<ExtensionConnectionState>('connecting');
 
+    // Only allow setting if current state is 'connecting'
     return {
         subscribe,
-        update: () => {
-            const currentState = get({ subscribe });
-            const currentAppState = get(appState);
-
-            if (currentState === undefined && currentAppState.isInitialized) {
-                loadedState.set(true);
-                set(true);
+        set: (value: ExtensionConnectionState) => {
+            // Only allow setting if current state is 'connecting'
+            const currentState = get(extensionConnectionState);
+            if (currentState !== 'connected') {
+                set(value);
             }
         }
     };
 })();
+
+type StateLoadState = 'loading' | 'loaded' | 'failed';
+export const stateLoadState = writable<StateLoadState>('loading');

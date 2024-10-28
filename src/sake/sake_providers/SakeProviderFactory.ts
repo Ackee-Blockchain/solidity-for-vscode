@@ -1,7 +1,7 @@
 import { WakeApi } from '../api/wake';
 import { showErrorMessage } from '../commands';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
-import { AppStateProvider } from '../state/AppStateProvider';
+import AppStateProvider from '../state/AppStateProvider';
 import { SakeError } from '../webview/shared/errors';
 import {
     NetworkConfiguration,

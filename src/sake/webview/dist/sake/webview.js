@@ -18766,12 +18766,13 @@ var WebviewMessageId;
     WebviewMessageId["onOpenExternal"] = "onOpenExternal";
     WebviewMessageId["onOpenDeploymentInBrowser"] = "onOpenDeploymentInBrowser";
     WebviewMessageId["onGetBytecode"] = "onGetBytecode";
-    WebviewMessageId["onrequestNewProvider"] = "onrequestNewProvider";
+    WebviewMessageId["onRequestNewProvider"] = "onRequestNewProvider";
     WebviewMessageId["onRestartWakeServer"] = "onRestartWakeServer";
     WebviewMessageId["onSelectChain"] = "onSelectChain";
     WebviewMessageId["onOpenSettings"] = "onOpenSettings";
     WebviewMessageId["onOpenChainsQuickPick"] = "onOpenChainsQuickPick";
     WebviewMessageId["onReconnectChain"] = "onReconnectChain";
+    WebviewMessageId["ping"] = "ping";
 })(WebviewMessageId || (WebviewMessageId = {}));
 // export type WebviewMessageRequest<T extends keyof WebviewMessageRequestPayload> = {
 //     command: T;
@@ -19869,9 +19870,6 @@ MessageHandler$1.messageHandler = MessageHandler.getInstance();
 	
 } (client));
 
-const RESTART_WAKE_SERVER_TIMEOUT = 5000;
-const REQUEST_STATE_TIMEOUT = 5000;
-
 /**
  * backend data
  */
@@ -19885,7 +19883,8 @@ const compilationState = writable({
 const appState = writable({
     isAnvilInstalled: undefined,
     isWakeServerRunning: undefined,
-    isOpenWorkspace: undefined
+    isOpenWorkspace: undefined,
+    initializationState: undefined
 });
 const chainState = writable({
     chains: [],
@@ -19894,22 +19893,21 @@ const chainState = writable({
 const currentChain = derived(chainState, ($chainState) => {
     return $chainState.chains.find((chain) => chain.chainId === $chainState.currentChainId);
 });
-async function requestState() {
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), REQUEST_STATE_TIMEOUT));
+function requestAppState() {
+    return requestState([StateId.App]);
+}
+function requestSharedState() {
+    return requestState([StateId.Chain, StateId.App]);
+}
+function requestLocalState() {
+    return requestState([StateId.Accounts, StateId.DeployedContracts, StateId.CompiledContracts]);
+}
+async function requestState(stateIds) {
     const wrapper = async (stateId) => {
         const result = await client.messageHandler.request(WebviewMessageId.requestState, stateId);
         return Object.assign(Object.assign({}, result), { stateId });
     };
-    return await Promise.race([
-        Promise.all([
-            wrapper(StateId.Accounts),
-            wrapper(StateId.DeployedContracts),
-            wrapper(StateId.CompiledContracts),
-            wrapper(StateId.Chain),
-            wrapper(StateId.App)
-        ]),
-        timeout
-    ])
+    return await Promise.all(stateIds.map((id) => wrapper(id)))
         .then((results) => {
         if (!results.every((result) => result.success)) {
             for (const result of results) {
@@ -19978,6 +19976,7 @@ function setupListeners() {
                     return;
                 }
                 if (message.stateId === StateId.App) {
+                    // console.log('received appState', message.payload);
                     if (message.payload === undefined) {
                         return;
                     }
@@ -19989,6 +19988,25 @@ function setupListeners() {
         }
     });
 }
+
+const withTimeout = async (request, seconds = 5) => {
+    const timeout = new Promise((_, reject) => {
+        setTimeout(() => {
+            reject(new Error('Request timed out'));
+        }, seconds * 1000);
+    });
+    return Promise.race([request, timeout]);
+};
+const loadWithTimeout = async (request, seconds = 5, message = 'Loading...') => {
+    if (message) {
+        loadingMessage.set(message);
+    }
+    loadingShown.set(true);
+    const result = await withTimeout(request, seconds);
+    loadingShown.set(false);
+    loadingMessage.set(null);
+    return result;
+};
 
 /**
  * App Stores
@@ -20020,21 +20038,24 @@ const chainStatusExpanded = writable(false);
 const setSelectedAccount = (accountId) => {
     selectedAccountId.set(accountId);
 };
-const loadedState = writable(undefined);
-const extensionInitialized = (() => {
-    const { subscribe, set } = writable(undefined);
+/* Loading */
+const loadingShown = writable(false);
+const loadingMessage = writable(null);
+const extensionConnectionState = (() => {
+    const { subscribe, set } = writable('connecting');
+    // Only allow setting if current state is 'connecting'
     return {
         subscribe,
-        update: () => {
-            const currentState = get_store_value({ subscribe });
-            const currentAppState = get_store_value(appState);
-            if (currentState === undefined && currentAppState.isInitialized) {
-                loadedState.set(true);
-                set(true);
+        set: (value) => {
+            // Only allow setting if current state is 'connecting'
+            const currentState = get_store_value(extensionConnectionState);
+            if (currentState !== 'connected') {
+                set(value);
             }
         }
     };
 })();
+const stateLoadState = writable('loading');
 
 /* src/components/common/Tabs.svelte generated by Svelte v3.59.2 */
 const file$z = "src/components/common/Tabs.svelte";
@@ -20667,6 +20688,13 @@ class Tabs extends SvelteComponentDev {
 	}
 }
 
+function ping() {
+    const request = {
+        command: WebviewMessageId.ping,
+        payload: undefined
+    };
+    return client.messageHandler.request(request.command, request.payload);
+}
 function copyToClipboard(stringToCopy) {
     const request = {
         command: WebviewMessageId.copyToClipboard,
@@ -20772,7 +20800,7 @@ async function openSettings(settingsUrl) {
 }
 async function requestNewProvider() {
     const request = {
-        command: WebviewMessageId.onrequestNewProvider,
+        command: WebviewMessageId.onRequestNewProvider,
         payload: undefined
     };
     client.messageHandler.send(request.command, request.payload);
@@ -20799,14 +20827,12 @@ function openChainsQuickPick() {
     };
     client.messageHandler.send(request.command, request.payload);
 }
-function reconnectChain(all = false) {
+async function reconnectChain() {
     const request = {
         command: WebviewMessageId.onReconnectChain,
-        payload: {
-            all
-        }
+        payload: undefined
     };
-    client.messageHandler.send(request.command, request.payload);
+    return await client.messageHandler.request(request.command, request.payload);
 }
 
 /* src/components/common/FlexContainer.svelte generated by Svelte v3.59.2 */
@@ -25730,7 +25756,7 @@ function splitNestedLists(input) {
 
 /* src/components/ContractFunctionInput.svelte generated by Svelte v3.59.2 */
 
-const { console: console_1 } = globals;
+const { console: console_1$1 } = globals;
 const file$i = "src/components/ContractFunctionInput.svelte";
 
 function get_each_context_1(ctx, list, i) {
@@ -26896,18 +26922,18 @@ function instance$k($$self, $$props, $$invalidate) {
 
 	$$self.$$.on_mount.push(function () {
 		if (input === undefined && !('input' in $$props || $$self.$$.bound[$$self.$$.props['input']])) {
-			console_1.warn("<ContractFunctionInput> was created without expected prop 'input'");
+			console_1$1.warn("<ContractFunctionInput> was created without expected prop 'input'");
 		}
 
 		if (onInputStateChange === undefined && !('onInputStateChange' in $$props || $$self.$$.bound[$$self.$$.props['onInputStateChange']])) {
-			console_1.warn("<ContractFunctionInput> was created without expected prop 'onInputStateChange'");
+			console_1$1.warn("<ContractFunctionInput> was created without expected prop 'onInputStateChange'");
 		}
 	});
 
 	const writable_props = ['input', 'onInputStateChange', 'expandable'];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1.warn(`<ContractFunctionInput> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$1.warn(`<ContractFunctionInput> was created with unknown prop '${key}'`);
 	});
 
 	function expandbutton_expanded_binding(value) {
@@ -30591,7 +30617,7 @@ class Compile extends SvelteComponentDev {
 
 /* src/components/Constructor.svelte generated by Svelte v3.59.2 */
 
-const { Error: Error_1 } = globals;
+const { Error: Error_1$1 } = globals;
 
 // (34:0) {#if constructor}
 function create_if_block$4(ctx) {
@@ -30662,7 +30688,7 @@ function create_fragment$8(ctx) {
 			if_block_anchor = empty();
 		},
 		l: function claim(nodes) {
-			throw new Error_1("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+			throw new Error_1$1("options.hydrate only works if the component was compiled with the `hydratable: true` option");
 		},
 		m: function mount(target, anchor) {
 			if (if_block) if_block.m(target, anchor);
@@ -30835,27 +30861,27 @@ class Constructor extends SvelteComponentDev {
 	}
 
 	get abi() {
-		throw new Error_1("<Constructor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+		throw new Error_1$1("<Constructor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 
 	set abi(value) {
-		throw new Error_1("<Constructor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+		throw new Error_1$1("<Constructor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 
 	get onDeploy() {
-		throw new Error_1("<Constructor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+		throw new Error_1$1("<Constructor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 
 	set onDeploy(value) {
-		throw new Error_1("<Constructor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+		throw new Error_1$1("<Constructor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 
 	get name() {
-		throw new Error_1("<Constructor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+		throw new Error_1$1("<Constructor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 
 	set name(value) {
-		throw new Error_1("<Constructor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+		throw new Error_1$1("<Constructor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 }
 
@@ -33305,9 +33331,11 @@ class ChainStatus extends SvelteComponentDev {
 }
 
 /* src/Sake.svelte generated by Svelte v3.59.2 */
+
+const { Error: Error_1, console: console_1 } = globals;
 const file = "src/Sake.svelte";
 
-// (168:4) {:else}
+// (180:4) {:else}
 function create_else_block(ctx) {
 	let chainstatus;
 	let t;
@@ -33316,11 +33344,11 @@ function create_else_block(ctx) {
 	let if_block;
 	let current;
 	chainstatus = new ChainStatus({ $$inline: true });
-	const if_block_creators = [create_if_block_9, create_else_block_1];
+	const if_block_creators = [create_if_block_10, create_else_block_1];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
-		if (/*$currentChain*/ ctx[4]?.connected) return 0;
+		if (/*$currentChain*/ ctx[6]?.connected) return 0;
 		return 1;
 	}
 
@@ -33334,7 +33362,7 @@ function create_else_block(ctx) {
 			div = element("div");
 			if_block.c();
 			attr_dev(div, "class", "flex-grow overflow-hidden");
-			add_location(div, file, 169, 8, 7411);
+			add_location(div, file, 181, 8, 8398);
 		},
 		m: function mount(target, anchor) {
 			mount_component(chainstatus, target, anchor);
@@ -33393,15 +33421,15 @@ function create_else_block(ctx) {
 		block,
 		id: create_else_block.name,
 		type: "else",
-		source: "(168:4) {:else}",
+		source: "(180:4) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (155:51) 
-function create_if_block_8(ctx) {
+// (167:51) 
+function create_if_block_9(ctx) {
 	let div;
 	let h3;
 	let t1;
@@ -33429,14 +33457,14 @@ function create_if_block_8(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Visit Anvil Installation Page";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 156, 12, 6780);
+			add_location(h3, file, 168, 12, 7767);
 			attr_dev(span0, "class", "italic");
-			add_location(span0, file, 158, 28, 6896);
-			add_location(span1, file, 157, 12, 6862);
+			add_location(span0, file, 170, 28, 7883);
+			add_location(span1, file, 169, 12, 7849);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 163, 12, 7216);
+			add_location(vscode_button, file, 175, 12, 8203);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 155, 8, 6716);
+			add_location(div, file, 167, 8, 7703);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -33450,7 +33478,7 @@ function create_if_block_8(ctx) {
 			append_dev(div, vscode_button);
 
 			if (!mounted) {
-				dispose = listen_dev(vscode_button, "click", /*installAnvil*/ ctx[7], false, false, false, false);
+				dispose = listen_dev(vscode_button, "click", /*installAnvil*/ ctx[9], false, false, false, false);
 				mounted = true;
 			}
 		},
@@ -33466,17 +33494,17 @@ function create_if_block_8(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_8.name,
+		id: create_if_block_9.name,
 		type: "if",
-		source: "(155:51) ",
+		source: "(167:51) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (135:54) 
-function create_if_block_7(ctx) {
+// (147:54) 
+function create_if_block_8(ctx) {
 	let div;
 	let h3;
 	let t1;
@@ -33504,14 +33532,14 @@ function create_if_block_7(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Restart Connection";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 136, 12, 5772);
+			add_location(h3, file, 148, 12, 6759);
 			attr_dev(span0, "class", "cursor-pointer underline");
-			add_location(span0, file, 142, 16, 6152);
-			add_location(span1, file, 139, 12, 5985);
+			add_location(span0, file, 154, 16, 7139);
+			add_location(span1, file, 151, 12, 6972);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 150, 12, 6508);
+			add_location(vscode_button, file, 162, 12, 7495);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 135, 8, 5708);
+			add_location(div, file, 147, 8, 6695);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -33526,8 +33554,8 @@ function create_if_block_7(ctx) {
 
 			if (!mounted) {
 				dispose = [
-					listen_dev(span0, "click", /*click_handler*/ ctx[8], false, false, false, false),
-					listen_dev(vscode_button, "click", /*tryWakeServerRestart*/ ctx[6], false, false, false, false)
+					listen_dev(span0, "click", /*click_handler*/ ctx[11], false, false, false, false),
+					listen_dev(vscode_button, "click", /*tryWakeServerRestart*/ ctx[8], false, false, false, false)
 				];
 
 				mounted = true;
@@ -33545,17 +33573,17 @@ function create_if_block_7(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_7.name,
+		id: create_if_block_8.name,
 		type: "if",
-		source: "(135:54) ",
+		source: "(147:54) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (127:64) 
-function create_if_block_6(ctx) {
+// (139:64) 
+function create_if_block_7(ctx) {
 	let div;
 	let h3;
 	let t1;
@@ -33570,10 +33598,56 @@ function create_if_block_6(ctx) {
 			span = element("span");
 			span.textContent = "The Deploy and Interact UI can only be used with a single workspace opened. Please\n                close other workspaces to use this feature.";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 128, 12, 5358);
-			add_location(span, file, 129, 12, 5444);
+			add_location(h3, file, 140, 12, 6345);
+			add_location(span, file, 141, 12, 6431);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 127, 8, 5294);
+			add_location(div, file, 139, 8, 6281);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, h3);
+			append_dev(div, t1);
+			append_dev(div, span);
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_7.name,
+		type: "if",
+		source: "(139:64) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (131:53) 
+function create_if_block_6(ctx) {
+	let div;
+	let h3;
+	let t1;
+	let span;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			h3 = element("h3");
+			h3.textContent = "No workspace opened";
+			t1 = space();
+			span = element("span");
+			span.textContent = "The Deploy and Interact UI requires an open workspace containing Solidity files.\n                Please open a project with Solidity contracts to use this feature.";
+			attr_dev(h3, "class", "uppercase font-bold text-base");
+			add_location(h3, file, 132, 12, 5907);
+			add_location(span, file, 133, 12, 5986);
+			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
+			add_location(div, file, 131, 8, 5843);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -33593,61 +33667,15 @@ function create_if_block_6(ctx) {
 		block,
 		id: create_if_block_6.name,
 		type: "if",
-		source: "(127:64) ",
+		source: "(131:53) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (119:53) 
+// (122:55) 
 function create_if_block_5(ctx) {
-	let div;
-	let h3;
-	let t1;
-	let span;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			h3 = element("h3");
-			h3.textContent = "No workspace opened";
-			t1 = space();
-			span = element("span");
-			span.textContent = "The Deploy and Interact UI requires an open workspace containing Solidity files.\n                Please open a project with Solidity contracts to use this feature.";
-			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 120, 12, 4920);
-			add_location(span, file, 121, 12, 4999);
-			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 119, 8, 4856);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, h3);
-			append_dev(div, t1);
-			append_dev(div, span);
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_5.name,
-		type: "if",
-		source: "(119:53) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (110:55) 
-function create_if_block_4(ctx) {
 	let div;
 	let h3;
 	let t1;
@@ -33669,12 +33697,12 @@ function create_if_block_4(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Select chain";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 111, 12, 4432);
-			add_location(span, file, 112, 12, 4509);
+			add_location(h3, file, 123, 12, 5419);
+			add_location(span, file, 124, 12, 5496);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 114, 12, 4661);
+			add_location(vscode_button, file, 126, 12, 5648);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 110, 8, 4368);
+			add_location(div, file, 122, 8, 5355);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -33701,17 +33729,17 @@ function create_if_block_4(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4.name,
+		id: create_if_block_5.name,
 		type: "if",
-		source: "(110:55) ",
+		source: "(122:55) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (101:46) 
-function create_if_block_3(ctx) {
+// (113:46) 
+function create_if_block_4(ctx) {
 	let div;
 	let h3;
 	let t1;
@@ -33733,12 +33761,12 @@ function create_if_block_3(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Setup new chain";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 102, 12, 3944);
-			add_location(span, file, 103, 12, 4019);
+			add_location(h3, file, 114, 12, 4931);
+			add_location(span, file, 115, 12, 5006);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 105, 12, 4161);
+			add_location(vscode_button, file, 117, 12, 5148);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 101, 8, 3880);
+			add_location(div, file, 113, 8, 4867);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -33765,38 +33793,68 @@ function create_if_block_3(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3.name,
+		id: create_if_block_4.name,
 		type: "if",
-		source: "(101:46) ",
+		source: "(113:46) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (96:39) 
-function create_if_block_2(ctx) {
+// (109:64) 
+function create_if_block_3(ctx) {
 	let div;
-	let vscode_progress_ring;
-	let t0;
 	let span;
 
 	const block = {
 		c: function create() {
 			div = element("div");
-			vscode_progress_ring = element("vscode-progress-ring");
-			t0 = space();
 			span = element("span");
-			span.textContent = "Setting up Deploy and Interact UI...";
-			add_location(vscode_progress_ring, file, 97, 12, 3723);
-			add_location(span, file, 98, 12, 3760);
+			span.textContent = "Loading chains...";
+			add_location(span, file, 110, 12, 4766);
 			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 96, 8, 3635);
+			add_location(div, file, 109, 8, 4678);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
-			append_dev(div, vscode_progress_ring);
-			append_dev(div, t0);
+			append_dev(div, span);
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_3.name,
+		type: "if",
+		source: "(109:64) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (98:85) 
+function create_if_block_2(ctx) {
+	let div;
+	let span;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			span = element("span");
+			span.textContent = "Unexpected error loading state from the extension. Please try restarting VS Code.";
+			add_location(span, file, 99, 12, 4205);
+			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
+			add_location(div, file, 98, 8, 4117);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
 			append_dev(div, span);
 		},
 		p: noop,
@@ -33811,14 +33869,14 @@ function create_if_block_2(ctx) {
 		block,
 		id: create_if_block_2.name,
 		type: "if",
-		source: "(96:39) ",
+		source: "(98:85) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (92:37) 
+// (94:90) 
 function create_if_block_1(ctx) {
 	let div;
 	let span;
@@ -33827,10 +33885,10 @@ function create_if_block_1(ctx) {
 		c: function create() {
 			div = element("div");
 			span = element("span");
-			span.textContent = "Failed to load state from the extension. Please try restarting VS Code.";
-			add_location(span, file, 93, 12, 3487);
+			span.textContent = "Initializing extension...";
+			add_location(span, file, 95, 12, 3969);
 			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 92, 8, 3399);
+			add_location(div, file, 94, 8, 3881);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -33848,19 +33906,21 @@ function create_if_block_1(ctx) {
 		block,
 		id: create_if_block_1.name,
 		type: "if",
-		source: "(92:37) ",
+		source: "(94:90) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (87:4) {#if showLoading}
+// (89:4) {#if $loadingShown}
 function create_if_block(ctx) {
 	let div;
 	let vscode_progress_ring;
 	let t0;
 	let span;
+	let t1_value = (/*$loadingMessage*/ ctx[2] ?? 'Loading...') + "";
+	let t1;
 
 	const block = {
 		c: function create() {
@@ -33868,19 +33928,22 @@ function create_if_block(ctx) {
 			vscode_progress_ring = element("vscode-progress-ring");
 			t0 = space();
 			span = element("span");
-			span.textContent = "Loading...";
-			add_location(vscode_progress_ring, file, 88, 12, 3277);
-			add_location(span, file, 89, 12, 3314);
+			t1 = text(t1_value);
+			add_location(vscode_progress_ring, file, 90, 12, 3683);
+			add_location(span, file, 91, 12, 3720);
 			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 87, 8, 3189);
+			add_location(div, file, 89, 8, 3595);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
 			append_dev(div, vscode_progress_ring);
 			append_dev(div, t0);
 			append_dev(div, span);
+			append_dev(span, t1);
 		},
-		p: noop,
+		p: function update(ctx, dirty) {
+			if (dirty & /*$loadingMessage*/ 4 && t1_value !== (t1_value = (/*$loadingMessage*/ ctx[2] ?? 'Loading...') + "")) set_data_dev(t1, t1_value);
+		},
 		i: noop,
 		o: noop,
 		d: function destroy(detaching) {
@@ -33892,14 +33955,14 @@ function create_if_block(ctx) {
 		block,
 		id: create_if_block.name,
 		type: "if",
-		source: "(87:4) {#if showLoading}",
+		source: "(89:4) {#if $loadingShown}",
 		ctx
 	});
 
 	return block;
 }
 
-// (173:12) {:else}
+// (185:12) {:else}
 function create_else_block_1(ctx) {
 	let div;
 	let h3;
@@ -33917,11 +33980,11 @@ function create_else_block_1(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Try to reconnect";
 			attr_dev(h3, "class", "uppercase text-base");
-			add_location(h3, file, 174, 20, 7639);
+			add_location(h3, file, 186, 20, 8626);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 176, 20, 7807);
+			add_location(vscode_button, file, 188, 20, 8794);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 173, 16, 7567);
+			add_location(div, file, 185, 16, 8554);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -33948,20 +34011,20 @@ function create_else_block_1(ctx) {
 		block,
 		id: create_else_block_1.name,
 		type: "else",
-		source: "(173:12) {:else}",
+		source: "(185:12) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (171:12) {#if $currentChain?.connected}
-function create_if_block_9(ctx) {
+// (183:12) {#if $currentChain?.connected}
+function create_if_block_10(ctx) {
 	let tabs_1;
 	let current;
 
 	tabs_1 = new Tabs({
-			props: { tabs: /*tabs*/ ctx[5] },
+			props: { tabs: /*tabs*/ ctx[7] },
 			$$inline: true
 		});
 
@@ -33990,9 +34053,9 @@ function create_if_block_9(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_9.name,
+		id: create_if_block_10.name,
 		type: "if",
-		source: "(171:12) {#if $currentChain?.connected}",
+		source: "(183:12) {#if $currentChain?.connected}",
 		ctx
 	});
 
@@ -34015,22 +34078,24 @@ function create_fragment(ctx) {
 		create_if_block_6,
 		create_if_block_7,
 		create_if_block_8,
+		create_if_block_9,
 		create_else_block
 	];
 
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (/*showLoading*/ ctx[0]) return 0;
-		if (/*$loadedState*/ ctx[1] === false) return 1;
-		if (!/*$appState*/ ctx[2].isInitialized) return 2;
-		if (/*$chainState*/ ctx[3].chains.length === 0) return 3;
-		if (/*$chainState*/ ctx[3].currentChainId === undefined) return 4;
-		if (/*$appState*/ ctx[2].isOpenWorkspace === 'closed') return 5;
-		if (/*$appState*/ ctx[2].isOpenWorkspace === 'tooManyWorkspaces') return 6;
-		if (/*$appState*/ ctx[2].isWakeServerRunning === false) return 7;
-		if (/*$appState*/ ctx[2].isAnvilInstalled === false) return 8;
-		return 9;
+		if (/*$loadingShown*/ ctx[1]) return 0;
+		if (/*$stateLoadState*/ ctx[3] === 'loading' || /*$extensionConnectionState*/ ctx[4] === 'connecting') return 1;
+		if (/*$stateLoadState*/ ctx[3] === 'failed' || /*$extensionConnectionState*/ ctx[4] === 'failed') return 2;
+		if (/*$appState*/ ctx[0].initializationState === 'loadingChains') return 3;
+		if (/*$chainState*/ ctx[5].chains.length === 0) return 4;
+		if (/*$chainState*/ ctx[5].currentChainId === undefined) return 5;
+		if (/*$appState*/ ctx[0].isOpenWorkspace === 'closed') return 6;
+		if (/*$appState*/ ctx[0].isOpenWorkspace === 'tooManyWorkspaces') return 7;
+		if (/*$appState*/ ctx[0].isWakeServerRunning === false) return 8;
+		if (/*$appState*/ ctx[0].isAnvilInstalled === false) return 9;
+		return 10;
 	}
 
 	current_block_type_index = select_block_type(ctx);
@@ -34041,10 +34106,10 @@ function create_fragment(ctx) {
 			main = element("main");
 			if_block.c();
 			attr_dev(main, "class", "h-full my-0 overflow-hidden flex flex-col");
-			add_location(main, file, 85, 0, 3102);
+			add_location(main, file, 87, 0, 3506);
 		},
 		l: function claim(nodes) {
-			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+			throw new Error_1("options.hydrate only works if the component was compiled with the `hydratable: true` option");
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, main, anchor);
@@ -34105,23 +34170,32 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
-	let $loadedState;
+	let extensionInitializationState;
 	let $appState;
+	let $loadingShown;
+	let $loadingMessage;
+	let $stateLoadState;
+	let $extensionConnectionState;
 	let $chainState;
 	let $currentChain;
-	validate_store(loadedState, 'loadedState');
-	component_subscribe($$self, loadedState, $$value => $$invalidate(1, $loadedState = $$value));
 	validate_store(appState, 'appState');
-	component_subscribe($$self, appState, $$value => $$invalidate(2, $appState = $$value));
+	component_subscribe($$self, appState, $$value => $$invalidate(0, $appState = $$value));
+	validate_store(loadingShown, 'loadingShown');
+	component_subscribe($$self, loadingShown, $$value => $$invalidate(1, $loadingShown = $$value));
+	validate_store(loadingMessage, 'loadingMessage');
+	component_subscribe($$self, loadingMessage, $$value => $$invalidate(2, $loadingMessage = $$value));
+	validate_store(stateLoadState, 'stateLoadState');
+	component_subscribe($$self, stateLoadState, $$value => $$invalidate(3, $stateLoadState = $$value));
+	validate_store(extensionConnectionState, 'extensionConnectionState');
+	component_subscribe($$self, extensionConnectionState, $$value => $$invalidate(4, $extensionConnectionState = $$value));
 	validate_store(chainState, 'chainState');
-	component_subscribe($$self, chainState, $$value => $$invalidate(3, $chainState = $$value));
+	component_subscribe($$self, chainState, $$value => $$invalidate(5, $chainState = $$value));
 	validate_store(currentChain, 'currentChain');
-	component_subscribe($$self, currentChain, $$value => $$invalidate(4, $currentChain = $$value));
+	component_subscribe($$self, currentChain, $$value => $$invalidate(6, $currentChain = $$value));
 	let { $$slots: slots = {}, $$scope } = $$props;
 	validate_slots('Sake', slots, []);
-	provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeDropdown(), vsCodeOption(), vsCodeDivider(), vsCodeCheckbox(), vsCodeTextField(), vsCodePanels(), vsCodePanelTab(), vsCodeBadge(), vsCodePanelView(), vsCodeProgressRing(), vsCodeTag());
+	provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeOption(), vsCodeDivider(), vsCodeDropdown(), vsCodeCheckbox(), vsCodeTextField(), vsCodePanels(), vsCodePanelTab(), vsCodeBadge(), vsCodePanelView(), vsCodeProgressRing(), vsCodeTag());
 	setupListeners();
-	let showLoading = false;
 	var TabId;
 
 	(function (TabId) {
@@ -34143,68 +34217,53 @@ function instance($$self, $$props, $$invalidate) {
 		}
 	];
 
-	const showLoadingFor = (seconds = 5) => {
-		$$invalidate(0, showLoading = true);
-		const callbacks = [];
-
-		const timeout = setTimeout(
-			() => {
-				$$invalidate(0, showLoading = false);
-			},
-			seconds
-		);
-
-		return {
-			finish: () => {
-				clearTimeout(timeout);
-				$$invalidate(0, showLoading = false);
-				callbacks.forEach(callback => callback());
-			}
-		};
+	const loadState = async () => {
+		await requestSharedState();
+		await requestLocalState();
+		console.log('loadState done');
 	};
 
-	const loadState = async () => {
-		requestState().then(success => {
-			if (success) {
-				loadedState.set(true);
-				return;
+	const retryPing = async () => {
+		await loadWithTimeout(ping(), 5).then(result => {
+			if (result) {
+				extensionConnectionState.set('connected');
+				requestAppState();
 			}
-
-			setTimeout(
-				async () => {
-					const loading = showLoadingFor(5);
-
-					// @dev listeners have to be set up before requesting state
-					const success = await requestState();
-
-					loading.finish();
-					loadedState.set(success);
-				},
-				5000
-			);
 		});
 	};
 
-	onMount(() => {
-		extensionInitialized.subscribe(initialized => {
-			if (initialized) {
-				loadState();
+	onMount(async () => {
+		await withTimeout(ping(), 5).then(result => {
+			if (result) {
+				extensionConnectionState.set('connected');
+
+				requestAppState().then(success => {
+					stateLoadState.set(success ? 'loaded' : 'failed');
+				});
+			} else {
+				throw new Error('Pinging extension failed');
 			}
+		}).catch(() => {
+			extensionConnectionState.set('failed');
 		});
 	});
 
-	const tryWakeServerRestart = async () => {
-		const loadingMessage = showLoadingFor(10);
+	const tryWakeServerRestart = () => {
+		loadWithTimeout(restartWakeServer(), 15, 'Restarting Wake server...').then(async () => {
+			const result = await loadWithTimeout(reconnectChain(), 15, 'Reconnecting to chain...');
 
-		try {
-			await restartWakeServer();
-			await reconnectChain(true);
-			await loadState();
-		} catch(error) {
-			showErrorMessage('Failed to restart Wake server');
-		}
+			if (!result) {
+				throw new Error('Reconnecting to chain failed');
+			}
+		}).then(async () => {
+			const result = await loadWithTimeout(loadState(), 15, 'Loading state...');
 
-		loadingMessage.finish();
+			if (!result) {
+				throw new Error('Loading state failed');
+			}
+		}).catch(e => {
+			showErrorMessage(typeof e === 'string' ? e : e.message);
+		});
 	};
 
 	const installAnvil = () => {
@@ -34214,7 +34273,7 @@ function instance($$self, $$props, $$invalidate) {
 	const writable_props = [];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Sake> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1.warn(`<Sake> was created with unknown prop '${key}'`);
 	});
 
 	const click_handler = () => openSettings('Tools-for-Solidity.Wake.installationMethod');
@@ -34235,14 +34294,16 @@ function instance($$self, $$props, $$invalidate) {
 		vsCodeTag,
 		onMount,
 		Tabs,
-		requestState,
 		setupListeners,
 		appState,
 		chainState,
 		currentChain,
-		RESTART_WAKE_SERVER_TIMEOUT,
+		requestSharedState,
+		requestAppState,
+		requestLocalState,
 		openExternal,
 		openSettings,
+		ping,
 		reconnectChain,
 		requestNewProvider,
 		restartWakeServer,
@@ -34252,40 +34313,61 @@ function instance($$self, $$props, $$invalidate) {
 		Deployment,
 		InteractionHeader,
 		ChainStatus,
-		extensionInitialized,
-		loadedState,
-		showLoading,
+		extensionConnectionState,
+		loadingMessage,
+		loadingShown,
+		stateLoadState,
+		loadWithTimeout,
+		withTimeout,
 		TabId,
 		tabs,
-		showLoadingFor,
 		loadState,
+		retryPing,
 		tryWakeServerRestart,
 		installAnvil,
-		$loadedState,
+		extensionInitializationState,
 		$appState,
+		$loadingShown,
+		$loadingMessage,
+		$stateLoadState,
+		$extensionConnectionState,
 		$chainState,
 		$currentChain
 	});
 
 	$$self.$inject_state = $$props => {
-		if ('showLoading' in $$props) $$invalidate(0, showLoading = $$props.showLoading);
 		if ('TabId' in $$props) TabId = $$props.TabId;
-		if ('tabs' in $$props) $$invalidate(5, tabs = $$props.tabs);
+		if ('tabs' in $$props) $$invalidate(7, tabs = $$props.tabs);
+		if ('extensionInitializationState' in $$props) $$invalidate(10, extensionInitializationState = $$props.extensionInitializationState);
 	};
 
 	if ($$props && "$$inject" in $$props) {
 		$$self.$inject_state($$props.$$inject);
 	}
 
+	$$self.$$.update = () => {
+		if ($$self.$$.dirty & /*$appState*/ 1) {
+			// Load state when appState is ready
+			$$invalidate(10, extensionInitializationState = $appState.initializationState);
+		}
+
+		if ($$self.$$.dirty & /*extensionInitializationState*/ 1024) {
+			extensionInitializationState === 'ready' && loadState();
+		}
+	};
+
 	return [
-		showLoading,
-		$loadedState,
 		$appState,
+		$loadingShown,
+		$loadingMessage,
+		$stateLoadState,
+		$extensionConnectionState,
 		$chainState,
 		$currentChain,
 		tabs,
 		tryWakeServerRestart,
 		installAnvil,
+		extensionInitializationState,
 		click_handler
 	];
 }

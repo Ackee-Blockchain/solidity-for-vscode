@@ -11,13 +11,16 @@ import {
 import { Account } from '../webview/shared/types';
 import { NetworkState } from '../webview/shared/storage_types';
 import { NetworkManager } from './NetworkManager';
-import { ChainStateProvider } from '../state/ChainStateProvider';
+import ChainStateProvider from '../state/ChainStateProvider';
 
 export abstract class NetworkProvider {
     type: NetworkId;
     _connected: boolean = false;
 
-    constructor(type: NetworkId, protected providerId: string) {
+    constructor(
+        type: NetworkId,
+        protected providerId: string
+    ) {
         this.type = type;
         NetworkManager.getInstance().addProvider(this);
     }
