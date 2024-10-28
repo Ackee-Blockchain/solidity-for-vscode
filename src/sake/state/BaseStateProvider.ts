@@ -46,7 +46,7 @@ export default abstract class BaseStateProvider<T> {
         // console.log('subscriptions', this.subscriptions);
         this.subscriptions.forEach((provider) => {
             provider.postMessageToWebview({
-                command: WebviewMessageId.getState,
+                command: WebviewMessageId.onGetState,
                 payload: this._state,
                 stateId: this._stateId
             });

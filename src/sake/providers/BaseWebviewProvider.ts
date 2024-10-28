@@ -129,12 +129,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.onInfo: {
+            case WebviewMessageId.showInfo: {
                 vscode.window.showInformationMessage(message.payload);
                 break;
             }
 
-            case WebviewMessageId.onError: {
+            case WebviewMessageId.showError: {
                 vscode.window.showErrorMessage(message.payload);
                 break;
             }
@@ -161,12 +161,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.onUndeployContract: {
+            case WebviewMessageId.undeployContract: {
                 this._sake.provider?.removeDeployedContract(message.payload);
                 break;
             }
 
-            case WebviewMessageId.onCompile: {
+            case WebviewMessageId.compile: {
                 await this._sake.provider?.compile();
 
                 webviewView.webview.postMessage({
@@ -180,27 +180,27 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.onDeploy: {
+            case WebviewMessageId.deploy: {
                 this._sake.provider?.deployContract(message.payload);
                 break;
             }
 
-            case WebviewMessageId.onContractFunctionCall: {
+            case WebviewMessageId.contractFunctionCall: {
                 this._sake.provider?.callContract(message.payload);
                 break;
             }
 
-            case WebviewMessageId.onSetBalance: {
+            case WebviewMessageId.setBalance: {
                 this._sake.provider?.setAccountBalance(message.payload);
                 break;
             }
 
-            case WebviewMessageId.onSetLabel: {
+            case WebviewMessageId.setLabel: {
                 this._sake.provider?.setAccountLabel(message.payload);
                 break;
             }
 
-            case WebviewMessageId.onNavigate: {
+            case WebviewMessageId.navigate: {
                 navigateTo(
                     message.payload.path,
                     message.payload.startOffset,
@@ -209,12 +209,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.onOpenExternal: {
+            case WebviewMessageId.openExternal: {
                 openExternal(message.payload.path);
                 break;
             }
 
-            case WebviewMessageId.onOpenDeploymentInBrowser: {
+            case WebviewMessageId.openDeploymentInBrowser: {
                 // TODO
                 if (!message.payload) {
                     console.error('No deployment params provided');
@@ -235,7 +235,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.onGetBytecode: {
+            case WebviewMessageId.getBytecode: {
                 const response: GetBytecodeResponse | undefined =
                     await this._sake.provider?.getBytecode(message.payload);
 
@@ -250,17 +250,17 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.onRequestNewProvider: {
+            case WebviewMessageId.requestNewProvider: {
                 this._sake.requestNewProvider();
                 break;
             }
 
-            case WebviewMessageId.onSelectChain: {
+            case WebviewMessageId.selectChain: {
                 this._sake.showProviderSelectionQuickPick();
                 break;
             }
 
-            case WebviewMessageId.onRestartWakeServer: {
+            case WebviewMessageId.restartWakeServer: {
                 const client = SakeContext.getInstance().client;
                 if (!client) {
                     console.error('Cannot restart Wake server, no client found');
@@ -286,7 +286,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.onOpenSettings: {
+            case WebviewMessageId.openSettings: {
                 if (!message.payload) {
                     console.error('Cannot open settings, no settings URL provided');
                     return;
@@ -296,12 +296,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.onOpenChainsQuickPick: {
+            case WebviewMessageId.openChainsQuickPick: {
                 this._sake.showProviderSelectionQuickPick();
                 break;
             }
 
-            case WebviewMessageId.onReconnectChain: {
+            case WebviewMessageId.reconnectChain: {
                 let success = true;
                 try {
                     await this._sake.provider?.connect();

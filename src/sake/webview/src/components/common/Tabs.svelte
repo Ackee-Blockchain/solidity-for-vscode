@@ -1,6 +1,6 @@
 <script lang="ts">
     import { SvelteComponent, type ComponentType } from 'svelte';
-    import { activeTabId } from '../../stores/appStore';
+    import { activeTabId } from '../../helpers/stores';
 
     export let tabs: { id: any; label: string; content: ComponentType; header?: ComponentType }[];
 </script>

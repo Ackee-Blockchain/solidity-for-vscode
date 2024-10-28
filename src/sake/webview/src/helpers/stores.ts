@@ -1,12 +1,40 @@
-import { writable, get, derived, readable } from 'svelte/store';
-import type { AccountState, ExtendedAccount } from '../../shared/types';
+import { writable, derived, get } from 'svelte/store';
+import {
+    type AccountState,
+    type AppState,
+    type ChainState,
+    type CompilationState,
+    type DeploymentState
+} from '../../shared/types';
 import { parseComplexNumber } from '../../shared/validate';
-import { accounts, appState, requestAppState } from './sakeStore';
-import { REQUEST_STATE_TIMEOUT } from '../helpers/constants';
-import { withTimeout } from '../helpers/helpers';
 
 /**
- * App Stores
+ * Extension data
+ */
+
+export const accounts = writable<AccountState>([]);
+export const deployedContracts = writable<DeploymentState>([]);
+export const compilationState = writable<CompilationState>({
+    contracts: [],
+    issues: [],
+    dirty: true
+});
+export const appState = writable<AppState>({
+    isAnvilInstalled: undefined,
+    isWakeServerRunning: undefined,
+    isOpenWorkspace: undefined,
+    initializationState: undefined
+});
+export const chainState = writable<ChainState>({
+    chains: [],
+    currentChainId: undefined
+});
+export const currentChain = derived(chainState, ($chainState) => {
+    return $chainState.chains.find((chain) => chain.chainId === $chainState.currentChainId);
+});
+
+/**
+ * Webview Stores
  */
 
 export const selectedAccountId = writable<number | null>(null);
@@ -34,7 +62,6 @@ export const selectedValue = derived(selectedValueString, ($selectedValueString)
 export const compilationIssuesVisible = writable<boolean>(false);
 export const activeTabId = writable<number>(0);
 export const txParametersExpanded = writable<boolean>(true);
-export const chainStatusExpanded = writable<boolean>(false);
 
 export const setSelectedAccount = (accountId: number | null) => {
     selectedAccountId.set(accountId);
@@ -67,3 +94,9 @@ export const extensionConnectionState = (() => {
 
 type StateLoadState = 'loading' | 'loaded' | 'failed';
 export const stateLoadState = writable<StateLoadState>('loading');
+
+/* Chain Navigator */
+export const chainNavigatorExpanded = writable<boolean>(false);
+
+type ChainNavigatorState = 'default' | 'createNewChain';
+export const chainNavigatorState = writable<ChainNavigatorState>('default');

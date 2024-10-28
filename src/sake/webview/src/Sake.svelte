@@ -16,15 +16,7 @@
     } from '@vscode/webview-ui-toolkit';
     import { onMount } from 'svelte';
     import Tabs from './components/common/Tabs.svelte';
-    import {
-        setupListeners,
-        appState,
-        chainState,
-        currentChain,
-        requestSharedState,
-        requestAppState,
-        requestLocalState
-    } from './stores/sakeStore';
+    import { appState, chainState, currentChain } from './helpers/stores';
 
     provideVSCodeDesignSystem().register(
         vsCodeButton(),
@@ -55,14 +47,20 @@
     import Interaction from './pages/Interaction.svelte';
     import Deployment from './pages/Deployment.svelte';
     import InteractionHeader from './pages/InteractionHeader.svelte';
-    import ChainStatus from './components/ChainStatus.svelte';
+    import ChainNavigator from './components/ChainNavigator.svelte';
     import {
         extensionConnectionState,
         loadingMessage,
         loadingShown,
         stateLoadState
-    } from './stores/appStore';
+    } from './helpers/stores';
     import { loadWithTimeout, withTimeout } from './helpers/helpers';
+    import {
+        requestAppState,
+        requestLocalState,
+        requestSharedState,
+        setupListeners
+    } from './helpers/events';
 
     setupListeners();
 
@@ -88,7 +86,6 @@
     const loadState = async () => {
         await requestSharedState();
         await requestLocalState();
-        console.log('loadState done');
     };
 
     const retryPing = async () => {
@@ -102,10 +99,10 @@
 
     onMount(async () => {
         await withTimeout(ping(), 5)
-            .then((result: boolean) => {
-                if (result) {
+            .then((success: boolean) => {
+                if (success) {
                     extensionConnectionState.set('connected');
-                    requestAppState().then((success) => {
+                    requestAppState().then((success: boolean) => {
                         stateLoadState.set(success ? 'loaded' : 'failed');
                     });
                 } else {
@@ -242,7 +239,7 @@
             </vscode-button>
         </div>
     {:else}
-        <ChainStatus />
+        <ChainNavigator />
         <div class="flex-grow overflow-hidden">
             {#if $currentChain?.connected}
                 <Tabs {tabs}></Tabs>

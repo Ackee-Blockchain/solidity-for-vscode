@@ -16,30 +16,33 @@ export interface BaseWebviewMessageResponse {
 }
 
 export enum WebviewMessageId {
-    // TODO consider removing in favor of specific getters
-    getState = 'getState', // getter for any state
+    // webview -> extension
     requestState = 'requestState', // request any state from the backend
-    onInfo = 'onInfo',
-    onError = 'onError',
+    showInfo = 'showInfo',
+    showError = 'showError',
     getTextFromInputBox = 'getTextFromInputBox',
     copyToClipboard = 'copyToClipboard',
-    onCompile = 'onCompile',
-    onDeploy = 'onDeploy',
-    onContractFunctionCall = 'onContractFunctionCall',
-    onUndeployContract = 'onUndeployContract', // TODO rename
-    onSetBalance = 'onSetBalance',
-    onSetLabel = 'onSetLabel',
-    onNavigate = 'onNavigate',
-    onOpenExternal = 'onOpenExternal',
-    onOpenDeploymentInBrowser = 'onOpenDeploymentInBrowser',
-    onGetBytecode = 'onGetBytecode',
-    onRequestNewProvider = 'onRequestNewProvider',
-    onRestartWakeServer = 'onRestartWakeServer',
-    onSelectChain = 'onSelectChain',
-    onOpenSettings = 'onOpenSettings',
-    onOpenChainsQuickPick = 'onOpenChainsQuickPick',
-    onReconnectChain = 'onReconnectChain',
-    ping = 'ping'
+    compile = 'compile',
+    deploy = 'deploy',
+    contractFunctionCall = 'contractFunctionCall',
+    undeployContract = 'undeployContract', // TODO rename
+    setBalance = 'setBalance',
+    setLabel = 'setLabel',
+    navigate = 'navigate',
+    openExternal = 'openExternal',
+    openDeploymentInBrowser = 'openDeploymentInBrowser',
+    getBytecode = 'getBytecode',
+    requestNewProvider = 'requestNewProvider',
+    restartWakeServer = 'restartWakeServer',
+    selectChain = 'selectChain',
+    openSettings = 'openSettings',
+    openChainsQuickPick = 'openChainsQuickPick',
+    reconnectChain = 'reconnectChain',
+    ping = 'ping',
+
+    // extension -> webview
+    onGetState = 'onGetState',
+    onSignal = 'onSignal'
 }
 
 export type SpecificWebviewMessageResponse<T extends WebviewMessageId> = {
@@ -60,11 +63,11 @@ export type WebviewMessageRequest =
           payload: StateId;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onInfo;
+          command: WebviewMessageId.showInfo;
           payload: string;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onError;
+          command: WebviewMessageId.showError;
           payload: string;
       } & BaseWebviewMessageRequest)
     | ({
@@ -79,31 +82,31 @@ export type WebviewMessageRequest =
           payload?: string;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onCompile;
+          command: WebviewMessageId.compile;
           payload: undefined;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onDeploy;
+          command: WebviewMessageId.deploy;
           payload: DeploymentRequest;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onContractFunctionCall;
+          command: WebviewMessageId.contractFunctionCall;
           payload: CallRequest;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onUndeployContract;
+          command: WebviewMessageId.undeployContract;
           payload: Address;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onSetBalance;
+          command: WebviewMessageId.setBalance;
           payload: SetAccountBalanceRequest;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onSetLabel;
+          command: WebviewMessageId.setLabel;
           payload: SetAccountLabelRequest;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onNavigate;
+          command: WebviewMessageId.navigate;
           payload: {
               path: string;
               startOffset?: number;
@@ -111,37 +114,37 @@ export type WebviewMessageRequest =
           };
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onOpenExternal;
+          command: WebviewMessageId.openExternal;
           payload: {
               path: string;
           };
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onOpenDeploymentInBrowser;
+          command: WebviewMessageId.openDeploymentInBrowser;
           payload: any; // TODO
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onGetBytecode;
+          command: WebviewMessageId.getBytecode;
           payload: GetBytecodeRequest;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onRequestNewProvider;
+          command: WebviewMessageId.requestNewProvider;
           payload: undefined;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onRestartWakeServer;
+          command: WebviewMessageId.restartWakeServer;
           payload: undefined;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onSelectChain;
+          command: WebviewMessageId.selectChain;
           payload: undefined;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onOpenSettings;
+          command: WebviewMessageId.openSettings;
           payload: string;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onOpenChainsQuickPick;
+          command: WebviewMessageId.openChainsQuickPick;
           payload: undefined;
       } & BaseWebviewMessageRequest)
     | ({
@@ -149,13 +152,13 @@ export type WebviewMessageRequest =
           payload: undefined;
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.onReconnectChain;
+          command: WebviewMessageId.reconnectChain;
           payload: undefined;
       } & BaseWebviewMessageRequest);
 
 export type WebviewMessageResponse =
     | ({
-          command: WebviewMessageId.getState;
+          command: WebviewMessageId.onGetState;
           payload: any;
           stateId: StateId;
       } & BaseWebviewMessageResponse)
@@ -166,7 +169,7 @@ export type WebviewMessageResponse =
           };
       } & BaseWebviewMessageResponse)
     | ({
-          command: WebviewMessageId.onGetBytecode;
+          command: WebviewMessageId.getBytecode;
           payload: {
               bytecode?: string;
           };
@@ -178,13 +181,13 @@ export type WebviewMessageResponse =
           };
       } & BaseWebviewMessageResponse)
     | ({
-          command: WebviewMessageId.onRestartWakeServer;
+          command: WebviewMessageId.restartWakeServer;
           payload: {
               success: boolean;
           };
       } & BaseWebviewMessageResponse)
     | ({
-          command: WebviewMessageId.onCompile;
+          command: WebviewMessageId.compile;
           payload: {
               success: boolean;
           };
@@ -196,11 +199,21 @@ export type WebviewMessageResponse =
           };
       } & BaseWebviewMessageResponse)
     | ({
-          command: WebviewMessageId.onReconnectChain;
+          command: WebviewMessageId.reconnectChain;
           payload: {
               success: boolean;
           };
+      } & BaseWebviewMessageResponse)
+    | ({
+          command: WebviewMessageId.onSignal;
+          payload: {
+              signal: SignalType;
+          };
       } & BaseWebviewMessageResponse);
+
+export enum SignalType {
+    showAdvancedLocalChainSetup = 'showAdvancedLocalChainSetup'
+}
 
 // export type WebviewMessageRequest<T extends keyof WebviewMessageRequestPayload> = {
 //     command: T;
