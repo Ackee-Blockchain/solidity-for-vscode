@@ -4,11 +4,14 @@
     import MultipleWindowsIcon from './icons/MultipleWindowsIcon.svelte';
     import BlankIcon from './icons/BlankIcon.svelte';
     import { openChainsQuickPick } from '../helpers/api';
-    import { chainNavigatorExpanded, chainNavigatorState } from '../helpers/stores';
+    import { chainNavigator } from '../helpers/stores';
     import ExpandButton from './icons/ExpandButton.svelte';
     import DefaultButton from './icons/DefaultButton.svelte';
     import Divider from './Divider.svelte';
     import ClickableSpan from './ClickableSpan.svelte';
+    import CloseIcon from './icons/CloseIcon.svelte';
+    import AdvancedLocalChainSetup from './AdvancedLocalChainSetup.svelte';
+    import { getCssVarWithOpacity } from '../helpers/helpers';
 </script>
 
 <!-- <ViewHeader>
@@ -16,14 +19,29 @@
 </ViewHeader> -->
 
 <div class="p-2">
-    {#if $chainNavigatorState === 'default'}
-        <TextContainer
-            classList="chain-status-container {$chainNavigatorExpanded
-                ? 'chain-status-container--expanded'
-                : ''}"
-        >
+    <!-- Placeholder to maintain layout space -->
+    <div class="h-[26px]"></div>
+
+    <!-- Backdrop overlay -->
+    {#if $chainNavigator.state === 'advancedLocalChainSetup'}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div
+            class="fixed inset-0 z-[5]"
+            style="background: {getCssVarWithOpacity('--vscode-sideBar-background', 0.8)}"
+        />
+    {/if}
+
+    <TextContainer
+        classList="chain-navigator-container {$chainNavigator.expanded
+            ? 'chain-navigator-container--expanded'
+            : ''}"
+    >
+        {#if $chainNavigator.state === 'default'}
             <div class="flex gap-1 items-center text-sm h-[26px] justify-between">
-                <ExpandButton bind:expanded={$chainNavigatorExpanded} />
+                <ExpandButton
+                    callback={chainNavigator.toggleExpanded}
+                    expanded={$chainNavigator.expanded}
+                />
                 <!-- <BlankIcon /> -->
 
                 {#if !$currentChain}
@@ -37,8 +55,8 @@
                     <MultipleWindowsIcon />
                 </DefaultButton>
             </div>
-            {#if $chainNavigatorExpanded}
-                <Divider className="" />
+            {#if $chainNavigator.expanded}
+                <!-- <Divider className="" />
                 <div class="flex flex-col gap-1 p-2">
                     <ClickableSpan callback={() => {}}>Create snapshot</ClickableSpan>
                     <ClickableSpan callback={() => {}}>Rename</ClickableSpan>
@@ -50,23 +68,36 @@
                     <ClickableSpan callback={() => {}}>Create new chain</ClickableSpan>
                     <ClickableSpan callback={() => {}}>Manage chains</ClickableSpan>
                     <ClickableSpan callback={() => {}}>Manage accounts</ClickableSpan>
-                </div>
+                </div> -->
             {/if}
-        </TextContainer>
-    {:else if $chainNavigatorState === 'createNewChain'}
-        <TextContainer>
-            <span>Create new chain</span>
-        </TextContainer>
-    {/if}
+        {:else if $chainNavigator.state === 'advancedLocalChainSetup'}
+            <div class="flex gap-1 items-center text-sm h-[26px] justify-between">
+                <DefaultButton callback={chainNavigator.clear}>
+                    <CloseIcon />
+                </DefaultButton>
+                <!-- <BlankIcon /> -->
+
+                <span class="truncate">Advanced Local Chain Setup</span>
+                <BlankIcon />
+            </div>
+            <Divider className="" />
+            <AdvancedLocalChainSetup />
+        {/if}
+    </TextContainer>
 </div>
 
 <style>
     /* @dev global to force css style to be included */
-    :global(.chain-status-container) {
+    :global(.chain-navigator-container) {
         padding: 0 !important;
+        position: absolute;
+        top: 8px; /* to account for parent p-2 */
+        left: 8px; /* to account for parent p-2 */
+        right: 8px;
+        z-index: 10;
     }
 
-    :global(.chain-status-container:not(.chain-status-container--expanded)) {
+    :global(.chain-navigator-container:not(.chain-navigator-container--expanded)) {
         height: 26px !important;
     }
 </style>

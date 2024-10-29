@@ -175,13 +175,13 @@ export async function getBytecode(contractFqn: string): Promise<GetBytecodeRespo
     return await messageHandler.request<GetBytecodeResponse>(request.command, request.payload);
 }
 
-export async function requestNewProvider() {
-    const request: WebviewMessageRequest = {
-        command: WebviewMessageId.requestNewProvider,
-        payload: undefined
-    };
-    messageHandler.send(request.command, request.payload);
-}
+// export async function requestNewProvider() {
+//     const request: WebviewMessageRequest = {
+//         command: WebviewMessageId.requestNewProvider,
+//         payload: undefined
+//     };
+//     messageHandler.send(request.command, request.payload);
+// }
 
 export async function selectChain(chainId: string) {
     const request: WebviewMessageRequest = {

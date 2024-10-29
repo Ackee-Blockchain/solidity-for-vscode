@@ -98,8 +98,9 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         );
     }
 
-    public postMessageToWebview(message: any) {
+    public postMessageToWebview(message: WebviewMessageResponse) {
         // TODO set type
+        console.log('postMessageToWebview', message);
         this._view?.webview.postMessage(message);
     }
 
@@ -250,10 +251,10 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.requestNewProvider: {
-                this._sake.requestNewProvider();
-                break;
-            }
+            // case WebviewMessageId.requestNewProvider: {
+            //     this._sake.requestNewProvider();
+            //     break;
+            // }
 
             case WebviewMessageId.selectChain: {
                 this._sake.showProviderSelectionQuickPick();

@@ -32,7 +32,7 @@ export enum WebviewMessageId {
     openExternal = 'openExternal',
     openDeploymentInBrowser = 'openDeploymentInBrowser',
     getBytecode = 'getBytecode',
-    requestNewProvider = 'requestNewProvider',
+    requestNewProvider = 'requestNewProvider', // TODO remove
     restartWakeServer = 'restartWakeServer',
     selectChain = 'selectChain',
     openSettings = 'openSettings',
@@ -206,12 +206,11 @@ export type WebviewMessageResponse =
       } & BaseWebviewMessageResponse)
     | ({
           command: WebviewMessageId.onSignal;
-          payload: {
-              signal: SignalType;
-          };
+          payload: any;
+          signalId: SignalId;
       } & BaseWebviewMessageResponse);
 
-export enum SignalType {
+export enum SignalId {
     showAdvancedLocalChainSetup = 'showAdvancedLocalChainSetup'
 }
 

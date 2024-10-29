@@ -4,7 +4,8 @@ import {
     type AppState,
     type ChainState,
     type CompilationState,
-    type DeploymentState
+    type DeploymentState,
+    type NetworkCreationConfiguration
 } from '../../shared/types';
 import { parseComplexNumber } from '../../shared/validate';
 
@@ -96,7 +97,60 @@ type StateLoadState = 'loading' | 'loaded' | 'failed';
 export const stateLoadState = writable<StateLoadState>('loading');
 
 /* Chain Navigator */
-export const chainNavigatorExpanded = writable<boolean>(false);
+type BaseChainNavigatorState = {
+    state: string;
+    expanded: boolean;
+};
 
-type ChainNavigatorState = 'default' | 'createNewChain';
-export const chainNavigatorState = writable<ChainNavigatorState>('default');
+type ChainNavigatorState =
+    | (BaseChainNavigatorState & {
+          state: 'default';
+      })
+    | (BaseChainNavigatorState & {
+          state: 'advancedLocalChainSetup';
+          expanded: true;
+          config?: NetworkCreationConfiguration;
+          activeTab: 'create' | 'connect';
+      });
+
+export const chainNavigator = (() => {
+    const { subscribe, set } = writable<ChainNavigatorState>({
+        // state: 'default',
+        // expanded: false,
+        state: 'advancedLocalChainSetup',
+        expanded: true,
+        config: undefined,
+        activeTab: 'connect'
+    });
+
+    return {
+        subscribe,
+        showAdvancedLocalChainSetup: (activeTab: 'create' | 'connect' = 'connect') => {
+            set({
+                state: 'advancedLocalChainSetup',
+                config: undefined,
+                activeTab,
+                expanded: true
+            });
+        },
+        clear: () => {
+            set({
+                state: 'default',
+                expanded: false
+            });
+        },
+        toggleExpanded: () => {
+            const state = get(chainNavigator);
+            if (state.state === 'default') {
+                set({ ...state, expanded: !state.expanded });
+            }
+        },
+        setActiveTab: (tab: 'create' | 'connect') => {
+            const state = get(chainNavigator);
+            console.log('setting active tab', tab);
+            if (state.state === 'advancedLocalChainSetup') {
+                set({ ...state, activeTab: tab });
+            }
+        }
+    };
+})();
