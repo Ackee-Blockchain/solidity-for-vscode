@@ -333,6 +333,14 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
+            case WebviewMessageId.createNewLocalChain: {
+                this._sake.createNewLocalChain(
+                    message.payload.displayName,
+                    message.payload.networkCreationConfig
+                );
+                break;
+            }
+
             default: {
                 // Pass the message to the inheriting class
                 this._onDidReceiveMessage(message);

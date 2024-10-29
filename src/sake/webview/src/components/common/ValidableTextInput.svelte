@@ -4,18 +4,19 @@
     export let value: string | undefined = undefined;
     export let error: string | null = null;
     export let onChange: (value: string) => void | undefined = () => undefined;
-    export let validate: (value: string) => string | null = () => null;
-    export let transform: (value: string) => string = (value) => value;
+    export let validate: (value: string | undefined) => string | null = () => null;
+    export let transform: (value: string | undefined) => string = (value) => value ?? '';
 
     let stringValue: string | undefined = undefined;
 
-    const valueChangeHandler = (e: CustomEvent<string>) => {
-        stringValue = e.detail;
+    const valueChangeHandler = (event: any) => {
+        stringValue = event.target.value;
         const validationResult = validate(stringValue);
-        if (validationResult !== null) {
+        if (validationResult != null) {
             error = validationResult;
             return;
         }
+        error = null;
         stringValue = transform(stringValue);
         value = stringValue;
         onChange(value);
@@ -28,7 +29,7 @@
 <vscode-text-field
     class="w-full"
     {placeholder}
-    value={value ?? stringValue}
+    value={value ?? stringValue ?? ''}
     on:change={valueChangeHandler}
 />
 {#if error}

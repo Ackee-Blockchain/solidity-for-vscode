@@ -1,25 +1,10 @@
 <script lang="ts">
-    import { currentChain } from '../helpers/stores';
-    import TextContainer from './TextContainer.svelte';
-    import MultipleWindowsIcon from './icons/MultipleWindowsIcon.svelte';
-    import BlankIcon from './icons/BlankIcon.svelte';
-    import { openChainsQuickPick } from '../helpers/api';
     import { chainNavigator } from '../helpers/stores';
-    import ExpandButton from './icons/ExpandButton.svelte';
-    import DefaultButton from './icons/DefaultButton.svelte';
-    import Divider from './Divider.svelte';
-    import ClickableSpan from './ClickableSpan.svelte';
-    import CloseIcon from './icons/CloseIcon.svelte';
-    import type {
-        CreateLocalChainRequest,
-        NetworkConnectionConfiguration,
-        NetworkCreationConfiguration
-    } from '../../shared/types';
-    import { writable, derived } from 'svelte/store';
-    import ViewHeader from './common/ViewHeader.svelte';
     import SegmentedControl from './common/SegmentedControl.svelte';
     import ValidableTextInput from './common/ValidableTextInput.svelte';
-    import { validateNonEmptyString } from '../helpers/validation';
+    import { validateNonEmptyString, validateNumber } from '../helpers/validation';
+    import DefaultButton from './icons/DefaultButton.svelte';
+    import { createNewLocalChain } from '../helpers/api';
 
     // export let form:
     //     | (NetworkCreationConfiguration & { displayName?: string })
@@ -27,7 +12,16 @@
     //     displayName: 'Local Chain'
     // };
 
-    export let form: any;
+    export let form = {
+        displayName: 'Local Chain',
+        accounts: undefined,
+        chainId: undefined,
+        fork: undefined,
+        hardfork: undefined,
+        minGasPrice: undefined,
+        blockBaseFeePerGas: undefined,
+        uri: undefined
+    };
 
     // let errors: Partial<
     //     Record<keyof (NetworkCreationConfiguration & { displayName?: string }), string>
@@ -75,8 +69,6 @@
     //         };
     //     };
     // }
-
-    $: console.log(form);
 </script>
 
 <!-- <ViewHeader>
@@ -86,7 +78,8 @@
 <!-- @dev for proper typing -->
 {#if $chainNavigator.state === 'advancedLocalChainSetup'}
     <div style="background:#2c2c2c" class="p-2">
-        <div class="flex flex-col gap-2">
+        <!-- TODO: remove hardcoded background color -->
+        <div class="flex flex-col gap-3">
             <div class="flex flex-col gap-1">
                 <ValidableTextInput
                     label="Display Name"
@@ -102,104 +95,71 @@
                     chainNavigator.setActiveTab(e.detail === 0 ? 'create' : 'connect')}
             />
 
-            <div class="flex flex-col gap-1">
-                {#if $chainNavigator.activeTab === 'create'}
-                    <!-- <ViewHeader>Create a new local chain</ViewHeader> -->
+            {#if $chainNavigator.activeTab === 'create'}
+                <!-- <ViewHeader>Create a new local chain</ViewHeader> -->
+                <div class="flex flex-col gap-1">
+                    <ValidableTextInput
+                        label="Number of accounts"
+                        validate={validateNumber}
+                        bind:value={form.accounts}
+                    />
 
-                    <div>
-                        <span class="text-sm">Number of accounts</span>
-                        <vscode-text-field
-                            placeholder="0"
-                            class="w-full"
-                            value={form.accounts}
-                            on:change={createFormChangeHandler('accounts')}
-                        />
-                        {#if errors.accounts}
-                            <span class="text-xs text-red-500">{errors.accounts}</span>
-                        {/if}
-                    </div>
+                    <ValidableTextInput
+                        label="Chain ID"
+                        validate={validateNumber}
+                        bind:value={form.chainId}
+                    />
 
-                    <div>
-                        <span class="text-sm">Chain ID</span>
-                        <vscode-text-field
-                            placeholder="0"
-                            class="w-full"
-                            value={form.chainId}
-                            on:change={createFormChangeHandler('chainId')}
-                        />
-                        {#if errors.chainId}
-                            <span class="text-xs text-red-500">{errors.chainId}</span>
-                        {/if}
-                    </div>
+                    <ValidableTextInput
+                        label="Fork"
+                        validate={validateNonEmptyString}
+                        bind:value={form.fork}
+                    />
 
-                    <div>
-                        <span class="text-sm">Fork</span>
-                        <vscode-text-field
-                            placeholder="Fork name"
-                            class="w-full"
-                            value={form.fork}
-                            on:change={createFormChangeHandler('fork')}
-                        />
-                        {#if errors.fork}
-                            <span class="text-xs text-red-500">{errors.fork}</span>
-                        {/if}
-                    </div>
+                    <ValidableTextInput
+                        label="Hardfork"
+                        validate={validateNonEmptyString}
+                        bind:value={form.hardfork}
+                    />
 
-                    <div>
-                        <span class="text-sm">Hardfork</span>
-                        <vscode-text-field
-                            placeholder="Hardfork name"
-                            class="w-full"
-                            value={form.hardfork}
-                            on:change={createFormChangeHandler('hardfork')}
-                        />
-                        {#if errors.hardfork}
-                            <span class="text-xs text-red-500">{errors.hardfork}</span>
-                        {/if}
-                    </div>
+                    <ValidableTextInput
+                        label="Minimum Gas Price"
+                        validate={validateNumber}
+                        bind:value={form.minGasPrice}
+                    />
 
-                    <div>
-                        <span class="text-sm">Minimum Gas Price</span>
-                        <vscode-text-field
-                            placeholder="0"
-                            class="w-full"
-                            value={form.minGasPrice}
-                            on:change={createFormChangeHandler('minGasPrice')}
-                        />
-                        {#if errors.minGasPrice}
-                            <span class="text-xs text-red-500">{errors.minGasPrice}</span>
-                        {/if}
-                    </div>
+                    <ValidableTextInput
+                        label="Block Base Fee Per Gas"
+                        validate={validateNumber}
+                        bind:value={form.blockBaseFeePerGas}
+                    />
+                </div>
 
-                    <div>
-                        <span class="text-sm">Block Base Fee Per Gas</span>
-                        <vscode-text-field
-                            placeholder="0"
-                            class="w-full"
-                            value={form.blockBaseFeePerGas}
-                            on:change={createFormChangeHandler('blockBaseFeePerGas')}
-                        />
-                        {#if errors.blockBaseFeePerGas}
-                            <span class="text-xs text-red-500">{errors.blockBaseFeePerGas}</span>
-                        {/if}
-                    </div>
-                {:else if $chainNavigator.activeTab === 'connect'}
-                    <!-- <ViewHeader>Connect to existing chain</ViewHeader> -->
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <vscode-button
+                    appearance="primary"
+                    on:click={() =>
+                        createNewLocalChain(form.displayName, {
+                            accounts: form.accounts,
+                            chainId: form.chainId,
+                            fork: form.fork,
+                            hardfork: form.hardfork,
+                            minGasPrice: form.minGasPrice,
+                            blockBaseFeePerGas: form.blockBaseFeePerGas
+                        })}
+                >
+                    Create
+                </vscode-button>
+            {:else if $chainNavigator.activeTab === 'connect'}
+                <ValidableTextInput
+                    label="URI Connection String"
+                    validate={validateNonEmptyString}
+                    bind:value={form.uri}
+                />
 
-                    <div>
-                        <span class="text-sm">URI Connection String</span>
-                        <vscode-text-field
-                            placeholder="0"
-                            class="w-full"
-                            value={form.uri}
-                            on:change={createFormChangeHandler('uri')}
-                        />
-                        {#if errors.blockBaseFeePerGas}
-                            <span class="text-xs text-red-500">{errors.blockBaseFeePerGas}</span>
-                        {/if}
-                    </div>
-                {/if}
-            </div>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- <vscode-button appearance="primary" on:click={() => {}}> Connect </vscode-button> -->
+            {/if}
         </div>
     </div>
 {/if}

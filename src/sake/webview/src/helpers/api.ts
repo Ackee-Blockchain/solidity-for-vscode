@@ -9,7 +9,8 @@ import {
     type WebviewMessageRequest,
     type Address,
     type DeployedContract,
-    type GetBytecodeResponse
+    type GetBytecodeResponse,
+    type NetworkCreationConfiguration
 } from '../../shared/types';
 import { deployedContracts } from './stores';
 
@@ -212,6 +213,20 @@ export async function reconnectChain(): Promise<boolean> {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.reconnectChain,
         payload: undefined
+    };
+    return await messageHandler.request<boolean>(request.command, request.payload);
+}
+
+export async function createNewLocalChain(
+    displayName: string,
+    networkCreationConfig?: NetworkCreationConfiguration
+) {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.createNewLocalChain,
+        payload: {
+            displayName,
+            networkCreationConfig
+        }
     };
     return await messageHandler.request<boolean>(request.command, request.payload);
 }
