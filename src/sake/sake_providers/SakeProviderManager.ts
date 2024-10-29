@@ -312,6 +312,15 @@ export default class SakeProviderManager {
         }
     }
 
+    public async createNewLocalChain(
+        displayName: string,
+        networkCreationConfig?: NetworkCreationConfiguration
+    ) {
+        this.addProvider(
+            await SakeProviderFactory.createNewLocalProvider(displayName, networkCreationConfig)
+        );
+    }
+
     public async requestNewAdvancedLocalProvider() {
         this.sendSignalToWebview(SignalId.showAdvancedLocalChainSetup);
     }

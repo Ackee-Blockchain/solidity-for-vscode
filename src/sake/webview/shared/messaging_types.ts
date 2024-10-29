@@ -2,6 +2,7 @@ import type {
     CallRequest,
     DeploymentRequest,
     GetBytecodeRequest,
+    NetworkCreationConfiguration,
     SetAccountBalanceRequest,
     SetAccountLabelRequest
 } from './network_types';
@@ -39,6 +40,10 @@ export enum WebviewMessageId {
     openChainsQuickPick = 'openChainsQuickPick',
     reconnectChain = 'reconnectChain',
     ping = 'ping',
+
+    // chain manager
+    createNewLocalChain = 'createNewLocalChain',
+    connectToLocalChain = 'connectToLocalChain',
 
     // extension -> webview
     onGetState = 'onGetState',
@@ -154,6 +159,13 @@ export type WebviewMessageRequest =
     | ({
           command: WebviewMessageId.reconnectChain;
           payload: undefined;
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.createNewLocalChain;
+          payload: {
+              displayName: string;
+              networkCreationConfig?: NetworkCreationConfiguration;
+          };
       } & BaseWebviewMessageRequest);
 
 export type WebviewMessageResponse =
