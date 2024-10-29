@@ -2,7 +2,9 @@ import {
     AccountState,
     DeploymentState,
     NetworkCreationConfiguration,
-    TransactionHistoryState
+    SignalId,
+    TransactionHistoryState,
+    WebviewMessageId
 } from '../webview/shared/types';
 import AppStateProvider from '../state/AppStateProvider';
 import * as vscode from 'vscode';
@@ -210,12 +212,12 @@ export default class SakeProviderManager {
             kind: vscode.QuickPickItemKind.Default
         });
 
-        // // add option to connect setup advanced local node
-        // quickPickItems.push({
-        //     iconPath: new vscode.ThemeIcon('plus'),
-        //     label: 'Create new local chain (advanced)',
-        //     kind: vscode.QuickPickItemKind.Default
-        // });
+        // add option to connect setup advanced local node
+        quickPickItems.push({
+            iconPath: new vscode.ThemeIcon('plus'),
+            label: 'Create new local chain (advanced)',
+            kind: vscode.QuickPickItemKind.Default
+        });
 
         // // add option to connect to remote node
         // quickPickItems.push({
@@ -257,9 +259,9 @@ export default class SakeProviderManager {
                     return;
                 }
                 if (selectedItem.label === 'Create new local chain') {
-                    this.requestNewProvider();
+                    this.requestNewLocalProvider();
                 } else if (selectedItem.label === 'Create new local chain (advanced)') {
-                    // pass
+                    this.requestNewAdvancedLocalProvider();
                 } else if (selectedItem.label === 'Connect to remote node') {
                     // pass
                 } else {
@@ -293,7 +295,7 @@ export default class SakeProviderManager {
         // });
     }
 
-    public async requestNewProvider() {
+    public async requestNewLocalProvider() {
         // get input from user
         const chainName = await getTextFromInputBox(
             'Select a name for the new chain',
@@ -308,6 +310,23 @@ export default class SakeProviderManager {
         if (provider) {
             this.addProvider(provider);
         }
+    }
+
+    public async requestNewAdvancedLocalProvider() {
+        this.sendSignalToWebview(SignalId.showAdvancedLocalChainSetup);
+    }
+
+    private sendSignalToWebview(signal: SignalId, data?: any) {
+        const webview = SakeContext.getInstance().webviewProvider;
+        if (!webview) {
+            console.error(`A signal (${signal}) was requested but no webview was found.`);
+            return;
+        }
+        webview.postMessageToWebview({
+            command: WebviewMessageId.onSignal,
+            signalId: signal,
+            payload: data
+        });
     }
 
     private _initializeStatusBar() {

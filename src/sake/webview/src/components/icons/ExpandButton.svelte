@@ -2,13 +2,12 @@
     import DefaultButton from './DefaultButton.svelte';
 
     export let expanded: boolean;
+    export let callback: () => void = () => {
+        expanded = !expanded;
+    };
 </script>
 
-<DefaultButton
-    callback={() => {
-        expanded = !expanded;
-    }}
->
+<DefaultButton {callback}>
     {#if expanded}
         <!-- chevron down from codicons -->
         <svg

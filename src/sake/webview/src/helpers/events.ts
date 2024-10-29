@@ -1,7 +1,7 @@
 import { messageHandler } from '@estruyf/vscode/dist/client';
 import { withTimeout } from './helpers';
 import {
-    SignalType,
+    SignalId,
     WebviewMessageId,
     type WebviewMessageResponse
 } from '../../shared/messaging_types';
@@ -9,6 +9,7 @@ import { RESTART_WAKE_SERVER_TIMEOUT } from './constants';
 import {
     accounts,
     appState,
+    chainNavigator,
     chainState,
     compilationState,
     deployedContracts,
@@ -17,6 +18,22 @@ import {
 } from './stores';
 import { StateId, type AccountState } from '../../shared/state_types';
 import { get } from 'svelte/store';
+
+export async function restartWakeServer(): Promise<boolean> {
+    return withTimeout(
+        messageHandler.request<{
+            success: boolean;
+        }>(WebviewMessageId.restartWakeServer, {}),
+        RESTART_WAKE_SERVER_TIMEOUT
+    )
+        .then((result) => {
+            return (result as { success: boolean }).success;
+        })
+        .catch((_) => {
+            console.error('Requesting state from the extension timed out');
+            return false;
+        });
+}
 
 export function requestAppState(): Promise<boolean> {
     return requestState([StateId.App]);
@@ -64,114 +81,99 @@ export function setupListeners() {
     window.addEventListener('message', (event) => {
         const message = event.data as WebviewMessageResponse;
 
-        // console.log('received message', message);
-
         switch (message.command) {
-            case WebviewMessageId.onSignal: {
-                if (message.payload === undefined) {
-                    return;
-                }
-
-                const { signal } = message.payload;
-
-                if (signal === SignalType.showAdvancedLocalChainSetup) {
-                    // showAdvancedLocalChainSetup();
-                }
-                break;
-            }
-
             case WebviewMessageId.onGetState: {
-                if (message.stateId === StateId.DeployedContracts) {
-                    if (message.payload === undefined) {
-                        return;
-                    }
-                    deployedContracts.set(message.payload);
-                }
-
-                if (message.stateId === StateId.CompiledContracts) {
-                    if (message.payload === undefined) {
-                        return;
-                    }
-                    compilationState.set(message.payload);
-                    return;
-                }
-
-                if (message.stateId === StateId.Accounts) {
-                    const _accounts = message.payload as AccountState;
-                    const _selectedAccount = get(selectedAccount);
-
-                    // update accounts store
-                    accounts.set(_accounts);
-
-                    // if no accounts, reset selected account
-                    if (_accounts.length === 0) {
-                        setSelectedAccount(null);
-                        return;
-                    }
-
-                    // check if selected account is still in the list, if not select the first account
-                    if (
-                        _selectedAccount === null ||
-                        (_selectedAccount !== null &&
-                            !_accounts.some(
-                                (account: { address: any }) =>
-                                    account.address === _selectedAccount.address
-                            ))
-                    ) {
-                        setSelectedAccount(0);
-                        return;
-                    }
-
-                    // if selectedAccount is in payload, update selectedAccount
-                    // @dev accounts.find should not return undefined, since checked above
-                    if (_selectedAccount !== null) {
-                        setSelectedAccount(
-                            _accounts.findIndex(
-                                (account: { address: any }) =>
-                                    account.address === _selectedAccount.address
-                            ) ?? null
-                        );
-                    }
-
-                    return;
-                }
-
-                if (message.stateId === StateId.Chain) {
-                    if (message.payload === undefined) {
-                        return;
-                    }
-                    chainState.set(message.payload);
-                    return;
-                }
-
-                if (message.stateId === StateId.App) {
-                    // console.log('received appState', message.payload);
-                    if (message.payload === undefined) {
-                        return;
-                    }
-
-                    appState.set(message.payload);
-                    return;
-                }
-
+                handleStateResponse(message);
                 break;
             }
+
+            case WebviewMessageId.onSignal: {
+                console.log('onSignal', message);
+                handleSignal(message);
+                break;
+            }
+
+            // @dev some events might be caught by messageHandlers and are not intended for the webview
+            // such messages originated in the webview
+            // only events sent from the extension are handled here
+            // default: {
+            //     console.error(`No listener set up for message with id ${message.command}`);
+            //     break;
+            // }
         }
     });
 }
 
-export async function restartWakeServer(): Promise<boolean> {
-    return withTimeout(
-        messageHandler.request<{
-            success: boolean;
-        }>(WebviewMessageId.restartWakeServer, {}),
-        RESTART_WAKE_SERVER_TIMEOUT
-    )
-        .then((result) => {
-            return (result as { success: boolean }).success;
-        })
-        .catch((_) => {
-            console.error('Requesting state from the extension timed out');
-            return false;
-        });
+function handleStateResponse(
+    message: WebviewMessageResponse & { command: WebviewMessageId.onGetState }
+) {
+    switch (message.stateId) {
+        case StateId.DeployedContracts: {
+            deployedContracts.set(message.payload);
+            break;
+        }
+
+        case StateId.CompiledContracts: {
+            compilationState.set(message.payload);
+            break;
+        }
+
+        case StateId.Accounts: {
+            const _accounts = message.payload as AccountState;
+            const _selectedAccount = get(selectedAccount);
+
+            // update accounts store
+            accounts.set(_accounts);
+
+            // if no accounts, reset selected account
+            if (_accounts.length === 0) {
+                setSelectedAccount(null);
+                break;
+            }
+
+            // check if selected account is still in the list, if not select the first account
+            if (
+                _selectedAccount === null ||
+                (_selectedAccount !== null &&
+                    !_accounts.some(
+                        (account: { address: any }) => account.address === _selectedAccount.address
+                    ))
+            ) {
+                setSelectedAccount(0);
+                break;
+            }
+
+            // if selectedAccount is in payload, update selectedAccount
+            // @dev accounts.find should not return undefined, since checked above
+            if (_selectedAccount !== null) {
+                setSelectedAccount(
+                    _accounts.findIndex(
+                        (account: { address: any }) => account.address === _selectedAccount.address
+                    ) ?? null
+                );
+            }
+            break;
+        }
+
+        case StateId.Chain: {
+            chainState.set(message.payload);
+            break;
+        }
+
+        case StateId.App: {
+            // console.log('received appState', message.payload);
+            appState.set(message.payload);
+            break;
+        }
+    }
+}
+
+function handleSignal(message: WebviewMessageResponse & { command: WebviewMessageId.onSignal }) {
+    switch (message.signalId) {
+        case SignalId.showAdvancedLocalChainSetup: {
+            chainNavigator.showAdvancedLocalChainSetup();
+
+            break;
+        }
+    }
 }

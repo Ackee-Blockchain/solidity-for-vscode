@@ -34,11 +34,11 @@
     );
 
     import {
+        openChainsQuickPick,
         openExternal,
         openSettings,
         ping,
         reconnectChain,
-        requestNewProvider,
         restartWakeServer,
         selectChain,
         showErrorMessage
@@ -86,6 +86,8 @@
     const loadState = async () => {
         await requestSharedState();
         await requestLocalState();
+        console.log('loadState done');
+        console.log($chainState);
     };
 
     const retryPing = async () => {
@@ -158,9 +160,9 @@
         </div>
     {:else if $stateLoadState === 'failed' || $extensionConnectionState === 'failed'}
         <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
-            <span
-                >Unexpected error loading state from the extension. Please try restarting VS Code.</span
-            >
+            <span>
+                Unexpected error loading state from the extension. Please try restarting VS Code.
+            </span>
         </div>
         <!-- {:else if !$appState.isInitialized} -->
         <!-- <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
@@ -176,7 +178,7 @@
             <h3 class="uppercase font-bold text-base">No chains found</h3>
             <span>No chains set up. Please set up a chain first. </span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <vscode-button appearance="primary" on:click={requestNewProvider}>
+            <vscode-button appearance="primary" on:click={openChainsQuickPick}>
                 Setup new chain
             </vscode-button>
         </div>
@@ -264,5 +266,13 @@
     body {
         /* padding: 0 10px 10px !important; */
         padding: 0 !important;
+    }
+
+    /* global styles copying vscode styles */
+    :global(.vscode-button-border) {
+        border: calc(var(--border-width) * 1px) solid var(--button-border);
+    }
+    :global(.vscode-bg-input) {
+        background: var(--input-background);
     }
 </style>

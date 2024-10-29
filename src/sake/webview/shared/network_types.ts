@@ -94,9 +94,6 @@ export interface NetworkConfiguration {
     minGasPrice?: number;
     blockBaseFeePerGas?: number;
 }
-
-export interface NetworkCreationConfiguration extends Omit<CreateLocalChainRequest, 'sessionId'> {}
-
 export interface CreateLocalChainRequest {
     sessionId: string;
     accounts?: number;
@@ -110,3 +107,6 @@ export interface CreateLocalChainRequest {
 export enum NetworkId {
     LocalNode = 'Anvil'
 }
+
+export interface NetworkCreationConfiguration extends Omit<CreateLocalChainRequest, 'sessionId'> {}
+export interface NetworkConnectionConfiguration {} // TODO: add fields
