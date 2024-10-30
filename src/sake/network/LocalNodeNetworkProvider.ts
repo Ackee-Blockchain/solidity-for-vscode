@@ -28,6 +28,10 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
         super(NetworkId.LocalNode, config.sessionId);
     }
 
+    /*
+     * Initialization via Wake API
+     * Creates a new chain from network configuration
+     */
     async createChain(accounts?: number): Promise<void> {
         const response = await WakeApi.createChain({
             sessionId: this.config.sessionId,
@@ -45,6 +49,25 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
 
         this.config.type = response.type;
         this.config.uri = response.uri;
+    }
+
+    /*
+     * Initialization via Wake API
+     * Connects to an existing (already running) chain via URI
+     */
+    async connectChain() {
+        if (!this.config.uri) {
+            throw new NetworkError('Cannot connect to chain without URI');
+        }
+
+        const response = await WakeApi.connectChain({
+            sessionId: this.config.sessionId,
+            uri: this.config.uri
+        });
+
+        if (!response.success) {
+            throw new NetworkError('Failed to connect to chain');
+        }
     }
 
     async onDeleteChain() {

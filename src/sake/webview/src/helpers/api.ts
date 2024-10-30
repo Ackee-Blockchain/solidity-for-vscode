@@ -230,3 +230,14 @@ export async function createNewLocalChain(
     };
     return await messageHandler.request<boolean>(request.command, request.payload);
 }
+
+export async function connectToLocalChain(displayName: string, uri: string) {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.connectToLocalChain,
+        payload: {
+            displayName,
+            uri
+        }
+    };
+    return await messageHandler.request<boolean>(request.command, request.payload);
+}

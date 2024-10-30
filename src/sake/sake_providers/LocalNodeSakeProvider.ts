@@ -43,6 +43,10 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
                 await this.network.loadState(this.initializationRequest.state.network.wakeDump);
                 this.state.loadProviderState(this.initializationRequest.state.state);
                 break;
+
+            case SakeProviderInitializationRequestType.ConnectToChain:
+                await this.network.connectChain();
+                break;
         }
 
         this.connected = true;
@@ -95,7 +99,7 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
         try {
             await this.network.setAccountLabel(request);
         } catch (e) {
-            console.log('Set account label error', e);
+            console.error('Set account label error', e);
         }
     }
 }

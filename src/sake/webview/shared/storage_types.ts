@@ -51,6 +51,7 @@ export interface LocalNodeNetworkState extends BaseNetworkState {
 
 export enum SakeProviderInitializationRequestType {
     CreateNewChain = 'CreateNewChain',
+    ConnectToChain = 'ConnectToChain',
     LoadFromState = 'LoadFromState'
 }
 
@@ -64,4 +65,7 @@ export type SakeLocalNodeProviderInitializationRequest =
     | {
           type: SakeProviderInitializationRequestType.LoadFromState;
           state: ProviderState;
+      }
+    | {
+          type: SakeProviderInitializationRequestType.ConnectToChain;
       };

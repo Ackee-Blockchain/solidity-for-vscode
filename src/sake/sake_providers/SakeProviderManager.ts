@@ -321,6 +321,11 @@ export default class SakeProviderManager {
         );
     }
 
+    public async connectToLocalChain(displayName: string, uri: string) {
+        console.log('connectToLocalChain', displayName, uri);
+        this.addProvider(await SakeProviderFactory.connectToLocalChain(displayName, uri));
+    }
+
     public async requestNewAdvancedLocalProvider() {
         this.sendSignalToWebview(SignalId.showAdvancedLocalChainSetup);
     }

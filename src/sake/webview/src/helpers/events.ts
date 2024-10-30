@@ -88,7 +88,6 @@ export function setupListeners() {
             }
 
             case WebviewMessageId.onSignal: {
-                console.log('onSignal', message);
                 handleSignal(message);
                 break;
             }
