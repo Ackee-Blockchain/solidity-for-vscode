@@ -224,6 +224,18 @@ export type WebviewMessageResponse =
           };
       } & BaseWebviewMessageResponse)
     | ({
+          command: WebviewMessageId.createNewLocalChain;
+          payload: {
+              success: boolean;
+          };
+      } & BaseWebviewMessageResponse)
+    | ({
+          command: WebviewMessageId.connectToLocalChain;
+          payload: {
+              success: boolean;
+          };
+      } & BaseWebviewMessageResponse)
+    | ({
           command: WebviewMessageId.onSignal;
           payload: any;
           signalId: SignalId;
