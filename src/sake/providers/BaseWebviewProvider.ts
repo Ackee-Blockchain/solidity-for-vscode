@@ -332,15 +332,35 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.createNewLocalChain: {
-                this._sake.createNewLocalChain(
+                const success = await this._sake.createNewLocalChain(
                     message.payload.displayName,
                     message.payload.networkCreationConfig
                 );
+
+                webviewView.webview.postMessage({
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success
+                    }
+                } as WebviewMessageResponse);
                 break;
             }
 
             case WebviewMessageId.connectToLocalChain: {
-                this._sake.connectToLocalChain(message.payload.displayName, message.payload.uri);
+                const success = await this._sake.connectToLocalChain(
+                    message.payload.displayName,
+                    message.payload.uri
+                );
+
+                webviewView.webview.postMessage({
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success
+                    }
+                } as WebviewMessageResponse);
+
                 break;
             }
 

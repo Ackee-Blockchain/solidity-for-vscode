@@ -316,14 +316,21 @@ export default class SakeProviderManager {
         displayName: string,
         networkCreationConfig?: NetworkCreationConfiguration
     ) {
-        this.addProvider(
-            await SakeProviderFactory.createNewLocalProvider(displayName, networkCreationConfig)
+        const provider = await SakeProviderFactory.createNewLocalProvider(
+            displayName,
+            networkCreationConfig
         );
+        this.addProvider(provider);
+        return true; // always return true, so even unconnected chains can be added
     }
 
-    public async connectToLocalChain(displayName: string, uri: string) {
-        console.log('connectToLocalChain', displayName, uri);
-        this.addProvider(await SakeProviderFactory.connectToLocalChain(displayName, uri));
+    public async connectToLocalChain(displayName: string, uri: string): Promise<boolean> {
+        const provider = await SakeProviderFactory.connectToLocalChain(displayName, uri);
+        if (provider.connected) {
+            // only add the chain if connection was successful
+            this.addProvider(provider);
+        }
+        return provider.connected;
     }
 
     public async requestNewAdvancedLocalProvider() {

@@ -23,6 +23,19 @@
         uri: undefined
     };
 
+    let loading = false;
+
+    const processChainSetup = async (chainSetup: () => Promise<boolean>) => {
+        loading = true;
+        await chainSetup().then((success) => {
+            console.log('chainSetup success', success);
+            if (success) {
+                chainNavigator.clear();
+            }
+        });
+        loading = false;
+    };
+
     // let errors: Partial<
     //     Record<keyof (NetworkCreationConfiguration & { displayName?: string }), string>
     // > = {};
@@ -138,17 +151,20 @@
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <vscode-button
                     appearance="primary"
+                    disabled={loading}
                     on:click={() =>
-                        createNewLocalChain(form.displayName, {
-                            accounts: form.accounts,
-                            chainId: form.chainId,
-                            fork: form.fork,
-                            hardfork: form.hardfork,
-                            minGasPrice: form.minGasPrice,
-                            blockBaseFeePerGas: form.blockBaseFeePerGas
-                        })}
+                        processChainSetup(() =>
+                            createNewLocalChain(form.displayName, {
+                                accounts: form.accounts,
+                                chainId: form.chainId,
+                                fork: form.fork,
+                                hardfork: form.hardfork,
+                                minGasPrice: form.minGasPrice,
+                                blockBaseFeePerGas: form.blockBaseFeePerGas
+                            })
+                        )}
                 >
-                    Create
+                    {loading ? 'Creating...' : 'Create'}
                 </vscode-button>
             {:else if $chainNavigator.activeTab === 'connect'}
                 <ValidableTextInput
@@ -158,16 +174,19 @@
                 />
 
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- possibly add disabled={!form.uri} -->
                 <vscode-button
                     appearance="primary"
-                    disabled={!form.uri}
+                    disabled={loading}
                     on:click={() =>
-                        connectToLocalChain(
-                            form.displayName,
-                            form.uri ?? '' // @dev silence typing error
+                        processChainSetup(() =>
+                            connectToLocalChain(
+                                form.displayName,
+                                form.uri ?? '' // @dev silence typing error
+                            )
                         )}
                 >
-                    Connect
+                    {loading ? 'Connecting...' : 'Connect'}
                 </vscode-button>
             {/if}
         </div>
