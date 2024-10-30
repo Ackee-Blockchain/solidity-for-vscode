@@ -4,7 +4,7 @@
     import ValidableTextInput from './common/ValidableTextInput.svelte';
     import { validateNonEmptyString, validateNumber } from '../helpers/validation';
     import DefaultButton from './icons/DefaultButton.svelte';
-    import { createNewLocalChain } from '../helpers/api';
+    import { connectToLocalChain, createNewLocalChain } from '../helpers/api';
 
     // export let form:
     //     | (NetworkCreationConfiguration & { displayName?: string })
@@ -158,7 +158,17 @@
                 />
 
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <!-- <vscode-button appearance="primary" on:click={() => {}}> Connect </vscode-button> -->
+                <vscode-button
+                    appearance="primary"
+                    disabled={!form.uri}
+                    on:click={() =>
+                        connectToLocalChain(
+                            form.displayName,
+                            form.uri ?? '' // @dev silence typing error
+                        )}
+                >
+                    Connect
+                </vscode-button>
             {/if}
         </div>
     </div>

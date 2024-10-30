@@ -166,6 +166,13 @@ export type WebviewMessageRequest =
               displayName: string;
               networkCreationConfig?: NetworkCreationConfiguration;
           };
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.connectToLocalChain;
+          payload: {
+              displayName: string;
+              uri: string;
+          };
       } & BaseWebviewMessageRequest);
 
 export type WebviewMessageResponse =

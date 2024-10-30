@@ -147,7 +147,6 @@ export const chainNavigator = (() => {
         },
         setActiveTab: (tab: 'create' | 'connect') => {
             const state = get(chainNavigator);
-            console.log('setting active tab', tab);
             if (state.state === 'advancedLocalChainSetup') {
                 set({ ...state, activeTab: tab });
             }

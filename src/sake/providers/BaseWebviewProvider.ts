@@ -99,8 +99,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
     }
 
     public postMessageToWebview(message: WebviewMessageResponse) {
-        // TODO set type
-        console.log('postMessageToWebview', message);
         this._view?.webview.postMessage(message);
     }
 
@@ -338,6 +336,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     message.payload.displayName,
                     message.payload.networkCreationConfig
                 );
+                break;
+            }
+
+            case WebviewMessageId.connectToLocalChain: {
+                this._sake.connectToLocalChain(message.payload.displayName, message.payload.uri);
                 break;
             }
 

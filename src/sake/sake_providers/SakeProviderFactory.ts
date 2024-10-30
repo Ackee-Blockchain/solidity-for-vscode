@@ -61,6 +61,23 @@ export class SakeProviderFactory {
         return provider;
     }
 
+    static async connectToLocalChain(
+        displayName: string,
+        uri: string
+    ): Promise<LocalNodeSakeProvider> {
+        const providerId = 'local-chain-' + this.getNewProviderId();
+        const networkConfig: NetworkConfiguration = {
+            uri,
+            sessionId: providerId
+        };
+
+        const provider = await this._newLocalProvider(providerId, displayName, networkConfig, {
+            type: SakeProviderInitializationRequestType.ConnectToChain
+        });
+
+        return provider;
+    }
+
     // TODO: generalize to support other network providers
     static async createFromState(state: ProviderState): Promise<LocalNodeSakeProvider> {
         switch (state.network.type) {

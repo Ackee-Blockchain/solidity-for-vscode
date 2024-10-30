@@ -86,8 +86,6 @@
     const loadState = async () => {
         await requestSharedState();
         await requestLocalState();
-        console.log('loadState done');
-        console.log($chainState);
     };
 
     const retryPing = async () => {

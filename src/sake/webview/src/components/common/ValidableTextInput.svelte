@@ -14,6 +14,7 @@
         const validationResult = validate(stringValue);
         if (validationResult != null) {
             error = validationResult;
+            value = undefined;
             return;
         }
         error = null;

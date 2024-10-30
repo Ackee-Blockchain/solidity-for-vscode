@@ -52,7 +52,7 @@ export function getCssVarWithOpacity(cssVar: string, opacity = 0.5) {
         .padStart(2, '0');
 
     const result = `#${newRedHex}${newGreenHex}${newBlueHex}${opacityHex}`;
-    console.log('Result:', result);
+    // console.log('Result:', result);
 
     return result;
 }

@@ -316,7 +316,7 @@ export class WakeApi {
                 throw new Error('No result returned');
             }
 
-            console.log('transact result', result);
+            // console.log('transact result', result);
 
             return result;
         } catch (e) {
