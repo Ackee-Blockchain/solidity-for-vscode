@@ -38,6 +38,7 @@ export enum WebviewMessageId {
     selectChain = 'selectChain',
     openSettings = 'openSettings',
     openChainsQuickPick = 'openChainsQuickPick',
+    openProxyQuickPick = 'openProxyQuickPick',
     reconnectChain = 'reconnectChain',
     ping = 'ping',
 
@@ -172,6 +173,12 @@ export type WebviewMessageRequest =
           payload: {
               displayName: string;
               uri: string;
+          };
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.openProxyQuickPick;
+          payload: {
+              contractFqn: string;
           };
       } & BaseWebviewMessageRequest);
 

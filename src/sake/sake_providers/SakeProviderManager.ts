@@ -189,6 +189,23 @@ export default class SakeProviderManager {
         this._statusBarItem.show();
     }
 
+    public showProxyQuickPick(contractFqn: string) {
+        if (this.state === undefined) {
+            return;
+        }
+
+        vscode.window
+            .showQuickPick(this.state?.compilation.state.contracts.map((contract) => contract.fqn))
+            .then((selected) => {
+                if (selected) {
+                    const abi = this.state?.compilation.get(selected)?.abi;
+                    if (abi) {
+                        this.state?.deployment.addProxy(contractFqn, abi);
+                    }
+                }
+            });
+    }
+
     public showProviderSelectionQuickPick() {
         const quickPickItems: vscode.QuickPickItem[] = [];
 

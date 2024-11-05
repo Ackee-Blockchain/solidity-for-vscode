@@ -117,10 +117,8 @@ export const chainNavigator = (() => {
     const { subscribe, set } = writable<ChainNavigatorState>({
         // state: 'default',
         // expanded: false,
-        state: 'advancedLocalChainSetup',
-        expanded: true,
-        config: undefined,
-        activeTab: 'connect'
+        state: 'default',
+        expanded: false
     });
 
     return {
