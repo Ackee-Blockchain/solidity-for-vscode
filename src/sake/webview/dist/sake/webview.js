@@ -11705,6 +11705,7 @@ var WebviewMessageId;
     WebviewMessageId["selectChain"] = "selectChain";
     WebviewMessageId["openSettings"] = "openSettings";
     WebviewMessageId["openChainsQuickPick"] = "openChainsQuickPick";
+    WebviewMessageId["openProxyQuickPick"] = "openProxyQuickPick";
     WebviewMessageId["reconnectChain"] = "reconnectChain";
     WebviewMessageId["ping"] = "ping";
     // chain manager
@@ -18950,10 +18951,8 @@ const chainNavigator = (() => {
     const { subscribe, set } = writable({
         // state: 'default',
         // expanded: false,
-        state: 'advancedLocalChainSetup',
-        expanded: true,
-        config: undefined,
-        activeTab: 'connect'
+        state: 'default',
+        expanded: false
     });
     return {
         subscribe,
@@ -18995,14 +18994,14 @@ function get_each_context$7(ctx, list, i) {
 	return child_ctx;
 }
 
-function get_each_context_1$1(ctx, list, i) {
+function get_each_context_1$2(ctx, list, i) {
 	const child_ctx = ctx.slice();
 	child_ctx[3] = list[i];
 	return child_ctx;
 }
 
 // (25:32) {:else}
-function create_else_block$a(ctx) {
+function create_else_block$b(ctx) {
 	let span;
 	let t_value = /*tab*/ ctx[3].label + "";
 	let t;
@@ -19029,7 +19028,7 @@ function create_else_block$a(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block$a.name,
+		id: create_else_block$b.name,
 		type: "else",
 		source: "(25:32) {:else}",
 		ctx
@@ -19113,7 +19112,7 @@ function create_if_block_1$a(ctx) {
 }
 
 // (10:16) {#each tabs as tab}
-function create_each_block_1$1(ctx) {
+function create_each_block_1$2(ctx) {
 	let li;
 	let a;
 	let span;
@@ -19123,7 +19122,7 @@ function create_each_block_1$1(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block_1$a, create_else_block$a];
+	const if_block_creators = [create_if_block_1$a, create_else_block$b];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -19217,7 +19216,7 @@ function create_each_block_1$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_each_block_1$1.name,
+		id: create_each_block_1$2.name,
 		type: "each",
 		source: "(10:16) {#each tabs as tab}",
 		ctx
@@ -19378,7 +19377,7 @@ function create_fragment$F(ctx) {
 	let each_blocks_1 = [];
 
 	for (let i = 0; i < each_value_1.length; i += 1) {
-		each_blocks_1[i] = create_each_block_1$1(get_each_context_1$1(ctx, each_value_1, i));
+		each_blocks_1[i] = create_each_block_1$2(get_each_context_1$2(ctx, each_value_1, i));
 	}
 
 	const out = i => transition_out(each_blocks_1[i], 1, 1, () => {
@@ -19455,13 +19454,13 @@ function create_fragment$F(ctx) {
 				let i;
 
 				for (i = 0; i < each_value_1.length; i += 1) {
-					const child_ctx = get_each_context_1$1(ctx, each_value_1, i);
+					const child_ctx = get_each_context_1$2(ctx, each_value_1, i);
 
 					if (each_blocks_1[i]) {
 						each_blocks_1[i].p(child_ctx, dirty);
 						transition_in(each_blocks_1[i], 1);
 					} else {
-						each_blocks_1[i] = create_each_block_1$1(child_ctx);
+						each_blocks_1[i] = create_each_block_1$2(child_ctx);
 						each_blocks_1[i].c();
 						transition_in(each_blocks_1[i], 1);
 						each_blocks_1[i].m(ul, null);
@@ -20792,6 +20791,15 @@ function openChainsQuickPick() {
     const request = {
         command: WebviewMessageId.openChainsQuickPick,
         payload: undefined
+    };
+    client.messageHandler.send(request.command, request.payload);
+}
+function openProxyQuickPick(contractFqn) {
+    const request = {
+        command: WebviewMessageId.openProxyQuickPick,
+        payload: {
+            contractFqn
+        }
     };
     client.messageHandler.send(request.command, request.payload);
 }
@@ -22172,9 +22180,9 @@ function create_if_block_1$9(ctx) {
 		each_blocks[i] = create_each_block$6(get_each_context$6(ctx, each_value, i));
 	}
 
-	let if_block0 = /*$selectedAccountId*/ ctx[3] !== null && create_if_block_4$3(ctx);
-	let if_block1 = /*$selectedAccount*/ ctx[0] !== null && create_if_block_3$4(ctx);
-	const if_block_creators = [create_if_block_2$7, create_else_block$9];
+	let if_block0 = /*$selectedAccountId*/ ctx[3] !== null && create_if_block_4$4(ctx);
+	let if_block1 = /*$selectedAccount*/ ctx[0] !== null && create_if_block_3$5(ctx);
+	const if_block_creators = [create_if_block_2$7, create_else_block$a];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
@@ -22305,7 +22313,7 @@ function create_if_block_1$9(ctx) {
 				if (if_block0) {
 					if_block0.p(ctx, dirty);
 				} else {
-					if_block0 = create_if_block_4$3(ctx);
+					if_block0 = create_if_block_4$4(ctx);
 					if_block0.c();
 					if_block0.m(span2, null);
 				}
@@ -22322,7 +22330,7 @@ function create_if_block_1$9(ctx) {
 						transition_in(if_block1, 1);
 					}
 				} else {
-					if_block1 = create_if_block_3$4(ctx);
+					if_block1 = create_if_block_3$5(ctx);
 					if_block1.c();
 					transition_in(if_block1, 1);
 					if_block1.m(div0, null);
@@ -22439,7 +22447,7 @@ function create_each_block$6(ctx) {
 }
 
 // (67:24) {#if $selectedAccountId !== null}
-function create_if_block_4$3(ctx) {
+function create_if_block_4$4(ctx) {
 	let t_value = (/*$selectedAccount*/ ctx[0]?.label ?? `Account ${/*$selectedAccountId*/ ctx[3]}`) + "";
 	let t;
 
@@ -22460,7 +22468,7 @@ function create_if_block_4$3(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4$3.name,
+		id: create_if_block_4$4.name,
 		type: "if",
 		source: "(67:24) {#if $selectedAccountId !== null}",
 		ctx
@@ -22470,7 +22478,7 @@ function create_if_block_4$3(ctx) {
 }
 
 // (73:16) {#if $selectedAccount !== null}
-function create_if_block_3$4(ctx) {
+function create_if_block_3$5(ctx) {
 	let div2;
 	let div0;
 	let copyablespan;
@@ -22491,7 +22499,7 @@ function create_if_block_3$4(ctx) {
 			props: {
 				className: "text-sm flex-1",
 				callback: /*topUp*/ ctx[8],
-				$$slots: { default: [create_default_slot_1$2] },
+				$$slots: { default: [create_default_slot_1$3] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -22553,7 +22561,7 @@ function create_if_block_3$4(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3$4.name,
+		id: create_if_block_3$5.name,
 		type: "if",
 		source: "(73:16) {#if $selectedAccount !== null}",
 		ctx
@@ -22563,7 +22571,7 @@ function create_if_block_3$4(ctx) {
 }
 
 // (85:28) <ClickableSpan className="text-sm flex-1" callback={topUp}>
-function create_default_slot_1$2(ctx) {
+function create_default_slot_1$3(ctx) {
 	let t_value = displayEtherValue(/*$selectedAccount*/ ctx[0].balance) + "";
 	let t;
 
@@ -22584,7 +22592,7 @@ function create_default_slot_1$2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot_1$2.name,
+		id: create_default_slot_1$3.name,
 		type: "slot",
 		source: "(85:28) <ClickableSpan className=\\\"text-sm flex-1\\\" callback={topUp}>",
 		ctx
@@ -22594,7 +22602,7 @@ function create_default_slot_1$2(ctx) {
 }
 
 // (108:24) {:else}
-function create_else_block$9(ctx) {
+function create_else_block$a(ctx) {
 	let span;
 
 	const block = {
@@ -22617,7 +22625,7 @@ function create_else_block$9(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block$9.name,
+		id: create_else_block$a.name,
 		type: "else",
 		source: "(108:24) {:else}",
 		ctx
@@ -23342,7 +23350,7 @@ class DefaultButton extends SvelteComponentDev {
 const file$q = "src/components/icons/ExpandButton.svelte";
 
 // (24:4) {:else}
-function create_else_block$8(ctx) {
+function create_else_block$9(ctx) {
 	let svg;
 	let path;
 
@@ -23373,7 +23381,7 @@ function create_else_block$8(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block$8.name,
+		id: create_else_block$9.name,
 		type: "else",
 		source: "(24:4) {:else}",
 		ctx
@@ -23429,7 +23437,7 @@ function create_default_slot$c(ctx) {
 
 	function select_block_type(ctx, dirty) {
 		if (/*expanded*/ ctx[0]) return create_if_block$d;
-		return create_else_block$8;
+		return create_else_block$9;
 	}
 
 	let current_block_type = select_block_type(ctx);
@@ -25770,10 +25778,10 @@ function splitNestedLists(input) {
 
 /* src/components/ContractFunctionInput.svelte generated by Svelte v3.59.2 */
 
-const { console: console_1$1 } = globals;
+const { console: console_1$2 } = globals;
 const file$m = "src/components/ContractFunctionInput.svelte";
 
-function get_each_context_1(ctx, list, i) {
+function get_each_context_1$1(ctx, list, i) {
 	const child_ctx = ctx.slice();
 	child_ctx[12] = list[i];
 	return child_ctx;
@@ -25786,12 +25794,12 @@ function get_each_context$5(ctx, list, i) {
 }
 
 // (42:4) {#if expandable}
-function create_if_block_4$2(ctx) {
+function create_if_block_4$3(ctx) {
 	let div;
 	let current_block_type_index;
 	let if_block;
 	let current;
-	const if_block_creators = [create_if_block_5$2, create_else_block_2];
+	const if_block_creators = [create_if_block_5$3, create_else_block_2];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -25858,7 +25866,7 @@ function create_if_block_4$2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4$2.name,
+		id: create_if_block_4$3.name,
 		type: "if",
 		source: "(42:4) {#if expandable}",
 		ctx
@@ -25935,7 +25943,7 @@ function create_else_block_2(ctx) {
 }
 
 // (44:12) {#if input.internalType === InputTypesInternal.LEAF}
-function create_if_block_5$2(ctx) {
+function create_if_block_5$3(ctx) {
 	let iconspacer;
 	let current;
 	iconspacer = new IconSpacer({ $$inline: true });
@@ -25965,7 +25973,7 @@ function create_if_block_5$2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_5$2.name,
+		id: create_if_block_5$3.name,
 		type: "if",
 		source: "(44:12) {#if input.internalType === InputTypesInternal.LEAF}",
 		ctx
@@ -25975,7 +25983,7 @@ function create_if_block_5$2(ctx) {
 }
 
 // (92:4) {:else}
-function create_else_block$7(ctx) {
+function create_else_block$8(ctx) {
 	let div1;
 	let vscode_text_field;
 	let div0;
@@ -25989,7 +25997,7 @@ function create_else_block$7(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block_2$6, create_if_block_3$3, create_else_block_1$2];
+	const if_block_creators = [create_if_block_2$6, create_if_block_3$4, create_else_block_1$2];
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
@@ -26091,7 +26099,7 @@ function create_else_block$7(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block$7.name,
+		id: create_else_block$8.name,
 		type: "else",
 		source: "(92:4) {:else}",
 		ctx
@@ -26269,14 +26277,14 @@ function create_else_block_1$2(ctx) {
 }
 
 // (109:52) 
-function create_if_block_3$3(ctx) {
+function create_if_block_3$4(ctx) {
 	let inputissueindicator;
 	let current;
 
 	inputissueindicator = new InputIssueIndicator({
 			props: {
 				type: "warning",
-				$$slots: { default: [create_default_slot_1$1] },
+				$$slots: { default: [create_default_slot_1$2] },
 				$$scope: { ctx }
 			},
 			$$inline: true
@@ -26315,7 +26323,7 @@ function create_if_block_3$3(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3$3.name,
+		id: create_if_block_3$4.name,
 		type: "if",
 		source: "(109:52) ",
 		ctx
@@ -26381,7 +26389,7 @@ function create_if_block_2$6(ctx) {
 }
 
 // (110:24) <InputIssueIndicator type="warning">
-function create_default_slot_1$1(ctx) {
+function create_default_slot_1$2(ctx) {
 	let span;
 
 	const block = {
@@ -26402,7 +26410,7 @@ function create_default_slot_1$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot_1$1.name,
+		id: create_default_slot_1$2.name,
 		type: "slot",
 		source: "(110:24) <InputIssueIndicator type=\\\"warning\\\">",
 		ctx
@@ -26412,7 +26420,7 @@ function create_default_slot_1$1(ctx) {
 }
 
 // (104:32) {#each input.errors as error}
-function create_each_block_1(ctx) {
+function create_each_block_1$1(ctx) {
 	let span;
 	let t_value = /*error*/ ctx[12] + "";
 	let t;
@@ -26438,7 +26446,7 @@ function create_each_block_1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_each_block_1.name,
+		id: create_each_block_1$1.name,
 		type: "each",
 		source: "(104:32) {#each input.errors as error}",
 		ctx
@@ -26455,7 +26463,7 @@ function create_key_block_1(ctx) {
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value_1.length; i += 1) {
-		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
+		each_blocks[i] = create_each_block_1$1(get_each_context_1$1(ctx, each_value_1, i));
 	}
 
 	const block = {
@@ -26482,12 +26490,12 @@ function create_key_block_1(ctx) {
 				let i;
 
 				for (i = 0; i < each_value_1.length; i += 1) {
-					const child_ctx = get_each_context_1(ctx, each_value_1, i);
+					const child_ctx = get_each_context_1$1(ctx, each_value_1, i);
 
 					if (each_blocks[i]) {
 						each_blocks[i].p(child_ctx, dirty);
 					} else {
-						each_blocks[i] = create_each_block_1(child_ctx);
+						each_blocks[i] = create_each_block_1$1(child_ctx);
 						each_blocks[i].c();
 						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
 					}
@@ -26781,8 +26789,8 @@ function create_fragment$o(ctx) {
 	let current_block_type_index;
 	let if_block1;
 	let current;
-	let if_block0 = /*expandable*/ ctx[2] && create_if_block_4$2(ctx);
-	const if_block_creators = [create_if_block$c, create_else_block$7];
+	let if_block0 = /*expandable*/ ctx[2] && create_if_block_4$3(ctx);
+	const if_block_creators = [create_if_block$c, create_else_block$8];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
@@ -26821,7 +26829,7 @@ function create_fragment$o(ctx) {
 						transition_in(if_block0, 1);
 					}
 				} else {
-					if_block0 = create_if_block_4$2(ctx);
+					if_block0 = create_if_block_4$3(ctx);
 					if_block0.c();
 					transition_in(if_block0, 1);
 					if_block0.m(div, t);
@@ -26936,18 +26944,18 @@ function instance$o($$self, $$props, $$invalidate) {
 
 	$$self.$$.on_mount.push(function () {
 		if (input === undefined && !('input' in $$props || $$self.$$.bound[$$self.$$.props['input']])) {
-			console_1$1.warn("<ContractFunctionInput> was created without expected prop 'input'");
+			console_1$2.warn("<ContractFunctionInput> was created without expected prop 'input'");
 		}
 
 		if (onInputStateChange === undefined && !('onInputStateChange' in $$props || $$self.$$.bound[$$self.$$.props['onInputStateChange']])) {
-			console_1$1.warn("<ContractFunctionInput> was created without expected prop 'onInputStateChange'");
+			console_1$2.warn("<ContractFunctionInput> was created without expected prop 'onInputStateChange'");
 		}
 	});
 
 	const writable_props = ['input', 'onInputStateChange', 'expandable'];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$1.warn(`<ContractFunctionInput> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$2.warn(`<ContractFunctionInput> was created with unknown prop '${key}'`);
 	});
 
 	function expandbutton_expanded_binding(value) {
@@ -27336,7 +27344,7 @@ function create_if_block$b(ctx) {
 	let if_block;
 	let div_class_value;
 	let current;
-	const if_block_creators = [create_if_block_1$7, create_else_block$6];
+	const if_block_creators = [create_if_block_1$7, create_else_block$7];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
@@ -27419,7 +27427,7 @@ function create_if_block$b(ctx) {
 }
 
 // (73:12) {:else}
-function create_else_block$6(ctx) {
+function create_else_block$7(ctx) {
 	let contractfunctioninput;
 	let current;
 
@@ -27463,7 +27471,7 @@ function create_else_block$6(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block$6.name,
+		id: create_else_block$7.name,
 		type: "else",
 		source: "(73:12) {:else}",
 		ctx
@@ -28264,16 +28272,30 @@ class CalldataBytes extends SvelteComponentDev {
 }
 
 /* src/components/Contract.svelte generated by Svelte v3.59.2 */
+
+const { console: console_1$1 } = globals;
 const file$i = "src/components/Contract.svelte";
 
 function get_each_context$3(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[7] = list[i];
+	child_ctx[13] = list[i];
 	return child_ctx;
 }
 
-// (25:16) <ClickableSpan callback={() => requestLabel(contract.address)}>
-function create_default_slot$6(ctx) {
+function get_each_context_1(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[16] = list[i];
+	return child_ctx;
+}
+
+function get_each_context_2(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[12] = list[i];
+	return child_ctx;
+}
+
+// (31:16) <ClickableSpan callback={() => requestLabel(contract.address)}>
+function create_default_slot_2$1(ctx) {
 	let t_value = (/*contract*/ ctx[0].label
 	? `${/*contract*/ ctx[0].label} (${/*contract*/ ctx[0].name})`
 	: /*contract*/ ctx[0].name) + "";
@@ -28299,17 +28321,44 @@ function create_default_slot$6(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot$6.name,
+		id: create_default_slot_2$1.name,
 		type: "slot",
-		source: "(25:16) <ClickableSpan callback={() => requestLabel(contract.address)}>",
+		source: "(31:16) <ClickableSpan callback={() => requestLabel(contract.address)}>",
 		ctx
 	});
 
 	return block;
 }
 
-// (31:12) {#if expanded}
-function create_if_block_2$4(ctx) {
+// (37:20) <DefaultButton                         callback={() => openProxyQuickPick(contract.fqn)}                         className="mr-5"                     >
+function create_default_slot_1$1(ctx) {
+	let t;
+
+	const block = {
+		c: function create() {
+			t = text("add proxy");
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, t, anchor);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(t);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_default_slot_1$1.name,
+		type: "slot",
+		source: "(37:20) <DefaultButton                         callback={() => openProxyQuickPick(contract.fqn)}                         className=\\\"mr-5\\\"                     >",
+		ctx
+	});
+
+	return block;
+}
+
+// (46:12) {#if expanded}
+function create_if_block_5$2(ctx) {
 	let div;
 	let copyablespan;
 	let current;
@@ -28327,7 +28376,7 @@ function create_if_block_2$4(ctx) {
 			div = element("div");
 			create_component(copyablespan.$$.fragment);
 			attr_dev(div, "class", "w-full flex flex-row gap-1 items-center justify-between pb-1");
-			add_location(div, file$i, 31, 16, 1511);
+			add_location(div, file$i, 46, 16, 2194);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -28356,54 +28405,44 @@ function create_if_block_2$4(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_2$4.name,
+		id: create_if_block_5$2.name,
 		type: "if",
-		source: "(31:12) {#if expanded}",
+		source: "(46:12) {#if expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (44:4) {#if expanded}
+// (59:4) {#if expanded}
 function create_if_block$a(ctx) {
-	let t;
-	let calldatabytes;
+	let if_block_anchor;
 	let current;
-	let if_block = /*filteredAbi*/ ctx[2].length > 0 && create_if_block_1$6(ctx);
-
-	calldatabytes = new CalldataBytes({
-			props: {
-				onFunctionCall: /*_onFunctionCall*/ ctx[3]
-			},
-			$$inline: true
-		});
+	let if_block = /*filteredAbi*/ ctx[4].length > 0 && create_if_block_1$6(ctx);
 
 	const block = {
 		c: function create() {
 			if (if_block) if_block.c();
-			t = space();
-			create_component(calldatabytes.$$.fragment);
+			if_block_anchor = empty();
 		},
 		m: function mount(target, anchor) {
 			if (if_block) if_block.m(target, anchor);
-			insert_dev(target, t, anchor);
-			mount_component(calldatabytes, target, anchor);
+			insert_dev(target, if_block_anchor, anchor);
 			current = true;
 		},
 		p: function update(ctx, dirty) {
-			if (/*filteredAbi*/ ctx[2].length > 0) {
+			if (/*filteredAbi*/ ctx[4].length > 0) {
 				if (if_block) {
 					if_block.p(ctx, dirty);
 
-					if (dirty & /*filteredAbi*/ 4) {
+					if (dirty & /*filteredAbi*/ 16) {
 						transition_in(if_block, 1);
 					}
 				} else {
 					if_block = create_if_block_1$6(ctx);
 					if_block.c();
 					transition_in(if_block, 1);
-					if_block.m(t.parentNode, t);
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
 			} else if (if_block) {
 				group_outros();
@@ -28418,18 +28457,15 @@ function create_if_block$a(ctx) {
 		i: function intro(local) {
 			if (current) return;
 			transition_in(if_block);
-			transition_in(calldatabytes.$$.fragment, local);
 			current = true;
 		},
 		o: function outro(local) {
 			transition_out(if_block);
-			transition_out(calldatabytes.$$.fragment, local);
 			current = false;
 		},
 		d: function destroy(detaching) {
 			if (if_block) if_block.d(detaching);
-			if (detaching) detach_dev(t);
-			destroy_component(calldatabytes, detaching);
+			if (detaching) detach_dev(if_block_anchor);
 		}
 	};
 
@@ -28437,18 +28473,454 @@ function create_if_block$a(ctx) {
 		block,
 		id: create_if_block$a.name,
 		type: "if",
-		source: "(44:4) {#if expanded}",
+		source: "(59:4) {#if expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (45:8) {#if filteredAbi.length > 0}
+// (60:8) {#if filteredAbi.length > 0}
 function create_if_block_1$6(ctx) {
 	let div;
+	let t0;
+	let calldatabytes;
+	let t1;
 	let current;
-	let each_value = /*filteredAbi*/ ctx[2];
+	let each_value_2 = /*filteredAbi*/ ctx[4];
+	validate_each_argument(each_value_2);
+	let each_blocks = [];
+
+	for (let i = 0; i < each_value_2.length; i += 1) {
+		each_blocks[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
+	}
+
+	const out = i => transition_out(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
+
+	calldatabytes = new CalldataBytes({
+			props: {
+				onFunctionCall: /*_onFunctionCall*/ ctx[5]
+			},
+			$$inline: true
+		});
+
+	let if_block = /*filteredProxies*/ ctx[3] && create_if_block_2$4(ctx);
+
+	const block = {
+		c: function create() {
+			div = element("div");
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			t0 = space();
+			create_component(calldatabytes.$$.fragment);
+			t1 = space();
+			if (if_block) if_block.c();
+			attr_dev(div, "class", "flex flex-col gap-1");
+			add_location(div, file$i, 60, 12, 2855);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				if (each_blocks[i]) {
+					each_blocks[i].m(div, null);
+				}
+			}
+
+			append_dev(div, t0);
+			mount_component(calldatabytes, div, null);
+			append_dev(div, t1);
+			if (if_block) if_block.m(div, null);
+			current = true;
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*filteredAbi, _onFunctionCall*/ 48) {
+				each_value_2 = /*filteredAbi*/ ctx[4];
+				validate_each_argument(each_value_2);
+				let i;
+
+				for (i = 0; i < each_value_2.length; i += 1) {
+					const child_ctx = get_each_context_2(ctx, each_value_2, i);
+
+					if (each_blocks[i]) {
+						each_blocks[i].p(child_ctx, dirty);
+						transition_in(each_blocks[i], 1);
+					} else {
+						each_blocks[i] = create_each_block_2(child_ctx);
+						each_blocks[i].c();
+						transition_in(each_blocks[i], 1);
+						each_blocks[i].m(div, t0);
+					}
+				}
+
+				group_outros();
+
+				for (i = each_value_2.length; i < each_blocks.length; i += 1) {
+					out(i);
+				}
+
+				check_outros();
+			}
+
+			if (/*filteredProxies*/ ctx[3]) {
+				if (if_block) {
+					if_block.p(ctx, dirty);
+
+					if (dirty & /*filteredProxies*/ 8) {
+						transition_in(if_block, 1);
+					}
+				} else {
+					if_block = create_if_block_2$4(ctx);
+					if_block.c();
+					transition_in(if_block, 1);
+					if_block.m(div, null);
+				}
+			} else if (if_block) {
+				group_outros();
+
+				transition_out(if_block, 1, 1, () => {
+					if_block = null;
+				});
+
+				check_outros();
+			}
+		},
+		i: function intro(local) {
+			if (current) return;
+
+			for (let i = 0; i < each_value_2.length; i += 1) {
+				transition_in(each_blocks[i]);
+			}
+
+			transition_in(calldatabytes.$$.fragment, local);
+			transition_in(if_block);
+			current = true;
+		},
+		o: function outro(local) {
+			each_blocks = each_blocks.filter(Boolean);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				transition_out(each_blocks[i]);
+			}
+
+			transition_out(calldatabytes.$$.fragment, local);
+			transition_out(if_block);
+			current = false;
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+			destroy_each(each_blocks, detaching);
+			destroy_component(calldatabytes);
+			if (if_block) if_block.d();
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_1$6.name,
+		type: "if",
+		source: "(60:8) {#if filteredAbi.length > 0}",
+		ctx
+	});
+
+	return block;
+}
+
+// (62:16) {#each filteredAbi as func}
+function create_each_block_2(ctx) {
+	let contractfunction;
+	let current;
+
+	contractfunction = new ContractFunction({
+			props: {
+				func: /*func*/ ctx[12],
+				onFunctionCall: /*_onFunctionCall*/ ctx[5]
+			},
+			$$inline: true
+		});
+
+	const block = {
+		c: function create() {
+			create_component(contractfunction.$$.fragment);
+		},
+		m: function mount(target, anchor) {
+			mount_component(contractfunction, target, anchor);
+			current = true;
+		},
+		p: function update(ctx, dirty) {
+			const contractfunction_changes = {};
+			if (dirty & /*filteredAbi*/ 16) contractfunction_changes.func = /*func*/ ctx[12];
+			contractfunction.$set(contractfunction_changes);
+		},
+		i: function intro(local) {
+			if (current) return;
+			transition_in(contractfunction.$$.fragment, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transition_out(contractfunction.$$.fragment, local);
+			current = false;
+		},
+		d: function destroy(detaching) {
+			destroy_component(contractfunction, detaching);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_each_block_2.name,
+		type: "each",
+		source: "(62:16) {#each filteredAbi as func}",
+		ctx
+	});
+
+	return block;
+}
+
+// (68:16) {#if filteredProxies}
+function create_if_block_2$4(ctx) {
+	let clickablespan;
+	let t;
+	let if_block_anchor;
+	let current;
+
+	clickablespan = new ClickableSpan({
+			props: {
+				callback: /*func_3*/ ctx[11],
+				className: "flex flex-row gap-1 items-center ml-2",
+				$$slots: { default: [create_default_slot$6] },
+				$$scope: { ctx }
+			},
+			$$inline: true
+		});
+
+	let if_block = /*expandedProxy*/ ctx[2] && create_if_block_3$3(ctx);
+
+	const block = {
+		c: function create() {
+			create_component(clickablespan.$$.fragment);
+			t = space();
+			if (if_block) if_block.c();
+			if_block_anchor = empty();
+		},
+		m: function mount(target, anchor) {
+			mount_component(clickablespan, target, anchor);
+			insert_dev(target, t, anchor);
+			if (if_block) if_block.m(target, anchor);
+			insert_dev(target, if_block_anchor, anchor);
+			current = true;
+		},
+		p: function update(ctx, dirty) {
+			const clickablespan_changes = {};
+			if (dirty & /*expandedProxy*/ 4) clickablespan_changes.callback = /*func_3*/ ctx[11];
+
+			if (dirty & /*$$scope, expandedProxy*/ 2097156) {
+				clickablespan_changes.$$scope = { dirty, ctx };
+			}
+
+			clickablespan.$set(clickablespan_changes);
+
+			if (/*expandedProxy*/ ctx[2]) {
+				if (if_block) {
+					if_block.p(ctx, dirty);
+
+					if (dirty & /*expandedProxy*/ 4) {
+						transition_in(if_block, 1);
+					}
+				} else {
+					if_block = create_if_block_3$3(ctx);
+					if_block.c();
+					transition_in(if_block, 1);
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				group_outros();
+
+				transition_out(if_block, 1, 1, () => {
+					if_block = null;
+				});
+
+				check_outros();
+			}
+		},
+		i: function intro(local) {
+			if (current) return;
+			transition_in(clickablespan.$$.fragment, local);
+			transition_in(if_block);
+			current = true;
+		},
+		o: function outro(local) {
+			transition_out(clickablespan.$$.fragment, local);
+			transition_out(if_block);
+			current = false;
+		},
+		d: function destroy(detaching) {
+			destroy_component(clickablespan, detaching);
+			if (detaching) detach_dev(t);
+			if (if_block) if_block.d(detaching);
+			if (detaching) detach_dev(if_block_anchor);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_2$4.name,
+		type: "if",
+		source: "(68:16) {#if filteredProxies}",
+		ctx
+	});
+
+	return block;
+}
+
+// (88:24) {:else}
+function create_else_block$6(ctx) {
+	let svg;
+	let path;
+
+	const block = {
+		c: function create() {
+			svg = svg_element("svg");
+			path = svg_element("path");
+			attr_dev(path, "fill-rule", "evenodd");
+			attr_dev(path, "clip-rule", "evenodd");
+			attr_dev(path, "d", "M10.072 8.024L5.715 3.667l.618-.62L11 7.716v.618L6.333 13l-.618-.619 4.357-4.357z");
+			add_location(path, file$i, 96, 33, 4592);
+			attr_dev(svg, "width", "16");
+			attr_dev(svg, "height", "16");
+			attr_dev(svg, "viewBox", "0 0 16 16");
+			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
+			attr_dev(svg, "fill", "currentColor");
+			attr_dev(svg, "class", "");
+			add_location(svg, file$i, 89, 28, 4255);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, svg, anchor);
+			append_dev(svg, path);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(svg);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_else_block$6.name,
+		type: "else",
+		source: "(88:24) {:else}",
+		ctx
+	});
+
+	return block;
+}
+
+// (73:24) {#if expandedProxy}
+function create_if_block_4$2(ctx) {
+	let svg;
+	let path;
+
+	const block = {
+		c: function create() {
+			svg = svg_element("svg");
+			path = svg_element("path");
+			attr_dev(path, "fill-rule", "evenodd");
+			attr_dev(path, "clip-rule", "evenodd");
+			attr_dev(path, "d", "M7.976 10.072l4.357-4.357.62.618L8.284 11h-.618L3 6.333l.619-.618 4.357 4.357z");
+			add_location(path, file$i, 81, 33, 3823);
+			attr_dev(svg, "width", "16");
+			attr_dev(svg, "height", "16");
+			attr_dev(svg, "viewBox", "0 0 16 16");
+			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
+			attr_dev(svg, "fill", "currentColor");
+			attr_dev(svg, "class", "");
+			add_location(svg, file$i, 74, 28, 3486);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, svg, anchor);
+			append_dev(svg, path);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(svg);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_4$2.name,
+		type: "if",
+		source: "(73:24) {#if expandedProxy}",
+		ctx
+	});
+
+	return block;
+}
+
+// (69:20) <ClickableSpan                         callback={() => (expandedProxy = !expandedProxy)}                         className="flex flex-row gap-1 items-center ml-2"                     >
+function create_default_slot$6(ctx) {
+	let t0;
+	let span;
+
+	function select_block_type(ctx, dirty) {
+		if (/*expandedProxy*/ ctx[2]) return create_if_block_4$2;
+		return create_else_block$6;
+	}
+
+	let current_block_type = select_block_type(ctx);
+	let if_block = current_block_type(ctx);
+
+	const block = {
+		c: function create() {
+			if_block.c();
+			t0 = space();
+			span = element("span");
+			span.textContent = "Proxy functions";
+			attr_dev(span, "class", "text-sm");
+			add_location(span, file$i, 103, 24, 4956);
+		},
+		m: function mount(target, anchor) {
+			if_block.m(target, anchor);
+			insert_dev(target, t0, anchor);
+			insert_dev(target, span, anchor);
+		},
+		p: function update(ctx, dirty) {
+			if (current_block_type !== (current_block_type = select_block_type(ctx))) {
+				if_block.d(1);
+				if_block = current_block_type(ctx);
+
+				if (if_block) {
+					if_block.c();
+					if_block.m(t0.parentNode, t0);
+				}
+			}
+		},
+		d: function destroy(detaching) {
+			if_block.d(detaching);
+			if (detaching) detach_dev(t0);
+			if (detaching) detach_dev(span);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_default_slot$6.name,
+		type: "slot",
+		source: "(69:20) <ClickableSpan                         callback={() => (expandedProxy = !expandedProxy)}                         className=\\\"flex flex-row gap-1 items-center ml-2\\\"                     >",
+		ctx
+	});
+
+	return block;
+}
+
+// (106:20) {#if expandedProxy}
+function create_if_block_3$3(ctx) {
+	let each_1_anchor;
+	let current;
+	let each_value = /*filteredProxies*/ ctx[3];
 	validate_each_argument(each_value);
 	let each_blocks = [];
 
@@ -28462,29 +28934,25 @@ function create_if_block_1$6(ctx) {
 
 	const block = {
 		c: function create() {
-			div = element("div");
-
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			attr_dev(div, "class", "flex flex-col gap-1");
-			add_location(div, file$i, 45, 12, 2172);
+			each_1_anchor = empty();
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				if (each_blocks[i]) {
-					each_blocks[i].m(div, null);
+					each_blocks[i].m(target, anchor);
 				}
 			}
 
+			insert_dev(target, each_1_anchor, anchor);
 			current = true;
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*filteredAbi, _onFunctionCall*/ 12) {
-				each_value = /*filteredAbi*/ ctx[2];
+			if (dirty & /*filteredProxies, _onFunctionCall*/ 40) {
+				each_value = /*filteredProxies*/ ctx[3];
 				validate_each_argument(each_value);
 				let i;
 
@@ -28498,7 +28966,7 @@ function create_if_block_1$6(ctx) {
 						each_blocks[i] = create_each_block$3(child_ctx);
 						each_blocks[i].c();
 						transition_in(each_blocks[i], 1);
-						each_blocks[i].m(div, null);
+						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
 					}
 				}
 
@@ -28530,31 +28998,31 @@ function create_if_block_1$6(ctx) {
 			current = false;
 		},
 		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
 			destroy_each(each_blocks, detaching);
+			if (detaching) detach_dev(each_1_anchor);
 		}
 	};
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_1$6.name,
+		id: create_if_block_3$3.name,
 		type: "if",
-		source: "(45:8) {#if filteredAbi.length > 0}",
+		source: "(106:20) {#if expandedProxy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (47:16) {#each filteredAbi as func}
-function create_each_block$3(ctx) {
+// (108:28) {#each proxy as proxy_func}
+function create_each_block_1(ctx) {
 	let contractfunction;
 	let current;
 
 	contractfunction = new ContractFunction({
 			props: {
-				func: /*func*/ ctx[7],
-				onFunctionCall: /*_onFunctionCall*/ ctx[3]
+				func: /*proxy_func*/ ctx[16],
+				onFunctionCall: /*_onFunctionCall*/ ctx[5]
 			},
 			$$inline: true
 		});
@@ -28569,7 +29037,7 @@ function create_each_block$3(ctx) {
 		},
 		p: function update(ctx, dirty) {
 			const contractfunction_changes = {};
-			if (dirty & /*filteredAbi*/ 4) contractfunction_changes.func = /*func*/ ctx[7];
+			if (dirty & /*filteredProxies*/ 8) contractfunction_changes.func = /*proxy_func*/ ctx[16];
 			contractfunction.$set(contractfunction_changes);
 		},
 		i: function intro(local) {
@@ -28588,9 +29056,107 @@ function create_each_block$3(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
+		id: create_each_block_1.name,
+		type: "each",
+		source: "(108:28) {#each proxy as proxy_func}",
+		ctx
+	});
+
+	return block;
+}
+
+// (107:24) {#each filteredProxies as proxy}
+function create_each_block$3(ctx) {
+	let each_1_anchor;
+	let current;
+	let each_value_1 = /*proxy*/ ctx[13];
+	validate_each_argument(each_value_1);
+	let each_blocks = [];
+
+	for (let i = 0; i < each_value_1.length; i += 1) {
+		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
+	}
+
+	const out = i => transition_out(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
+
+	const block = {
+		c: function create() {
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			each_1_anchor = empty();
+		},
+		m: function mount(target, anchor) {
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				if (each_blocks[i]) {
+					each_blocks[i].m(target, anchor);
+				}
+			}
+
+			insert_dev(target, each_1_anchor, anchor);
+			current = true;
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*filteredProxies, _onFunctionCall*/ 40) {
+				each_value_1 = /*proxy*/ ctx[13];
+				validate_each_argument(each_value_1);
+				let i;
+
+				for (i = 0; i < each_value_1.length; i += 1) {
+					const child_ctx = get_each_context_1(ctx, each_value_1, i);
+
+					if (each_blocks[i]) {
+						each_blocks[i].p(child_ctx, dirty);
+						transition_in(each_blocks[i], 1);
+					} else {
+						each_blocks[i] = create_each_block_1(child_ctx);
+						each_blocks[i].c();
+						transition_in(each_blocks[i], 1);
+						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
+					}
+				}
+
+				group_outros();
+
+				for (i = each_value_1.length; i < each_blocks.length; i += 1) {
+					out(i);
+				}
+
+				check_outros();
+			}
+		},
+		i: function intro(local) {
+			if (current) return;
+
+			for (let i = 0; i < each_value_1.length; i += 1) {
+				transition_in(each_blocks[i]);
+			}
+
+			current = true;
+		},
+		o: function outro(local) {
+			each_blocks = each_blocks.filter(Boolean);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				transition_out(each_blocks[i]);
+			}
+
+			current = false;
+		},
+		d: function destroy(detaching) {
+			destroy_each(each_blocks, detaching);
+			if (detaching) detach_dev(each_1_anchor);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
 		id: create_each_block$3.name,
 		type: "each",
-		source: "(47:16) {#each filteredAbi as func}",
+		source: "(107:24) {#each filteredProxies as proxy}",
 		ctx
 	});
 
@@ -28598,22 +29164,25 @@ function create_each_block$3(ctx) {
 }
 
 function create_fragment$j(ctx) {
+	let div4;
 	let div3;
-	let div2;
 	let expandbutton;
 	let updating_expanded;
 	let t0;
+	let div2;
 	let div1;
-	let div0;
 	let clickablespan;
 	let t1;
+	let div0;
 	let deletebutton;
 	let t2;
+	let defaultbutton;
 	let t3;
+	let t4;
 	let current;
 
 	function expandbutton_expanded_binding(value) {
-		/*expandbutton_expanded_binding*/ ctx[5](value);
+		/*expandbutton_expanded_binding*/ ctx[8](value);
 	}
 
 	let expandbutton_props = {};
@@ -28631,62 +29200,80 @@ function create_fragment$j(ctx) {
 
 	clickablespan = new ClickableSpan({
 			props: {
-				callback: /*func*/ ctx[7],
-				$$slots: { default: [create_default_slot$6] },
+				callback: /*func*/ ctx[12],
+				$$slots: { default: [create_default_slot_2$1] },
 				$$scope: { ctx }
 			},
 			$$inline: true
 		});
 
 	deletebutton = new DeleteButton({
-			props: { callback: /*func_1*/ ctx[6] },
+			props: { callback: /*func_1*/ ctx[9] },
 			$$inline: true
 		});
 
-	let if_block0 = /*expanded*/ ctx[1] && create_if_block_2$4(ctx);
+	defaultbutton = new DefaultButton({
+			props: {
+				callback: /*func_2*/ ctx[10],
+				className: "mr-5",
+				$$slots: { default: [create_default_slot_1$1] },
+				$$scope: { ctx }
+			},
+			$$inline: true
+		});
+
+	let if_block0 = /*expanded*/ ctx[1] && create_if_block_5$2(ctx);
 	let if_block1 = /*expanded*/ ctx[1] && create_if_block$a(ctx);
 
 	const block = {
 		c: function create() {
+			div4 = element("div");
 			div3 = element("div");
-			div2 = element("div");
 			create_component(expandbutton.$$.fragment);
 			t0 = space();
+			div2 = element("div");
 			div1 = element("div");
-			div0 = element("div");
 			create_component(clickablespan.$$.fragment);
 			t1 = space();
+			div0 = element("div");
 			create_component(deletebutton.$$.fragment);
 			t2 = space();
-			if (if_block0) if_block0.c();
+			create_component(defaultbutton.$$.fragment);
 			t3 = space();
+			if (if_block0) if_block0.c();
+			t4 = space();
 			if (if_block1) if_block1.c();
-			attr_dev(div0, "class", "w-full flex flex-row gap-1 items-center justify-between");
-			add_location(div0, file$i, 22, 12, 1007);
-			attr_dev(div1, "class", "flex-1 overflow-x-hidden rounded ps-2 bg-vscodeInputBackground flex flex-col");
-			add_location(div1, file$i, 20, 8, 835);
-			attr_dev(div2, "class", "flex flex-row gap-1");
-			add_location(div2, file$i, 18, 4, 754);
-			attr_dev(div3, "class", "flex flex-col gap-1");
-			add_location(div3, file$i, 17, 0, 716);
+			attr_dev(div0, "class", "flex fex-row gap-1");
+			add_location(div0, file$i, 33, 16, 1736);
+			attr_dev(div1, "class", "w-full flex flex-row gap-1 items-center justify-between");
+			add_location(div1, file$i, 28, 12, 1370);
+			attr_dev(div2, "class", "flex-1 overflow-x-hidden rounded ps-2 bg-vscodeInputBackground flex flex-col");
+			add_location(div2, file$i, 26, 8, 1198);
+			attr_dev(div3, "class", "flex flex-row gap-1");
+			add_location(div3, file$i, 24, 4, 1117);
+			attr_dev(div4, "class", "flex flex-col gap-1");
+			add_location(div4, file$i, 23, 0, 1079);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, div3, anchor);
+			insert_dev(target, div4, anchor);
+			append_dev(div4, div3);
+			mount_component(expandbutton, div3, null);
+			append_dev(div3, t0);
 			append_dev(div3, div2);
-			mount_component(expandbutton, div2, null);
-			append_dev(div2, t0);
 			append_dev(div2, div1);
+			mount_component(clickablespan, div1, null);
+			append_dev(div1, t1);
 			append_dev(div1, div0);
-			mount_component(clickablespan, div0, null);
-			append_dev(div0, t1);
 			mount_component(deletebutton, div0, null);
-			append_dev(div1, t2);
-			if (if_block0) if_block0.m(div1, null);
-			append_dev(div3, t3);
-			if (if_block1) if_block1.m(div3, null);
+			append_dev(div0, t2);
+			mount_component(defaultbutton, div0, null);
+			append_dev(div2, t3);
+			if (if_block0) if_block0.m(div2, null);
+			append_dev(div4, t4);
+			if (if_block1) if_block1.m(div4, null);
 			current = true;
 		},
 		p: function update(ctx, [dirty]) {
@@ -28700,16 +29287,24 @@ function create_fragment$j(ctx) {
 
 			expandbutton.$set(expandbutton_changes);
 			const clickablespan_changes = {};
-			if (dirty & /*contract*/ 1) clickablespan_changes.callback = /*func*/ ctx[7];
+			if (dirty & /*contract*/ 1) clickablespan_changes.callback = /*func*/ ctx[12];
 
-			if (dirty & /*$$scope, contract*/ 1025) {
+			if (dirty & /*$$scope, contract*/ 2097153) {
 				clickablespan_changes.$$scope = { dirty, ctx };
 			}
 
 			clickablespan.$set(clickablespan_changes);
 			const deletebutton_changes = {};
-			if (dirty & /*contract*/ 1) deletebutton_changes.callback = /*func_1*/ ctx[6];
+			if (dirty & /*contract*/ 1) deletebutton_changes.callback = /*func_1*/ ctx[9];
 			deletebutton.$set(deletebutton_changes);
+			const defaultbutton_changes = {};
+			if (dirty & /*contract*/ 1) defaultbutton_changes.callback = /*func_2*/ ctx[10];
+
+			if (dirty & /*$$scope*/ 2097152) {
+				defaultbutton_changes.$$scope = { dirty, ctx };
+			}
+
+			defaultbutton.$set(defaultbutton_changes);
 
 			if (/*expanded*/ ctx[1]) {
 				if (if_block0) {
@@ -28719,10 +29314,10 @@ function create_fragment$j(ctx) {
 						transition_in(if_block0, 1);
 					}
 				} else {
-					if_block0 = create_if_block_2$4(ctx);
+					if_block0 = create_if_block_5$2(ctx);
 					if_block0.c();
 					transition_in(if_block0, 1);
-					if_block0.m(div1, null);
+					if_block0.m(div2, null);
 				}
 			} else if (if_block0) {
 				group_outros();
@@ -28745,7 +29340,7 @@ function create_fragment$j(ctx) {
 					if_block1 = create_if_block$a(ctx);
 					if_block1.c();
 					transition_in(if_block1, 1);
-					if_block1.m(div3, null);
+					if_block1.m(div4, null);
 				}
 			} else if (if_block1) {
 				group_outros();
@@ -28762,6 +29357,7 @@ function create_fragment$j(ctx) {
 			transition_in(expandbutton.$$.fragment, local);
 			transition_in(clickablespan.$$.fragment, local);
 			transition_in(deletebutton.$$.fragment, local);
+			transition_in(defaultbutton.$$.fragment, local);
 			transition_in(if_block0);
 			transition_in(if_block1);
 			current = true;
@@ -28770,15 +29366,17 @@ function create_fragment$j(ctx) {
 			transition_out(expandbutton.$$.fragment, local);
 			transition_out(clickablespan.$$.fragment, local);
 			transition_out(deletebutton.$$.fragment, local);
+			transition_out(defaultbutton.$$.fragment, local);
 			transition_out(if_block0);
 			transition_out(if_block1);
 			current = false;
 		},
 		d: function destroy(detaching) {
-			if (detaching) detach_dev(div3);
+			if (detaching) detach_dev(div4);
 			destroy_component(expandbutton);
 			destroy_component(clickablespan);
 			destroy_component(deletebutton);
+			destroy_component(defaultbutton);
 			if (if_block0) if_block0.d();
 			if (if_block1) if_block1.d();
 		}
@@ -28797,11 +29395,14 @@ function create_fragment$j(ctx) {
 
 function instance$j($$self, $$props, $$invalidate) {
 	let filteredAbi;
+	let filteredProxies;
 	let { $$slots: slots = {}, $$scope } = $$props;
 	validate_slots('Contract', slots, []);
+	var _a;
 	let { contract } = $$props;
 	let { onFunctionCall } = $$props;
 	let expanded = true;
+	let expandedProxy = false;
 
 	const _onFunctionCall = (calldata, func) => {
 		onFunctionCall(calldata, contract.address, func);
@@ -28809,18 +29410,18 @@ function instance$j($$self, $$props, $$invalidate) {
 
 	$$self.$$.on_mount.push(function () {
 		if (contract === undefined && !('contract' in $$props || $$self.$$.bound[$$self.$$.props['contract']])) {
-			console.warn("<Contract> was created without expected prop 'contract'");
+			console_1$1.warn("<Contract> was created without expected prop 'contract'");
 		}
 
 		if (onFunctionCall === undefined && !('onFunctionCall' in $$props || $$self.$$.bound[$$self.$$.props['onFunctionCall']])) {
-			console.warn("<Contract> was created without expected prop 'onFunctionCall'");
+			console_1$1.warn("<Contract> was created without expected prop 'onFunctionCall'");
 		}
 	});
 
 	const writable_props = ['contract', 'onFunctionCall'];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Contract> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$1.warn(`<Contract> was created with unknown prop '${key}'`);
 	});
 
 	function expandbutton_expanded_binding(value) {
@@ -28830,34 +29431,45 @@ function instance$j($$self, $$props, $$invalidate) {
 
 	const func = () => requestLabel(contract.address);
 	const func_1 = () => removeDeployedContract(contract.address);
+	const func_2 = () => openProxyQuickPick(contract.fqn);
+	const func_3 = () => $$invalidate(2, expandedProxy = !expandedProxy);
 
 	$$self.$$set = $$props => {
 		if ('contract' in $$props) $$invalidate(0, contract = $$props.contract);
-		if ('onFunctionCall' in $$props) $$invalidate(4, onFunctionCall = $$props.onFunctionCall);
+		if ('onFunctionCall' in $$props) $$invalidate(6, onFunctionCall = $$props.onFunctionCall);
 	};
 
 	$$self.$capture_state = () => ({
+		_a,
 		ContractFunction,
 		ExpandButton,
 		DeleteButton,
 		removeDeployedContract,
 		requestLabel,
 		setLabel,
+		openProxyQuickPick,
 		CalldataBytes,
 		CopyableSpan,
 		ClickableSpan,
+		WarningIcon,
+		DefaultButton,
 		contract,
 		onFunctionCall,
 		expanded,
+		expandedProxy,
 		_onFunctionCall,
+		filteredProxies,
 		filteredAbi
 	});
 
 	$$self.$inject_state = $$props => {
+		if ('_a' in $$props) $$invalidate(7, _a = $$props._a);
 		if ('contract' in $$props) $$invalidate(0, contract = $$props.contract);
-		if ('onFunctionCall' in $$props) $$invalidate(4, onFunctionCall = $$props.onFunctionCall);
+		if ('onFunctionCall' in $$props) $$invalidate(6, onFunctionCall = $$props.onFunctionCall);
 		if ('expanded' in $$props) $$invalidate(1, expanded = $$props.expanded);
-		if ('filteredAbi' in $$props) $$invalidate(2, filteredAbi = $$props.filteredAbi);
+		if ('expandedProxy' in $$props) $$invalidate(2, expandedProxy = $$props.expandedProxy);
+		if ('filteredProxies' in $$props) $$invalidate(3, filteredProxies = $$props.filteredProxies);
+		if ('filteredAbi' in $$props) $$invalidate(4, filteredAbi = $$props.filteredAbi);
 	};
 
 	if ($$props && "$$inject" in $$props) {
@@ -28866,18 +29478,33 @@ function instance$j($$self, $$props, $$invalidate) {
 
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*contract*/ 1) {
-			$$invalidate(2, filteredAbi = contract.abi.filter(func => func.type == 'function'));
+			$$invalidate(4, filteredAbi = contract.abi.filter(func => func.type == 'function'));
+		}
+
+		if ($$self.$$.dirty & /*contract, _a*/ 129) {
+			$$invalidate(3, filteredProxies = $$invalidate(7, _a = contract.proxies) === null || _a === void 0
+			? void 0
+			: _a.map(proxy => proxy.filter(func => func.type == 'function')));
+		}
+
+		if ($$self.$$.dirty & /*contract*/ 1) {
+			console.log('updated contract', contract);
 		}
 	};
 
 	return [
 		contract,
 		expanded,
+		expandedProxy,
+		filteredProxies,
 		filteredAbi,
 		_onFunctionCall,
 		onFunctionCall,
+		_a,
 		expandbutton_expanded_binding,
 		func_1,
+		func_2,
+		func_3,
 		func
 	];
 }
@@ -28885,7 +29512,7 @@ function instance$j($$self, $$props, $$invalidate) {
 class Contract extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init(this, options, instance$j, create_fragment$j, safe_not_equal, { contract: 0, onFunctionCall: 4 });
+		init(this, options, instance$j, create_fragment$j, safe_not_equal, { contract: 0, onFunctionCall: 6 });
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,

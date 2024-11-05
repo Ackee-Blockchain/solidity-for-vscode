@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { SakeContext } from './context';
 
 export async function copyToClipboard(text: string | undefined) {
     if (!text) {

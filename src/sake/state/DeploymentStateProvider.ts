@@ -1,4 +1,10 @@
-import { Address, DeployedContract, DeploymentState, StateId } from '../webview/shared/types';
+import {
+    Address,
+    ContractAbi,
+    DeployedContract,
+    DeploymentState,
+    StateId
+} from '../webview/shared/types';
 import BaseStateProvider from './BaseStateProvider';
 
 export default class DeploymentStateProvider extends BaseStateProvider<DeploymentState> {
@@ -34,6 +40,23 @@ export default class DeploymentStateProvider extends BaseStateProvider<Deploymen
             }
             return c;
         });
+    }
+
+    public addProxy(contractFqn: string, abi: ContractAbi) {
+        console.log('adding proxy', contractFqn, abi);
+
+        this.state = this.state.map((c) => {
+            if (c.fqn === contractFqn) {
+                if (c.proxies) {
+                    c.proxies.push(abi);
+                } else {
+                    c.proxies = [abi];
+                }
+            }
+            return c;
+        });
+
+        console.log('added proxy', this.state);
     }
 
     // TODO remove

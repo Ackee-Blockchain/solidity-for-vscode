@@ -159,6 +159,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
                 name: compilation.name,
                 address: deploymentResponse.deployedAddress,
                 abi: compilation.abi,
+                fqn: deploymentRequest.contractFqn,
                 balance: balance
             });
 

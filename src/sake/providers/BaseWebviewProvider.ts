@@ -300,6 +300,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
+            case WebviewMessageId.openProxyQuickPick: {
+                this._sake.showProxyQuickPick(message.payload.contractFqn);
+                break;
+            }
+
             case WebviewMessageId.reconnectChain: {
                 let success = true;
                 try {

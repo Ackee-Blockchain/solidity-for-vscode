@@ -20,6 +20,8 @@ export interface DeployedContract extends ExtendedAccount {
     abi: ContractAbi;
     label?: string;
     name: string;
+    fqn: string;
+    proxies?: ContractAbi[];
 }
 
 export type DeploymentState = DeployedContract[];

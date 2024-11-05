@@ -209,6 +209,16 @@ export function openChainsQuickPick() {
     messageHandler.send(request.command, request.payload);
 }
 
+export function openProxyQuickPick(contractFqn: string) {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.openProxyQuickPick,
+        payload: {
+            contractFqn
+        }
+    };
+    messageHandler.send(request.command, request.payload);
+}
+
 export async function reconnectChain(): Promise<boolean> {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.reconnectChain,
