@@ -2,6 +2,7 @@ import {
     Address,
     ContractAbi,
     DeployedContract,
+    DeployedContractType,
     DeploymentState,
     StateId
 } from '../webview/shared/types';
@@ -42,21 +43,17 @@ export default class DeploymentStateProvider extends BaseStateProvider<Deploymen
         });
     }
 
-    public addProxy(contractFqn: string, abi: ContractAbi) {
-        console.log('adding proxy', contractFqn, abi);
-
+    public extendAbi(contractFqn: string, abi: ContractAbi) {
         this.state = this.state.map((c) => {
-            if (c.fqn === contractFqn) {
-                if (c.proxies) {
-                    c.proxies.push(abi);
+            if (c.type === DeployedContractType.Compiled && c.fqn === contractFqn) {
+                if (c.extendedAbi) {
+                    c.extendedAbi.push(abi);
                 } else {
-                    c.proxies = [abi];
+                    c.extendedAbi = [abi];
                 }
             }
             return c;
         });
-
-        console.log('added proxy', this.state);
     }
 
     // TODO remove

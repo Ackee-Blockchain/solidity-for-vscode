@@ -7,6 +7,7 @@
         selectedValue,
         txParametersExpanded
     } from '../helpers/stores';
+    import { requestAddDeployedContract } from '../helpers/api';
     import Compile from '../views/Compile.svelte';
     import BlankIcon from '../components/icons/BlankIcon.svelte';
     import Deploy from '../views/Deploy.svelte';
@@ -15,6 +16,8 @@
     import ViewStatic from '../components/common/ViewStatic.svelte';
     import ViewScrollable from '../components/common/ViewScrollable.svelte';
     import { displayEtherValue } from '../../shared/ether';
+    import PlusIcon from '../components/icons/PlusIcon.svelte';
+    import HeaderButton from '../components/icons/HeaderButton.svelte';
 </script>
 
 <FlexContainer>
@@ -57,8 +60,18 @@
     </ViewStatic>
     <ViewScrollable>
         <svelte:fragment slot="header">
-            <BlankIcon />
-            <span>Deploy contracts</span>
+            <div class="flex flex-row gap-1 items-center w-full">
+                <div class="flex flex-row gap-1 items-center">
+                    <BlankIcon />
+                    <span>Deploy contracts</span>
+                </div>
+
+                <div class="flex flex-row gap-1 items-center ml-auto pr-1">
+                    <HeaderButton callback={requestAddDeployedContract}>
+                        <PlusIcon />
+                    </HeaderButton>
+                </div>
+            </div>
         </svelte:fragment>
         <svelte:fragment slot="content">
             <Deploy />

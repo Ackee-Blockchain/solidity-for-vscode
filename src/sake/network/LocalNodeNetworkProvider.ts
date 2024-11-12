@@ -13,11 +13,12 @@ import {
     SetAccountLabelRequest
 } from '../webview/shared/network_types';
 import { LocalNodeNetworkState, WakeChainDump } from '../webview/shared/storage_types';
-import { Account } from '../webview/shared/types';
+import { Account, Address, ContractAbi } from '../webview/shared/types';
 import {
     WakeCallRequestParams,
     WakeDeploymentResponse,
     WakeDumpStateResponse,
+    WakeGetAbiResponse,
     WakeGetAccountsResponse,
     WakeSetBalancesResponse
 } from '../webview/shared/wake_types';
@@ -215,5 +216,16 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
         if (!response.success) {
             throw new NetworkError('Failed to load state');
         }
+    }
+
+    async getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }> {
+        const response: WakeGetAbiResponse = await WakeApi.getAbi({
+            address: address,
+            sessionId: this.config.sessionId
+        });
+        return {
+            abi: response.abi,
+            name: response.name
+        };
     }
 }

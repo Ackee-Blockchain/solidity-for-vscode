@@ -27,12 +27,15 @@ import {
     WakeDumpStateRequestParams,
     WakeDumpStateResponse,
     WakeLoadStateResponse,
-    WakeLoadStateRequestParams
+    WakeLoadStateRequestParams,
+    WakeGetAbiRequestParams,
+    WakeGetAbiResponse
 } from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
 import AppStateProvider from '../state/AppStateProvider';
 import { SakeContext } from '../context';
+import ChainStateProvider from '../state/ChainStateProvider';
 
 /*
  * Get accounts and balances and save to state
@@ -379,6 +382,27 @@ export class WakeApi {
         }
     }
 
+    static async getAbi(requestParams: WakeGetAbiRequestParams): Promise<WakeGetAbiResponse> {
+        try {
+            console.log('getting abi', requestParams);
+            const result = await WakeApi.sendWakeRequest<WakeGetAbiResponse>(
+                'wake/sake/getAbi',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            console.log('error getting abi', e);
+            throw new WakeApiError(
+                `Failed to get ABI: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
+    }
+
     private static async sendWakeRequest<T>(
         method: string,
         params?: any,
@@ -400,6 +424,10 @@ export class WakeApi {
             }
             if (message == 'Client is not running') {
                 AppStateProvider.getInstance().setIsWakeServerRunning(false);
+            }
+            if (message == 'Chain instance not connected') {
+                console.log('chain not connected', params);
+                ChainStateProvider.getInstance().setChainConnectionStatus(params.sessionId, false);
             }
             throw new WakeApiError(message);
         }

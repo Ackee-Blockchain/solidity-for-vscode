@@ -1,7 +1,9 @@
 import {
     AccountState,
+    DeployedContractType,
     DeploymentState,
     NetworkCreationConfiguration,
+    NetworkId,
     SignalId,
     TransactionHistoryState,
     WebviewMessageId
@@ -16,10 +18,11 @@ import { SakeContext } from '../context';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 import { SakeProviderFactory } from './SakeProviderFactory';
 import ChainStateProvider from '../state/ChainStateProvider';
-import { StoredSakeState } from '../webview/shared/storage_types';
+import { ProviderState, StoredSakeState } from '../webview/shared/storage_types';
 import SakeState from './SakeState';
 import { NetworkProvider } from '../network/NetworkProvider';
 import { NetworkManager } from '../network/NetworkManager';
+import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
 
 export default class SakeProviderManager {
     private static _instance: SakeProviderManager;
@@ -189,19 +192,118 @@ export default class SakeProviderManager {
         this._statusBarItem.show();
     }
 
-    public showProxyQuickPick(contractFqn: string) {
-        if (this.state === undefined) {
+    public showAddAbiQuickPick(contractFqn: string) {
+        const _provider = this.provider;
+
+        if (this.state === undefined || _provider === undefined) {
             return;
         }
 
         vscode.window
-            .showQuickPick(this.state?.compilation.state.contracts.map((contract) => contract.fqn))
-            .then((selected) => {
-                if (selected) {
-                    const abi = this.state?.compilation.get(selected)?.abi;
-                    if (abi) {
-                        this.state?.deployment.addProxy(contractFqn, abi);
+            .showQuickPick(
+                [
+                    {
+                        label: 'Add from compiled contract',
+                        description: 'Add an ABI from a compiled contract'
+                    },
+                    {
+                        label: 'Fetch ABI from chain',
+                        description:
+                            _provider.network.type === NetworkId.LocalNode &&
+                            (_provider.network as LocalNodeNetworkProvider).config.fork !==
+                                undefined
+                                ? 'Fetch the ABI of a contract from onchain using Etherscan or Sourcify'
+                                : 'Fetch the ABI of a contract from the local chain'
+                    },
+                    {
+                        label: 'Copy-paste ABI',
+                        description: 'Add an existing ABI to the deployment'
                     }
+                ],
+                {
+                    title: 'Select method to extend ABI'
+                }
+            )
+            .then((selected) => {
+                if (!selected) {
+                    return;
+                }
+
+                if (selected.label === 'Add from compiled contract') {
+                    if (this.state === undefined) {
+                        showErrorMessage('No compilation state found');
+                        return;
+                    }
+                    if (this.state?.compilation.state.contracts.length === 0) {
+                        showErrorMessage(
+                            'Cannot add ABI from compiled contract: No compiled contracts found'
+                        );
+                        return;
+                    }
+                    vscode.window
+                        .showQuickPick(
+                            this.state?.compilation.state.contracts.map((contract) => contract.fqn),
+                            {
+                                title: 'Select the contract to add the ABI from'
+                            }
+                        )
+                        .then((selected) => {
+                            if (selected) {
+                                const abi = this.state?.compilation.get(selected)?.abi;
+                                if (abi) {
+                                    this.state?.deployment.extendAbi(contractFqn, abi);
+                                }
+                            }
+                        });
+                } else if (selected.label === 'Fetch ABI from chain') {
+                    vscode.window
+                        .showInputBox({
+                            prompt: 'Enter the address of the contract to fetch the ABI from',
+                            value: ''
+                        })
+                        .then((address) => {
+                            if (!address) {
+                                return;
+                            }
+                            this.provider
+                                ?.getAbi(address)
+                                .then((contract) => {
+                                    this.state?.deployment.extendAbi(contractFqn, contract.abi);
+                                    vscode.window.showInformationMessage(
+                                        `Successfully fetched ABI from ${contract.name} and added to ${contractFqn}`
+                                    );
+                                })
+                                .catch((e) => {
+                                    console.error(
+                                        `Failed to fetch ABI from ${address}: ${
+                                            e instanceof Error ? e.message : String(e)
+                                        }`
+                                    );
+                                    vscode.window.showErrorMessage(
+                                        `Unable to fetch ABI from ${address}`
+                                    );
+                                });
+                        });
+                } else if (selected.label === 'Copy-paste ABI') {
+                    vscode.window
+                        .showInputBox({
+                            prompt: 'Enter the ABI to add',
+                            value: ''
+                        })
+                        .then((abiString) => {
+                            if (abiString) {
+                                // try to parse the abi
+                                try {
+                                    const abi = JSON.parse(abiString);
+                                    // @todo missing validation, add zod
+                                    this.state?.deployment.extendAbi(contractFqn, abi);
+                                } catch (e) {
+                                    showErrorMessage(
+                                        `Failed to parse ABI: ${e instanceof Error ? e.message : String(e)}`
+                                    );
+                                }
+                            }
+                        });
                 }
             });
     }
@@ -312,6 +414,45 @@ export default class SakeProviderManager {
         // });
     }
 
+    public requestAddDeployedContract() {
+        if (!this.provider) {
+            return;
+        }
+
+        vscode.window
+            .showInputBox({
+                title: 'Enter the address of the contract to fetch the ABI from',
+                value: ''
+            })
+            .then((address) => {
+                if (!address) {
+                    return;
+                }
+                this.provider
+                    ?.getAbi(address)
+                    .then((contract) => {
+                        this.provider?.state?.deployment.add({
+                            type: DeployedContractType.Onchain,
+                            address: address,
+                            abi: contract.abi,
+                            name: contract.name,
+                            balance: null
+                        });
+                        vscode.window.showInformationMessage(
+                            `Successfully fetched ${contract.name} from ${address}`
+                        );
+                    })
+                    .catch((e) => {
+                        console.error(
+                            `Failed to fetch ABI from ${address}: ${
+                                e instanceof Error ? e.message : String(e)
+                            }`
+                        );
+                        vscode.window.showErrorMessage(`Unable to fetch ABI from ${address}`);
+                    });
+            });
+    }
+
     public async requestNewLocalProvider() {
         // get input from user
         const chainName = await getTextFromInputBox(
@@ -396,11 +537,13 @@ export default class SakeProviderManager {
 
     /* State Handling */
 
-    async dumpState(): Promise<StoredSakeState> {
+    async dumpState(providerStates?: ProviderState[]): Promise<StoredSakeState> {
         // Load all providers
-        const providerStates = await Promise.all(
-            this.providers.map((provider) => provider.dumpState())
-        );
+        if (providerStates === undefined) {
+            providerStates = await Promise.all(
+                this.providers.map((provider) => provider.dumpState())
+            );
+        }
 
         // Load shared state
         const sharedState = SakeState.dumpSharedState();
@@ -419,7 +562,9 @@ export default class SakeProviderManager {
                 if (provider) {
                     this.addProvider(provider, silent);
                 }
+                console.log('added provider', provider.id);
             } catch (error) {
+                console.log('failed to create provider from state', error);
                 console.error('Failed to create provider from state:', error);
                 if (!silent) {
                     vscode.window.showErrorMessage(

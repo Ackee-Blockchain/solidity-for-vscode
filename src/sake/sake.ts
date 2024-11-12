@@ -16,6 +16,7 @@ import AppStateProvider from './state/AppStateProvider';
 import { SakeContext } from './context';
 import { SakeProviderFactory } from './sake_providers/SakeProviderFactory';
 import { StorageHandler } from './storage/StorageHandler';
+import { WakeChainDump } from './webview/shared/storage_types';
 export async function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     /* Register Context */
     const sakeContext = SakeContext.getInstance();
@@ -60,7 +61,17 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     workspaceWatcher();
 
+    /* Wake Crash Dump */
+
+    // client.onNotification('wake/sake/dumpState', (dump: any) => {
+    //     console.log('Wake Crash Dump', dump);
+    // });
+
+    /* Register Commands */
+
     registerCommands(context, sake);
+
+    /* Load Chains */
 
     appState.setInitializationState('loadingChains');
 

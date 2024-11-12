@@ -209,12 +209,20 @@ export function openChainsQuickPick() {
     messageHandler.send(request.command, request.payload);
 }
 
-export function openProxyQuickPick(contractFqn: string) {
+export function openAddAbiQuickPick(contractFqn: string) {
     const request: WebviewMessageRequest = {
-        command: WebviewMessageId.openProxyQuickPick,
+        command: WebviewMessageId.openAddAbiQuickPick,
         payload: {
             contractFqn
         }
+    };
+    messageHandler.send(request.command, request.payload);
+}
+
+export function requestAddDeployedContract() {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.requestAddDeployedContract,
+        payload: undefined
     };
     messageHandler.send(request.command, request.payload);
 }

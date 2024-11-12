@@ -108,6 +108,7 @@ function handleStateResponse(
 ) {
     switch (message.stateId) {
         case StateId.DeployedContracts: {
+            console.log('received deployedContracts', message.payload);
             deployedContracts.set(message.payload);
             break;
         }

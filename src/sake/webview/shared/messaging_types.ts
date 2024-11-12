@@ -38,7 +38,10 @@ export enum WebviewMessageId {
     selectChain = 'selectChain',
     openSettings = 'openSettings',
     openChainsQuickPick = 'openChainsQuickPick',
-    openProxyQuickPick = 'openProxyQuickPick',
+    openAddAbiQuickPick = 'openAddAbiQuickPick',
+    requestAddDeployedContract = 'requestAddDeployedContract',
+
+    // connection
     reconnectChain = 'reconnectChain',
     ping = 'ping',
 
@@ -176,10 +179,14 @@ export type WebviewMessageRequest =
           };
       } & BaseWebviewMessageRequest)
     | ({
-          command: WebviewMessageId.openProxyQuickPick;
+          command: WebviewMessageId.openAddAbiQuickPick;
           payload: {
               contractFqn: string;
           };
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.requestAddDeployedContract;
+          payload: undefined;
       } & BaseWebviewMessageRequest);
 
 export type WebviewMessageResponse =
