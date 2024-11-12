@@ -1,5 +1,6 @@
 import * as w3t from 'web3-types';
 import type { CallOperation, CallType } from './network_types';
+import type { Address, ContractAbi } from './types';
 
 export interface WakeCompiledContracts {
     [key: string]: {
@@ -196,6 +197,18 @@ export interface WakeGetBytecodeRequestParams {
 
 export interface WakeGetBytecodeResponse extends WakeBaseResponse {
     bytecode: w3t.HexString;
+}
+
+export interface WakeGetAbiRequestParams extends WakeBaseRequestParams {
+    address: w3t.Address;
+}
+
+export interface WakeGetAbiResponse extends WakeBaseResponse {
+    name: string;
+    abi: w3t.ContractAbi;
+    proxyName: string | null;
+    proxyAbi: ContractAbi[] | null;
+    implementationAddress: Address | null;
 }
 
 /*

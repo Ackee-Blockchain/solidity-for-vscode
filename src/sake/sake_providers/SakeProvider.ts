@@ -14,7 +14,9 @@ import {
     SetAccountLabelRequest,
     TransactionCallResult,
     TransactionDecodedReturnValue,
-    TransactionDeploymentResult
+    TransactionDeploymentResult,
+    ContractAbi,
+    DeployedContractType
 } from '../webview/shared/types';
 import * as vscode from 'vscode';
 import { WakeApi } from '../api/wake';
@@ -156,6 +158,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
             ).balance;
 
             this.state.deployment.add({
+                type: DeployedContractType.Compiled,
                 name: compilation.name,
                 address: deploymentResponse.deployedAddress,
                 abi: compilation.abi,
@@ -229,9 +232,11 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         // TODO consider check and update balance of caller and callee
     }
 
-    async fetchContractFromEtherscan(address: string) {
-        throw new Error('Method not implemented.');
-        // TODO
+    /* ABI fetching */
+
+    async getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }> {
+        const abiResponse = await this.network.getAbi(address);
+        return abiResponse;
     }
 
     /* Event handling */

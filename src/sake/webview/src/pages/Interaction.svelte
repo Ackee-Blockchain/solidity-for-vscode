@@ -14,6 +14,9 @@
     import ChevronDown from '../components/icons/ChevronDown.svelte';
     import ChevronRight from '../components/icons/ChevronRight.svelte';
     import { displayEtherValue } from '../../shared/ether';
+    import { requestAddDeployedContract } from '../helpers/api';
+    import HeaderButton from '../components/icons/HeaderButton.svelte';
+    import PlusIcon from '../components/icons/PlusIcon.svelte';
 </script>
 
 <FlexContainer>
@@ -47,8 +50,18 @@
     </ViewStatic>
     <ViewScrollable>
         <svelte:fragment slot="header">
-            <BlankIcon />
-            <span>Interact with contracts</span>
+            <div class="flex flex-row gap-1 items-center w-full">
+                <div class="flex flex-row gap-1 items-center">
+                    <BlankIcon />
+                    <span>Interact with contracts</span>
+                </div>
+
+                <div class="flex flex-row gap-1 items-center ml-auto pr-1">
+                    <HeaderButton callback={requestAddDeployedContract}>
+                        <PlusIcon />
+                    </HeaderButton>
+                </div>
+            </div>
         </svelte:fragment>
         <svelte:fragment slot="content">
             <Run />

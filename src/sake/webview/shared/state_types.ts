@@ -16,13 +16,27 @@ export type AccountState = ExtendedAccount[];
 
 /* Deployment */
 
-export interface DeployedContract extends ExtendedAccount {
-    abi: ContractAbi;
-    label?: string;
-    name: string;
-    fqn: string;
-    proxies?: ContractAbi[];
+export enum DeployedContractType {
+    Compiled = 'compiled',
+    Onchain = 'onchain'
 }
+
+export type DeployedContract =
+    | ({
+          type: DeployedContractType.Compiled;
+          abi: ContractAbi;
+          label?: string;
+          name: string;
+          fqn: string;
+          extendedAbi?: ContractAbi[];
+      } & ExtendedAccount)
+    | ({
+          type: DeployedContractType.Onchain;
+          abi: ContractAbi;
+          label?: string;
+          name: string;
+          balance: number | null;
+      } & Omit<ExtendedAccount, 'balance'>);
 
 export type DeploymentState = DeployedContract[];
 

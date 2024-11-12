@@ -300,8 +300,8 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
-            case WebviewMessageId.openProxyQuickPick: {
-                this._sake.showProxyQuickPick(message.payload.contractFqn);
+            case WebviewMessageId.openAddAbiQuickPick: {
+                this._sake.showAddAbiQuickPick(message.payload.contractFqn);
                 break;
             }
 
@@ -366,6 +366,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     }
                 } as WebviewMessageResponse);
 
+                break;
+            }
+
+            case WebviewMessageId.requestAddDeployedContract: {
+                this._sake.requestAddDeployedContract();
                 break;
             }
 
