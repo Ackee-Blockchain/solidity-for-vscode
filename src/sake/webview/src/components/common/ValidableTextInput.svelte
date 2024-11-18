@@ -1,8 +1,10 @@
 <script lang="ts">
+    import InfoTooltip from '../InfoTooltip.svelte';
     export let label: string | undefined = undefined;
     export let placeholder: string | undefined = undefined;
     export let value: string | undefined = undefined;
     export let error: string | null = null;
+    export let tooltip: string | null = null;
     export let onChange: (value: string) => void | undefined = () => undefined;
     export let validate: (value: string | undefined) => string | null = () => null;
     export let transform: (value: string | undefined) => string = (value) => value ?? '';
@@ -25,7 +27,12 @@
 </script>
 
 {#if label}
-    <span class="text-sm">{label}</span>
+    <div class="flex gap-1">
+        <span class="text-sm">{label}</span>
+        {#if tooltip}
+            <InfoTooltip content={tooltip} />
+        {/if}
+    </div>
 {/if}
 <vscode-text-field
     class="w-full"
