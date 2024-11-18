@@ -123,7 +123,7 @@ export const chainNavigator = (() => {
 
     return {
         subscribe,
-        showAdvancedLocalChainSetup: (activeTab: 'create' | 'connect' = 'connect') => {
+        showAdvancedLocalChainSetup: (activeTab: 'create' | 'connect' = 'create') => {
             set({
                 state: 'advancedLocalChainSetup',
                 config: undefined,

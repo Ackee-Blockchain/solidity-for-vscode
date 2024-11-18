@@ -16,6 +16,9 @@
     import { getInputFromTopBar, setBalance, showErrorMessage } from '../helpers/api';
     import CopyableSpan from '../components/CopyableSpan.svelte';
     import WarningIcon from '../components/icons/WarningIcon.svelte';
+    import { validateNonEmptyString } from '../helpers/validation';
+    import ValidableTextInput from '../components/common/ValidableTextInput.svelte';
+    import InfoTooltip from '../components/InfoTooltip.svelte';
 
     function handleAccountChange(event: any) {
         const _selectedAccountIndex = event.detail.value;
@@ -113,7 +116,12 @@
             </div>
 
             <div class="w-full">
-                <span class="text-sm">Transaction Value</span>
+                <div class="flex flex-row gap-1">
+                    <span class="text-sm">Transaction Value</span>
+                    <InfoTooltip
+                        content="The ether value which will be sent with the transaction."
+                    />
+                </div>
                 <vscode-text-field
                     placeholder="0 ETH"
                     class="w-full"

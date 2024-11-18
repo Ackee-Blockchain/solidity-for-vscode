@@ -114,35 +114,45 @@
                     <ValidableTextInput
                         label="Number of accounts"
                         validate={validateNumber}
+                        tooltip="The number of accounts to be created on the chain. The default is 10."
+                        placeholder="10"
                         bind:value={form.accounts}
                     />
 
                     <ValidableTextInput
                         label="Chain ID"
                         validate={validateNumber}
+                        tooltip="Chain ID is the identifier of the chain. Ethereum Mainnet has a chain ID of 1."
+                        placeholder="1"
                         bind:value={form.chainId}
                     />
 
                     <ValidableTextInput
-                        label="Fork"
+                        label="Fork URL"
                         validate={validateNonEmptyString}
+                        tooltip="The fork URL is the URL of the Ethereum node to fork from. This can be an Alchemy, Infura, or any other Ethereum node provider."
+                        placeholder="https://eth-mainnet.g.alchemy.com/v2/<api-key>"
                         bind:value={form.fork}
                     />
 
                     <ValidableTextInput
                         label="Hardfork"
+                        tooltip="The hardfork to be used in the chain. The default is 'latest'."
+                        placeholder="latest"
                         validate={validateNonEmptyString}
                         bind:value={form.hardfork}
                     />
 
                     <ValidableTextInput
                         label="Minimum Gas Price"
+                        placeholder="0"
                         validate={validateNumber}
                         bind:value={form.minGasPrice}
                     />
 
                     <ValidableTextInput
                         label="Block Base Fee Per Gas"
+                        placeholder="0"
                         validate={validateNumber}
                         bind:value={form.blockBaseFeePerGas}
                     />
@@ -170,6 +180,8 @@
                 <ValidableTextInput
                     label="URI Connection String"
                     validate={validateNonEmptyString}
+                    tooltip="The URI connection string is the connection string to the Ethereum node to connect to. This can be an Alchemy, Infura, or any other Ethereum node provider."
+                    placeholder="ws://localhost:8545"
                     bind:value={form.uri}
                 />
 
