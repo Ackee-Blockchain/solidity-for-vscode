@@ -11,7 +11,8 @@
         if (tooltipContainer) {
             const rect = tooltipContainer.getBoundingClientRect();
             const viewportWidth = window.innerWidth;
-            maxWidth = viewportWidth - rect.left - 5;
+            maxWidth =
+                align === 'left' ? viewportWidth - rect.left - 5 : viewportWidth - rect.right - 5;
         }
     }
 
@@ -29,8 +30,8 @@
 
     <div
         bind:this={tooltipContainer}
-        class="absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999]
-        {align === 'left'
+        class="absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999] vscode-box-shadow
+        {align === 'right'
             ? 'left-full top-1/2 transform -translate-y-1/2 ml-2'
             : 'right-full top-1/2 transform -translate-y-1/2 mr-2'}"
         style="max-width: {maxWidth}px;"

@@ -22122,7 +22122,7 @@ const get_tooltip_slot_context = ctx => ({});
 const get_content_slot_changes$1 = dirty => ({});
 const get_content_slot_context$1 = ctx => ({});
 
-// (34:8) <TextContainer>
+// (35:8) <TextContainer>
 function create_default_slot$f(ctx) {
 	let div;
 	let current;
@@ -22134,7 +22134,7 @@ function create_default_slot$f(ctx) {
 			div = element("div");
 			if (tooltip_slot) tooltip_slot.c();
 			attr_dev(div, "class", "flex flex-col gap-1 text-sm");
-			add_location(div, file$A, 34, 12, 1144);
+			add_location(div, file$A, 35, 12, 1227);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -22180,7 +22180,7 @@ function create_default_slot$f(ctx) {
 		block,
 		id: create_default_slot$f.name,
 		type: "slot",
-		source: "(34:8) <TextContainer>",
+		source: "(35:8) <TextContainer>",
 		ctx
 	});
 
@@ -22215,16 +22215,16 @@ function create_fragment$C(ctx) {
 			div0 = element("div");
 			create_component(textcontainer.$$.fragment);
 			attr_dev(span, "class", "cursor-pointer");
-			add_location(span, file$A, 21, 4, 677);
+			add_location(span, file$A, 22, 4, 741);
 
-			attr_dev(div0, "class", div0_class_value = "absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999] " + (/*align*/ ctx[0] === 'left'
+			attr_dev(div0, "class", div0_class_value = "absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999] vscode-box-shadow " + (/*align*/ ctx[0] === 'right'
 			? 'left-full top-1/2 transform -translate-y-1/2 ml-2'
 			: 'right-full top-1/2 transform -translate-y-1/2 mr-2'));
 
 			set_style(div0, "max-width", /*maxWidth*/ ctx[2] + "px");
-			add_location(div0, file$A, 25, 4, 756);
+			add_location(div0, file$A, 26, 4, 820);
 			attr_dev(div1, "class", "relative inline-block group");
-			add_location(div1, file$A, 20, 0, 631);
+			add_location(div1, file$A, 21, 0, 695);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -22267,7 +22267,7 @@ function create_fragment$C(ctx) {
 
 			textcontainer.$set(textcontainer_changes);
 
-			if (!current || dirty & /*align*/ 1 && div0_class_value !== (div0_class_value = "absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999] " + (/*align*/ ctx[0] === 'left'
+			if (!current || dirty & /*align*/ 1 && div0_class_value !== (div0_class_value = "absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999] vscode-box-shadow " + (/*align*/ ctx[0] === 'right'
 			? 'left-full top-1/2 transform -translate-y-1/2 ml-2'
 			: 'right-full top-1/2 transform -translate-y-1/2 mr-2'))) {
 				attr_dev(div0, "class", div0_class_value);
@@ -22318,7 +22318,10 @@ function instance$C($$self, $$props, $$invalidate) {
 		if (tooltipContainer) {
 			const rect = tooltipContainer.getBoundingClientRect();
 			const viewportWidth = window.innerWidth;
-			$$invalidate(2, maxWidth = viewportWidth - rect.left - 5);
+
+			$$invalidate(2, maxWidth = align === 'left'
+			? viewportWidth - rect.left - 5
+			: viewportWidth - rect.right - 5);
 		}
 	}
 
@@ -29568,14 +29571,14 @@ function create_default_slot_2$1(ctx) {
 	return block;
 }
 
-// (45:20) {#if contract.type === DeployedContractType.Compiled}
+// (41:20) {#if contract.type === DeployedContractType.Compiled}
 function create_if_block_6$1(ctx) {
 	let defaultbutton;
 	let current;
 
 	defaultbutton = new DefaultButton({
 			props: {
-				callback: /*func_2*/ ctx[10],
+				callback: /*func_1*/ ctx[9],
 				$$slots: { default: [create_default_slot_1$3] },
 				$$scope: { ctx }
 			},
@@ -29592,7 +29595,7 @@ function create_if_block_6$1(ctx) {
 		},
 		p: function update(ctx, dirty) {
 			const defaultbutton_changes = {};
-			if (dirty & /*contract*/ 1) defaultbutton_changes.callback = /*func_2*/ ctx[10];
+			if (dirty & /*contract*/ 1) defaultbutton_changes.callback = /*func_1*/ ctx[9];
 
 			if (dirty & /*$$scope*/ 2097152) {
 				defaultbutton_changes.$$scope = { dirty, ctx };
@@ -29618,14 +29621,14 @@ function create_if_block_6$1(ctx) {
 		block,
 		id: create_if_block_6$1.name,
 		type: "if",
-		source: "(45:20) {#if contract.type === DeployedContractType.Compiled}",
+		source: "(41:20) {#if contract.type === DeployedContractType.Compiled}",
 		ctx
 	});
 
 	return block;
 }
 
-// (46:24) <DefaultButton callback={() => openAddAbiQuickPick(contract.fqn)}>
+// (42:24) <DefaultButton callback={() => openAddAbiQuickPick(contract.fqn)}>
 function create_default_slot_1$3(ctx) {
 	let radiotowericon;
 	let current;
@@ -29657,14 +29660,14 @@ function create_default_slot_1$3(ctx) {
 		block,
 		id: create_default_slot_1$3.name,
 		type: "slot",
-		source: "(46:24) <DefaultButton callback={() => openAddAbiQuickPick(contract.fqn)}>",
+		source: "(42:24) <DefaultButton callback={() => openAddAbiQuickPick(contract.fqn)}>",
 		ctx
 	});
 
 	return block;
 }
 
-// (53:12) {#if expanded}
+// (50:12) {#if expanded}
 function create_if_block_5$2(ctx) {
 	let div;
 	let span;
@@ -29694,9 +29697,9 @@ function create_if_block_5$2(ctx) {
 			t1 = space();
 			create_component(copyablespan.$$.fragment);
 			attr_dev(span, "class", "text-sm");
-			add_location(span, file$j, 54, 20, 2659);
+			add_location(span, file$j, 51, 20, 2569);
 			attr_dev(div, "class", "w-full flex flex-row gap-1 items-center justify-between pb-1");
-			add_location(div, file$j, 53, 16, 2564);
+			add_location(div, file$j, 50, 16, 2474);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -29734,14 +29737,14 @@ function create_if_block_5$2(ctx) {
 		block,
 		id: create_if_block_5$2.name,
 		type: "if",
-		source: "(53:12) {#if expanded}",
+		source: "(50:12) {#if expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (71:4) {#if expanded}
+// (68:4) {#if expanded}
 function create_if_block$9(ctx) {
 	let if_block_anchor;
 	let current;
@@ -29800,14 +29803,14 @@ function create_if_block$9(ctx) {
 		block,
 		id: create_if_block$9.name,
 		type: "if",
-		source: "(71:4) {#if expanded}",
+		source: "(68:4) {#if expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (72:8) {#if filteredAbi.length > 0}
+// (69:8) {#if filteredAbi.length > 0}
 function create_if_block_1$5(ctx) {
 	let div;
 	let t0;
@@ -29848,7 +29851,7 @@ function create_if_block_1$5(ctx) {
 			t1 = space();
 			if (if_block) if_block.c();
 			attr_dev(div, "class", "flex flex-col gap-1");
-			add_location(div, file$j, 72, 12, 3463);
+			add_location(div, file$j, 69, 12, 3373);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -29951,14 +29954,14 @@ function create_if_block_1$5(ctx) {
 		block,
 		id: create_if_block_1$5.name,
 		type: "if",
-		source: "(72:8) {#if filteredAbi.length > 0}",
+		source: "(69:8) {#if filteredAbi.length > 0}",
 		ctx
 	});
 
 	return block;
 }
 
-// (74:16) {#each filteredAbi as func}
+// (71:16) {#each filteredAbi as func}
 function create_each_block_2(ctx) {
 	let contractfunction;
 	let current;
@@ -30002,14 +30005,14 @@ function create_each_block_2(ctx) {
 		block,
 		id: create_each_block_2.name,
 		type: "each",
-		source: "(74:16) {#each filteredAbi as func}",
+		source: "(71:16) {#each filteredAbi as func}",
 		ctx
 	});
 
 	return block;
 }
 
-// (80:16) {#if filteredProxies}
+// (77:16) {#if filteredProxies}
 function create_if_block_2$4(ctx) {
 	let clickablespan;
 	let t;
@@ -30098,14 +30101,14 @@ function create_if_block_2$4(ctx) {
 		block,
 		id: create_if_block_2$4.name,
 		type: "if",
-		source: "(80:16) {#if filteredProxies}",
+		source: "(77:16) {#if filteredProxies}",
 		ctx
 	});
 
 	return block;
 }
 
-// (100:24) {:else}
+// (97:24) {:else}
 function create_else_block$6(ctx) {
 	let svg;
 	let path;
@@ -30117,14 +30120,14 @@ function create_else_block$6(ctx) {
 			attr_dev(path, "fill-rule", "evenodd");
 			attr_dev(path, "clip-rule", "evenodd");
 			attr_dev(path, "d", "M10.072 8.024L5.715 3.667l.618-.62L11 7.716v.618pmL6.333 13l-.618-.619 4.357-4.357z");
-			add_location(path, file$j, 108, 33, 5200);
+			add_location(path, file$j, 105, 33, 5110);
 			attr_dev(svg, "width", "16");
 			attr_dev(svg, "height", "16");
 			attr_dev(svg, "viewBox", "0 0 16 16");
 			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
 			attr_dev(svg, "fill", "currentColor");
 			attr_dev(svg, "class", "");
-			add_location(svg, file$j, 101, 28, 4863);
+			add_location(svg, file$j, 98, 28, 4773);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, svg, anchor);
@@ -30139,14 +30142,14 @@ function create_else_block$6(ctx) {
 		block,
 		id: create_else_block$6.name,
 		type: "else",
-		source: "(100:24) {:else}",
+		source: "(97:24) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (85:24) {#if expandedProxy}
+// (82:24) {#if expandedProxy}
 function create_if_block_4$2(ctx) {
 	let svg;
 	let path;
@@ -30158,14 +30161,14 @@ function create_if_block_4$2(ctx) {
 			attr_dev(path, "fill-rule", "evenodd");
 			attr_dev(path, "clip-rule", "evenodd");
 			attr_dev(path, "d", "M7.976 10.072l4.357-4.357.62.618L8.284 11h-.618L3 6.333l.619-.618 4.357 4.357z");
-			add_location(path, file$j, 93, 33, 4431);
+			add_location(path, file$j, 90, 33, 4341);
 			attr_dev(svg, "width", "16");
 			attr_dev(svg, "height", "16");
 			attr_dev(svg, "viewBox", "0 0 16 16");
 			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
 			attr_dev(svg, "fill", "currentColor");
 			attr_dev(svg, "class", "");
-			add_location(svg, file$j, 86, 28, 4094);
+			add_location(svg, file$j, 83, 28, 4004);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, svg, anchor);
@@ -30180,14 +30183,14 @@ function create_if_block_4$2(ctx) {
 		block,
 		id: create_if_block_4$2.name,
 		type: "if",
-		source: "(85:24) {#if expandedProxy}",
+		source: "(82:24) {#if expandedProxy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (81:20) <ClickableSpan                         callback={() => (expandedProxy = !expandedProxy)}                         className="flex flex-row gap-1 items-center ml-2"                     >
+// (78:20) <ClickableSpan                         callback={() => (expandedProxy = !expandedProxy)}                         className="flex flex-row gap-1 items-center ml-2"                     >
 function create_default_slot$6(ctx) {
 	let t0;
 	let span;
@@ -30207,7 +30210,7 @@ function create_default_slot$6(ctx) {
 			span = element("span");
 			span.textContent = "Custom Added ABI";
 			attr_dev(span, "class", "text-sm");
-			add_location(span, file$j, 115, 24, 5566);
+			add_location(span, file$j, 112, 24, 5476);
 		},
 		m: function mount(target, anchor) {
 			if_block.m(target, anchor);
@@ -30236,14 +30239,14 @@ function create_default_slot$6(ctx) {
 		block,
 		id: create_default_slot$6.name,
 		type: "slot",
-		source: "(81:20) <ClickableSpan                         callback={() => (expandedProxy = !expandedProxy)}                         className=\\\"flex flex-row gap-1 items-center ml-2\\\"                     >",
+		source: "(78:20) <ClickableSpan                         callback={() => (expandedProxy = !expandedProxy)}                         className=\\\"flex flex-row gap-1 items-center ml-2\\\"                     >",
 		ctx
 	});
 
 	return block;
 }
 
-// (118:20) {#if expandedProxy}
+// (115:20) {#if expandedProxy}
 function create_if_block_3$3(ctx) {
 	let each_1_anchor;
 	let current;
@@ -30334,14 +30337,14 @@ function create_if_block_3$3(ctx) {
 		block,
 		id: create_if_block_3$3.name,
 		type: "if",
-		source: "(118:20) {#if expandedProxy}",
+		source: "(115:20) {#if expandedProxy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (120:28) {#each proxy as proxy_func}
+// (117:28) {#each proxy as proxy_func}
 function create_each_block_1(ctx) {
 	let contractfunction;
 	let current;
@@ -30385,14 +30388,14 @@ function create_each_block_1(ctx) {
 		block,
 		id: create_each_block_1.name,
 		type: "each",
-		source: "(120:28) {#each proxy as proxy_func}",
+		source: "(117:28) {#each proxy as proxy_func}",
 		ctx
 	});
 
 	return block;
 }
 
-// (119:24) {#each filteredProxies as proxy}
+// (116:24) {#each filteredProxies as proxy}
 function create_each_block$3(ctx) {
 	let each_1_anchor;
 	let current;
@@ -30483,7 +30486,7 @@ function create_each_block$3(ctx) {
 		block,
 		id: create_each_block$3.name,
 		type: "each",
-		source: "(119:24) {#each filteredProxies as proxy}",
+		source: "(116:24) {#each filteredProxies as proxy}",
 		ctx
 	});
 
@@ -30501,8 +30504,8 @@ function create_fragment$k(ctx) {
 	let clickablespan;
 	let t1;
 	let div0;
-	let deletebutton;
 	let t2;
+	let deletebutton;
 	let t3;
 	let t4;
 	let current;
@@ -30533,12 +30536,13 @@ function create_fragment$k(ctx) {
 			$$inline: true
 		});
 
+	let if_block0 = /*contract*/ ctx[0].type === DeployedContractType.Compiled && create_if_block_6$1(ctx);
+
 	deletebutton = new DeleteButton({
-			props: { callback: /*func_1*/ ctx[9] },
+			props: { callback: /*func_2*/ ctx[10] },
 			$$inline: true
 		});
 
-	let if_block0 = /*contract*/ ctx[0].type === DeployedContractType.Compiled && create_if_block_6$1(ctx);
 	let if_block1 = /*expanded*/ ctx[1] && create_if_block_5$2(ctx);
 	let if_block2 = /*expanded*/ ctx[1] && create_if_block$9(ctx);
 
@@ -30553,9 +30557,9 @@ function create_fragment$k(ctx) {
 			create_component(clickablespan.$$.fragment);
 			t1 = space();
 			div0 = element("div");
-			create_component(deletebutton.$$.fragment);
-			t2 = space();
 			if (if_block0) if_block0.c();
+			t2 = space();
+			create_component(deletebutton.$$.fragment);
 			t3 = space();
 			if (if_block1) if_block1.c();
 			t4 = space();
@@ -30584,9 +30588,9 @@ function create_fragment$k(ctx) {
 			mount_component(clickablespan, div1, null);
 			append_dev(div1, t1);
 			append_dev(div1, div0);
-			mount_component(deletebutton, div0, null);
-			append_dev(div0, t2);
 			if (if_block0) if_block0.m(div0, null);
+			append_dev(div0, t2);
+			mount_component(deletebutton, div0, null);
 			append_dev(div2, t3);
 			if (if_block1) if_block1.m(div2, null);
 			append_dev(div4, t4);
@@ -30611,9 +30615,6 @@ function create_fragment$k(ctx) {
 			}
 
 			clickablespan.$set(clickablespan_changes);
-			const deletebutton_changes = {};
-			if (dirty & /*contract*/ 1) deletebutton_changes.callback = /*func_1*/ ctx[9];
-			deletebutton.$set(deletebutton_changes);
 
 			if (/*contract*/ ctx[0].type === DeployedContractType.Compiled) {
 				if (if_block0) {
@@ -30626,7 +30627,7 @@ function create_fragment$k(ctx) {
 					if_block0 = create_if_block_6$1(ctx);
 					if_block0.c();
 					transition_in(if_block0, 1);
-					if_block0.m(div0, null);
+					if_block0.m(div0, t2);
 				}
 			} else if (if_block0) {
 				group_outros();
@@ -30637,6 +30638,10 @@ function create_fragment$k(ctx) {
 
 				check_outros();
 			}
+
+			const deletebutton_changes = {};
+			if (dirty & /*contract*/ 1) deletebutton_changes.callback = /*func_2*/ ctx[10];
+			deletebutton.$set(deletebutton_changes);
 
 			if (/*expanded*/ ctx[1]) {
 				if (if_block1) {
@@ -30688,8 +30693,8 @@ function create_fragment$k(ctx) {
 			if (current) return;
 			transition_in(expandbutton.$$.fragment, local);
 			transition_in(clickablespan.$$.fragment, local);
-			transition_in(deletebutton.$$.fragment, local);
 			transition_in(if_block0);
+			transition_in(deletebutton.$$.fragment, local);
 			transition_in(if_block1);
 			transition_in(if_block2);
 			current = true;
@@ -30697,8 +30702,8 @@ function create_fragment$k(ctx) {
 		o: function outro(local) {
 			transition_out(expandbutton.$$.fragment, local);
 			transition_out(clickablespan.$$.fragment, local);
-			transition_out(deletebutton.$$.fragment, local);
 			transition_out(if_block0);
+			transition_out(deletebutton.$$.fragment, local);
 			transition_out(if_block1);
 			transition_out(if_block2);
 			current = false;
@@ -30707,8 +30712,8 @@ function create_fragment$k(ctx) {
 			if (detaching) detach_dev(div4);
 			destroy_component(expandbutton);
 			destroy_component(clickablespan);
-			destroy_component(deletebutton);
 			if (if_block0) if_block0.d();
+			destroy_component(deletebutton);
 			if (if_block1) if_block1.d();
 			if (if_block2) if_block2.d();
 		}
@@ -30762,8 +30767,8 @@ function instance$k($$self, $$props, $$invalidate) {
 	}
 
 	const func = () => requestLabel(contract.address);
-	const func_1 = () => removeDeployedContract(contract.address);
-	const func_2 = () => openAddAbiQuickPick(contract.fqn);
+	const func_1 = () => openAddAbiQuickPick(contract.fqn);
+	const func_2 = () => removeDeployedContract(contract.address);
 	const func_3 = () => $$invalidate(2, expandedProxy = !expandedProxy);
 
 	$$self.$$set = $$props => {
