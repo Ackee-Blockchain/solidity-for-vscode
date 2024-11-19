@@ -273,4 +273,7 @@
     :global(.vscode-bg-input) {
         background: var(--input-background);
     }
+    :global(.vscode-box-shadow) {
+        box-shadow: rgba(0, 0, 0, 0.36) 0px 0px 8px 2px;
+    }
 </style>

@@ -59,15 +59,12 @@
                     {contract.label ? `${contract.label} (${contract.name})` : contract.name}
                 </ClickableSpan>
                 <div class="flex fex-row pr-1">
-                    <DeleteButton callback={() => removeDeployedContract(contract.address)} />
-
-                    <!--
-                        could use radio-tower or bracket-dot-->
                     {#if contract.type === DeployedContractType.Compiled}
                         <DefaultButton callback={() => openAddAbiQuickPick(contract.fqn)}>
                             <RadioTowerIcon />
                         </DefaultButton>
                     {/if}
+                    <DeleteButton callback={() => removeDeployedContract(contract.address)} />
                 </div>
             </div>
 
