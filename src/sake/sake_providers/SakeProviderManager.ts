@@ -251,7 +251,11 @@ export default class SakeProviderManager {
                             if (selected) {
                                 const abi = this.state?.compilation.get(selected)?.abi;
                                 if (abi) {
-                                    this.state?.deployment.extendAbi(contractFqn, abi);
+                                    this.state?.deployment.extendProxySupport(contractFqn, {
+                                        address: undefined,
+                                        abi,
+                                        name: selected
+                                    });
                                 }
                             }
                         });
@@ -268,7 +272,12 @@ export default class SakeProviderManager {
                             this.provider
                                 ?.getAbi(address)
                                 .then((contract) => {
-                                    this.state?.deployment.extendAbi(contractFqn, contract.abi);
+                                    console.log('fetched abi', contract);
+                                    this.state?.deployment.extendProxySupport(contractFqn, {
+                                        address,
+                                        abi: contract.abi,
+                                        name: contract.name
+                                    });
                                     vscode.window.showInformationMessage(
                                         `Successfully fetched ABI from ${contract.name} and added to ${contractFqn}`
                                     );
@@ -296,7 +305,11 @@ export default class SakeProviderManager {
                                 try {
                                     const abi = JSON.parse(abiString);
                                     // @todo missing validation, add zod
-                                    this.state?.deployment.extendAbi(contractFqn, abi);
+                                    this.state?.deployment.extendProxySupport(contractFqn, {
+                                        address: undefined,
+                                        abi,
+                                        name: undefined
+                                    });
                                 } catch (e) {
                                     showErrorMessage(
                                         `Failed to parse ABI: ${e instanceof Error ? e.message : String(e)}`
@@ -432,11 +445,11 @@ export default class SakeProviderManager {
                     ?.getAbi(address)
                     .then((contract) => {
                         this.provider?.state?.deployment.add({
-                            type: DeployedContractType.Onchain,
+                            type: DeployedContractType.OnChain,
                             address: address,
                             abi: contract.abi,
                             name: contract.name,
-                            balance: null
+                            balance: undefined
                         });
                         vscode.window.showInformationMessage(
                             `Successfully fetched ${contract.name} from ${address}`

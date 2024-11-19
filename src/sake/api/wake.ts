@@ -28,8 +28,10 @@ import {
     WakeDumpStateResponse,
     WakeLoadStateResponse,
     WakeLoadStateRequestParams,
+    WakeGetAbiResponse,
+    WakeGetAbiWithProxyResponse,
     WakeGetAbiRequestParams,
-    WakeGetAbiResponse
+    WakeGetAbiWithProxyRequestParams
 } from '../webview/shared/types';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { validate } from '../utils/validate';
@@ -274,6 +276,8 @@ export class WakeApi {
         requestParams: WakeDeploymentRequestParams
     ): Promise<WakeDeploymentResponse> {
         try {
+            console.log('deploying', requestParams.sessionId);
+
             const result = await WakeApi.sendWakeRequest<WakeDeploymentResponse>(
                 'wake/sake/deploy',
                 requestParams
@@ -384,9 +388,32 @@ export class WakeApi {
 
     static async getAbi(requestParams: WakeGetAbiRequestParams): Promise<WakeGetAbiResponse> {
         try {
-            console.log('getting abi', requestParams);
+            console.log('getting abi normally', requestParams);
             const result = await WakeApi.sendWakeRequest<WakeGetAbiResponse>(
                 'wake/sake/getAbi',
+                requestParams
+            );
+
+            if (result == null) {
+                throw new Error('No result returned');
+            }
+
+            return result;
+        } catch (e) {
+            console.log('error getting abi', e);
+            throw new WakeApiError(
+                `Failed to get ABI: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
+    }
+
+    static async getAbiWithProxy(
+        requestParams: WakeGetAbiWithProxyRequestParams
+    ): Promise<WakeGetAbiWithProxyResponse> {
+        try {
+            console.log('getting abi with proxy sessionId', requestParams.sessionId);
+            const result = await WakeApi.sendWakeRequest<WakeGetAbiWithProxyResponse>(
+                'wake/sake/getAbiWithProxy',
                 requestParams
             );
 

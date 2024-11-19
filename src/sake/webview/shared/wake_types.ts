@@ -199,15 +199,28 @@ export interface WakeGetBytecodeResponse extends WakeBaseResponse {
     bytecode: w3t.HexString;
 }
 
-export interface WakeGetAbiRequestParams extends WakeBaseRequestParams {
-    address: w3t.Address;
+/* Get ABI */
+
+export interface WakeGetAbiRequestParams {
+    // this one does not need session id
+    address: Address;
+    chainId: number;
 }
 
 export interface WakeGetAbiResponse extends WakeBaseResponse {
     name: string;
-    abi: w3t.ContractAbi;
+    abi: ContractAbi;
+}
+
+export interface WakeGetAbiWithProxyRequestParams extends WakeBaseRequestParams {
+    address: Address;
+}
+
+export interface WakeGetAbiWithProxyResponse extends WakeBaseResponse {
+    name: string;
+    abi: ContractAbi;
     proxyName: string | null;
-    proxyAbi: ContractAbi[] | null;
+    proxyAbi: ContractAbi | null;
     implementationAddress: Address | null;
 }
 

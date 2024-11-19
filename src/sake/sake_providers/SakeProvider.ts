@@ -16,7 +16,8 @@ import {
     TransactionDecodedReturnValue,
     TransactionDeploymentResult,
     ContractAbi,
-    DeployedContractType
+    DeployedContractType,
+    DeployedContract
 } from '../webview/shared/types';
 import * as vscode from 'vscode';
 import { WakeApi } from '../api/wake';
@@ -236,6 +237,11 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
 
     async getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }> {
         const abiResponse = await this.network.getAbi(address);
+        return abiResponse;
+    }
+
+    async getOnchainContract(address: Address): Promise<DeployedContract> {
+        const abiResponse = await this.network.getOnchainContract(address);
         return abiResponse;
     }
 

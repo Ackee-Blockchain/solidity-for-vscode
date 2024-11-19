@@ -18,25 +18,30 @@ export type AccountState = ExtendedAccount[];
 
 export enum DeployedContractType {
     Compiled = 'compiled',
-    Onchain = 'onchain'
+    OnChain = 'onchain'
 }
+
+type BaseDeployedContract = {
+    type: DeployedContractType;
+    name: string;
+    address: Address;
+    balance?: number;
+    abi: ContractAbi;
+    proxyFor?: {
+        abi: ContractAbi;
+        address?: Address;
+        name?: string;
+    }[];
+} & Omit<ExtendedAccount, 'balance'>;
 
 export type DeployedContract =
     | ({
           type: DeployedContractType.Compiled;
-          abi: ContractAbi;
-          label?: string;
-          name: string;
           fqn: string;
-          extendedAbi?: ContractAbi[];
-      } & ExtendedAccount)
+      } & BaseDeployedContract)
     | ({
-          type: DeployedContractType.Onchain;
-          abi: ContractAbi;
-          label?: string;
-          name: string;
-          balance: number | null;
-      } & Omit<ExtendedAccount, 'balance'>);
+          type: DeployedContractType.OnChain;
+      } & BaseDeployedContract);
 
 export type DeploymentState = DeployedContract[];
 
