@@ -26,20 +26,22 @@
     };
 </script>
 
-{#if label}
-    <div class="flex gap-1">
-        <span class="text-sm">{label}</span>
-        {#if tooltip}
-            <InfoTooltip content={tooltip} />
-        {/if}
-    </div>
-{/if}
-<vscode-text-field
-    class="w-full"
-    {placeholder}
-    value={value ?? stringValue ?? ''}
-    on:change={valueChangeHandler}
-/>
-{#if error}
-    <span class="text-xs text-red-500">{error}</span>
-{/if}
+<div>
+    {#if label}
+        <div class="flex gap-1">
+            <span class="text-sm">{label}</span>
+            {#if tooltip}
+                <InfoTooltip content={tooltip} />
+            {/if}
+        </div>
+    {/if}
+    <vscode-text-field
+        class="w-full"
+        {placeholder}
+        value={value ?? stringValue ?? ''}
+        on:change={valueChangeHandler}
+    />
+    {#if error}
+        <span class="text-xs text-red-500">{error}</span>
+    {/if}
+</div>

@@ -43,13 +43,20 @@ export default class DeploymentStateProvider extends BaseStateProvider<Deploymen
         });
     }
 
-    public extendAbi(contractFqn: string, abi: ContractAbi) {
+    public extendProxySupport(
+        contractFqn: string,
+        implementation: {
+            address?: Address;
+            abi: ContractAbi;
+            name?: string;
+        }
+    ) {
         this.state = this.state.map((c) => {
             if (c.type === DeployedContractType.Compiled && c.fqn === contractFqn) {
-                if (c.extendedAbi) {
-                    c.extendedAbi.push(abi);
+                if (c.proxyFor) {
+                    c.proxyFor.push(implementation);
                 } else {
-                    c.extendedAbi = [abi];
+                    c.proxyFor = [implementation];
                 }
             }
             return c;

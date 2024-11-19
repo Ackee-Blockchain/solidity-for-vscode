@@ -13,12 +13,19 @@ import {
     SetAccountLabelRequest
 } from '../webview/shared/network_types';
 import { LocalNodeNetworkState, WakeChainDump } from '../webview/shared/storage_types';
-import { Account, Address, ContractAbi } from '../webview/shared/types';
+import {
+    Account,
+    Address,
+    ContractAbi,
+    DeployedContract,
+    DeployedContractType
+} from '../webview/shared/types';
 import {
     WakeCallRequestParams,
     WakeDeploymentResponse,
     WakeDumpStateResponse,
     WakeGetAbiResponse,
+    WakeGetAbiWithProxyResponse,
     WakeGetAccountsResponse,
     WakeSetBalancesResponse
 } from '../webview/shared/wake_types';
@@ -219,13 +226,37 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
     }
 
     async getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }> {
-        const response: WakeGetAbiResponse = await WakeApi.getAbi({
+        // @dev simpler to use getAbiWithProxy for now, as chainId for getAbi can be undefined
+        const response: WakeGetAbiResponse = await WakeApi.getAbiWithProxy({
             address: address,
             sessionId: this.config.sessionId
         });
         return {
             abi: response.abi,
             name: response.name
+        };
+    }
+
+    async getOnchainContract(address: Address): Promise<DeployedContract> {
+        const response: WakeGetAbiWithProxyResponse = await WakeApi.getAbiWithProxy({
+            address: address,
+            sessionId: this.config.sessionId
+        });
+
+        return {
+            type: DeployedContractType.OnChain,
+            name: response.name,
+            address: address,
+            abi: response.abi,
+            proxyFor: response.proxyAbi
+                ? [
+                      {
+                          address: response.implementationAddress ?? undefined,
+                          abi: response.proxyAbi!,
+                          name: response.proxyName ?? undefined
+                      }
+                  ]
+                : undefined
         };
     }
 }

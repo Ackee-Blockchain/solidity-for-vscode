@@ -32,20 +32,18 @@
     $: filteredAbi = contract.abi.filter(
         (func: any) => func.type == 'function'
     ) as AbiFunctionFragment[];
+
+    // Proxies
+    $: isProxy = contract.proxyFor && contract.proxyFor.length > 0;
     $: filteredProxies =
-        contract.type === DeployedContractType.Compiled
-            ? contract.extendedAbi?.map(
-                  (proxy) =>
-                      proxy.filter((func: any) => func.type == 'function') as AbiFunctionFragment[]
-              )
-            : [];
-    $: console.log('updated contract', contract);
+        contract.proxyFor?.map((proxy) => ({
+            ...proxy,
+            abi: proxy.abi.filter((func: any) => func.type == 'function') as AbiFunctionFragment[]
+        })) ?? [];
 
     const _onFunctionCall = (calldata: string, func: AbiFunctionFragment) => {
         onFunctionCall(calldata, contract.address, func);
     };
-
-    $: console.log('contract', contract);
 </script>
 
 <div class="flex flex-col gap-1">
@@ -89,61 +87,23 @@
     {#if expanded}
         {#if filteredAbi.length > 0}
             <div class="flex flex-col gap-1">
+                {#if isProxy}
+                    {#each filteredProxies as proxy}
+                        <span>Implementation from {proxy.name}</span>
+                        <div class="flex flex-col gap-1">
+                            {#each proxy.abi as func}
+                                <ContractFunction {func} onFunctionCall={_onFunctionCall} />
+                            {/each}
+                        </div>
+                    {/each}
+                    <span>Proxy</span>
+                {/if}
+
                 {#each filteredAbi as func}
                     <ContractFunction {func} onFunctionCall={_onFunctionCall} />
                 {/each}
 
                 <CalldataBytes onFunctionCall={_onFunctionCall} />
-
-                {#if filteredProxies}
-                    <ClickableSpan
-                        callback={() => (expandedProxy = !expandedProxy)}
-                        className="flex flex-row gap-1 items-center ml-2"
-                    >
-                        {#if expandedProxy}
-                            <!-- chevron down from codicons -->
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 16 16"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="currentColor"
-                                class=""
-                                ><path
-                                    fill-rule="evenodd"
-                                    clip-rule="evenodd"
-                                    d="M7.976 10.072l4.357-4.357.62.618L8.284 11h-.618L3 6.333l.619-.618 4.357 4.357z"
-                                /></svg
-                            >
-                        {:else}
-                            <!-- chevron right from codicons -->
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 16 16"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="currentColor"
-                                class=""
-                                ><path
-                                    fill-rule="evenodd"
-                                    clip-rule="evenodd"
-                                    d="M10.072 8.024L5.715 3.667l.618-.62L11 7.716v.618pmL6.333 13l-.618-.619 4.357-4.357z"
-                                /></svg
-                            >
-                        {/if}
-                        <span class="text-sm">Custom Added ABI</span>
-                    </ClickableSpan>
-                    {#if expandedProxy}
-                        {#each filteredProxies as proxy}
-                            {#each proxy as proxy_func}
-                                <ContractFunction
-                                    func={proxy_func}
-                                    onFunctionCall={_onFunctionCall}
-                                />
-                            {/each}
-                        {/each}
-                    {/if}
-                {/if}
             </div>
         {/if}
     {/if}

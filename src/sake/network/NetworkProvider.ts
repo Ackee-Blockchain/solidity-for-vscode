@@ -1,4 +1,9 @@
-import { Address, ContractAbi, DeploymentResponse } from '../webview/shared/types';
+import {
+    Address,
+    ContractAbi,
+    DeployedContract,
+    DeploymentResponse
+} from '../webview/shared/types';
 
 import {
     CallRequest,
@@ -53,4 +58,5 @@ export abstract class NetworkProvider {
     abstract dumpState(): Promise<NetworkState>;
     abstract loadState(state: any): Promise<void>; // TODO: add specific type
     abstract getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }>;
+    abstract getOnchainContract(address: Address): Promise<DeployedContract>;
 }
