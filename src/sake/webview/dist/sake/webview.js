@@ -26488,8 +26488,11 @@ class RootInputHandler extends InputHandlerInterface {
      *
      * @returns {string}
      */
-    rawCalldata() {
+    rawCalldata(allowEmpty = false) {
         if (!this.hasInputs()) {
+            return '';
+        }
+        if (allowEmpty && this.state === InputState.EMPTY) {
             return '';
         }
         if (this.state !== InputState.VALID) {
@@ -28311,11 +28314,11 @@ const file$q = "src/components/ContractFunction.svelte";
 
 function get_each_context$6(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[12] = list[i];
+	child_ctx[13] = list[i];
 	return child_ctx;
 }
 
-// (50:8) {:else}
+// (51:8) {:else}
 function create_else_block_1$2(ctx) {
 	let iconspacer;
 	let current;
@@ -28348,14 +28351,14 @@ function create_else_block_1$2(ctx) {
 		block,
 		id: create_else_block_1$2.name,
 		type: "else",
-		source: "(50:8) {:else}",
+		source: "(51:8) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (47:8) {#if inputRoot.hasInputs()}
+// (48:8) {#if inputRoot.hasInputs()}
 function create_if_block_2$6(ctx) {
 	let expandbutton;
 	let updating_expanded;
@@ -28415,14 +28418,14 @@ function create_if_block_2$6(ctx) {
 		block,
 		id: create_if_block_2$6.name,
 		type: "if",
-		source: "(47:8) {#if inputRoot.hasInputs()}",
+		source: "(48:8) {#if inputRoot.hasInputs()}",
 		ctx
 	});
 
 	return block;
 }
 
-// (60:4) {#if inputRoot.hasInputs()}
+// (61:4) {#if inputRoot.hasInputs()}
 function create_if_block$c(ctx) {
 	let div;
 	let show_if;
@@ -28448,7 +28451,7 @@ function create_if_block$c(ctx) {
 			div = element("div");
 			if_block.c();
 			attr_dev(div, "class", div_class_value = "flex flex-1 flex-col gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : '') + " overflow-hidden");
-			add_location(div, file$q, 60, 8, 1966);
+			add_location(div, file$q, 61, 8, 2014);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -28505,14 +28508,14 @@ function create_if_block$c(ctx) {
 		block,
 		id: create_if_block$c.name,
 		type: "if",
-		source: "(60:4) {#if inputRoot.hasInputs()}",
+		source: "(61:4) {#if inputRoot.hasInputs()}",
 		ctx
 	});
 
 	return block;
 }
 
-// (73:12) {:else}
+// (74:12) {:else}
 function create_else_block$8(ctx) {
 	let contractfunctioninput;
 	let current;
@@ -28559,14 +28562,14 @@ function create_else_block$8(ctx) {
 		block,
 		id: create_else_block$8.name,
 		type: "else",
-		source: "(73:12) {:else}",
+		source: "(74:12) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (62:12) {#if inputRoot.isMultiInput() && expanded}
+// (63:12) {#if inputRoot.isMultiInput() && expanded}
 function create_if_block_1$8(ctx) {
 	let each_1_anchor;
 	let current;
@@ -28657,21 +28660,21 @@ function create_if_block_1$8(ctx) {
 		block,
 		id: create_if_block_1$8.name,
 		type: "if",
-		source: "(62:12) {#if inputRoot.isMultiInput() && expanded}",
+		source: "(63:12) {#if inputRoot.isMultiInput() && expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (64:16) {#each inputRoot.inputs.children as input}
+// (65:16) {#each inputRoot.inputs.children as input}
 function create_each_block$6(ctx) {
 	let contractfunctioninput;
 	let current;
 
 	contractfunctioninput = new ContractFunctionInput({
 			props: {
-				input: /*input*/ ctx[12],
+				input: /*input*/ ctx[13],
 				onInputStateChange: /*func_1*/ ctx[8]
 			},
 			$$inline: true
@@ -28687,7 +28690,7 @@ function create_each_block$6(ctx) {
 		},
 		p: function update(ctx, dirty) {
 			const contractfunctioninput_changes = {};
-			if (dirty & /*inputRoot*/ 8) contractfunctioninput_changes.input = /*input*/ ctx[12];
+			if (dirty & /*inputRoot*/ 8) contractfunctioninput_changes.input = /*input*/ ctx[13];
 			if (dirty & /*inputRoot*/ 8) contractfunctioninput_changes.onInputStateChange = /*func_1*/ ctx[8];
 			contractfunctioninput.$set(contractfunctioninput_changes);
 		},
@@ -28709,7 +28712,7 @@ function create_each_block$6(ctx) {
 		block,
 		id: create_each_block$6.name,
 		type: "each",
-		source: "(64:16) {#each inputRoot.inputs.children as input}",
+		source: "(65:16) {#each inputRoot.inputs.children as input}",
 		ctx
 	});
 
@@ -28760,11 +28763,11 @@ function create_fragment$s(ctx) {
 			if (if_block1) if_block1.c();
 			set_custom_element_data(vscode_button, "class", "flex-1 truncate");
 			set_custom_element_data(vscode_button, "appearance", vscode_button_appearance_value = /*isCalldata*/ ctx[1] ? 'secondary' : 'primary');
-			add_location(vscode_button, file$q, 53, 8, 1726);
+			add_location(vscode_button, file$q, 54, 8, 1774);
 			attr_dev(div0, "class", div0_class_value = "flex flex-1 gap-1 " + (/*expanded*/ ctx[2] ? 'w-full' : '') + " overflow-hidden");
-			add_location(div0, file$q, 45, 4, 1395);
+			add_location(div0, file$q, 46, 4, 1443);
 			attr_dev(div1, "class", div1_class_value = "flex flex-1 w-full items-end gap-1 " + (/*expanded*/ ctx[2] ? 'flex-col' : 'flex-row'));
-			add_location(div1, file$q, 44, 0, 1305);
+			add_location(div1, file$q, 45, 0, 1353);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -28883,6 +28886,7 @@ function create_fragment$s(ctx) {
 }
 
 function instance$s($$self, $$props, $$invalidate) {
+	let allowEmptyInput;
 	let { $$slots: slots = {}, $$scope } = $$props;
 	validate_slots('ContractFunction', slots, []);
 	let { func } = $$props;
@@ -28899,7 +28903,7 @@ function instance$s($$self, $$props, $$invalidate) {
 
 	const getEncodedInput = () => {
 		if (isCalldata) {
-			return inputRoot.rawCalldata();
+			return inputRoot.rawCalldata(allowEmptyInput);
 		} else if (isConstructor) {
 			return inputRoot.encodedParameters();
 		} else {
@@ -28974,7 +28978,8 @@ function instance$s($$self, $$props, $$invalidate) {
 		inputRoot,
 		funcChanged,
 		getEncodedInput,
-		_onFunctionCall
+		_onFunctionCall,
+		allowEmptyInput
 	});
 
 	$$self.$inject_state = $$props => {
@@ -28984,6 +28989,7 @@ function instance$s($$self, $$props, $$invalidate) {
 		if ('isCalldata' in $$props) $$invalidate(1, isCalldata = $$props.isCalldata);
 		if ('expanded' in $$props) $$invalidate(2, expanded = $$props.expanded);
 		if ('inputRoot' in $$props) $$invalidate(3, inputRoot = $$props.inputRoot);
+		if ('allowEmptyInput' in $$props) allowEmptyInput = $$props.allowEmptyInput;
 	};
 
 	if ($$props && "$$inject" in $$props) {
@@ -28993,6 +28999,10 @@ function instance$s($$self, $$props, $$invalidate) {
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*func*/ 1) {
 			funcChanged(func);
+		}
+
+		if ($$self.$$.dirty & /*isCalldata*/ 2) {
+			allowEmptyInput = isCalldata;
 		}
 	};
 

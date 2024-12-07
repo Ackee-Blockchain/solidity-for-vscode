@@ -310,8 +310,12 @@ export class RootInputHandler extends InputHandlerInterface {
      *
      * @returns {string}
      */
-    public rawCalldata(): string {
+    public rawCalldata(allowEmpty: boolean = false): string {
         if (!this.hasInputs()) {
+            return '';
+        }
+
+        if (allowEmpty && this.state === InputState.EMPTY) {
             return '';
         }
 
