@@ -97,6 +97,10 @@
         z-index: 10;
     }
 
+    :global(.chain-navigator-container--expanded) {
+        box-shadow: rgba(0, 0, 0, 0.36) 0px 0px 8px 2px;
+    }
+
     :global(.chain-navigator-container:not(.chain-navigator-container--expanded)) {
         height: 26px !important;
     }

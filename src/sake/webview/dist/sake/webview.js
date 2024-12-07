@@ -36888,10 +36888,9 @@ function create_if_block$2(ctx) {
 			t1 = space();
 			if (if_block) if_block.c();
 			attr_dev(div0, "class", "flex flex-col gap-1");
-			add_location(div0, file$2, 85, 12, 3039);
+			add_location(div0, file$2, 85, 12, 3012);
 			attr_dev(div1, "class", "flex flex-col gap-3");
-			add_location(div1, file$2, 84, 8, 2993);
-			set_style(div2, "background", "#2c2c2c");
+			add_location(div1, file$2, 84, 8, 2966);
 			attr_dev(div2, "class", "p-2");
 			add_location(div2, file$2, 82, 4, 2883);
 		},
@@ -37039,7 +37038,7 @@ function create_if_block_2$2(ctx) {
 			t1 = text(t1_value);
 			set_custom_element_data(vscode_button, "appearance", "primary");
 			set_custom_element_data(vscode_button, "disabled", /*loading*/ ctx[1]);
-			add_location(vscode_button, file$2, 179, 16, 7381);
+			add_location(vscode_button, file$2, 179, 16, 7354);
 		},
 		m: function mount(target, anchor) {
 			mount_component(validabletextinput, target, anchor);
@@ -37274,10 +37273,10 @@ function create_if_block_1$2(ctx) {
 			vscode_button = element("vscode-button");
 			t6 = text(t6_value);
 			attr_dev(div, "class", "flex flex-col gap-1");
-			add_location(div, file$2, 102, 16, 3752);
+			add_location(div, file$2, 102, 16, 3725);
 			set_custom_element_data(vscode_button, "appearance", "primary");
 			set_custom_element_data(vscode_button, "disabled", /*loading*/ ctx[1]);
-			add_location(vscode_button, file$2, 151, 16, 5958);
+			add_location(vscode_button, file$2, 151, 16, 5931);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
