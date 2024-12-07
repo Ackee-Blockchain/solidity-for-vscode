@@ -14,6 +14,7 @@
     let expanded: boolean = false;
     let inputRoot: RootInputHandler;
     $: funcChanged(func);
+    $: allowEmptyInput = isCalldata;
 
     const funcChanged = (_func: AbiFunctionFragment) => {
         inputRoot = buildTree(_func);
@@ -22,7 +23,7 @@
 
     const getEncodedInput = () => {
         if (isCalldata) {
-            return inputRoot.rawCalldata();
+            return inputRoot.rawCalldata(allowEmptyInput);
         } else if (isConstructor) {
             return inputRoot.encodedParameters();
         } else {
