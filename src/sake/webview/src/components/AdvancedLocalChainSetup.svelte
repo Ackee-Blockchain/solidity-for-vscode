@@ -90,7 +90,7 @@
 
 <!-- @dev for proper typing -->
 {#if $chainNavigator.state === 'advancedLocalChainSetup'}
-    <div style="background:#2c2c2c" class="p-2">
+    <div class="p-2">
         <!-- TODO: remove hardcoded background color -->
         <div class="flex flex-col gap-3">
             <div class="flex flex-col gap-1">
