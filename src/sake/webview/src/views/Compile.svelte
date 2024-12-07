@@ -38,7 +38,10 @@
             {#if $compilationState.issues.length > 0}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <vscode-button
-                    on:click={() => compilationIssuesVisible.set(!$compilationIssuesVisible)}
+                    on:click={() => {
+                        compilationIssuesVisible.set(!$compilationIssuesVisible);
+                        console.log('clicked', $compilationIssuesVisible);
+                    }}
                     class="bg-vscodeInputBackground text-vscodeInputForeground"
                 >
                     <div class="flex items-center gap-2">

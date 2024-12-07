@@ -61,6 +61,12 @@ export const selectedValue = derived(selectedValueString, ($selectedValueString)
     }
 });
 export const compilationIssuesVisible = writable<boolean>(false);
+compilationState.subscribe((state) => {
+    // If compilation issues are visible but there are no issues, hide them
+    if (get(compilationIssuesVisible) && state.issues.length === 0) {
+        compilationIssuesVisible.set(false);
+    }
+});
 export const activeTabId = writable<number>(0);
 export const txParametersExpanded = writable<boolean>(true);
 
