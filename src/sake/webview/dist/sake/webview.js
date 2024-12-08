@@ -22135,7 +22135,7 @@ const get_tooltip_slot_context = ctx => ({});
 const get_content_slot_changes$1 = dirty => ({});
 const get_content_slot_context$1 = ctx => ({});
 
-// (35:8) <TextContainer>
+// (36:8) <TextContainer>
 function create_default_slot$g(ctx) {
 	let div;
 	let current;
@@ -22147,7 +22147,7 @@ function create_default_slot$g(ctx) {
 			div = element("div");
 			if (tooltip_slot) tooltip_slot.c();
 			attr_dev(div, "class", "flex flex-col gap-1 text-sm");
-			add_location(div, file$D, 35, 12, 1227);
+			add_location(div, file$D, 36, 12, 1286);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -22193,7 +22193,7 @@ function create_default_slot$g(ctx) {
 		block,
 		id: create_default_slot$g.name,
 		type: "slot",
-		source: "(35:8) <TextContainer>",
+		source: "(36:8) <TextContainer>",
 		ctx
 	});
 
@@ -22230,7 +22230,7 @@ function create_fragment$F(ctx) {
 			attr_dev(span, "class", "cursor-pointer");
 			add_location(span, file$D, 22, 4, 741);
 
-			attr_dev(div0, "class", div0_class_value = "absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999] vscode-box-shadow " + (/*align*/ ctx[0] === 'right'
+			attr_dev(div0, "class", div0_class_value = "absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999] vscode-box-shadow transition-[opacity] group-hover:delay-500 delay-0 " + (/*align*/ ctx[0] === 'right'
 			? 'left-full top-1/2 transform -translate-y-1/2 ml-2'
 			: 'right-full top-1/2 transform -translate-y-1/2 mr-2'));
 
@@ -22280,7 +22280,7 @@ function create_fragment$F(ctx) {
 
 			textcontainer.$set(textcontainer_changes);
 
-			if (!current || dirty & /*align*/ 1 && div0_class_value !== (div0_class_value = "absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999] vscode-box-shadow " + (/*align*/ ctx[0] === 'right'
+			if (!current || dirty & /*align*/ 1 && div0_class_value !== (div0_class_value = "absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999] vscode-box-shadow transition-[opacity] group-hover:delay-500 delay-0 " + (/*align*/ ctx[0] === 'right'
 			? 'left-full top-1/2 transform -translate-y-1/2 ml-2'
 			: 'right-full top-1/2 transform -translate-y-1/2 mr-2'))) {
 				attr_dev(div0, "class", div0_class_value);

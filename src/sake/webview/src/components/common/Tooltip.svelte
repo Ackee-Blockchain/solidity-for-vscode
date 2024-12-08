@@ -31,6 +31,7 @@
     <div
         bind:this={tooltipContainer}
         class="absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 w-max z-[999] vscode-box-shadow
+        transition-[opacity] group-hover:delay-500 delay-0
         {align === 'right'
             ? 'left-full top-1/2 transform -translate-y-1/2 ml-2'
             : 'right-full top-1/2 transform -translate-y-1/2 mr-2'}"
