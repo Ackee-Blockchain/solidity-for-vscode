@@ -18569,6 +18569,22 @@ const sha3Raw = (data) => {
 };
 
 // import assert from 'assert';
+const TYPE_LIMITS = {
+    uint8: { min: BigInt(0), max: BigInt(2) ** BigInt(8) - BigInt(1) },
+    uint16: { min: BigInt(0), max: BigInt(2) ** BigInt(16) - BigInt(1) },
+    uint32: { min: BigInt(0), max: BigInt(2) ** BigInt(32) - BigInt(1) },
+    uint64: { min: BigInt(0), max: BigInt(2) ** BigInt(64) - BigInt(1) },
+    uint128: { min: BigInt(0), max: BigInt(2) ** BigInt(128) - BigInt(1) },
+    uint256: { min: BigInt(0), max: BigInt(2) ** BigInt(256) - BigInt(1) },
+    uint: { min: BigInt(0), max: BigInt(2) ** BigInt(256) - BigInt(1) }, // alias for uint256
+    int8: { min: -(BigInt(2) ** BigInt(7)), max: BigInt(2) ** BigInt(7) - BigInt(1) },
+    int16: { min: -(BigInt(2) ** BigInt(15)), max: BigInt(2) ** BigInt(15) - BigInt(1) },
+    int32: { min: -(BigInt(2) ** BigInt(31)), max: BigInt(2) ** BigInt(31) - BigInt(1) },
+    int64: { min: -(BigInt(2) ** BigInt(63)), max: BigInt(2) ** BigInt(63) - BigInt(1) },
+    int128: { min: -(BigInt(2) ** BigInt(127)), max: BigInt(2) ** BigInt(127) - BigInt(1) },
+    int256: { min: -(BigInt(2) ** BigInt(255)), max: BigInt(2) ** BigInt(255) - BigInt(1) },
+    int: { min: -(BigInt(2) ** BigInt(255)), max: BigInt(2) ** BigInt(255) - BigInt(1) } // alias for int256
+};
 function validateAndParseType(value, type) {
     value = value.trim();
     switch (type) {
@@ -18784,49 +18800,48 @@ function _validateUintType(value, type) {
     }
     switch (type) {
         case 'uint8':
-            assert(value <= BigInt(2) ** BigInt(8) - BigInt(1), 'Invalid uint8 length');
+            assert(value <= TYPE_LIMITS.uint8.max, 'Numbers is out of uint8 range');
             break;
         case 'uint16':
-            assert(value <= BigInt(2) ** BigInt(16) - BigInt(1), 'Invalid uint16 length');
+            assert(value <= TYPE_LIMITS.uint16.max, 'Numbers is out of uint16 range');
             break;
         case 'uint32':
-            assert(value <= BigInt(2) ** BigInt(32) - BigInt(1), 'Invalid uint32 length');
+            assert(value <= TYPE_LIMITS.uint32.max, 'Numbers is out of uint32 range');
             break;
         case 'uint64':
-            assert(value <= BigInt(2) ** BigInt(64) - BigInt(1), 'Invalid uint64 length');
+            assert(value <= TYPE_LIMITS.uint64.max, 'Numbers is out of uint64 range');
             break;
         case 'uint128':
-            assert(value <= BigInt(2) ** BigInt(128) - BigInt(1), 'Invalid uint128 length');
+            assert(value <= TYPE_LIMITS.uint128.max, 'Numbers is out of uint128 range');
             break;
         case 'uint':
         case 'uint256':
-            assert(value <= BigInt(2) ** BigInt(256) - BigInt(1), 'Invalid uint256 length');
+            assert(value <= TYPE_LIMITS.uint256.max, 'Numbers is out of uint256 range');
             break;
         default:
             throw new FunctionInputParseError(`Unexpected uint type "${type}"`);
     }
 }
 function _validateIntType(value, type) {
-    const abs = (n) => (n < BigInt(0) ? -n : n);
     switch (type) {
         case 'int8':
-            assert(abs(value) <= BigInt(2) ** BigInt(7) - BigInt(1), 'Invalid int length');
+            assert(value <= TYPE_LIMITS.int8.max && value >= TYPE_LIMITS.int8.min, 'Numbers is out of int8 range');
             break;
         case 'int16':
-            assert(abs(value) <= BigInt(2) ** BigInt(15) - BigInt(1), 'Invalid int length');
+            assert(value <= TYPE_LIMITS.int16.max && value >= TYPE_LIMITS.int16.min, 'Numbers is out of int16 range');
             break;
         case 'int32':
-            assert(abs(value) <= BigInt(2) ** BigInt(31) - BigInt(1), 'Invalid int length');
+            assert(value <= TYPE_LIMITS.int32.max && value >= TYPE_LIMITS.int32.min, 'Numbers is out of int32 range');
             break;
         case 'int64':
-            assert(abs(value) <= BigInt(2) ** BigInt(63) - BigInt(1), 'Invalid int length');
+            assert(value <= TYPE_LIMITS.int64.max && value >= TYPE_LIMITS.int64.min, 'Numbers is out of int64 range');
             break;
         case 'int128':
-            assert(abs(value) <= BigInt(2) ** BigInt(127) - BigInt(1), 'Invalid int length');
+            assert(value <= TYPE_LIMITS.int128.max && value >= TYPE_LIMITS.int128.min, 'Numbers is out of int128 range');
             break;
         case 'int':
         case 'int256':
-            assert(abs(value) <= BigInt(2) ** BigInt(255) - BigInt(1), 'Invalid int length');
+            assert(value <= TYPE_LIMITS.int256.max && value >= TYPE_LIMITS.int256.min, 'Numbers is out of int256 range');
             break;
         default:
             throw new FunctionInputParseError(`Unexpected int type "${type}"`);
@@ -18863,6 +18878,23 @@ function parseComplexNumber(value) {
             throw new FunctionInputParseError(`Cannot parse uint value "${value}"`);
         }
         return parsedBase ** parsedPower;
+    }
+    // check for type limits syntax (uint256.max or type(uint256).max)
+    const typeMaxMatch = value.match(/^(?:type\()?(u?int\d*)\)?\.max$/i);
+    const typeMinMatch = value.match(/^(?:type\()?(int\d*)\)?\.min$/i);
+    if (typeMaxMatch) {
+        const type = typeMaxMatch[1].toLowerCase();
+        if (type in TYPE_LIMITS) {
+            return TYPE_LIMITS[type].max;
+        }
+        throw new FunctionInputParseError(`Unknown type "${type}"`);
+    }
+    if (typeMinMatch) {
+        const type = typeMinMatch[1].toLowerCase();
+        if (type in TYPE_LIMITS && 'min' in TYPE_LIMITS[type]) {
+            return TYPE_LIMITS[type].min;
+        }
+        throw new FunctionInputParseError(`Unknown type "${type}" or type doesn't have min value`);
     }
     // check if it is a value with string denominator
     match = value.match(/^(\d+)\s*([a-zA-Z]+)$/);
