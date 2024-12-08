@@ -1,4 +1,4 @@
-import { WakeApi } from '../api/wake';
+import * as WakeApi from '../api/wake';
 import { showErrorMessage } from '../commands';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
 import AppStateProvider from '../state/AppStateProvider';

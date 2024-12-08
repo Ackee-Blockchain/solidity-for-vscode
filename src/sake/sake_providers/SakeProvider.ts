@@ -17,10 +17,11 @@ import {
     TransactionDeploymentResult,
     ContractAbi,
     DeployedContractType,
-    DeployedContract
+    DeployedContract,
+    NetworkConfiguration
 } from '../webview/shared/types';
 import * as vscode from 'vscode';
-import { WakeApi } from '../api/wake';
+import * as WakeApi from '../api/wake';
 import { OutputViewManager } from '../providers/OutputTreeProvider';
 import {
     getNameFromContractFqn,
@@ -31,7 +32,11 @@ import {
 import { decodeCallReturnValue } from '../utils/call';
 import { showTimedInfoMessage } from '../commands';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
-import { SakeProviderInitializationRequest, SharedState } from '../webview/shared/storage_types';
+import {
+    NetworkState,
+    SakeProviderInitializationRequest,
+    SharedState
+} from '../webview/shared/storage_types';
 import SakeState from './SakeState';
 import { SakeError } from '../webview/shared/errors';
 import { NetworkProvider } from '../network/NetworkProvider';
