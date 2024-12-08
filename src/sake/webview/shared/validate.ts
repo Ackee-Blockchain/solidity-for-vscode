@@ -235,55 +235,56 @@ function _validateByteType(value: string, type: string): void {
     }
 }
 
-function _validateUintType(value: number, type: string): void {
+function _validateUintType(value: bigint, type: string): void {
     if (value < 0) {
         throw new FunctionInputParseError('Uint should be positive');
     }
     switch (type) {
         case 'uint8':
-            assert(value <= 2 ** 8 - 1, 'Invalid uint8 length');
+            assert(value <= BigInt(2) ** BigInt(8) - BigInt(1), 'Invalid uint8 length');
             break;
         case 'uint16':
-            assert(value <= 2 ** 16 - 1, 'Invalid uint16 length');
+            assert(value <= BigInt(2) ** BigInt(16) - BigInt(1), 'Invalid uint16 length');
             break;
         case 'uint32':
-            assert(value <= 2 ** 32 - 1, 'Invalid uint32 length');
+            assert(value <= BigInt(2) ** BigInt(32) - BigInt(1), 'Invalid uint32 length');
             break;
         case 'uint64':
-            assert(value <= 2 ** 64 - 1, 'Invalid uint64 length');
+            assert(value <= BigInt(2) ** BigInt(64) - BigInt(1), 'Invalid uint64 length');
             break;
         case 'uint128':
-            assert(value <= 2 ** 128 - 1, 'Invalid uint128 length');
+            assert(value <= BigInt(2) ** BigInt(128) - BigInt(1), 'Invalid uint128 length');
             break;
         case 'uint':
         case 'uint256':
-            assert(value <= 2 ** 256 - 1, 'Invalid uint256 length');
+            assert(value <= BigInt(2) ** BigInt(256) - BigInt(1), 'Invalid uint256 length');
             break;
         default:
             throw new FunctionInputParseError(`Unexpected uint type "${type}"`);
     }
 }
 
-function _validateIntType(value: number, type: string): void {
+function _validateIntType(value: bigint, type: string): void {
+    const abs = (n: bigint) => (n < BigInt(0) ? -n : n);
     switch (type) {
         case 'int8':
-            assert(Math.abs(value) <= 2 ** 7 - 1, 'Invalid int length');
+            assert(abs(value) <= BigInt(2) ** BigInt(7) - BigInt(1), 'Invalid int length');
             break;
         case 'int16':
-            assert(Math.abs(value) <= 2 ** 15 - 1, 'Invalid int length');
+            assert(abs(value) <= BigInt(2) ** BigInt(15) - BigInt(1), 'Invalid int length');
             break;
         case 'int32':
-            assert(Math.abs(value) <= 2 ** 31 - 1, 'Invalid int length');
+            assert(abs(value) <= BigInt(2) ** BigInt(31) - BigInt(1), 'Invalid int length');
             break;
         case 'int64':
-            assert(Math.abs(value) <= 2 ** 63 - 1, 'Invalid int length');
+            assert(abs(value) <= BigInt(2) ** BigInt(63) - BigInt(1), 'Invalid int length');
             break;
         case 'int128':
-            assert(Math.abs(value) <= 2 ** 127 - 1, 'Invalid int length');
+            assert(abs(value) <= BigInt(2) ** BigInt(127) - BigInt(1), 'Invalid int length');
             break;
         case 'int':
         case 'int256':
-            assert(Math.abs(value) <= 2 ** 255 - 1, 'Invalid int length');
+            assert(abs(value) <= BigInt(2) ** BigInt(255) - BigInt(1), 'Invalid int length');
             break;
         default:
             throw new FunctionInputParseError(`Unexpected int type "${type}"`);
@@ -300,14 +301,14 @@ function _validateIntType(value: number, type: string): void {
  * @returns The parsed complex integer value.
  * @throws {FunctionInputParseError} If the value cannot be parsed as a complex integer.
  */
-export function parseComplexNumber(value: string): number {
+export function parseComplexNumber(value: string): bigint {
     value = value.trim().replace('_', '');
 
     // return classic integer
     let match = value.match(/^(\d+)$/);
     if (match) {
-        const parsedValue = parseInt(match[1]);
-        if (isNaN(parsedValue)) {
+        const parsedValue = BigInt(match[1]);
+        if (isNaN(Number(parsedValue))) {
             throw new FunctionInputParseError(`Cannot parse uint value "${match[1]}"`);
         }
 
@@ -318,10 +319,10 @@ export function parseComplexNumber(value: string): number {
     match = value.match(/^(\d+)\s*(?:\*{2}|\^)\s*(\d+)$/);
     if (match) {
         const [base, power] = match.slice(1);
-        const parsedBase = parseInt(base);
-        const parsedPower = parseInt(power);
+        const parsedBase = BigInt(base);
+        const parsedPower = BigInt(power);
 
-        if (isNaN(parsedBase) || isNaN(parsedPower)) {
+        if (isNaN(Number(parsedBase)) || isNaN(Number(parsedPower))) {
             throw new FunctionInputParseError(`Cannot parse uint value "${value}"`);
         }
 
@@ -338,8 +339,8 @@ export function parseComplexNumber(value: string): number {
 
         const convertedValue = toWei(parsedValue, match[2] as EtherUnits);
 
-        const parsedConvertedValue = parseFloat(convertedValue);
-        if (isNaN(parsedConvertedValue)) {
+        const parsedConvertedValue = BigInt(convertedValue);
+        if (isNaN(Number(parsedConvertedValue))) {
             throw new FunctionInputParseError(
                 `Cannot parse converted uint value "${convertedValue}"`
             );
