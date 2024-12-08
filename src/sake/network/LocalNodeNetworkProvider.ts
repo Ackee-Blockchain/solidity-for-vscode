@@ -1,4 +1,4 @@
-import { WakeApi } from '../api/wake';
+import * as WakeApi from '../api/wake';
 import { NetworkError } from '../webview/shared/errors';
 import {
     CallRequest,
