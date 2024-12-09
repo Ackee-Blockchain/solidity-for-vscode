@@ -274,6 +274,7 @@ export default class SakeProviderManager {
                             if (!address) {
                                 return;
                             }
+
                             this.provider
                                 ?.getAbi(address)
                                 .then((contract) => {
@@ -438,11 +439,16 @@ export default class SakeProviderManager {
 
         vscode.window
             .showInputBox({
-                title: 'Enter the address of the contract to fetch the ABI from',
+                title: 'Input the contract address to retrieve from onchain',
                 value: ''
             })
             .then((address) => {
                 if (!address) {
+                    return;
+                }
+                // check if the addess is not already in the deployment state
+                if (this.state?.deployment.state.find((c) => c.address === address)) {
+                    // @todo show info message when native messaging is implemented
                     return;
                 }
                 this.provider
