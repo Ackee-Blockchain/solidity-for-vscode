@@ -114,7 +114,7 @@ export interface WakeDeploymentRequestParams extends WakeBaseRequestParams {
     contractFqn: string;
     sender: string;
     calldata: string;
-    value: number;
+    value: string;
 }
 
 export interface WakeDeploymentResponse extends WakeTransaction {
@@ -148,7 +148,7 @@ export interface WakeCallRequestParams extends WakeBaseRequestParams {
     contractAddress: w3t.Address;
     sender: w3t.Address;
     calldata: string;
-    value: number;
+    value: string;
 }
 
 export interface WakeTransactRequestParams extends WakeCallRequestParams {}

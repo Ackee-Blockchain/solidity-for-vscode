@@ -55,7 +55,7 @@ export function deployContract(
     contractFqn: string,
     sender: string,
     calldata: string,
-    value: number = 0
+    value: bigint
 ) {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.deploy,
@@ -63,7 +63,7 @@ export function deployContract(
             contractFqn,
             sender,
             calldata,
-            value
+            value: value.toString()
         }
     };
 

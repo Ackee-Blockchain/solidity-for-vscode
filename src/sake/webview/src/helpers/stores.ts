@@ -52,7 +52,7 @@ export const selectedValueString = writable<string | null>(null);
 // null indicated wrong stirng input
 export const selectedValue = derived(selectedValueString, ($selectedValueString) => {
     if ($selectedValueString === null || $selectedValueString === '') {
-        return 0;
+        return BigInt(0);
     }
     try {
         return parseComplexNumber($selectedValueString);

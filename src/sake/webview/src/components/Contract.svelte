@@ -48,7 +48,7 @@
     };
 </script>
 
-<div class="flex flex-col gap-1">
+<div class="flex flex-col gap-1 group">
     <div class="flex flex-row gap-1">
         <ExpandButton bind:expanded />
         <div class="flex-1 overflow-x-hidden rounded ps-2 bg-vscodeInputBackground flex flex-col">
@@ -58,7 +58,7 @@
                 <ClickableSpan callback={() => requestLabel(contract.address)}>
                     {contract.label ? `${contract.label} (${contract.name})` : contract.name}
                 </ClickableSpan>
-                <div class="flex fex-row pr-1">
+                <div class="flex fex-row pr-1 opacity-0 group-hover:opacity-100">
                     {#if contract.type === DeployedContractType.Compiled}
                         {#if isProxy}
                             <!-- @dev currently only supports one proxy -->
