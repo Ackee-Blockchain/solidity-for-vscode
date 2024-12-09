@@ -11,8 +11,7 @@
         if (tooltipContainer) {
             const rect = tooltipContainer.getBoundingClientRect();
             const viewportWidth = window.innerWidth;
-            maxWidth =
-                align === 'left' ? viewportWidth - rect.left - 5 : viewportWidth - rect.right - 5;
+            maxWidth = align === 'left' ? rect.left - 5 : viewportWidth - rect.right - 5;
         }
     }
 
