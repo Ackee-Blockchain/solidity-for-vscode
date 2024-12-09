@@ -6,11 +6,13 @@
     import IconSpacer from './icons/IconSpacer.svelte';
     import { type AbiFunctionFragment } from '../../shared/types';
     import { showErrorMessage } from '../helpers/api';
+    import RadioTowerIcon from './icons/RadioTowerIcon.svelte';
 
     export let func: AbiFunctionFragment;
     export let onFunctionCall: (calldata: string, func: AbiFunctionFragment) => void;
     export let isConstructor: boolean = false;
     export let isCalldata: boolean = false;
+    export let isProxy: boolean = false;
     let expanded: boolean = false;
     let inputRoot: RootInputHandler;
     $: funcChanged(func);
@@ -56,10 +58,17 @@
         {/if}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <vscode-button
-            class="flex-1 truncate"
+            class="flex-1"
             on:click={_onFunctionCall}
-            appearance={isCalldata ? 'secondary' : 'primary'}>{func.name}</vscode-button
+            appearance={isCalldata ? 'secondary' : 'primary'}
         >
+            {#if isProxy}
+                <span slot="start">
+                    <RadioTowerIcon />
+                </span>
+            {/if}
+            {func.name}
+        </vscode-button>
     </div>
     {#if inputRoot.hasInputs()}
         <div class="flex flex-1 flex-col gap-1 {expanded ? 'w-full' : ''} overflow-hidden">
