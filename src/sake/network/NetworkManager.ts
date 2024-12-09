@@ -1,3 +1,4 @@
+import { chainRegistry } from '../sake_providers/ChainHook';
 import { BaseSakeProvider } from '../sake_providers/SakeProvider';
 import { LocalNodeNetworkProvider } from './LocalNodeNetworkProvider';
 import { NetworkProvider } from './NetworkProvider';
@@ -33,7 +34,9 @@ export class NetworkManager {
     disconnectLocalProviders() {
         for (const provider of this._providers.values()) {
             if (provider instanceof LocalNodeNetworkProvider) {
-                provider.connected = false;
+                chainRegistry.getHook(provider.providerId)?.setLazy({
+                    connected: false
+                });
             }
         }
     }

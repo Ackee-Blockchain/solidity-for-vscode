@@ -37,6 +37,7 @@ import { validate } from '../utils/validate';
 import AppStateProvider from '../state/AppStateProvider';
 import { SakeContext } from '../context';
 import ChainStateProvider from '../state/ChainStateProvider';
+import { chainRegistry } from '../sake_providers/ChainHook';
 
 export class WakeError extends Error {}
 export class WakeApiError extends WakeError {}
@@ -64,7 +65,9 @@ async function sendWakeRequest<T>(
             AppStateProvider.getInstance().setIsWakeServerRunning(false);
         }
         if (message == 'Chain instance not connected') {
-            ChainStateProvider.getInstance().setChainConnectionStatus(params.sessionId, false);
+            chainRegistry.getHook(params.sessionId)?.setLazy({
+                connected: false
+            });
         }
         throw new WakeApiError(message);
     }

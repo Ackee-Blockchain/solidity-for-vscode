@@ -20,11 +20,10 @@ import ChainStateProvider from '../state/ChainStateProvider';
 
 export abstract class NetworkProvider {
     type: NetworkId;
-    _connected: boolean = false;
 
     constructor(
         type: NetworkId,
-        protected providerId: string
+        public providerId: string
     ) {
         this.type = type;
         NetworkManager.getInstance().addProvider(this);
@@ -33,15 +32,6 @@ export abstract class NetworkProvider {
     deleteChain(): Promise<void> {
         NetworkManager.getInstance().deleteProvider(this);
         return this.onDeleteChain();
-    }
-
-    get connected(): boolean {
-        return this._connected;
-    }
-
-    set connected(value: boolean) {
-        this._connected = value;
-        ChainStateProvider.getInstance().setChainConnectionStatus(this.providerId, value);
     }
 
     abstract registerAccount(address: string): Promise<Account | undefined>;

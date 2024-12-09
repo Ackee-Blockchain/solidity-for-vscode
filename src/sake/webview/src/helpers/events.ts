@@ -56,6 +56,7 @@ async function requestState(stateIds: StateId[]): Promise<boolean> {
         const result = await messageHandler.request<{
             success: boolean;
         }>(WebviewMessageId.requestState, stateId);
+        console.log('requestState', stateId, result);
         return { ...result, stateId };
     };
 

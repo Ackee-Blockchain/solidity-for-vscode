@@ -7,7 +7,8 @@ export const withTimeout = async (request: Promise<any>, seconds: number = 5) =>
             reject(new Error('Request timed out'));
         }, seconds * 1000);
     });
-    return Promise.race([request, timeout]);
+    const result = await Promise.race([request, timeout]);
+    return result;
 };
 
 export const loadWithTimeout = async (
@@ -19,7 +20,9 @@ export const loadWithTimeout = async (
         loadingMessage.set(message);
     }
     loadingShown.set(true);
+    console.log('loadWithTimeout', request);
     const result = await withTimeout(request, seconds);
+    console.log('loadWithTimeout', result);
     loadingShown.set(false);
     loadingMessage.set(null);
     return result;

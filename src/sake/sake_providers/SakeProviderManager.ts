@@ -24,17 +24,18 @@ import SakeState from './SakeState';
 import { NetworkProvider } from '../network/NetworkProvider';
 import { NetworkManager } from '../network/NetworkManager';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
+import { chainRegistry } from './ChainHook';
 
 export default class SakeProviderManager {
     private static _instance: SakeProviderManager;
-    private _selectedProviderId?: string;
-    private _providers: Map<string, BaseSakeProvider<NetworkProvider>>;
+    // private _selectedProviderId?: string;
+    // private _providers: Map<string, BaseSakeProvider<NetworkProvider>>;
     private _statusBarItem!: vscode.StatusBarItem;
     private _chains: ChainStateProvider;
     private _app: AppStateProvider;
 
     private constructor() {
-        this._providers = new Map();
+        // this._providers = new Map();
         this._chains = ChainStateProvider.getInstance();
         this._app = AppStateProvider.getInstance();
         this._initializeState();
@@ -75,18 +76,15 @@ export default class SakeProviderManager {
     }
 
     addProvider(provider: BaseSakeProvider<NetworkProvider>, notifyUser: boolean = true) {
+        if (chainRegistry.contains(provider.id)) {
+            throw new Error('Provider with id ' + provider.id + ' already exists');
+        }
+
         if (this._providers.has(provider.id)) {
             throw new Error('Provider with id ' + provider.id + ' already exists');
         }
 
         this._providers.set(provider.id, provider);
-
-        this._chains.addChain({
-            chainId: provider.id,
-            chainName: provider.displayName,
-            network: provider.network.type,
-            connected: provider.connected
-        });
 
         if (this._selectedProviderId === undefined) {
             this.setProvider(provider.id);
@@ -131,7 +129,6 @@ export default class SakeProviderManager {
         }
 
         this._providers.delete(provider.id);
-        this._chains.removeChain(provider.id);
 
         this._updateStatusBar();
     }
@@ -145,7 +142,7 @@ export default class SakeProviderManager {
     }
 
     get state(): SakeState | undefined {
-        return this.provider?.state;
+        return this.provider?.states;
     }
 
     // get network(): NetworkProvider {
@@ -454,7 +451,7 @@ export default class SakeProviderManager {
                 this.provider
                     ?.getAbi(address)
                     .then((contract) => {
-                        this.provider?.state?.deployment.add({
+                        this.provider?.states?.deployment.add({
                             type: DeployedContractType.OnChain,
                             address: address,
                             abi: contract.abi,

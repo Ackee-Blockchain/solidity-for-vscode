@@ -79,10 +79,6 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
     }
 
     async onDeleteChain() {
-        if (!this.connected) {
-            return;
-        }
-
         const response = await WakeApi.disconnectChain({
             sessionId: this.config.sessionId
         });

@@ -1,3 +1,4 @@
+import { chainRegistry } from '../sake_providers/ChainHook';
 import { StateId, ChainState, AppState, ChainInfo, NetworkId } from '../webview/shared/types';
 import BaseStateProvider from './BaseStateProvider';
 
@@ -9,6 +10,18 @@ export default class ChainStateProvider extends BaseStateProvider<ChainState> {
             chains: [],
             currentChainId: undefined
         });
+
+        chainRegistry.subscribe(() => {
+            this.state = {
+                ...this._state,
+                chains: chainRegistry.getAllStates().map((state) => ({
+                    chainId: state.id,
+                    chainName: state.name,
+                    network: state.network,
+                    connected: state.connected
+                }))
+            };
+        });
     }
 
     public static getInstance(): ChainStateProvider {
@@ -16,23 +29,6 @@ export default class ChainStateProvider extends BaseStateProvider<ChainState> {
             this._instance = new ChainStateProvider();
         }
         return this._instance;
-    }
-
-    public addChain(chain: ChainInfo) {
-        if (this._state.chains.find((c) => c.chainId === chain.chainId)) {
-            throw new Error('Chain already added');
-        }
-        this.state = {
-            ...this._state,
-            chains: [...this._state.chains, chain]
-        };
-    }
-
-    public removeChain(chainId: string) {
-        this.state = {
-            ...this._state,
-            chains: this._state.chains.filter((chain) => chain.chainId !== chainId)
-        };
     }
 
     public getChain(chainId: string): ChainInfo | undefined {
@@ -43,20 +39,6 @@ export default class ChainStateProvider extends BaseStateProvider<ChainState> {
         this.state = {
             ...this._state,
             currentChainId: chainId
-        };
-    }
-
-    public setChainConnectionStatus(chainId: string, connected: boolean) {
-        // check if chain exists
-        const chain = this._state.chains.find((chain) => chain.chainId === chainId);
-        if (!chain) {
-            return;
-        }
-        this.state = {
-            ...this._state,
-            chains: this._state.chains.map((chain) =>
-                chain.chainId === chainId ? { ...chain, connected } : chain
-            )
         };
     }
 
