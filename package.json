@@ -101,7 +101,7 @@
                     },
                     "Tools-for-Solidity.Wake.port": {
                         "type": "integer",
-                        "markdownDescription": "Port on which Wake LSP is listening. Overrides both `#Tools-for-Solidity.Wake.installationMethod#` and `#Tools-for-Solidity.Wake.pathToExecutable#`."
+                        "markdownDescription": "Port on which Wake LSP is listening. Overrides both `#Tools-for-Solidity.Wake.installationMethod#` and `#Tools-for-Solidity.Wake.pathToExecutable#`. Leave empty to use the default port."
                     },
                     "Tools-for-Solidity.Wake.compiler.solc.ignoredWarnings": {
                         "type": "array",
