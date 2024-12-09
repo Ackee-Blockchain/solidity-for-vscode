@@ -13,6 +13,7 @@ interface Transaction {
     success: boolean;
     receipt?: TransactionReceipt;
     callTrace: WakeCallTrace | null; // @hotfix: this is currently undefined in the response
+    error?: string; // @dev wake returns a user-friendly error message as string
 }
 
 export enum CallType {
@@ -57,6 +58,7 @@ export interface DeploymentRequest {
 
 export interface DeploymentResponse extends Transaction {
     deployedAddress: Address;
+    error?: string;
 }
 
 /* Call */
