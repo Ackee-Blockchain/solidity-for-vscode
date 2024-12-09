@@ -1,5 +1,6 @@
 import {
     AccountState,
+    Address,
     DeployedContractType,
     DeploymentState,
     NetworkCreationConfiguration,
@@ -192,6 +193,10 @@ export default class SakeProviderManager {
         this._statusBarItem.show();
     }
 
+    public removeProxy(contractFqn: string, proxyAddress?: Address) {
+        this.state?.deployment.removeProxy(contractFqn, proxyAddress);
+    }
+
     public showAddAbiQuickPick(contractFqn: string) {
         const _provider = this.provider;
 
@@ -272,7 +277,6 @@ export default class SakeProviderManager {
                             this.provider
                                 ?.getAbi(address)
                                 .then((contract) => {
-                                    console.log('fetched abi', contract);
                                     this.state?.deployment.extendProxySupport(contractFqn, {
                                         address,
                                         abi: contract.abi,
@@ -575,9 +579,7 @@ export default class SakeProviderManager {
                 if (provider) {
                     this.addProvider(provider, silent);
                 }
-                console.log('added provider', provider.id);
             } catch (error) {
-                console.log('failed to create provider from state', error);
                 console.error('Failed to create provider from state:', error);
                 if (!silent) {
                     vscode.window.showErrorMessage(

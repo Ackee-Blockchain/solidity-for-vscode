@@ -11,7 +11,8 @@
         removeDeployedContract,
         requestLabel,
         setLabel,
-        openAddAbiQuickPick
+        openAddAbiQuickPick,
+        removeProxy
     } from '../helpers/api';
     import CalldataBytes from './CalldataBytes.svelte';
     import CopyableSpan from './CopyableSpan.svelte';
@@ -20,6 +21,7 @@
     import DefaultButton from './icons/DefaultButton.svelte';
     import AbiIcon from './icons/AbiIcon.svelte';
     import RadioTowerIcon from './icons/RadioTowerIcon.svelte';
+    import RadioTowerCrossedIcon from './icons/RadioTowerCrossedIcon.svelte';
 
     export let contract: DeployedContract;
     export let onFunctionCall: (
@@ -58,10 +60,21 @@
                 </ClickableSpan>
                 <div class="flex fex-row pr-1">
                     {#if contract.type === DeployedContractType.Compiled}
-                        <DefaultButton callback={() => openAddAbiQuickPick(contract.fqn)}>
-                            <RadioTowerIcon />
-                        </DefaultButton>
+                        {#if isProxy}
+                            <!-- @dev currently only supports one proxy -->
+                            <DefaultButton
+                                callback={() =>
+                                    removeProxy(contract.fqn, contract.proxyFor?.[0]?.address)}
+                            >
+                                <RadioTowerCrossedIcon />
+                            </DefaultButton>
+                        {:else}
+                            <DefaultButton callback={() => openAddAbiQuickPick(contract.fqn)}>
+                                <RadioTowerIcon />
+                            </DefaultButton>
+                        {/if}
                     {/if}
+
                     <DeleteButton callback={() => removeDeployedContract(contract.address)} />
                 </div>
             </div>
@@ -89,14 +102,16 @@
             <div class="flex flex-col gap-1">
                 {#if isProxy}
                     {#each filteredProxies as proxy}
-                        <span>Implementation from {proxy.name}</span>
                         <div class="flex flex-col gap-1">
                             {#each proxy.abi as func}
-                                <ContractFunction {func} onFunctionCall={_onFunctionCall} />
+                                <ContractFunction
+                                    {func}
+                                    onFunctionCall={_onFunctionCall}
+                                    isProxy={true}
+                                />
                             {/each}
                         </div>
                     {/each}
-                    <span>Proxy</span>
                 {/if}
 
                 {#each filteredAbi as func}

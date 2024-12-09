@@ -39,6 +39,7 @@ export enum WebviewMessageId {
     openSettings = 'openSettings',
     openChainsQuickPick = 'openChainsQuickPick',
     openAddAbiQuickPick = 'openAddAbiQuickPick',
+    removeProxy = 'removeProxy',
     requestAddDeployedContract = 'requestAddDeployedContract',
 
     // connection
@@ -182,6 +183,13 @@ export type WebviewMessageRequest =
           command: WebviewMessageId.openAddAbiQuickPick;
           payload: {
               contractFqn: string;
+          };
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.removeProxy;
+          payload: {
+              contractFqn: string;
+              proxyAddress?: Address;
           };
       } & BaseWebviewMessageRequest)
     | ({

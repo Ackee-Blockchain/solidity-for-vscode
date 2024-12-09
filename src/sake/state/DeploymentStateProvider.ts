@@ -63,6 +63,20 @@ export default class DeploymentStateProvider extends BaseStateProvider<Deploymen
         });
     }
 
+    public removeProxy(contractFqn: string, address?: Address) {
+        console.log('removeProxy', contractFqn, address);
+        this.state = this.state.map((c) => {
+            if (c.type === DeployedContractType.Compiled && c.fqn === contractFqn) {
+                if (address) {
+                    c.proxyFor = c.proxyFor?.filter((p) => p.address !== address);
+                } else {
+                    c.proxyFor = undefined;
+                }
+            }
+            return c;
+        });
+    }
+
     // TODO remove
     // public getDict() {
     //     return this.state.reduce((acc, contract) => {

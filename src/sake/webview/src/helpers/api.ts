@@ -219,6 +219,18 @@ export function openAddAbiQuickPick(contractFqn: string) {
     messageHandler.send(request.command, request.payload);
 }
 
+export function removeProxy(contractFqn: string, proxyAddress?: Address) {
+    console.log('removeProxy', contractFqn, proxyAddress);
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.removeProxy,
+        payload: {
+            contractFqn,
+            proxyAddress
+        }
+    };
+    messageHandler.send(request.command, request.payload);
+}
+
 export function requestAddDeployedContract() {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.requestAddDeployedContract,
