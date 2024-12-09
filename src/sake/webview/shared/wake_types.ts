@@ -245,6 +245,7 @@ export interface WakeCallTrace {
     status: string | null;
     value: string | null;
     subtraces: WakeCallTrace[];
+    events?: string[];
 }
 
 /*
