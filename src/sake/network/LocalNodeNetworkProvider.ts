@@ -167,6 +167,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
                     receipt: response.txReceipt,
                     callTrace: response.callTrace,
                     returnValue: response.returnValue,
+                    events: response.events,
                     error: response.error
                 };
             default:

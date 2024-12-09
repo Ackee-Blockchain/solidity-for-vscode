@@ -188,7 +188,8 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
             contractAddress: deploymentResponse.deployedAddress,
             contractName: getNameFromContractFqn(deploymentRequest.contractFqn),
             receipt: deploymentResponse.receipt,
-            callTrace: deploymentResponse.callTrace
+            callTrace: deploymentResponse.callTrace,
+            events: deploymentResponse.events
         };
 
         this.output.set(transaction);
@@ -225,6 +226,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
             to: callRequest.to,
             functionName: callRequest.functionAbi.name,
             callType: callRequest.callType,
+            events: callResponse.events,
             returnData: {
                 bytes: callResponse.returnValue,
                 decoded: decoded
@@ -233,8 +235,6 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
             callTrace: callResponse.callTrace,
             error: callResponse.error
         };
-
-        console.log('transaction', transaction);
 
         this.output.set(transaction);
         this.state.history.add(transaction);

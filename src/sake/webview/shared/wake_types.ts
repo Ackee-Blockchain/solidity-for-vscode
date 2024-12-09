@@ -122,6 +122,7 @@ export interface WakeDeploymentResponse extends WakeTransaction {
     txReceipt: w3t.TransactionReceipt;
     rawError?: string;
     error?: string;
+    events?: string[];
 }
 
 // export interface WakeDeployedContract {
@@ -159,6 +160,7 @@ export interface WakeCallResponse extends WakeTransaction {
 
 export interface WakeTransactResponse extends WakeCallResponse {
     error?: string;
+    events?: string[];
     txReceipt: w3t.TransactionReceipt;
 }
 
@@ -269,6 +271,7 @@ export interface TransactionDeploymentResult extends TransactionResultBase {
     contractName: string;
     contractAddress?: w3t.Address;
     error?: string;
+    events?: string[];
 }
 
 export interface TransactionCallResult extends TransactionResultBase {
@@ -278,6 +281,7 @@ export interface TransactionCallResult extends TransactionResultBase {
     functionName: string;
     returnData: TransactionReturnData;
     error?: string;
+    events?: string[];
 }
 
 export type TransactionResult = TransactionDeploymentResult | TransactionCallResult;
