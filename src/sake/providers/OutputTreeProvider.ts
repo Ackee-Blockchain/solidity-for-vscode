@@ -12,7 +12,10 @@ import { SakeContext } from '../context';
 class BaseOutputItem extends vscode.TreeItem {
     children: BaseOutputItem[] = [];
 
-    constructor(public label: string, public collapsibleState: vscode.TreeItemCollapsibleState) {
+    constructor(
+        public label: string,
+        public collapsibleState: vscode.TreeItemCollapsibleState
+    ) {
         super(label, collapsibleState);
     }
 
@@ -34,6 +37,7 @@ export class OutputViewManager {
             treeDataProvider: this.provider
         });
         this._context.subscriptions.push(this.treeView);
+        this.treeView.message = ''; // override left over message from previous extension run
     }
 
     private get _context(): vscode.ExtensionContext {
