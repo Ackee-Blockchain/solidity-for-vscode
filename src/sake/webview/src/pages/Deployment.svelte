@@ -22,6 +22,7 @@
     import HeaderButton from '../components/icons/HeaderButton.svelte';
     import BackIcon from '../components/icons/BackIcon.svelte';
     import CompilationIssues from '../components/CompilationIssues.svelte';
+    import Tooltip from '../components/common/Tooltip.svelte';
 </script>
 
 <FlexContainer>
@@ -96,7 +97,16 @@
 
                     <div class="flex flex-row gap-1 items-center ml-auto pr-1">
                         <HeaderButton callback={requestAddDeployedContract}>
-                            <PlusIcon />
+                            <Tooltip align="left">
+                                <svelte:fragment slot="content">
+                                    <PlusIcon />
+                                </svelte:fragment>
+                                <svelte:fragment slot="tooltip">
+                                    <span class="font-normal"
+                                        >Add onchain contract to the deployment list</span
+                                    >
+                                </svelte:fragment>
+                            </Tooltip>
                         </HeaderButton>
                     </div>
                 </div>
