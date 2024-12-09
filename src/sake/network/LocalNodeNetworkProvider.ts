@@ -136,7 +136,8 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
             success: response.success,
             receipt: response.txReceipt,
             callTrace: response.callTrace,
-            deployedAddress: response.contractAddress
+            deployedAddress: response.contractAddress,
+            error: response.error
         };
     }
 
@@ -165,7 +166,8 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
                     success: response.success,
                     receipt: response.txReceipt,
                     callTrace: response.callTrace,
-                    returnValue: response.returnValue
+                    returnValue: response.returnValue,
+                    error: response.error
                 };
             default:
                 throw new NetworkError('Invalid call type');

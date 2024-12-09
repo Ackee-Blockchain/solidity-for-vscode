@@ -268,6 +268,7 @@ export interface TransactionDeploymentResult extends TransactionResultBase {
     type: CallOperation.Deployment;
     contractName: string;
     contractAddress?: w3t.Address;
+    error?: string;
 }
 
 export interface TransactionCallResult extends TransactionResultBase {
@@ -276,6 +277,7 @@ export interface TransactionCallResult extends TransactionResultBase {
     to: w3t.Address; // TODO maybe this could be joined with deployed address
     functionName: string;
     returnData: TransactionReturnData;
+    error?: string;
 }
 
 export type TransactionResult = TransactionDeploymentResult | TransactionCallResult;

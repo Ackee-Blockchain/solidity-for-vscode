@@ -206,16 +206,30 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         //     );
         // }
 
-        // parse contract name
-        if (data.receipt?.contractAddress !== undefined) {
-            rootNodes.push(
-                new SakeOutputItem(
-                    'Contract Address',
-                    data.receipt.contractAddress,
-                    vscode.TreeItemCollapsibleState.None,
-                    'rocket'
-                )
-            );
+        if (data.success) {
+            // parse contract name
+            if (data.receipt?.contractAddress !== undefined) {
+                rootNodes.push(
+                    new SakeOutputItem(
+                        'Contract Address',
+                        data.receipt.contractAddress,
+                        vscode.TreeItemCollapsibleState.None,
+                        'rocket'
+                    )
+                );
+            }
+        } else {
+            // parse error
+            if (data.error) {
+                rootNodes.push(
+                    new SakeOutputItem(
+                        'Error',
+                        data.error,
+                        vscode.TreeItemCollapsibleState.None,
+                        'error'
+                    )
+                );
+            }
         }
 
         // value
@@ -271,50 +285,63 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
     private _parseFunctionCall(data: TransactionCallResult): BaseOutputItem[] {
         const rootNodes: SakeOutputItem[] = [];
 
-        // add return data
-        if (data.returnData !== undefined) {
-            const hasReturnData = data.returnData.bytes !== '';
+        if (data.success) {
+            // add return data
+            if (data.returnData !== undefined) {
+                const hasReturnData = data.returnData.bytes !== '';
 
-            const returnDataNode = new SakeOutputItem(
-                'Return Data',
-                hasReturnData ? undefined : 'null',
-                hasReturnData
-                    ? vscode.TreeItemCollapsibleState.Expanded
-                    : vscode.TreeItemCollapsibleState.None,
-                'file-binary'
-            );
-            rootNodes.push(returnDataNode);
+                const returnDataNode = new SakeOutputItem(
+                    'Return Data',
+                    hasReturnData ? undefined : 'null',
+                    hasReturnData
+                        ? vscode.TreeItemCollapsibleState.Expanded
+                        : vscode.TreeItemCollapsibleState.None,
+                    'file-binary'
+                );
+                rootNodes.push(returnDataNode);
 
-            // decoded
-            if (hasReturnData && data.returnData.decoded !== undefined) {
-                const returnDataDecodedNode = new SakeOutputItem(
-                    'Decoded',
-                    undefined,
-                    vscode.TreeItemCollapsibleState.Expanded
-                ) as BaseOutputItem;
+                // decoded
+                if (hasReturnData && data.returnData.decoded !== undefined) {
+                    const returnDataDecodedNode = new SakeOutputItem(
+                        'Decoded',
+                        undefined,
+                        vscode.TreeItemCollapsibleState.Expanded
+                    ) as BaseOutputItem;
 
-                returnDataNode.setChildren([...returnDataNode.children, returnDataDecodedNode]);
+                    returnDataNode.setChildren([...returnDataNode.children, returnDataDecodedNode]);
 
-                const decoded = data.returnData.decoded;
+                    const decoded = data.returnData.decoded;
 
-                decoded.forEach((item) => {
-                    returnDataDecodedNode.setChildren([
-                        ...returnDataDecodedNode.children,
-                        destructureDecodedObject(item)
+                    decoded.forEach((item) => {
+                        returnDataDecodedNode.setChildren([
+                            ...returnDataDecodedNode.children,
+                            destructureDecodedObject(item)
+                        ]);
+                    });
+                }
+
+                // bytes
+                if (hasReturnData && data.returnData.bytes !== undefined) {
+                    returnDataNode.setChildren([
+                        ...returnDataNode.children,
+                        new SakeOutputItem(
+                            'Bytes',
+                            data.returnData.bytes,
+                            vscode.TreeItemCollapsibleState.None
+                        ) as BaseOutputItem
                     ]);
-                });
+                }
             }
-
-            // bytes
-            if (hasReturnData && data.returnData.bytes !== undefined) {
-                returnDataNode.setChildren([
-                    ...returnDataNode.children,
+        } else {
+            if (data.error) {
+                rootNodes.push(
                     new SakeOutputItem(
-                        'Bytes',
-                        data.returnData.bytes,
-                        vscode.TreeItemCollapsibleState.None
-                    ) as BaseOutputItem
-                ]);
+                        'Error',
+                        data.error,
+                        vscode.TreeItemCollapsibleState.None,
+                        'error'
+                    )
+                );
             }
         }
 
