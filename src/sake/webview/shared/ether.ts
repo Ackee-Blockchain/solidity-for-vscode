@@ -1,34 +1,32 @@
 import { FunctionInputParseError } from './errors';
 
-export function displayEtherValue(value: number | null) {
-    if (value === null) {
+export function displayEtherValue(value: bigint | null): string {
+    if (value === null || value === BigInt(0)) {
         return '0 ETH';
     }
 
-    if (value === 0) {
-        return '0 ETH';
+    // Convert to Wei string first
+    const weiValue = value.toString();
+
+    // Handle Wei (small values)
+    if (value < BigInt(1000)) {
+        return `${weiValue} Wei`;
     }
 
-    if (10 ** 14 <= value && value < 10 ** 23) {
-        return `${(value / 10 ** 18).toFixed(4)} ETH`;
+    // Handle Gwei (medium values)
+    if (value < BigInt(10 ** 12)) {
+        const gweiValue = Number(value) / 1e9;
+        return `${gweiValue.toFixed(2)} Gwei`;
     }
 
-    return `${(value / 10 ** 18).toExponential(3)} ETH`;
+    // Handle ETH (larger values)
+    const ethValue = Number(value) / 1e18;
 
-    // if (value < 10 ** 4) {
-    //     // return wei
-    //     return `${value} wei`;
-    // }
+    // Use regular decimal for reasonable numbers
+    if (ethValue >= 0.0001 && ethValue < 1000000) {
+        return `${ethValue.toFixed(4)} ETH`;
+    }
 
-    // if (value < 10 ** 15) {
-    //     // return gwei
-    //     return `${value.toExponential(3)} gwei`;
-    // }
-
-    // if (value < 10 ** 21) {
-    //     // return eth
-    //     return `${value / 10 ** 18} ether`;
-    // }
-
-    // return `${value.toExponential(3)} eth`;
+    // Use scientific notation for very large or very small numbers
+    return `${ethValue.toExponential(4)} ETH`;
 }

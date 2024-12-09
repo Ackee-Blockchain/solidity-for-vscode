@@ -18,7 +18,7 @@
             return;
         }
 
-        deployContract(contract.fqn, _sender, calldata, $selectedValue ?? 0);
+        deployContract(contract.fqn, _sender, calldata, $selectedValue || BigInt(0));
     };
 
     const handleFilter = function (e: any) {

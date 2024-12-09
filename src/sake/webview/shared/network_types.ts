@@ -52,7 +52,7 @@ export interface DeploymentRequest {
     contractFqn: string; // TODO maybe this should be smth like contractId
     sender: Address;
     calldata: HexString;
-    value: number;
+    value: string; // @dev encoded bigint
 }
 
 export interface DeploymentResponse extends Transaction {
@@ -65,7 +65,7 @@ export interface CallRequest {
     to: Address;
     from: Address;
     calldata: HexString;
-    value: number;
+    value: string; // @dev encoded bigint
     callType?: CallType;
     functionAbi: AbiFunctionFragment;
 }

@@ -19,13 +19,13 @@
             return;
         }
 
-        const _value: number = $selectedValue ?? 0;
+        const _value: bigint = $selectedValue ?? BigInt(0);
 
         const payload: CallRequest = {
             to: contractAddress,
             from: _sender,
             calldata: calldata,
-            value: func.stateMutability === 'payable' ? _value : 0,
+            value: func.stateMutability === 'payable' ? _value.toString() : '0',
             functionAbi: func
         };
 
