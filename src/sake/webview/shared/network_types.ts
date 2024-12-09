@@ -1,19 +1,16 @@
 import type { AbiFunctionFragment, Address, HexString, TransactionReceipt } from 'web3-types';
 import type {
-    WakeCallRequestParams,
     WakeCallTrace,
     WakeGetBytecodeResponse,
-    WakeGetBytecodeRequestParams,
-    WakeCreateChainRequestParams
+    WakeGetBytecodeRequestParams
 } from './wake_types';
-import type { Account } from './types';
-import type { NetworkState, WakeChainDump } from './storage_types';
 
 interface Transaction {
     success: boolean;
     receipt?: TransactionReceipt;
     callTrace: WakeCallTrace | null; // @hotfix: this is currently undefined in the response
     error?: string; // @dev wake returns a user-friendly error message as string
+    events?: string[]; // @dev wake returns a list of events as strings
 }
 
 export enum CallType {
@@ -59,6 +56,7 @@ export interface DeploymentRequest {
 export interface DeploymentResponse extends Transaction {
     deployedAddress: Address;
     error?: string;
+    events?: string[];
 }
 
 /* Call */

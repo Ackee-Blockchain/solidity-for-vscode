@@ -373,6 +373,28 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
             rootNodes.push(callTraceNode);
         }
 
+        if (data.events !== undefined) {
+            const eventsNode = new SakeOutputItem(
+                'Events',
+                undefined,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'calendar'
+            );
+
+            eventsNode.setChildren(
+                data.events.map(
+                    (event) =>
+                        new SakeOutputItem(
+                            event,
+                            undefined,
+                            vscode.TreeItemCollapsibleState.None
+                        ) as BaseOutputItem
+                )
+            );
+
+            rootNodes.push(eventsNode);
+        }
+
         // parse from and to
         // if (data.to !== undefined) {
         //     rootNodes.push(
