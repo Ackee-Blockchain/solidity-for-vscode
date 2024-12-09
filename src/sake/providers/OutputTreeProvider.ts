@@ -260,6 +260,29 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
             rootNodes.push(callTraceNode);
         }
 
+        // add events
+        if (data.events !== undefined) {
+            const eventsNode = new SakeOutputItem(
+                'Events',
+                undefined,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'symbol-event'
+            );
+
+            eventsNode.setChildren(
+                data.events.map(
+                    (event) =>
+                        new SakeOutputItem(
+                            event,
+                            undefined,
+                            vscode.TreeItemCollapsibleState.None
+                        ) as BaseOutputItem
+                )
+            );
+
+            rootNodes.push(eventsNode);
+        }
+
         // add receipt
         if (data.receipt !== undefined) {
             const receiptNode = new SakeOutputItem(
@@ -373,12 +396,13 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
             rootNodes.push(callTraceNode);
         }
 
+        // add events
         if (data.events !== undefined) {
             const eventsNode = new SakeOutputItem(
                 'Events',
                 undefined,
                 vscode.TreeItemCollapsibleState.Collapsed,
-                'calendar'
+                'symbol-event'
             );
 
             eventsNode.setChildren(
