@@ -117,6 +117,8 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
                 state?.sendToWebview();
 
+                console.log('requestState', state !== undefined, state);
+
                 webviewView.webview.postMessage({
                     command: message.command,
                     requestId: message.requestId,
@@ -312,6 +314,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
             case WebviewMessageId.reconnectChain: {
                 let success = true;
+
                 try {
                     await this._sake.provider?.connect();
                 } catch (error) {

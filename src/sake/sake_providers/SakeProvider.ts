@@ -40,11 +40,11 @@ import {
 import SakeState from './SakeState';
 import { SakeError } from '../webview/shared/errors';
 import { NetworkProvider } from '../network/NetworkProvider';
+import { ChainHook, ChainState, useChainState } from './ChainHook';
 
 // TODO consider renaming to BaseSakeProvider
 export abstract class BaseSakeProvider<T extends NetworkProvider> {
-    state: SakeState;
-    protected output: OutputViewManager;
+    private _hook: ChainHook;
 
     constructor(
         public id: string,
@@ -52,8 +52,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         public network: T,
         protected initializationRequest: SakeProviderInitializationRequest
     ) {
-        this.state = new SakeState();
-        this.output = OutputViewManager.getInstance();
+        this._hook = useChainState(this.id, displayName, network.type);
         this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
         this.setAccountLabel = showVSCodeMessageOnErrorWrapper(this.setAccountLabel.bind(this));
         this.refreshAccount = showVSCodeMessageOnErrorWrapper(this.refreshAccount.bind(this));
@@ -67,12 +66,18 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
 
     abstract connect(): Promise<void>;
 
-    set connected(value: boolean) {
-        this.network.connected = value;
+    get connected(): boolean {
+        return this._hook.get().connected;
     }
 
-    get connected(): boolean {
-        return this.network.connected;
+    set connected(connected: boolean) {
+        this._hook.setLazy({
+            connected: connected
+        });
+    }
+
+    get states(): SakeState {
+        return this._hook.get().states;
     }
 
     /* Compilation */
@@ -87,7 +92,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         const parsedContracts = parseCompiledContracts(compilationResponse.contracts);
         const parsedErrors = parseCompilationIssues(compilationResponse.errors);
         const parsedSkipped = parseCompilationSkipped(compilationResponse.skipped);
-        this.state.compilation.set(parsedContracts, [...parsedErrors, ...parsedSkipped]);
+        this.states.compilation.set(parsedContracts, [...parsedErrors, ...parsedSkipped]);
 
         return compilationResponse;
     }
@@ -101,7 +106,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
 
     // async addAccount(address: string) {
     //     // check if account is already in the list
-    //     if (this.state.accounts.includes(address)) {
+    //     if (this.states.accounts.includes(address)) {
     //         return;
     //     }
 
@@ -109,25 +114,25 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
     //     const account: Account | undefined = await this.network.registerAccount(address);
 
     //     if (account) {
-    //         this.state.accounts.add(account);
+    //         this.states.accounts.add(account);
     //     }
     // }
 
     // async removeAccount(address: string) {
-    //     this.state.accounts.remove(address);
+    //     this.states.accounts.remove(address);
     // }
 
     async setAccountBalance(request: SetAccountBalanceRequest) {
         const success = await this.network.setAccountBalance(request);
 
         if (success) {
-            this.state.accounts.setBalance(request.address, request.balance);
+            this.states.accounts.setBalance(request.address, request.balance);
         }
     }
 
     async setAccountLabel(request: SetAccountLabelRequest) {
-        this.state.accounts.setLabel(request.address, request.label);
-        this.state.deployment.setLabel(request.address, request.label);
+        this.states.accounts.setLabel(request.address, request.label);
+        this.states.deployment.setLabel(request.address, request.label);
     }
 
     async refreshAccount(address: string) {
@@ -137,20 +142,20 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
             return;
         }
 
-        if (this.state.accounts.includes(address)) {
-            this.state.accounts.update({
+        if (this.states.accounts.includes(address)) {
+            this.states.accounts.update({
                 ...account,
-                label: this.state.accounts.get(address)?.label
+                label: this.states.accounts.get(address)?.label
             });
         } else {
-            this.state.accounts.add(account);
+            this.states.accounts.add(account);
         }
     }
 
     /* Deployment management */
 
     async deployContract(deploymentRequest: DeploymentRequest) {
-        const compilation = this.state.compilation.get(deploymentRequest.contractFqn);
+        const compilation = this.states.compilation.get(deploymentRequest.contractFqn);
 
         if (!compilation) {
             throw new SakeError('Deployment failed: Contract ABI was not found');
@@ -163,7 +168,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
                 await this.network.getAccountDetails(deploymentResponse.deployedAddress)
             ).balance;
 
-            this.state.deployment.add({
+            this.states.deployment.add({
                 type: DeployedContractType.Compiled,
                 name: compilation.name,
                 address: deploymentResponse.deployedAddress,
@@ -192,12 +197,12 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
             events: deploymentResponse.events
         };
 
-        this.output.set(transaction);
-        this.state.history.add(transaction);
+        OutputViewManager.getInstance().set(transaction);
+        this.states.history.add(transaction);
     }
 
     async removeDeployedContract(address: Address) {
-        this.state.deployment.remove(address);
+        this.states.deployment.remove(address);
     }
 
     /* Interactions */
@@ -236,8 +241,8 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
             error: callResponse.error
         };
 
-        this.output.set(transaction);
-        this.state.history.add(transaction);
+        OutputViewManager.getInstance().set(transaction);
+        this.states.history.add(transaction);
 
         // TODO consider check and update balance of caller and callee
     }
@@ -258,13 +263,13 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
 
     async onActivateProvider() {
         // TODO save state
-        this.state.subscribe();
+        this.states.subscribe();
         this.network.onActivate();
     }
 
     async onDeactivateProvider() {
         // TODO save state
-        this.state.unsubscribe();
+        this.states.unsubscribe();
         this.network.onDeactivate();
     }
 
@@ -274,7 +279,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         return {
             id: this.id,
             displayName: this.displayName,
-            state: this.state.dumpProviderState(),
+            state: this.states.dumpProviderState(),
             network: await this.network.dumpState()
         };
     }

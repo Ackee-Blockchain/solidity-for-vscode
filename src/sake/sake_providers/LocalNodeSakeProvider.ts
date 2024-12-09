@@ -21,7 +21,7 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
     }
 
     async connect(): Promise<void> {
-        if (this.network.connected) {
+        if (this.connected) {
             throw new SakeError('Cannot connect provider, already connected');
         }
 
@@ -33,7 +33,7 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
                 for (const account of accounts) {
                     const accountDetails = await this.network.getAccountDetails(account);
                     if (accountDetails) {
-                        this.state.accounts.add(accountDetails);
+                        this.states.accounts.add(accountDetails);
                     }
                 }
                 break;
@@ -41,7 +41,7 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
             case SakeProviderInitializationRequestType.LoadFromState:
                 await this.network.createChain();
                 await this.network.loadState(this.initializationRequest.state.network.wakeDump);
-                this.state.loadProviderState(this.initializationRequest.state.state);
+                this.states.loadProviderState(this.initializationRequest.state.state);
                 break;
 
             case SakeProviderInitializationRequestType.ConnectToChain:
@@ -53,7 +53,9 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
     }
 
     async onDeleteProvider(): Promise<void> {
-        await this.network.deleteChain();
+        if (this.connected) {
+            await this.network.deleteChain();
+        }
     }
 
     _getQuickPickItem(): SakeProviderQuickPickItem {
@@ -64,7 +66,7 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
                 tooltip: 'Delete'
             }
         ];
-        // if (!this.network.connected) {
+        // if (!this.connected) {
         //     buttons.push({
         //         iconPath: new vscode.ThemeIcon('refresh'),
         //         tooltip: 'Reconnect'

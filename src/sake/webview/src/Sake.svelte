@@ -83,9 +83,10 @@
         }
     ];
 
-    const loadState = async () => {
-        await requestSharedState();
-        await requestLocalState();
+    const loadState: () => Promise<boolean> = async () => {
+        const sharedStateSuccess = await requestSharedState();
+        const localStateSuccess = await requestLocalState();
+        return sharedStateSuccess && localStateSuccess;
     };
 
     const retryPing = async () => {
@@ -121,6 +122,7 @@
     const tryWakeServerRestart = () => {
         loadWithTimeout(restartWakeServer(), 15, 'Restarting Wake server...')
             .then(async () => {
+                console.log('xixi tryWakeServerRestart');
                 const result = await loadWithTimeout(
                     reconnectChain(),
                     15,
@@ -131,7 +133,9 @@
                 }
             })
             .then(async () => {
+                console.log('xixi loadState');
                 const result = await loadWithTimeout(loadState(), 15, 'Loading state...');
+                console.log('xixi loadState', result);
                 if (!result) {
                     throw new Error('Loading state failed');
                 }
