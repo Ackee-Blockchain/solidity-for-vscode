@@ -115,7 +115,7 @@ export class SakeOutputItem extends vscode.TreeItem {
         this.value = value;
 
         if (icon !== undefined) {
-            this.iconPath = new vscode.ThemeIcon(icon);
+            this.iconPath = new vscode.ThemeIcon(icon, new vscode.ThemeColor('foreground'));
         }
 
         this.contextValue = this.value === undefined ? undefined : 'copyable';
@@ -256,6 +256,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
                 vscode.TreeItemCollapsibleState.Collapsed,
                 'list-tree'
             );
+            console.log('callTrace', data.callTrace);
             callTraceNode.setChildren([parseCallTrace(data.callTrace)]);
             rootNodes.push(callTraceNode);
         }
@@ -477,7 +478,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
 }
 
 class CallTraceItem extends BaseOutputItem {
-    children: CallTraceItem[] = [];
+    children: (CallTraceItem | CallTraceEventItem)[] = [];
 
     constructor(public label: string) {
         super(label, vscode.TreeItemCollapsibleState.None);
@@ -491,11 +492,20 @@ class CallTraceItem extends BaseOutputItem {
         if (this.children.length > 0) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
             this.children.forEach((child) => {
-                child.updateCollapsibleState();
+                if (child instanceof CallTraceItem) {
+                    child.updateCollapsibleState();
+                }
             });
             return;
         }
         this.collapsibleState = vscode.TreeItemCollapsibleState.None;
+    }
+}
+
+class CallTraceEventItem extends BaseOutputItem {
+    constructor(public label: string) {
+        super(label, vscode.TreeItemCollapsibleState.None);
+        this.iconPath = new vscode.ThemeIcon('symbol-event', new vscode.ThemeColor('foreground'));
     }
 }
 
@@ -507,6 +517,13 @@ function parseCallTrace(callTrace: WakeCallTrace) {
             root.setChildren([new CallTraceItem(callTrace.error)]);
         } else if (callTrace.subtraces !== undefined) {
             root.setChildren(callTrace.subtraces.map((subtrace: any) => _parseCallTrace(subtrace)));
+        }
+        // add events
+        if (callTrace.events !== undefined) {
+            root.setChildren([
+                ...root.children,
+                ...callTrace.events.map((event) => new CallTraceEventItem(event))
+            ]);
         }
         return root;
     };
