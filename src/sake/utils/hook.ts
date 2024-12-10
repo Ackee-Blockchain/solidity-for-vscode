@@ -13,12 +13,12 @@ export class Hook<T> implements IHook<T> {
         this.state = initialState;
     }
 
-    set(state: T): void {
+    public set(state: T): void {
         this.state = state;
         this.notifySubscribers();
     }
 
-    setLazy(partialState: Partial<T>): void {
+    public setLazy(partialState: Partial<T>): void {
         this.state = {
             ...this.state,
             ...partialState
@@ -26,11 +26,11 @@ export class Hook<T> implements IHook<T> {
         this.notifySubscribers();
     }
 
-    get(): T {
+    public get(): T {
         return this.state;
     }
 
-    subscribe(callback: (state: T) => void): () => void {
+    public subscribe(callback: (state: T) => void): () => void {
         this.subscribers.push(callback);
         return () => {
             this.subscribers = this.subscribers.filter((cb) => cb !== callback);

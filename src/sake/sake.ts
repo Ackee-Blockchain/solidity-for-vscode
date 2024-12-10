@@ -31,8 +31,9 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     client.onDidChangeState((state) => {
         appState.setLazy({ isWakeServerRunning: state.newState === State.Running });
     });
-    
+
     /* Initialize Sake Provider */
+    sakeProviderManager.initialize();
 
     /* Register Webview */
     const sidebarSakeProvider = new SakeWebviewProvider(context.extensionUri);

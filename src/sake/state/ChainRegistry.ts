@@ -32,7 +32,7 @@ export const chainRegistry = {
         return Array.from(this.states.values()).map((state) => state.get());
     },
 
-    add(id: string, name: string, network: NetworkId): void {
+    add(id: string, name: string, network: NetworkId): ChainHook {
         if (this.contains(id)) {
             throw new Error('Chain with id ' + id + ' already exists');
         }
@@ -40,6 +40,8 @@ export const chainRegistry = {
         const hook = useChainState(id, name, network);
         this.states.set(id, hook);
         this.notifyUpdate();
+
+        return hook;
     },
 
     delete(id: string): void {
@@ -75,19 +77,11 @@ function useChainState(id: string, name: string, network: NetworkId) {
     };
 
     hook = new Hook<ChainState>(state);
-    const wrappedHook = {
-        ...hook,
-        set: (_state: ChainState) => {
-            hook.set(_state);
-            chainRegistry.notifyUpdate();
-        },
-        setLazy: (partialState: Partial<ChainState>) => {
-            hook.setLazy(partialState);
-            chainRegistry.notifyUpdate();
-        }
-    } as ChainHook;
+    hook.subscribe((_) => {
+        chainRegistry.notifyUpdate();
+    });
 
-    return wrappedHook;
+    return hook;
 }
 
 export interface AdditionalSakeState {

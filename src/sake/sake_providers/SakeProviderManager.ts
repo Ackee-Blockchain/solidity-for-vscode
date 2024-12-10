@@ -30,6 +30,7 @@ export const sakeProviderManager = {
         this.pingWakeServer();
 
         providerRegistry.subscribeAdd((id) => {
+            console.log('providerRegistry.subscribeAdd', id);
             if (this.currentChainId === undefined) {
                 this.setProvider(id);
                 vscode.window.showInformationMessage(

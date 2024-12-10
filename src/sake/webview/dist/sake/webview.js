@@ -39005,7 +39005,7 @@ function requestLocalState() {
 async function requestState(stateIds) {
     const wrapper = async (stateId) => {
         const result = await client.messageHandler.request(WebviewMessageId.requestState, stateId);
-        console.log('requestState', stateId, result);
+        // console.log('requestState', stateId, result);
         return Object.assign(Object.assign({}, result), { stateId });
     };
     return await Promise.all(stateIds.map((id) => wrapper(id)))
@@ -39049,6 +39049,7 @@ function setupListeners() {
 }
 function handleStateResponse(message) {
     var _a;
+    console.log('received message', message.stateId, message.payload);
     switch (message.stateId) {
         case StateId.DeployedContracts: {
             console.log('received deployedContracts', message.payload);
