@@ -21,7 +21,7 @@ import {
 import BaseStateProvider from '../state/BaseStateProvider';
 import SakeProviderManager, { sakeProviderManager } from '../sake_providers/SakeProviderManager';
 import CompilationStateProvider from '../state/CompilationStateProvider';
-import {ChainStateProvider, AppStateProvider} from '../state/HookStateConnectors';
+import { ChainStateProvider, AppStateProvider } from '../state/HookStateConnectors';
 import { restartWakeClient } from '../../commands';
 import { SakeContext } from '../context';
 
@@ -112,8 +112,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 const state = this._stateSubscriptions.get(message.payload);
 
                 state?.sendToWebview();
-
-                console.log('requestState', state !== undefined, state);
 
                 webviewView.webview.postMessage({
                     command: message.command,
