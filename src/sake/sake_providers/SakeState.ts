@@ -5,13 +5,13 @@ import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
 import TransactionHistoryStateProvider from '../state/TransactionHistoryStateProvider';
 import AppStateProvider from '../state/AppStateProvider';
 import { SakeContext } from '../context';
-import ChainStateProvider from '../state/ChainStateProvider';
 import { ProviderState, SharedState } from '../webview/shared/storage_types';
 import {
     AccountState,
     DeploymentState,
     TransactionHistoryState
 } from '../webview/shared/state_types';
+import { ChainStateProvider } from '../state/HookStateConnectors';
 
 export default class SakeState {
     accounts: AccountStateProvider;

@@ -21,8 +21,7 @@ import {
 import BaseStateProvider from '../state/BaseStateProvider';
 import SakeProviderManager, { sakeProviderManager } from '../sake_providers/SakeProviderManager';
 import CompilationStateProvider from '../state/CompilationStateProvider';
-import ChainStateProvider from '../state/ChainStateProvider';
-import AppStateProvider, { appState } from '../state/AppStateProvider';
+import {ChainStateProvider, AppStateProvider} from '../state/HookStateConnectors';
 import { restartWakeClient } from '../../commands';
 import { SakeContext } from '../context';
 
@@ -42,7 +41,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
     private _subscribeToSharedState() {
         CompilationStateProvider.getInstance().subscribe(this);
         ChainStateProvider.getInstance().subscribe(this);
-        appState.subscribe(this);
+        AppStateProvider.getInstance().subscribe(this);
     }
 
     public resolveWebviewView(webviewView: vscode.WebviewView) {

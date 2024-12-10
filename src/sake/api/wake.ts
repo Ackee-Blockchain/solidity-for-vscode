@@ -34,10 +34,9 @@ import {
     WakeGetAbiWithProxyRequestParams
 } from '../webview/shared/types';
 import { validate } from '../utils/validate';
-import AppStateProvider, { appState } from '../state/AppStateProvider';
 import { SakeContext } from '../context';
-import ChainStateProvider from '../state/ChainStateProvider';
-import { chainRegistry } from '../sake_providers/ChainRegistry';
+import { chainRegistry } from '../state/ChainRegistry';
+import appState from '../state/AppStateProvider';
 
 export class WakeError extends Error {}
 export class WakeApiError extends WakeError {}

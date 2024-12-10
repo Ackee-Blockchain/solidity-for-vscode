@@ -1,5 +1,6 @@
+import { Hook, IHook } from '../utils/hook';
 import { NetworkId } from '../webview/shared/network_types';
-import SakeState from './SakeState';
+import SakeState from '../sake_providers/SakeState';
 
 export interface ChainState {
     id: string;
@@ -7,50 +8,6 @@ export interface ChainState {
     connected: boolean;
     name: string;
     network: NetworkId;
-}
-
-export class Hook<T> implements IHook<T> {
-    private state: T;
-    private subscribers: ((state: T) => void)[] = [];
-
-    constructor(initialState: T) {
-        this.state = initialState;
-    }
-
-    set(state: T): void {
-        this.state = state;
-        this.notifySubscribers();
-    }
-
-    setLazy(partialState: Partial<T>): void {
-        this.state = {
-            ...this.state,
-            ...partialState
-        };
-        this.notifySubscribers();
-    }
-
-    get(): T {
-        return this.state;
-    }
-
-    subscribe(callback: (state: T) => void): () => void {
-        this.subscribers.push(callback);
-        return () => {
-            this.subscribers = this.subscribers.filter((cb) => cb !== callback);
-        };
-    }
-
-    private notifySubscribers(): void {
-        this.subscribers.forEach((callback) => callback(this.state));
-    }
-}
-
-export interface IHook<T> {
-    set: (state: T) => void;
-    setLazy: (partialState: Partial<T>) => void;
-    get: () => T;
-    subscribe: (callback: (state: T) => void) => () => void;
 }
 
 export interface ChainHook extends IHook<ChainState> {}

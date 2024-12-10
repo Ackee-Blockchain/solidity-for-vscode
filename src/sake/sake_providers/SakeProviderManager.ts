@@ -16,15 +16,13 @@ import { BaseSakeProvider } from './SakeProvider';
 import * as WakeApi from '../api/wake';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import { SakeContext } from '../context';
-import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 import * as SakeProviderFactory from './SakeProviderFactory';
-import ChainStateProvider from '../state/ChainStateProvider';
 import { ProviderState, StoredSakeState } from '../webview/shared/storage_types';
 import SakeState from './SakeState';
 import { NetworkProvider } from '../network/NetworkProvider';
 import { NetworkManager } from '../network/NetworkManager';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
-import { additionalSakeState, chainRegistry } from './ChainRegistry';
+import { additionalSakeState, chainRegistry } from '../state/ChainRegistry';
 import { providerRegistry } from './ProviderRegistry';
 
 export const sakeProviderManager = {
