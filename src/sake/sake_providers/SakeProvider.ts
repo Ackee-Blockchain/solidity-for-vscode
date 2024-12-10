@@ -40,7 +40,7 @@ import {
 import SakeState from './SakeState';
 import { SakeError } from '../webview/shared/errors';
 import { NetworkProvider } from '../network/NetworkProvider';
-import { ChainHook, chainRegistry, ChainState } from './ChainRegistry';
+import { ChainHook, chainRegistry, ChainState } from '../state/ChainRegistry';
 import { providerRegistry } from './ProviderRegistry';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 

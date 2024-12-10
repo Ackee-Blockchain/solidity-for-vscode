@@ -16,7 +16,6 @@ import {
 import { Account } from '../webview/shared/types';
 import { NetworkState } from '../webview/shared/storage_types';
 import { NetworkManager } from './NetworkManager';
-import ChainStateProvider from '../state/ChainStateProvider';
 
 export abstract class NetworkProvider {
     type: NetworkId;

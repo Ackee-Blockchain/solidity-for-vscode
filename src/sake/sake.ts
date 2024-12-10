@@ -22,11 +22,16 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     sakeContext.context = context;
     sakeContext.client = client;
 
-    /* Initialize Chain State */
+    /* Initialize Chain and App State */
     appState.setLazy({
         initializationState: 'initializing'
     });
 
+    appState.setLazy({ isWakeServerRunning: client.state === State.Running });
+    client.onDidChangeState((state) => {
+        appState.setLazy({ isWakeServerRunning: state.newState === State.Running });
+    });
+    
     /* Initialize Sake Provider */
 
     /* Register Webview */
@@ -39,7 +44,6 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     sakeContext.webviewProvider = sidebarSakeProvider;
 
     /* Workspace watcher */
-
     const workspaceWatcher = () => {
         const workspaces = vscode.workspace.workspaceFolders;
         if (workspaces === undefined || workspaces.length === 0) {
