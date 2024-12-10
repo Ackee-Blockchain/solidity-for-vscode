@@ -1,4 +1,4 @@
-import { chainRegistry } from '../sake_providers/ChainHook';
+import { chainRegistry } from '../sake_providers/ChainRegistry';
 import { BaseSakeProvider } from '../sake_providers/SakeProvider';
 import { LocalNodeNetworkProvider } from './LocalNodeNetworkProvider';
 import { NetworkProvider } from './NetworkProvider';

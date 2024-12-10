@@ -19,7 +19,7 @@ import {
     WebviewMessageResponse
 } from '../webview/shared/types';
 import BaseStateProvider from '../state/BaseStateProvider';
-import SakeProviderManager from '../sake_providers/SakeProviderManager';
+import SakeProviderManager, { sakeProviderManager } from '../sake_providers/SakeProviderManager';
 import CompilationStateProvider from '../state/CompilationStateProvider';
 import ChainStateProvider from '../state/ChainStateProvider';
 import AppStateProvider from '../state/AppStateProvider';
@@ -30,14 +30,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
     _view?: vscode.WebviewView;
     _doc?: vscode.TextDocument;
     _stateSubscriptions: Map<StateId, BaseStateProvider<any>> = new Map();
-    _sake: SakeProviderManager;
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
         private readonly _targetPath: string
     ) {
-        this._sake = SakeProviderManager.getInstance();
-
         // Subscribe to shared state
         this._subscribeToSharedState();
     }
@@ -163,12 +160,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.undeployContract: {
-                this._sake.provider?.removeDeployedContract(message.payload);
+                sakeProviderManager.provider?.removeDeployedContract(message.payload);
                 break;
             }
 
             case WebviewMessageId.compile: {
-                await this._sake.provider?.compile();
+                await sakeProviderManager.provider?.compile();
 
                 webviewView.webview.postMessage({
                     command: message.command,
@@ -182,22 +179,22 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.deploy: {
-                this._sake.provider?.deployContract(message.payload);
+                sakeProviderManager.provider?.deployContract(message.payload);
                 break;
             }
 
             case WebviewMessageId.contractFunctionCall: {
-                this._sake.provider?.callContract(message.payload);
+                sakeProviderManager.provider?.callContract(message.payload);
                 break;
             }
 
             case WebviewMessageId.setBalance: {
-                this._sake.provider?.setAccountBalance(message.payload);
+                sakeProviderManager.provider?.setAccountBalance(message.payload);
                 break;
             }
 
             case WebviewMessageId.setLabel: {
-                this._sake.provider?.setAccountLabel(message.payload);
+                sakeProviderManager.provider?.setAccountLabel(message.payload);
                 break;
             }
 
@@ -238,7 +235,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
             case WebviewMessageId.getBytecode: {
                 const response: GetBytecodeResponse | undefined =
-                    await this._sake.provider?.getBytecode(message.payload);
+                    await sakeProviderManager.provider?.getBytecode(message.payload);
 
                 webviewView.webview.postMessage({
                     command: message.command,
@@ -252,12 +249,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             // case WebviewMessageId.requestNewProvider: {
-            //     this._sake.requestNewProvider();
+            //     sakeProviderManager.requestNewProvider();
             //     break;
             // }
 
             case WebviewMessageId.selectChain: {
-                this._sake.showProviderSelectionQuickPick();
+                sakeProviderManager.showProviderSelectionQuickPick();
                 break;
             }
 
@@ -271,7 +268,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 await restartWakeClient(client);
 
                 try {
-                    await this._sake.provider?.connect();
+                    await sakeProviderManager.provider?.connect();
                 } catch (error) {
                     showErrorMessage(error as string);
                 }
@@ -298,17 +295,20 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.openChainsQuickPick: {
-                this._sake.showProviderSelectionQuickPick();
+                sakeProviderManager.showProviderSelectionQuickPick();
                 break;
             }
 
             case WebviewMessageId.openAddAbiQuickPick: {
-                this._sake.showAddAbiQuickPick(message.payload.contractFqn);
+                sakeProviderManager.showAddAbiQuickPick(message.payload.contractFqn);
                 break;
             }
 
             case WebviewMessageId.removeProxy: {
-                this._sake.removeProxy(message.payload.contractFqn, message.payload.proxyAddress);
+                sakeProviderManager.removeProxy(
+                    message.payload.contractFqn,
+                    message.payload.proxyAddress
+                );
                 break;
             }
 
@@ -316,7 +316,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 let success = true;
 
                 try {
-                    await this._sake.provider?.connect();
+                    await sakeProviderManager.provider?.connect();
                 } catch (error) {
                     success = false;
                     showErrorMessage(error as string);
@@ -345,7 +345,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.createNewLocalChain: {
-                const success = await this._sake.createNewLocalChain(
+                const success = await sakeProviderManager.createNewLocalChain(
                     message.payload.displayName,
                     message.payload.networkCreationConfig
                 );
@@ -361,7 +361,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.connectToLocalChain: {
-                const success = await this._sake.connectToLocalChain(
+                const success = await sakeProviderManager.connectToLocalChain(
                     message.payload.displayName,
                     message.payload.uri
                 );
@@ -378,7 +378,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.requestAddDeployedContract: {
-                this._sake.requestAddDeployedContract();
+                sakeProviderManager.requestAddDeployedContract();
                 break;
             }
 

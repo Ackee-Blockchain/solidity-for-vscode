@@ -40,7 +40,9 @@ import {
 import SakeState from './SakeState';
 import { SakeError } from '../webview/shared/errors';
 import { NetworkProvider } from '../network/NetworkProvider';
-import { ChainHook, ChainState, useChainState } from './ChainHook';
+import { ChainHook, chainRegistry, ChainState } from './ChainRegistry';
+import { providerRegistry } from './ProviderRegistry';
+import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 
 // TODO consider renaming to BaseSakeProvider
 export abstract class BaseSakeProvider<T extends NetworkProvider> {
@@ -52,7 +54,14 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         public network: T,
         protected initializationRequest: SakeProviderInitializationRequest
     ) {
-        this._hook = useChainState(this.id, displayName, network.type);
+        // check if chain already exists
+        if (chainRegistry.contains(this.id)) {
+            throw new Error('Provider with id ' + this.id + ' already exists');
+        }
+
+        chainRegistry.add(this.id, displayName, network.type);
+        providerRegistry.add(this.id, this as any as LocalNodeSakeProvider); // @todo currently a hotfix to ignore type error
+        this._hook = chainRegistry.getHook(this.id)!;
         this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
         this.setAccountLabel = showVSCodeMessageOnErrorWrapper(this.setAccountLabel.bind(this));
         this.refreshAccount = showVSCodeMessageOnErrorWrapper(this.refreshAccount.bind(this));
@@ -273,6 +282,11 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         this.network.onDeactivate();
     }
 
+    async onDeleteProvider(): Promise<void> {
+        chainRegistry.delete(this.id);
+        providerRegistry.delete(this.id);
+    }
+
     /* State Handling */
 
     async dumpState() {
@@ -294,8 +308,6 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
     abstract _getQuickPickItem(): SakeProviderQuickPickItem;
 
     abstract _getStatusBarItemText(): string;
-
-    abstract onDeleteProvider(): Promise<void>;
 }
 
 // TODO add context if needed

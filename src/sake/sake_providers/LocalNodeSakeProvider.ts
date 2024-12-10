@@ -2,7 +2,7 @@ import { SetAccountLabelRequest } from '../webview/shared/types';
 import * as vscode from 'vscode';
 import { BaseSakeProvider } from './SakeProvider';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
-import SakeProviderManager from './SakeProviderManager';
+import SakeProviderManager, { sakeProviderManager } from './SakeProviderManager';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
 import {
     SakeLocalNodeProviderInitializationRequest,
@@ -53,13 +53,13 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
     }
 
     async onDeleteProvider(): Promise<void> {
+        await super.onDeleteProvider();
         if (this.connected) {
             await this.network.deleteChain();
         }
     }
 
     _getQuickPickItem(): SakeProviderQuickPickItem {
-        const sake = SakeProviderManager.getInstance();
         const buttons = [
             {
                 iconPath: new vscode.ThemeIcon('trash'),
@@ -83,7 +83,7 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
             buttons,
             itemButtonClick: (button: vscode.QuickInputButton) => {
                 if (button.tooltip === 'Delete') {
-                    sake.removeProvider(this);
+                    sakeProviderManager.removeProvider(this);
                 }
             }
         };

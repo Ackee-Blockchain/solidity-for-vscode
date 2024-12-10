@@ -1,4 +1,4 @@
-import { chainRegistry } from '../sake_providers/ChainHook';
+import { chainRegistry } from '../sake_providers/ChainRegistry';
 import { StateId, ChainState, AppState, ChainInfo, NetworkId } from '../webview/shared/types';
 import BaseStateProvider from './BaseStateProvider';
 
@@ -14,7 +14,7 @@ export default class ChainStateProvider extends BaseStateProvider<ChainState> {
         chainRegistry.subscribe(() => {
             this.state = {
                 ...this._state,
-                chains: chainRegistry.getAllStates().map((state) => ({
+                chains: chainRegistry.getAll().map((state) => ({
                     chainId: state.id,
                     chainName: state.name,
                     network: state.network,

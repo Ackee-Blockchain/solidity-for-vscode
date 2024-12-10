@@ -11,10 +11,9 @@ import {
 import { LanguageClient, State } from 'vscode-languageclient/node';
 import { SakeOutputItem } from './providers/OutputTreeProvider';
 import { copyToClipboardHandler } from '../commands';
-import SakeProviderManager from './sake_providers/SakeProviderManager';
-import AppStateProvider from './state/AppStateProvider';
+import SakeProviderManager, { sakeProviderManager } from './sake_providers/SakeProviderManager';
+import AppStateProvider, { appState } from './state/AppStateProvider';
 import { SakeContext } from './context';
-import { SakeProviderFactory } from './sake_providers/SakeProviderFactory';
 import { StorageHandler } from './storage/StorageHandler';
 import { WakeChainDump } from './webview/shared/storage_types';
 export async function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
@@ -24,11 +23,11 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     sakeContext.client = client;
 
     /* Initialize Chain State */
-    const appState = AppStateProvider.getInstance();
-    appState.setInitializationState('initializing');
+    appState.setLazy({
+        initializationState: 'initializing'
+    });
 
     /* Initialize Sake Provider */
-    const sake = SakeProviderManager.getInstance();
 
     /* Register Webview */
     const sidebarSakeProvider = new SakeWebviewProvider(context.extensionUri);
@@ -44,14 +43,20 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     const workspaceWatcher = () => {
         const workspaces = vscode.workspace.workspaceFolders;
         if (workspaces === undefined || workspaces.length === 0) {
-            appState.setIsOpenWorkspace('closed');
+            appState.setLazy({
+                isOpenWorkspace: 'closed'
+            });
             return;
         } else if (workspaces.length > 1) {
-            appState.setIsOpenWorkspace('tooManyWorkspaces');
+            appState.setLazy({
+                isOpenWorkspace: 'tooManyWorkspaces'
+            });
             return;
         }
 
-        appState.setIsOpenWorkspace('open');
+        appState.setLazy({
+            isOpenWorkspace: 'open'
+        });
     };
 
     // check if workspace is open
@@ -69,15 +74,19 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     /* Register Commands */
 
-    registerCommands(context, sake);
+    registerCommands(context);
 
     /* Load Chains */
 
-    appState.setInitializationState('loadingChains');
+    appState.setLazy({
+        initializationState: 'loadingChains'
+    });
 
-    await loadChains(sake);
+    await loadChains();
 
-    appState.setInitializationState('ready');
+    appState.setLazy({
+        initializationState: 'ready'
+    });
 }
 
 export function deactivateSake() {
@@ -85,7 +94,7 @@ export function deactivateSake() {
     // TODO save state
 }
 
-async function loadChains(sake: SakeProviderManager) {
+async function loadChains() {
     // Check if there is was any state saved
     if (await StorageHandler.hasAnySavedState()) {
         await StorageHandler.loadExtensionState(false).catch((e) => {
@@ -96,16 +105,11 @@ async function loadChains(sake: SakeProviderManager) {
         });
     } else {
         // Start with a default local chain
-        const localProvider = await SakeProviderFactory.createNewLocalProvider('Local Chain');
-
-        if (localProvider) {
-            sake.addProvider(localProvider, false);
-            sake.setProvider(localProvider.id);
-        }
+        await sakeProviderManager.createNewLocalChain('Local Chain');
     }
 }
 
-function registerCommands(context: vscode.ExtensionContext, sake: SakeProviderManager) {
+function registerCommands(context: vscode.ExtensionContext) {
     // register commands
     context.subscriptions.push(
         vscode.commands.registerCommand(
@@ -141,14 +145,14 @@ function registerCommands(context: vscode.ExtensionContext, sake: SakeProviderMa
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.compile', () =>
-            sake.provider?.compile()
+            sakeProviderManager.provider?.compile()
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.deploy',
-            (request: DeploymentRequest) => sake.provider?.deployContract(request)
+            (request: DeploymentRequest) => sakeProviderManager.provider?.deployContract(request)
         )
     );
 
@@ -160,20 +164,21 @@ function registerCommands(context: vscode.ExtensionContext, sake: SakeProviderMa
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.call', (request: CallRequest) =>
-            sake.provider?.callContract(request)
+            sakeProviderManager.provider?.callContract(request)
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.show_history', () =>
-            sake.state?.history.show()
+            sakeProviderManager.state?.history.show()
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.setBalances',
-            (request: SetAccountBalanceRequest) => sake.provider?.setAccountBalance(request)
+            (request: SetAccountBalanceRequest) =>
+                sakeProviderManager.provider?.setAccountBalance(request)
         )
     );
 
@@ -189,14 +194,15 @@ function registerCommands(context: vscode.ExtensionContext, sake: SakeProviderMa
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.setLabel',
-            (request: SetAccountLabelRequest) => sake.provider?.setAccountLabel(request)
+            (request: SetAccountLabelRequest) =>
+                sakeProviderManager.provider?.setAccountLabel(request)
         )
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'Tools-for-Solidity.sake.getBytecode',
-            (request: GetBytecodeRequest) => sake.provider?.getBytecode(request)
+            (request: GetBytecodeRequest) => sakeProviderManager.provider?.getBytecode(request)
         )
     );
 
@@ -209,7 +215,7 @@ function registerCommands(context: vscode.ExtensionContext, sake: SakeProviderMa
 
     vscode.workspace.onDidChangeTextDocument((e) => {
         if (e.document.languageId == 'solidity' && !e.document.isDirty) {
-            sake.state?.compilation.makeDirty();
+            sakeProviderManager.state?.compilation.makeDirty();
         }
         // TODO might need to rework using vscode.workspace.createFileSystemWatcher
     });

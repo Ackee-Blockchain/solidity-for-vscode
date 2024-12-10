@@ -15,89 +15,85 @@ import {
 } from '../webview/shared/storage_types';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 import { v4 as uuidv4 } from 'uuid';
+import * as vscode from 'vscode';
 
-export class SakeProviderFactory {
-    private static async _newLocalProvider(
-        providerId: string,
-        displayName: string,
-        networkConfig: NetworkConfiguration,
-        initializationRequest: SakeLocalNodeProviderInitializationRequest
-    ): Promise<LocalNodeSakeProvider> {
-        const networkProvider = new LocalNodeNetworkProvider(networkConfig);
+async function _newLocalProvider(
+    providerId: string,
+    displayName: string,
+    networkConfig: NetworkConfiguration,
+    initializationRequest: SakeLocalNodeProviderInitializationRequest
+): Promise<LocalNodeSakeProvider> {
+    const networkProvider = new LocalNodeNetworkProvider(networkConfig);
 
-        const provider = new LocalNodeSakeProvider(
-            providerId,
-            displayName,
-            networkProvider,
-            initializationRequest
+    // @dev do not catch errors here, so it can be handled by the caller
+    const provider = new LocalNodeSakeProvider(
+        providerId,
+        displayName,
+        networkProvider,
+        initializationRequest
+    );
+
+    // @dev allow failing connection, so it can reconnect later
+    try {
+        await provider.connect();
+    } catch (e) {
+        vscode.window.showErrorMessage(
+            `Failed to connect to provider: ${e instanceof Error ? e.message : String(e)}`
         );
-
-        await provider.connect().catch((error) => {
-            showErrorMessage(
-                `Failed to initialize chain: ${
-                    error instanceof Error ? error.message : String(error)
-                }`
-            );
-        });
-
-        return provider;
     }
 
-    static async createNewLocalProvider(
-        displayName: string,
-        networkCreationConfig?: NetworkCreationConfiguration
-    ): Promise<LocalNodeSakeProvider> {
-        const providerId = 'local-chain-' + this.getNewProviderId();
-        const networkConfig: NetworkConfiguration = {
-            ...networkCreationConfig,
-            sessionId: providerId
-        };
+    return provider;
+}
 
-        const provider = await this._newLocalProvider(providerId, displayName, networkConfig, {
-            type: SakeProviderInitializationRequestType.CreateNewChain,
-            accounts: networkCreationConfig?.accounts
-        });
+export async function createNewLocalProvider(
+    displayName: string,
+    networkCreationConfig?: NetworkCreationConfiguration
+): Promise<LocalNodeSakeProvider> {
+    const providerId = 'local-chain-' + getNewProviderId();
+    const networkConfig: NetworkConfiguration = {
+        ...networkCreationConfig,
+        sessionId: providerId
+    };
 
-        return provider;
+    const provider = await _newLocalProvider(providerId, displayName, networkConfig, {
+        type: SakeProviderInitializationRequestType.CreateNewChain,
+        accounts: networkCreationConfig?.accounts
+    });
+
+    return provider;
+}
+
+export async function connectToLocalChain(
+    displayName: string,
+    uri: string
+): Promise<LocalNodeSakeProvider> {
+    const providerId = 'local-chain-' + getNewProviderId();
+    const networkConfig: NetworkConfiguration = {
+        uri,
+        sessionId: providerId
+    };
+
+    const provider = await _newLocalProvider(providerId, displayName, networkConfig, {
+        type: SakeProviderInitializationRequestType.ConnectToChain
+    });
+
+    return provider;
+}
+
+// TODO: generalize to support other network providers
+export async function createFromState(state: ProviderState): Promise<LocalNodeSakeProvider> {
+    switch (state.network.type) {
+        case NetworkId.LocalNode:
+            return await _newLocalProvider(state.id, state.displayName, state.network.config, {
+                type: SakeProviderInitializationRequestType.LoadFromState,
+                state: state
+            });
+
+        default:
+            throw new SakeError(`Unsupported network type: ${state.network.type}`);
     }
+}
 
-    static async connectToLocalChain(
-        displayName: string,
-        uri: string
-    ): Promise<LocalNodeSakeProvider> {
-        const providerId = 'local-chain-' + this.getNewProviderId();
-        const networkConfig: NetworkConfiguration = {
-            uri,
-            sessionId: providerId
-        };
-
-        const provider = await this._newLocalProvider(providerId, displayName, networkConfig, {
-            type: SakeProviderInitializationRequestType.ConnectToChain
-        });
-
-        return provider;
-    }
-
-    // TODO: generalize to support other network providers
-    static async createFromState(state: ProviderState): Promise<LocalNodeSakeProvider> {
-        switch (state.network.type) {
-            case NetworkId.LocalNode:
-                return await this._newLocalProvider(
-                    state.id,
-                    state.displayName,
-                    state.network.config,
-                    {
-                        type: SakeProviderInitializationRequestType.LoadFromState,
-                        state: state
-                    }
-                );
-
-            default:
-                throw new SakeError(`Unsupported network type: ${state.network.type}`);
-        }
-    }
-
-    static getNewProviderId(): string {
-        return uuidv4();
-    }
+function getNewProviderId(): string {
+    return uuidv4();
 }
