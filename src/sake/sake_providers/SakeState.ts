@@ -19,7 +19,6 @@ export default class SakeState {
     compilation: CompilationStateProvider;
     history: TransactionHistoryStateProvider;
     chains: ChainStateProvider;
-    app: AppStateProvider;
     subscribed: boolean;
 
     private get _webviewProvider(): BaseWebviewProvider {
@@ -39,7 +38,6 @@ export default class SakeState {
         // shared state
         this.compilation = CompilationStateProvider.getInstance();
         this.chains = ChainStateProvider.getInstance();
-        this.app = AppStateProvider.getInstance();
 
         this.subscribed = false;
     }

@@ -34,10 +34,10 @@ import {
     WakeGetAbiWithProxyRequestParams
 } from '../webview/shared/types';
 import { validate } from '../utils/validate';
-import AppStateProvider from '../state/AppStateProvider';
+import AppStateProvider, { appState } from '../state/AppStateProvider';
 import { SakeContext } from '../context';
 import ChainStateProvider from '../state/ChainStateProvider';
-import { chainRegistry } from '../sake_providers/ChainHook';
+import { chainRegistry } from '../sake_providers/ChainRegistry';
 
 export class WakeError extends Error {}
 export class WakeApiError extends WakeError {}
@@ -54,15 +54,21 @@ async function sendWakeRequest<T>(
     }
     try {
         const response = await client.sendRequest<T>(method, params);
-        AppStateProvider.getInstance().setIsAnvilInstalled(true);
+        appState.setLazy({
+            isAnvilInstalled: true
+        });
         return validateResponse ? validate(response) : response;
     } catch (e) {
         const message = typeof e === 'string' ? e : (e as Error).message;
         if (message == 'Anvil executable not found') {
-            AppStateProvider.getInstance().setIsAnvilInstalled(false);
+            appState.setLazy({
+                isAnvilInstalled: false
+            });
         }
         if (message == 'Client is not running') {
-            AppStateProvider.getInstance().setIsWakeServerRunning(false);
+            appState.setLazy({
+                isWakeServerRunning: false
+            });
         }
         if (message == 'Chain instance not connected') {
             chainRegistry.getHook(params.sessionId)?.setLazy({

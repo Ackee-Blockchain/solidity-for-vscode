@@ -102,6 +102,7 @@ export interface ChainState {
 export interface ChainInfo {
     chainId: string;
     chainName: string;
+    network: string;
     connected: boolean;
 }
 

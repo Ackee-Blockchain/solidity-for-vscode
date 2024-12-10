@@ -1,5 +1,5 @@
 import { SakeContext } from '../context';
-import SakeProviderManager from '../sake_providers/SakeProviderManager';
+import SakeProviderManager, { sakeProviderManager } from '../sake_providers/SakeProviderManager';
 import * as vscode from 'vscode';
 
 export class StorageHandler {
@@ -33,20 +33,18 @@ export class StorageHandler {
             return;
         }
 
-        await SakeProviderManager.getInstance().loadState(state, notifyUser);
+        await sakeProviderManager.loadState(state, notifyUser);
     }
 
     static async saveExtensionState(notifyUser: boolean = true) {
-        const state = await SakeProviderManager.getInstance()
-            .dumpState()
-            .catch((e) => {
-                if (notifyUser) {
-                    vscode.window.showErrorMessage(
-                        `Failed to dump state: ${e instanceof Error ? e.message : String(e)}`
-                    );
-                }
-                return undefined;
-            });
+        const state = await sakeProviderManager.dumpState().catch((e) => {
+            if (notifyUser) {
+                vscode.window.showErrorMessage(
+                    `Failed to dump state: ${e instanceof Error ? e.message : String(e)}`
+                );
+            }
+            return undefined;
+        });
 
         if (state == undefined) {
             return;
