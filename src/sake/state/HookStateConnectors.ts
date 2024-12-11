@@ -1,8 +1,9 @@
-import { State } from "vscode-languageclient";
-import { SakeContext } from "../context";
-import BaseStateProvider from "./BaseStateProvider";
-import { AppState, ChainState, StateId } from "../webview/shared/types";
-import { additionalSakeState, chainRegistry } from "./ChainRegistry";
+import { State } from 'vscode-languageclient';
+import { SakeContext } from '../context';
+import BaseStateProvider from './BaseStateProvider';
+import { AppState, ChainState, StateId } from '../webview/shared/types';
+import { additionalSakeState, chainRegistry } from './ChainRegistry';
+import appState from './AppStateProvider';
 
 /*
  * Only helper classes to provide chain state from hooks to webviews.
@@ -33,7 +34,7 @@ export class ChainStateProvider extends BaseStateProvider<ChainState> {
                 }))
             };
         });
-        
+
         additionalSakeState.subscribe((state) => {
             this.state = {
                 ...this._state,
@@ -61,7 +62,9 @@ export class AppStateProvider extends BaseStateProvider<AppState> {
             initializationState: undefined
         });
 
-        
+        appState.subscribe((state) => {
+            this.state = state;
+        });
     }
 
     public static getInstance(): AppStateProvider {
