@@ -17,7 +17,11 @@ import * as WakeApi from '../api/wake';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import { SakeContext } from '../context';
 import * as SakeProviderFactory from './SakeProviderFactory';
-import { ProviderState, StoredSakeState } from '../webview/shared/storage_types';
+import {
+    ProviderState,
+    SakeProviderInitializationRequestType,
+    StoredSakeState
+} from '../webview/shared/storage_types';
 import SakeState from './SakeState';
 import { NetworkProvider } from '../network/NetworkProvider';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
@@ -502,33 +506,62 @@ export const sakeProviderManager = {
     async loadState(state: StoredSakeState, silent: boolean = false) {
         SakeState.loadSharedState(state.sharedState);
         for (const providerState of state.providerStates) {
-            try {
-                await SakeProviderFactory.createFromState(providerState);
-            } catch (error) {
-                console.error(`Failed to create provider "${providerState.id}": ${error}`);
-                if (!silent) {
-                    vscode.window.showErrorMessage(
-                        `Failed to load chain "${providerState.displayName}": ${
-                            error instanceof Error ? error.message : String(error)
-                        }`
-                    );
-                }
-            }
+            this.createProviderFromState(providerState);
         }
     },
 
-    async reloadState(): Promise<boolean> {
+    async createProviderFromState(providerState: ProviderState, silent: boolean = false) {
         try {
-            await this.resetChains();
-            await StorageHandler.loadExtensionState();
+            await SakeProviderFactory.createFromState(providerState);
         } catch (error) {
-            console.error('Failed to reload state:', error);
-            showErrorMessage(
-                `Failed to reload state: ${error instanceof Error ? error.message : String(error)}`
+            console.error(`Failed to create provider "${providerState.id}": ${error}`);
+
+            vscode.window.showErrorMessage(
+                `Failed to load chain "${providerState.displayName}": ${
+                    error instanceof Error ? error.message : String(error)
+                }`
             );
-            return false;
         }
-        return true;
+    },
+
+    async reloadState(): Promise<void> {
+        // try {
+        //     await this.resetChains();
+        //     await StorageHandler.loadExtensionState();
+        // } catch (error) {
+        //     console.error('Failed to reload state:', error);
+        //     showErrorMessage(
+        //         `Failed to reload state: ${error instanceof Error ? error.message : String(error)}`
+        //     );
+        //     return false;
+        // }
+        // return true;
+
+        const storedState = await StorageHandler.getExtensionState();
+        const getStoredState = (providerId: string) => {
+            return storedState?.providerStates.find((state) => state.id === providerId);
+        };
+
+        this.providers.forEach((provider) => {
+            if (
+                // only try to reconnect to existing chains
+                provider.initializationRequest.type ==
+                SakeProviderInitializationRequestType.ConnectToChain
+            ) {
+                provider.connect();
+            } else {
+                // otherwise state was created via wake and has to be recreated
+                this.removeProvider(provider);
+                const providerState = getStoredState(provider.id);
+                if (providerState == undefined) {
+                    vscode.window.showErrorMessage(
+                        `Failed to reload chain "${provider.displayName}": No state found`
+                    );
+                    return;
+                }
+                this.createProviderFromState(providerState, true);
+            }
+        });
     },
 
     async resetChains() {
