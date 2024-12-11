@@ -60,7 +60,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
             throw new Error('Provider with id ' + this.id + ' already exists');
         }
 
-        this._hook = chainRegistry.add(this.id, displayName, network.type);
+        this._hook = chainRegistry.add(this.id, displayName, network.getInfo());
         providerRegistry.add(this.id, this as any as LocalNodeSakeProvider); // @todo currently a hotfix to ignore type error
         this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
         this.setAccountLabel = showVSCodeMessageOnErrorWrapper(this.setAccountLabel.bind(this));

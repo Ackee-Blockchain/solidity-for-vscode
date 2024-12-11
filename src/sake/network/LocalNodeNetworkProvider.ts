@@ -7,7 +7,6 @@ import {
     DeploymentRequest,
     DeploymentResponse,
     NetworkConfiguration,
-    NetworkId,
     SetAccountBalanceRequest,
     SetAccountBalanceResponse,
     SetAccountLabelRequest
@@ -18,7 +17,9 @@ import {
     Address,
     ContractAbi,
     DeployedContract,
-    DeployedContractType
+    DeployedContractType,
+    NetworkInfo,
+    NetworkType
 } from '../webview/shared/types';
 import {
     WakeCallRequestParams,
@@ -33,7 +34,7 @@ import { NetworkProvider } from './NetworkProvider';
 
 export class LocalNodeNetworkProvider extends NetworkProvider {
     constructor(public config: NetworkConfiguration) {
-        super(NetworkId.LocalNode, config.sessionId);
+        super(NetworkType.Local, config.sessionId);
     }
 
     /*
@@ -256,6 +257,15 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
                       }
                   ]
                 : undefined
+        };
+    }
+
+    getInfo(): NetworkInfo {
+        return {
+            type: NetworkType.Local,
+            uri: this.config.uri,
+            chainId: this.config.chainId,
+            fork: this.config.fork
         };
     }
 }

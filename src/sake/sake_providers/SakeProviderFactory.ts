@@ -5,9 +5,9 @@ import AppStateProvider from '../state/AppStateProvider';
 import { SakeError } from '../webview/shared/errors';
 import {
     NetworkConfiguration,
-    NetworkCreationConfiguration,
-    NetworkId
+    NetworkCreationConfiguration
 } from '../webview/shared/network_types';
+import { NetworkType } from '../webview/shared/state_types';
 import {
     ProviderState,
     SakeLocalNodeProviderInitializationRequest,
@@ -83,7 +83,7 @@ export async function connectToLocalChain(
 // TODO: generalize to support other network providers
 export async function createFromState(state: ProviderState): Promise<LocalNodeSakeProvider> {
     switch (state.network.type) {
-        case NetworkId.LocalNode:
+        case NetworkType.Local:
             return await _newLocalProvider(state.id, state.displayName, state.network.config, {
                 type: SakeProviderInitializationRequestType.LoadFromState,
                 state: state
