@@ -118,6 +118,9 @@ export const sakeProviderManager = {
             currentChainId: id
         });
         this.provider?.onActivateProvider();
+
+        // force update provider
+        this.state?.sendToWebview();
     },
 
     removeProxy(contractFqn: string, proxyAddress?: Address) {
