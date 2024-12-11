@@ -53,7 +53,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         public id: string,
         public displayName: string,
         public network: T,
-        protected initializationRequest: SakeProviderInitializationRequest
+        public initializationRequest: SakeProviderInitializationRequest
     ) {
         // check if chain already exists
         if (chainRegistry.contains(this.id)) {
