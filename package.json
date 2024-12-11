@@ -1,7 +1,7 @@
 {
     "name": "tools-for-solidity",
     "displayName": "Solidity (Wake)",
-    "version": "1.16.7",
+    "version": "1.17",
     "publisher": "AckeeBlockchain",
     "description": "Code fast and secure Solidity smart contracts on Ethereum with a Remix-like experience",
     "keywords": [
