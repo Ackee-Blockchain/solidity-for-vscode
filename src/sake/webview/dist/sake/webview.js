@@ -38295,7 +38295,7 @@ function create_if_block_6$1(ctx) {
 	return block;
 }
 
-// (78:70) 
+// (79:70) 
 function create_if_block_5$1(ctx) {
 	let div;
 	let defaultbutton;
@@ -38336,9 +38336,9 @@ function create_if_block_5$1(ctx) {
 			t4 = space();
 			create_component(advancedlocalchainsetup.$$.fragment);
 			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 84, 16, 3769);
+			add_location(span, file$1, 85, 16, 3770);
 			attr_dev(div, "class", "flex gap-1 items-center text-sm h-[26px] justify-between");
-			add_location(div, file$1, 78, 12, 3511);
+			add_location(div, file$1, 79, 12, 3512);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -38392,7 +38392,7 @@ function create_if_block_5$1(ctx) {
 		block,
 		id: create_if_block_5$1.name,
 		type: "if",
-		source: "(78:70) ",
+		source: "(79:70) ",
 		ctx
 	});
 
@@ -38402,33 +38402,14 @@ function create_if_block_5$1(ctx) {
 // (40:8) {#if $chainNavigator.state === 'default'}
 function create_if_block$1(ctx) {
 	let div;
-	let current_block_type_index;
-	let if_block0;
+	let defaultbutton;
 	let t0;
 	let t1;
-	let defaultbutton;
+	let current_block_type_index;
+	let if_block1;
 	let t2;
 	let if_block2_anchor;
 	let current;
-	const if_block_creators = [create_if_block_4$1, create_else_block_1$1];
-	const if_blocks = [];
-
-	function select_block_type_1(ctx, dirty) {
-		if (!/*$currentChain*/ ctx[1]?.connected) return 0;
-		return 1;
-	}
-
-	current_block_type_index = select_block_type_1(ctx);
-	if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-
-	function select_block_type_2(ctx, dirty) {
-		if (!/*$currentChain*/ ctx[1]) return create_if_block_2$1;
-		if (/*$currentChain*/ ctx[1].connected) return create_if_block_3$1;
-		return create_else_block$1;
-	}
-
-	let current_block_type = select_block_type_2(ctx);
-	let if_block1 = current_block_type(ctx);
 
 	defaultbutton = new DefaultButton({
 			props: {
@@ -38439,16 +38420,34 @@ function create_if_block$1(ctx) {
 			$$inline: true
 		});
 
+	function select_block_type_1(ctx, dirty) {
+		if (!/*$currentChain*/ ctx[1]) return create_if_block_3$1;
+		if (/*$currentChain*/ ctx[1].connected) return create_if_block_4$1;
+		return create_else_block_1$1;
+	}
+
+	let current_block_type = select_block_type_1(ctx);
+	let if_block0 = current_block_type(ctx);
+	const if_block_creators = [create_if_block_2$1, create_else_block$1];
+	const if_blocks = [];
+
+	function select_block_type_2(ctx, dirty) {
+		if (!/*$currentChain*/ ctx[1]?.connected) return 0;
+		return 1;
+	}
+
+	current_block_type_index = select_block_type_2(ctx);
+	if_block1 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 	let if_block2 = /*$chainNavigator*/ ctx[0].expanded && create_if_block_1$1(ctx);
 
 	const block = {
 		c: function create() {
 			div = element("div");
-			if_block0.c();
-			t0 = space();
-			if_block1.c();
-			t1 = space();
 			create_component(defaultbutton.$$.fragment);
+			t0 = space();
+			if_block0.c();
+			t1 = space();
+			if_block1.c();
 			t2 = space();
 			if (if_block2) if_block2.c();
 			if_block2_anchor = empty();
@@ -38457,19 +38456,39 @@ function create_if_block$1(ctx) {
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
-			if_blocks[current_block_type_index].m(div, null);
-			append_dev(div, t0);
-			if_block1.m(div, null);
-			append_dev(div, t1);
 			mount_component(defaultbutton, div, null);
+			append_dev(div, t0);
+			if_block0.m(div, null);
+			append_dev(div, t1);
+			if_blocks[current_block_type_index].m(div, null);
 			insert_dev(target, t2, anchor);
 			if (if_block2) if_block2.m(target, anchor);
 			insert_dev(target, if_block2_anchor, anchor);
 			current = true;
 		},
 		p: function update(ctx, dirty) {
+			const defaultbutton_changes = {};
+
+			if (dirty & /*$$scope*/ 4) {
+				defaultbutton_changes.$$scope = { dirty, ctx };
+			}
+
+			defaultbutton.$set(defaultbutton_changes);
+
+			if (current_block_type === (current_block_type = select_block_type_1(ctx)) && if_block0) {
+				if_block0.p(ctx, dirty);
+			} else {
+				if_block0.d(1);
+				if_block0 = current_block_type(ctx);
+
+				if (if_block0) {
+					if_block0.c();
+					if_block0.m(div, t1);
+				}
+			}
+
 			let previous_block_index = current_block_type_index;
-			current_block_type_index = select_block_type_1(ctx);
+			current_block_type_index = select_block_type_2(ctx);
 
 			if (current_block_type_index !== previous_block_index) {
 				group_outros();
@@ -38479,36 +38498,16 @@ function create_if_block$1(ctx) {
 				});
 
 				check_outros();
-				if_block0 = if_blocks[current_block_type_index];
+				if_block1 = if_blocks[current_block_type_index];
 
-				if (!if_block0) {
-					if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-					if_block0.c();
-				}
-
-				transition_in(if_block0, 1);
-				if_block0.m(div, t0);
-			}
-
-			if (current_block_type === (current_block_type = select_block_type_2(ctx)) && if_block1) {
-				if_block1.p(ctx, dirty);
-			} else {
-				if_block1.d(1);
-				if_block1 = current_block_type(ctx);
-
-				if (if_block1) {
+				if (!if_block1) {
+					if_block1 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 					if_block1.c();
-					if_block1.m(div, t1);
 				}
+
+				transition_in(if_block1, 1);
+				if_block1.m(div, null);
 			}
-
-			const defaultbutton_changes = {};
-
-			if (dirty & /*$$scope*/ 4) {
-				defaultbutton_changes.$$scope = { dirty, ctx };
-			}
-
-			defaultbutton.$set(defaultbutton_changes);
 
 			if (/*$chainNavigator*/ ctx[0].expanded) {
 				if (if_block2) ; else {
@@ -38523,20 +38522,20 @@ function create_if_block$1(ctx) {
 		},
 		i: function intro(local) {
 			if (current) return;
-			transition_in(if_block0);
 			transition_in(defaultbutton.$$.fragment, local);
+			transition_in(if_block1);
 			current = true;
 		},
 		o: function outro(local) {
-			transition_out(if_block0);
 			transition_out(defaultbutton.$$.fragment, local);
+			transition_out(if_block1);
 			current = false;
 		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(div);
-			if_blocks[current_block_type_index].d();
-			if_block1.d();
 			destroy_component(defaultbutton);
+			if_block0.d();
+			if_blocks[current_block_type_index].d();
 			if (detaching) detach_dev(t2);
 			if (if_block2) if_block2.d(detaching);
 			if (detaching) detach_dev(if_block2_anchor);
@@ -38554,7 +38553,7 @@ function create_if_block$1(ctx) {
 	return block;
 }
 
-// (80:16) <DefaultButton callback={chainNavigator.clear}>
+// (81:16) <DefaultButton callback={chainNavigator.clear}>
 function create_default_slot_2(ctx) {
 	let closeicon;
 	let current;
@@ -38586,201 +38585,14 @@ function create_default_slot_2(ctx) {
 		block,
 		id: create_default_slot_2.name,
 		type: "slot",
-		source: "(80:16) <DefaultButton callback={chainNavigator.clear}>",
+		source: "(81:16) <DefaultButton callback={chainNavigator.clear}>",
 		ctx
 	});
 
 	return block;
 }
 
-// (44:16) {:else}
-function create_else_block_1$1(ctx) {
-	let blankicon;
-	let current;
-	blankicon = new BlankIcon({ $$inline: true });
-
-	const block = {
-		c: function create() {
-			create_component(blankicon.$$.fragment);
-		},
-		m: function mount(target, anchor) {
-			mount_component(blankicon, target, anchor);
-			current = true;
-		},
-		i: function intro(local) {
-			if (current) return;
-			transition_in(blankicon.$$.fragment, local);
-			current = true;
-		},
-		o: function outro(local) {
-			transition_out(blankicon.$$.fragment, local);
-			current = false;
-		},
-		d: function destroy(detaching) {
-			destroy_component(blankicon, detaching);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_else_block_1$1.name,
-		type: "else",
-		source: "(44:16) {:else}",
-		ctx
-	});
-
-	return block;
-}
-
-// (42:16) {#if !$currentChain?.connected}
-function create_if_block_4$1(ctx) {
-	let warningicon;
-	let current;
-	warningicon = new WarningIcon({ $$inline: true });
-
-	const block = {
-		c: function create() {
-			create_component(warningicon.$$.fragment);
-		},
-		m: function mount(target, anchor) {
-			mount_component(warningicon, target, anchor);
-			current = true;
-		},
-		i: function intro(local) {
-			if (current) return;
-			transition_in(warningicon.$$.fragment, local);
-			current = true;
-		},
-		o: function outro(local) {
-			transition_out(warningicon.$$.fragment, local);
-			current = false;
-		},
-		d: function destroy(detaching) {
-			destroy_component(warningicon, detaching);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_4$1.name,
-		type: "if",
-		source: "(42:16) {#if !$currentChain?.connected}",
-		ctx
-	});
-
-	return block;
-}
-
-// (56:16) {:else}
-function create_else_block$1(ctx) {
-	let span;
-	let t0;
-	let t1_value = /*$currentChain*/ ctx[1]?.chainName + "";
-	let t1;
-
-	const block = {
-		c: function create() {
-			span = element("span");
-			t0 = text("Disconnected from ");
-			t1 = text(t1_value);
-			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 56, 20, 2270);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, span, anchor);
-			append_dev(span, t0);
-			append_dev(span, t1);
-		},
-		p: function update(ctx, dirty) {
-			if (dirty & /*$currentChain*/ 2 && t1_value !== (t1_value = /*$currentChain*/ ctx[1]?.chainName + "")) set_data_dev(t1, t1_value);
-		},
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(span);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_else_block$1.name,
-		type: "else",
-		source: "(56:16) {:else}",
-		ctx
-	});
-
-	return block;
-}
-
-// (54:50) 
-function create_if_block_3$1(ctx) {
-	let span;
-	let t0;
-	let t1_value = /*$currentChain*/ ctx[1]?.chainName + "";
-	let t1;
-
-	const block = {
-		c: function create() {
-			span = element("span");
-			t0 = text("Connected to ");
-			t1 = text(t1_value);
-			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 54, 20, 2156);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, span, anchor);
-			append_dev(span, t0);
-			append_dev(span, t1);
-		},
-		p: function update(ctx, dirty) {
-			if (dirty & /*$currentChain*/ 2 && t1_value !== (t1_value = /*$currentChain*/ ctx[1]?.chainName + "")) set_data_dev(t1, t1_value);
-		},
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(span);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_3$1.name,
-		type: "if",
-		source: "(54:50) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (52:16) {#if !$currentChain}
-function create_if_block_2$1(ctx) {
-	let span;
-
-	const block = {
-		c: function create() {
-			span = element("span");
-			span.textContent = "No chain selected";
-			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 52, 20, 2037);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, span, anchor);
-		},
-		p: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(span);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_2$1.name,
-		type: "if",
-		source: "(52:16) {#if !$currentChain}",
-		ctx
-	});
-
-	return block;
-}
-
-// (59:16) <DefaultButton callback={openChainsQuickPick}>
+// (42:16) <DefaultButton callback={openChainsQuickPick}>
 function create_default_slot_1(ctx) {
 	let multiplewindowsicon;
 	let current;
@@ -38812,14 +38624,201 @@ function create_default_slot_1(ctx) {
 		block,
 		id: create_default_slot_1.name,
 		type: "slot",
-		source: "(59:16) <DefaultButton callback={openChainsQuickPick}>",
+		source: "(42:16) <DefaultButton callback={openChainsQuickPick}>",
 		ctx
 	});
 
 	return block;
 }
 
-// (63:12) {#if $chainNavigator.expanded}
+// (54:16) {:else}
+function create_else_block_1$1(ctx) {
+	let span;
+	let t0;
+	let t1_value = /*$currentChain*/ ctx[1]?.chainName + "";
+	let t1;
+
+	const block = {
+		c: function create() {
+			span = element("span");
+			t0 = text("Disconnected from ");
+			t1 = text(t1_value);
+			attr_dev(span, "class", "truncate");
+			add_location(span, file$1, 54, 20, 2246);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, span, anchor);
+			append_dev(span, t0);
+			append_dev(span, t1);
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*$currentChain*/ 2 && t1_value !== (t1_value = /*$currentChain*/ ctx[1]?.chainName + "")) set_data_dev(t1, t1_value);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(span);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_else_block_1$1.name,
+		type: "else",
+		source: "(54:16) {:else}",
+		ctx
+	});
+
+	return block;
+}
+
+// (52:50) 
+function create_if_block_4$1(ctx) {
+	let span;
+	let t0;
+	let t1_value = /*$currentChain*/ ctx[1]?.chainName + "";
+	let t1;
+
+	const block = {
+		c: function create() {
+			span = element("span");
+			t0 = text("Connected to ");
+			t1 = text(t1_value);
+			attr_dev(span, "class", "truncate");
+			add_location(span, file$1, 52, 20, 2132);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, span, anchor);
+			append_dev(span, t0);
+			append_dev(span, t1);
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*$currentChain*/ 2 && t1_value !== (t1_value = /*$currentChain*/ ctx[1]?.chainName + "")) set_data_dev(t1, t1_value);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(span);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_4$1.name,
+		type: "if",
+		source: "(52:50) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (50:16) {#if !$currentChain}
+function create_if_block_3$1(ctx) {
+	let span;
+
+	const block = {
+		c: function create() {
+			span = element("span");
+			span.textContent = "No chain selected";
+			attr_dev(span, "class", "truncate");
+			add_location(span, file$1, 50, 20, 2013);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, span, anchor);
+		},
+		p: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(span);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_3$1.name,
+		type: "if",
+		source: "(50:16) {#if !$currentChain}",
+		ctx
+	});
+
+	return block;
+}
+
+// (60:16) {:else}
+function create_else_block$1(ctx) {
+	let blankicon;
+	let current;
+	blankicon = new BlankIcon({ $$inline: true });
+
+	const block = {
+		c: function create() {
+			create_component(blankicon.$$.fragment);
+		},
+		m: function mount(target, anchor) {
+			mount_component(blankicon, target, anchor);
+			current = true;
+		},
+		i: function intro(local) {
+			if (current) return;
+			transition_in(blankicon.$$.fragment, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transition_out(blankicon.$$.fragment, local);
+			current = false;
+		},
+		d: function destroy(detaching) {
+			destroy_component(blankicon, detaching);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_else_block$1.name,
+		type: "else",
+		source: "(60:16) {:else}",
+		ctx
+	});
+
+	return block;
+}
+
+// (58:16) {#if !$currentChain?.connected}
+function create_if_block_2$1(ctx) {
+	let warningicon;
+	let current;
+	warningicon = new WarningIcon({ $$inline: true });
+
+	const block = {
+		c: function create() {
+			create_component(warningicon.$$.fragment);
+		},
+		m: function mount(target, anchor) {
+			mount_component(warningicon, target, anchor);
+			current = true;
+		},
+		i: function intro(local) {
+			if (current) return;
+			transition_in(warningicon.$$.fragment, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transition_out(warningicon.$$.fragment, local);
+			current = false;
+		},
+		d: function destroy(detaching) {
+			destroy_component(warningicon, detaching);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_2$1.name,
+		type: "if",
+		source: "(58:16) {#if !$currentChain?.connected}",
+		ctx
+	});
+
+	return block;
+}
+
+// (64:12) {#if $chainNavigator.expanded}
 function create_if_block_1$1(ctx) {
 	const block = { c: noop, m: noop, d: noop };
 
@@ -38827,7 +38826,7 @@ function create_if_block_1$1(ctx) {
 		block,
 		id: create_if_block_1$1.name,
 		type: "if",
-		source: "(63:12) {#if $chainNavigator.expanded}",
+		source: "(64:12) {#if $chainNavigator.expanded}",
 		ctx
 	});
 

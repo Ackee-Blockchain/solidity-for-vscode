@@ -13,5 +13,4 @@ export const appState = new Hook<AppState>({
 
 const _client = SakeContext.getInstance().client;
 
-
 export default appState;

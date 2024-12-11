@@ -24,6 +24,7 @@ import CompilationStateProvider from '../state/CompilationStateProvider';
 import { ChainStateProvider, AppStateProvider } from '../state/HookStateConnectors';
 import { restartWakeClient } from '../../commands';
 import { SakeContext } from '../context';
+import { providerRegistry } from '../sake_providers/ProviderRegistry';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -264,11 +265,25 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
                 await restartWakeClient(client);
 
-                try {
-                    await sakeProviderManager.provider?.connect();
-                } catch (error) {
-                    showErrorMessage(error as string);
-                }
+                // reconnect the current provider
+                // try {
+                //     await sakeProviderManager.provider?.connect();
+                // } catch (error) {
+                //     showErrorMessage(error as string);
+                // }
+
+                // try to reconnect all providers
+                // providerRegistry.getAll().forEach((provider) => {
+                //     try {
+                //         provider.connect();
+                //     } catch (error) {
+                //         showErrorMessage(`Failed to reconnect provider ${provider.displayName}`);
+                //         console.error(
+                //             `Failed to reconnect provider ${provider.displayName}: ${error}`
+                //         );
+                //     }
+                // });
+                await sakeProviderManager.reloadState();
 
                 webviewView.webview.postMessage({
                     command: message.command,
