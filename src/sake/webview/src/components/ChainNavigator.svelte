@@ -14,6 +14,7 @@
     import { getCssVarWithOpacity } from '../helpers/helpers';
     import WarningIcon from './icons/WarningIcon.svelte';
     import ErrorIcon from './icons/ErrorIcon.svelte';
+    import { NetworkType } from '../../shared/state_types';
 </script>
 
 <!-- <ViewHeader>
@@ -40,30 +41,68 @@
     >
         {#if $chainNavigator.state === 'default'}
             <div class="flex gap-1 items-center text-sm h-[26px] justify-between">
-                <DefaultButton callback={openChainsQuickPick}>
-                    <MultipleWindowsIcon />
-                </DefaultButton>
                 <!-- <ExpandButton
                     callback={chainNavigator.toggleExpanded}
                     expanded={$chainNavigator.expanded}
                 /> -->
+                <DefaultButton callback={openChainsQuickPick}>
+                    <MultipleWindowsIcon />
+                </DefaultButton>
 
                 {#if !$currentChain}
                     <span class="truncate">No chain selected</span>
                 {:else if $currentChain.connected}
                     <span class="truncate">Connected to {$currentChain?.chainName}</span>
                 {:else}
-                    <span class="truncate">Disconnected from {$currentChain?.chainName}</span>
+                    <span class="truncate flex gap-1">
+                        <WarningIcon />
+                        <span>Disconnected from {$currentChain?.chainName}</span>
+                    </span>
                 {/if}
 
-                {#if !$currentChain?.connected}
-                    <WarningIcon />
-                {:else}
-                    <BlankIcon />
-                {/if}
+                <BlankIcon />
             </div>
-            {#if $chainNavigator.expanded}
-                <!-- <Divider className="" />
+            <!-- {#if $chainNavigator.expanded}
+                <div class="flex flex-col gap-1">
+                    {#if $currentChain?.network.type === NetworkType.Local}
+                        <Divider className="" />
+                        <div class="flex flex-col gap-1 p-2 font-sm p-2">
+                            {#if $currentChain?.network.chainId}
+                                <span class="flex gap-1 items-center">
+
+                                    <span class="font-bold">Chain ID</span>
+                                    <span class="">
+                                        {$currentChain?.network.chainId}
+                                    </span>
+                                </span>
+                            {/if}
+                            {#if $currentChain?.network.fork}
+                                <span class="flex gap-1 items-center">
+
+                                    <span class="font-bold">Fork</span>
+                                    <span class="">
+                                        {$currentChain?.network.fork}
+                                    </span>
+                                </span>
+                            {/if}
+                            {#if $currentChain?.network.uri}
+                                <span class="flex gap-1 items-center">
+
+                                    <span class="font-bold">URI</span>
+                                    <span class="">
+                                        {$currentChain?.network.uri}
+                                    </span>
+                                </span>
+                            {/if}
+
+                            <ClickableSpan callback={() => {}}>Create snapshot</ClickableSpan>
+                            <ClickableSpan callback={() => {}}>Rename</ClickableSpan>
+                            <ClickableSpan callback={() => {}}>Duplicate chain</ClickableSpan>
+                            <ClickableSpan callback={() => {}}>Delete chain</ClickableSpan>
+                        </div>
+                    {/if}  -->
+
+            <!-- <Divider className="" />
                 <div class="flex flex-col gap-1 p-2">
                     <ClickableSpan callback={() => {}}>Create snapshot</ClickableSpan>
                     <ClickableSpan callback={() => {}}>Rename</ClickableSpan>
@@ -76,7 +115,8 @@
                     <ClickableSpan callback={() => {}}>Manage chains</ClickableSpan>
                     <ClickableSpan callback={() => {}}>Manage accounts</ClickableSpan>
                 </div> -->
-            {/if}
+            <!-- </div>
+            {/if} -->
         {:else if $chainNavigator.state === 'advancedLocalChainSetup'}
             <div class="flex gap-1 items-center text-sm h-[26px] justify-between">
                 <DefaultButton callback={chainNavigator.clear}>

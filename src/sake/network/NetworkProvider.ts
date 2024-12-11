@@ -2,14 +2,15 @@ import {
     Address,
     ContractAbi,
     DeployedContract,
-    DeploymentResponse
+    DeploymentResponse,
+    NetworkInfo,
+    NetworkType
 } from '../webview/shared/types';
 
 import {
     CallRequest,
     CallResponse,
     DeploymentRequest,
-    NetworkId,
     SetAccountBalanceRequest,
     SetAccountBalanceResponse
 } from '../webview/shared/network_types';
@@ -17,10 +18,10 @@ import { Account } from '../webview/shared/types';
 import { NetworkState } from '../webview/shared/storage_types';
 
 export abstract class NetworkProvider {
-    type: NetworkId;
+    type: NetworkType;
 
     constructor(
-        type: NetworkId,
+        type: NetworkType,
         public providerId: string
     ) {
         this.type = type;
@@ -45,4 +46,5 @@ export abstract class NetworkProvider {
     abstract loadState(state: any): Promise<void>; // TODO: add specific type
     abstract getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }>;
     abstract getOnchainContract(address: Address): Promise<DeployedContract>;
+    abstract getInfo(): NetworkInfo;
 }

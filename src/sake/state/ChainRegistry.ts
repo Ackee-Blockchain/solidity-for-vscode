@@ -1,14 +1,14 @@
 import { Hook, IHook } from '../utils/hook';
-import { NetworkId } from '../webview/shared/network_types';
 import SakeState from '../sake_providers/SakeState';
 import appState from './AppStateProvider';
+import { NetworkInfo, NetworkType } from '../webview/shared/state_types';
 
 export interface ChainState {
     id: string;
     states: SakeState;
     connected: boolean;
     name: string;
-    network: NetworkId;
+    network: NetworkInfo;
 }
 
 export interface ChainHook extends IHook<ChainState> {}
@@ -37,7 +37,7 @@ export const chainRegistry = {
         return Array.from(this.states.values());
     },
 
-    add(id: string, name: string, network: NetworkId): ChainHook {
+    add(id: string, name: string, network: NetworkInfo): ChainHook {
         if (this.contains(id)) {
             throw new Error('Chain with id ' + id + ' already exists');
         }
@@ -66,7 +66,7 @@ export const chainRegistry = {
     }
 };
 
-function useChainState(id: string, name: string, network: NetworkId) {
+function useChainState(id: string, name: string, network: NetworkInfo) {
     let hook: ChainHook | undefined = chainRegistry.getHook(id);
 
     if (hook !== undefined) {
@@ -106,7 +106,7 @@ appState.subscribe((state) => {
     if (!state.isWakeServerRunning) {
         chainRegistry.getAllHooks().forEach((chain) => {
             const chainState = chain.get();
-            if (chainState.network === NetworkId.LocalNode && chainState.connected) {
+            if (chainState.network.type === NetworkType.Local && chainState.connected) {
                 chain.setLazy({
                     connected: false
                 });

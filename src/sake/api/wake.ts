@@ -69,7 +69,14 @@ async function sendWakeRequest<T>(
                 isWakeServerRunning: false
             });
         }
+        // local wake instance
         if (message == 'Chain instance not connected') {
+            chainRegistry.getHook(params.sessionId)?.setLazy({
+                connected: false
+            });
+        }
+        // anvil instance which was connected to
+        if (message == 'Connection to remote host was lost.') {
             chainRegistry.getHook(params.sessionId)?.setLazy({
                 connected: false
             });

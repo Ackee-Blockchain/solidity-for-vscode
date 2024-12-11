@@ -90,9 +90,15 @@ export interface AppState {
 }
 
 export enum NetworkType {
-    Local = 'Local',
-    Remote = 'Remote'
+    Local = 'Local Chain'
 }
+
+export type NetworkInfo = {
+    type: NetworkType.Local;
+    uri?: string;
+    chainId?: number;
+    fork?: string;
+};
 
 export interface ChainState {
     chains: ChainInfo[];
@@ -102,7 +108,7 @@ export interface ChainState {
 export interface ChainInfo {
     chainId: string;
     chainName: string;
-    network: string;
+    network: NetworkInfo;
     connected: boolean;
 }
 

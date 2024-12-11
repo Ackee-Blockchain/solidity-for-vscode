@@ -4,7 +4,7 @@ import {
     DeployedContractType,
     DeploymentState,
     NetworkCreationConfiguration,
-    NetworkId,
+    NetworkType,
     SignalId,
     TransactionHistoryState,
     WebviewMessageId
@@ -159,7 +159,7 @@ export const sakeProviderManager = {
                     {
                         label: 'Fetch ABI from chain',
                         description:
-                            _provider.network.type === NetworkId.LocalNode &&
+                            _provider.network.type === NetworkType.Local &&
                             (_provider.network as LocalNodeNetworkProvider).config.fork !==
                                 undefined
                                 ? 'Fetch the ABI of a contract from onchain using Etherscan or Sourcify'
@@ -479,10 +479,13 @@ export const sakeProviderManager = {
         // Load all providers
         if (providerStates === undefined) {
             const _providerStates = await Promise.all(
-                this.providers.map((provider) => {
+                this.providers.map(async (provider) => {
                     try {
-                        return provider.dumpState();
+                        return await provider.dumpState();
                     } catch (error) {
+                        vscode.window.showErrorMessage(
+                            `Failed to dump state for provider ${provider.displayName}: ${error}`
+                        );
                         console.error(
                             `Failed to dump state for provider ${provider.displayName}: ${error}`
                         );
@@ -493,6 +496,8 @@ export const sakeProviderManager = {
             // filter out undefined states
             providerStates = _providerStates.filter((state) => state !== undefined);
         }
+
+        console.log('providerStates', providerStates);
 
         // Load shared state
         const sharedState = SakeState.dumpSharedState();

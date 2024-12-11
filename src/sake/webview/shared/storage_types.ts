@@ -5,7 +5,7 @@ import type {
     ChainState,
     AppState,
     CompilationState,
-    NetworkId,
+    NetworkType,
     WakeDumpStateResponse,
     NetworkConfiguration,
     WakeSakeStateMetadata,
@@ -38,13 +38,13 @@ export interface SharedState {
 export type NetworkState = LocalNodeNetworkState; // | other network types
 
 export interface BaseNetworkState {
-    type: NetworkId;
+    type: NetworkType;
 }
 
 export interface WakeChainDump extends Omit<WakeDumpStateResponse, 'success'> {}
 
 export interface LocalNodeNetworkState extends BaseNetworkState {
-    type: NetworkId.LocalNode;
+    type: NetworkType.Local;
     wakeDump: WakeChainDump;
     // @dev currently wake cannot recreate on the same uri, on chain creation these 2 params are returned
     config: Omit<NetworkConfiguration, 'type' | 'uri'>;
