@@ -25,11 +25,12 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
             throw new SakeError('Cannot connect provider, already connected');
         }
 
+        let accounts = [];
         switch (this.initializationRequest.type) {
             case SakeProviderInitializationRequestType.CreateNewChain:
                 await this.network.createChain(this.initializationRequest.accounts);
 
-                const accounts = await this.network.getAccounts();
+                accounts = await this.network.getAccounts();
                 for (const account of accounts) {
                     const accountDetails = await this.network.getAccountDetails(account);
                     if (accountDetails) {
@@ -46,6 +47,14 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
 
             case SakeProviderInitializationRequestType.ConnectToChain:
                 await this.network.connectChain();
+
+                accounts = await this.network.getAccounts();
+                for (const account of accounts) {
+                    const accountDetails = await this.network.getAccountDetails(account);
+                    if (accountDetails) {
+                        this.states.accounts.add(accountDetails);
+                    }
+                }
                 break;
         }
 
