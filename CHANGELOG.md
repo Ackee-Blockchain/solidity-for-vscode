@@ -1,5 +1,28 @@
 # Change Log
 
+## [1.17.0]
+### Features
+- Added ability to fetch contract ABIs directly from onchain
+- Added proxy contract support with implementation ABI integration
+- Introduced chain forking capabilities for local development
+- Enabled connecting to existing local blockchain nodes
+- Added events in transaction output
+- Added input tooltips for better UX
+
+### Fixes
+- Resolved compilation issue expansion problems
+- Addressed UI theming inconsistencies
+- Fixed handling of empty `calldata` in function calls
+- Fixed `bigint` serialization and processing
+- Corrected integer value overflow handling
+- Enhanced type conversion safety for bigint operations
+- Improved proxy contract UI and management
+- Optimized handling of large transaction values
+- Cleaned up residual messages in output windows
+- Enhanced state persistence and recovery
+- Resolved chain session issues
+- Refactored code
+
 ## [1.16.7]
 ### Features
 - Added support for multiple chain sessions
