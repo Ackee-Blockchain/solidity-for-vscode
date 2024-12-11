@@ -304,8 +304,6 @@ export async function call(requestParams: WakeCallRequestParams): Promise<WakeCa
             throw new Error('No result returned');
         }
 
-        console.log('call result', result);
-
         return result;
     } catch (e) {
         throw new WakeApiError(`Failed to call: ${e instanceof Error ? e.message : String(e)}`);

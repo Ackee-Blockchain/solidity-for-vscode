@@ -20,9 +20,7 @@ export const loadWithTimeout = async (
         loadingMessage.set(message);
     }
     loadingShown.set(true);
-    console.log('loadWithTimeout', request);
     const result = await withTimeout(request, seconds);
-    console.log('loadWithTimeout', result);
     loadingShown.set(false);
     loadingMessage.set(null);
     return result;
@@ -55,7 +53,6 @@ export function getCssVarWithOpacity(cssVar: string, opacity = 0.5) {
         .padStart(2, '0');
 
     const result = `#${newRedHex}${newGreenHex}${newBlueHex}${opacityHex}`;
-    // console.log('Result:', result);
 
     return result;
 }

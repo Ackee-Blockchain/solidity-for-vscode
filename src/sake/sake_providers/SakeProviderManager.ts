@@ -29,7 +29,6 @@ export const sakeProviderManager = {
         this.pingWakeServer();
 
         providerRegistry.subscribeAdd((id) => {
-            console.log('providerRegistry.subscribeAdd', id);
             if (this.currentChainId === undefined) {
                 this.setProvider(id);
                 vscode.window.showInformationMessage(
@@ -121,6 +120,17 @@ export const sakeProviderManager = {
 
         // force update provider
         this.state?.sendToWebview();
+
+        // try to reconnect provider
+        if (!this.provider?.connected) {
+            try {
+                this.provider?.connect();
+            } catch (e) {
+                showErrorMessage(
+                    `Failed to reconnect provider: ${e instanceof Error ? e.message : String(e)}`
+                );
+            }
+        }
     },
 
     removeProxy(contractFqn: string, proxyAddress?: Address) {
@@ -481,9 +491,6 @@ export const sakeProviderManager = {
         // Load shared state
         const sharedState = SakeState.dumpSharedState();
 
-        console.log('sharedState', sharedState);
-        console.log('providerStates', providerStates);
-
         return {
             sharedState: sharedState,
             providerStates
@@ -492,7 +499,6 @@ export const sakeProviderManager = {
 
     async loadState(state: StoredSakeState, silent: boolean = false) {
         SakeState.loadSharedState(state.sharedState);
-        console.log('loaded sharedState', SakeState.dumpSharedState());
         for (const providerState of state.providerStates) {
             try {
                 await SakeProviderFactory.createFromState(providerState);

@@ -595,7 +595,8 @@
             },
             {
                 "command": "Tools-for-Solidity.sake.save-state",
-                "title": "Solidity: Save Extension State"
+                "title": "Solidity: Save Extension State",
+                "icon": "$(save)"
             }
         ],
         "viewsContainers": {
@@ -669,6 +670,11 @@
                 {
                     "command": "Tools-for-Solidity.sake.show_history",
                     "when": "view == sake-output",
+                    "group": "navigation"
+                },
+                {
+                    "command": "Tools-for-Solidity.sake.save-state",
+                    "when": "view == sake",
                     "group": "navigation"
                 }
             ],

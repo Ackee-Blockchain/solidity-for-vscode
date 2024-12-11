@@ -28,7 +28,6 @@
     const processChainSetup = async (chainSetup: () => Promise<boolean>) => {
         loading = true;
         await chainSetup().then((success) => {
-            console.log('chainSetup success', success);
             if (success) {
                 chainNavigator.clear();
             }

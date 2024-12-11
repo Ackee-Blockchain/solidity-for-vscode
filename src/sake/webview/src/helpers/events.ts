@@ -56,7 +56,6 @@ async function requestState(stateIds: StateId[]): Promise<boolean> {
         const result = await messageHandler.request<{
             success: boolean;
         }>(WebviewMessageId.requestState, stateId);
-        // console.log('requestState', stateId, result);
         return { ...result, stateId };
     };
 
@@ -107,10 +106,8 @@ export function setupListeners() {
 function handleStateResponse(
     message: WebviewMessageResponse & { command: WebviewMessageId.onGetState }
 ) {
-    console.log('received message', message.stateId, message.payload);
     switch (message.stateId) {
         case StateId.DeployedContracts: {
-            console.log('received deployedContracts', message.payload);
             deployedContracts.set(message.payload);
             break;
         }
@@ -163,7 +160,6 @@ function handleStateResponse(
         }
 
         case StateId.App: {
-            // console.log('received appState', message.payload);
             appState.set(message.payload);
             break;
         }
