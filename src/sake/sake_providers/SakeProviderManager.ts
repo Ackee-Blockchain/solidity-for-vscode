@@ -20,7 +20,6 @@ import * as SakeProviderFactory from './SakeProviderFactory';
 import { ProviderState, StoredSakeState } from '../webview/shared/storage_types';
 import SakeState from './SakeState';
 import { NetworkProvider } from '../network/NetworkProvider';
-import { NetworkManager } from '../network/NetworkManager';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
 import { additionalSakeState, chainRegistry } from '../state/ChainRegistry';
 import { providerRegistry } from './ProviderRegistry';
@@ -59,10 +58,6 @@ export const sakeProviderManager = {
         appState.setLazy({
             isWakeServerRunning: isWakeServerRunning
         });
-
-        if (!isWakeServerRunning) {
-            NetworkManager.getInstance().disconnectLocalProviders();
-        }
     },
 
     async removeProvider(provider: BaseSakeProvider<NetworkProvider>) {
@@ -483,6 +478,9 @@ export const sakeProviderManager = {
         // Load shared state
         const sharedState = SakeState.dumpSharedState();
 
+        console.log('sharedState', sharedState);
+        console.log('providerStates', providerStates);
+
         return {
             sharedState: sharedState,
             providerStates
@@ -491,6 +489,7 @@ export const sakeProviderManager = {
 
     async loadState(state: StoredSakeState, silent: boolean = false) {
         SakeState.loadSharedState(state.sharedState);
+        console.log('loaded sharedState', SakeState.dumpSharedState());
         for (const providerState of state.providerStates) {
             try {
                 await SakeProviderFactory.createFromState(providerState);

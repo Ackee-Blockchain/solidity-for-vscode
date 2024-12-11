@@ -4,6 +4,7 @@ import {
     CompiledContract,
     StateId
 } from '../webview/shared/types';
+import appState from './AppStateProvider';
 import BaseStateProvider from './BaseStateProvider';
 
 export default class CompilationStateProvider extends BaseStateProvider<CompilationState> {
@@ -14,6 +15,17 @@ export default class CompilationStateProvider extends BaseStateProvider<Compilat
             contracts: [],
             issues: [],
             dirty: true
+        });
+
+        // listener to remove compilation when wake crashes
+        appState.subscribe((state) => {
+            if (!state.isWakeServerRunning) {
+                this.state = {
+                    contracts: [],
+                    issues: [],
+                    dirty: true
+                };
+            }
         });
     }
 

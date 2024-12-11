@@ -15,7 +15,6 @@ import {
 } from '../webview/shared/network_types';
 import { Account } from '../webview/shared/types';
 import { NetworkState } from '../webview/shared/storage_types';
-import { NetworkManager } from './NetworkManager';
 
 export abstract class NetworkProvider {
     type: NetworkId;
@@ -25,11 +24,9 @@ export abstract class NetworkProvider {
         public providerId: string
     ) {
         this.type = type;
-        NetworkManager.getInstance().addProvider(this);
     }
 
     deleteChain(): Promise<void> {
-        NetworkManager.getInstance().deleteProvider(this);
         return this.onDeleteChain();
     }
 

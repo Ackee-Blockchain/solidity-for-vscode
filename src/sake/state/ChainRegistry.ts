@@ -1,6 +1,7 @@
 import { Hook, IHook } from '../utils/hook';
 import { NetworkId } from '../webview/shared/network_types';
 import SakeState from '../sake_providers/SakeState';
+import appState from './AppStateProvider';
 
 export interface ChainState {
     id: string;
@@ -30,6 +31,10 @@ export const chainRegistry = {
 
     getAll(): ChainState[] {
         return Array.from(this.states.values()).map((state) => state.get());
+    },
+
+    getAllHooks(): ChainHook[] {
+        return Array.from(this.states.values());
     },
 
     add(id: string, name: string, network: NetworkId): ChainHook {
@@ -90,4 +95,22 @@ export interface AdditionalSakeState {
 
 export const additionalSakeState = new Hook<AdditionalSakeState>({
     currentChainId: undefined
+});
+
+/*
+ * Event listeners
+ */
+
+// If Wake server is not running, disconnect all local node providers
+appState.subscribe((state) => {
+    if (!state.isWakeServerRunning) {
+        chainRegistry.getAllHooks().forEach((chain) => {
+            const chainState = chain.get();
+            if (chainState.network === NetworkId.LocalNode && chainState.connected) {
+                chain.setLazy({
+                    connected: false
+                });
+            }
+        });
+    }
 });

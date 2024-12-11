@@ -15,7 +15,10 @@ export class ClientErrorHandler implements ErrorHandler {
     private readonly restarts: number[];
     private maxRestartCount: number = 5;
 
-    constructor(private outputChannel: OutputChannel, private analytics: Analytics) {
+    constructor(
+        private outputChannel: OutputChannel,
+        private analytics: Analytics
+    ) {
         this.restarts = [];
     }
 
@@ -25,12 +28,10 @@ export class ClientErrorHandler implements ErrorHandler {
             return { action: ErrorAction.Continue };
         }
         this.analytics.logEvent(EventType.ERROR_WAKE_CONNECTION_ERROR_SHUTDOWN);
-        console.log('shutdown client');
         return { action: ErrorAction.Shutdown };
     }
 
     public closed(): CloseHandlerResult {
-        console.log('closed client');
         this.restarts.push(Date.now());
         if (this.restarts.length <= this.maxRestartCount) {
             this.analytics.logEvent(EventType.ERROR_WAKE_CONNECTION_CLOSE_RESTART);
