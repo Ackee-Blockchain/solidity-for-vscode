@@ -73,9 +73,9 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     /* Wake Crash Dump */
 
-    // client.onNotification('wake/sake/dumpState', (dump: any) => {
-    //     console.log('Wake Crash Dump', dump);
-    // });
+    client.onNotification('wake/sake/dumpState', (dump: any) => {
+        console.log('Wake Crash Dump', dump);
+    });
 
     /* Register Commands */
 

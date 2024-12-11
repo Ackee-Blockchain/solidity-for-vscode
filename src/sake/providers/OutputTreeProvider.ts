@@ -256,7 +256,6 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
                 vscode.TreeItemCollapsibleState.Collapsed,
                 'list-tree'
             );
-            console.log('callTrace', data.callTrace);
             callTraceNode.setChildren([parseCallTrace(data.callTrace)]);
             rootNodes.push(callTraceNode);
         }
