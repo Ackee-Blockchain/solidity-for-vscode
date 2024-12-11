@@ -122,7 +122,6 @@
     const tryWakeServerRestart = () => {
         loadWithTimeout(restartWakeServer(), 15, 'Restarting Wake server...')
             .then(async () => {
-                console.log('xixi tryWakeServerRestart');
                 const result = await loadWithTimeout(
                     reconnectChain(),
                     15,
@@ -133,9 +132,7 @@
                 }
             })
             .then(async () => {
-                console.log('xixi loadState');
                 const result = await loadWithTimeout(loadState(), 15, 'Loading state...');
-                console.log('xixi loadState', result);
                 if (!result) {
                     throw new Error('Loading state failed');
                 }
@@ -249,7 +246,10 @@
                 <Tabs {tabs}></Tabs>
             {:else}
                 <div class="flex flex-col gap-4 h-full w-full p-4">
-                    <h3 class="uppercase text-base">Chain is not connected to network</h3>
+                    <h3 class="uppercase font-bold text-base">Chain is not connected to network</h3>
+                    <span
+                        >The selected chain is not connected. Please try reconnecting to continue.</span
+                    >
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <vscode-button appearance="primary" on:click={reconnectChain}>
                         Try to reconnect

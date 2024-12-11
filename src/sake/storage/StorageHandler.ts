@@ -1,6 +1,7 @@
 import { SakeContext } from '../context';
 import SakeProviderManager, { sakeProviderManager } from '../sake_providers/SakeProviderManager';
 import * as vscode from 'vscode';
+import { ProviderState } from '../webview/shared/storage_types';
 
 export class StorageHandler {
     // USE EITHER CONTEXT.workspaceState OR CONTEXT.storageUri
@@ -20,7 +21,7 @@ export class StorageHandler {
                 return JSON.parse(state);
             })
             .catch((e) => {
-                console.log('Failed to load state:', e);
+                console.error('Failed to load state:', e);
                 if (notifyUser) {
                     vscode.window.showErrorMessage(
                         `Failed to load state: ${e instanceof Error ? e.message : String(e)}`

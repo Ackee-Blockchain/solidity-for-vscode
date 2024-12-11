@@ -12,6 +12,8 @@
     import CloseIcon from './icons/CloseIcon.svelte';
     import AdvancedLocalChainSetup from './AdvancedLocalChainSetup.svelte';
     import { getCssVarWithOpacity } from '../helpers/helpers';
+    import WarningIcon from './icons/WarningIcon.svelte';
+    import ErrorIcon from './icons/ErrorIcon.svelte';
 </script>
 
 <!-- <ViewHeader>
@@ -38,11 +40,15 @@
     >
         {#if $chainNavigator.state === 'default'}
             <div class="flex gap-1 items-center text-sm h-[26px] justify-between">
-                <ExpandButton
+                {#if !$currentChain?.connected}
+                    <WarningIcon />
+                {:else}
+                    <BlankIcon />
+                {/if}
+                <!-- <ExpandButton
                     callback={chainNavigator.toggleExpanded}
                     expanded={$chainNavigator.expanded}
-                />
-                <!-- <BlankIcon /> -->
+                /> -->
 
                 {#if !$currentChain}
                     <span class="truncate">No chain selected</span>

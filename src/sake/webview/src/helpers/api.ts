@@ -220,7 +220,6 @@ export function openAddAbiQuickPick(contractFqn: string) {
 }
 
 export function removeProxy(contractFqn: string, proxyAddress?: Address) {
-    console.log('removeProxy', contractFqn, proxyAddress);
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.removeProxy,
         payload: {
