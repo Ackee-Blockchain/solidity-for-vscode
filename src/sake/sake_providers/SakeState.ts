@@ -12,6 +12,7 @@ import {
     TransactionHistoryState
 } from '../webview/shared/state_types';
 import { ChainStateProvider } from '../state/HookStateConnectors';
+import { fingerprint } from '../utils/hash';
 
 export default class SakeState {
     accounts: AccountStateProvider;
@@ -102,5 +103,9 @@ export default class SakeState {
         // ChainStateProvider.getInstance().state = state.chains;
         // @hotfix: compilation state is not loaded until wake is able to save it in state dump
         // CompilationStateProvider.getInstance().state = state.compilation;
+    }
+
+    fingerprint() {
+        return fingerprint(this.dumpProviderState());
     }
 }

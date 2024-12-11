@@ -43,6 +43,7 @@ import { NetworkProvider } from '../network/NetworkProvider';
 import { ChainHook, chainRegistry, ChainState } from '../state/ChainRegistry';
 import { providerRegistry } from './ProviderRegistry';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
+import { fingerprint } from '../utils/hash';
 
 // TODO consider renaming to BaseSakeProvider
 export abstract class BaseSakeProvider<T extends NetworkProvider> {
@@ -289,11 +290,13 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
     /* State Handling */
 
     async dumpState() {
+        const providerState = this.states.dumpProviderState();
         return {
             id: this.id,
             displayName: this.displayName,
-            state: this.states.dumpProviderState(),
-            network: await this.network.dumpState()
+            state: providerState,
+            network: await this.network.dumpState(),
+            stateFingerprint: fingerprint(providerState)
         };
     }
 

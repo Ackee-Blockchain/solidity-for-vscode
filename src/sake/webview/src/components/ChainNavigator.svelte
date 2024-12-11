@@ -40,11 +40,9 @@
     >
         {#if $chainNavigator.state === 'default'}
             <div class="flex gap-1 items-center text-sm h-[26px] justify-between">
-                {#if !$currentChain?.connected}
-                    <WarningIcon />
-                {:else}
-                    <BlankIcon />
-                {/if}
+                <DefaultButton callback={openChainsQuickPick}>
+                    <MultipleWindowsIcon />
+                </DefaultButton>
                 <!-- <ExpandButton
                     callback={chainNavigator.toggleExpanded}
                     expanded={$chainNavigator.expanded}
@@ -57,9 +55,12 @@
                 {:else}
                     <span class="truncate">Disconnected from {$currentChain?.chainName}</span>
                 {/if}
-                <DefaultButton callback={openChainsQuickPick}>
-                    <MultipleWindowsIcon />
-                </DefaultButton>
+
+                {#if !$currentChain?.connected}
+                    <WarningIcon />
+                {:else}
+                    <BlankIcon />
+                {/if}
             </div>
             {#if $chainNavigator.expanded}
                 <!-- <Divider className="" />

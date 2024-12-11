@@ -23,6 +23,7 @@ import { NetworkProvider } from '../network/NetworkProvider';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
 import { additionalSakeState, chainRegistry } from '../state/ChainRegistry';
 import { providerRegistry } from './ProviderRegistry';
+import { StorageHandler } from '../storage/StorageHandler';
 
 export const sakeProviderManager = {
     initialize() {
@@ -468,24 +469,25 @@ export const sakeProviderManager = {
         });
     },
 
-    reconnectChain(all: boolean = false) {
-        if (all) {
-            this.providers.forEach((provider) => {
-                provider.connect();
-            });
-        } else {
-            this.provider?.connect();
-        }
-    },
-
     /* State Handling */
 
     async dumpState(providerStates?: ProviderState[]) {
         // Load all providers
         if (providerStates === undefined) {
-            providerStates = await Promise.all(
-                this.providers.map((provider) => provider.dumpState())
+            const _providerStates = await Promise.all(
+                this.providers.map((provider) => {
+                    try {
+                        return provider.dumpState();
+                    } catch (error) {
+                        console.error(
+                            `Failed to dump state for provider ${provider.displayName}: ${error}`
+                        );
+                        return undefined;
+                    }
+                })
             );
+            // filter out undefined states
+            providerStates = _providerStates.filter((state) => state !== undefined);
         }
 
         // Load shared state
@@ -503,16 +505,40 @@ export const sakeProviderManager = {
             try {
                 await SakeProviderFactory.createFromState(providerState);
             } catch (error) {
-                console.error('Failed to create provider from state:', error);
+                console.error(`Failed to create provider "${providerState.id}": ${error}`);
                 if (!silent) {
                     vscode.window.showErrorMessage(
-                        `Failed to create provider from state: ${
+                        `Failed to load chain "${providerState.displayName}": ${
                             error instanceof Error ? error.message : String(error)
                         }`
                     );
                 }
             }
         }
+    },
+
+    async reloadState(): Promise<boolean> {
+        try {
+            await this.resetChains();
+            await StorageHandler.loadExtensionState();
+        } catch (error) {
+            console.error('Failed to reload state:', error);
+            showErrorMessage(
+                `Failed to reload state: ${error instanceof Error ? error.message : String(error)}`
+            );
+            return false;
+        }
+        return true;
+    },
+
+    async resetChains() {
+        providerRegistry.getAll().forEach((provider) => {
+            provider.onDeleteProvider();
+        });
+
+        additionalSakeState.setLazy({
+            currentChainId: undefined
+        });
     }
 };
 

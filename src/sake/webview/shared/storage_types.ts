@@ -26,6 +26,7 @@ export interface ProviderState {
         history: TransactionHistoryState;
     };
     network: NetworkState;
+    stateFingerprint: string;
 }
 
 export interface SharedState {

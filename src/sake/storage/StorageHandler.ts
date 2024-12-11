@@ -1,7 +1,7 @@
 import { SakeContext } from '../context';
 import SakeProviderManager, { sakeProviderManager } from '../sake_providers/SakeProviderManager';
 import * as vscode from 'vscode';
-import { ProviderState } from '../webview/shared/storage_types';
+import { ProviderState, StoredSakeState } from '../webview/shared/storage_types';
 
 export class StorageHandler {
     // USE EITHER CONTEXT.workspaceState OR CONTEXT.storageUri
@@ -13,7 +13,26 @@ export class StorageHandler {
     }
 
     static async loadExtensionState(notifyUser: boolean = true) {
-        const state = await this.loadFromWorkspaceFolder('state.json')
+        try {
+            const state = await this.getExtensionState();
+
+            if (state == undefined) {
+                throw new Error('State file not found');
+            }
+
+            await sakeProviderManager.loadState(state, notifyUser);
+        } catch (e) {
+            console.error('Failed to load state:', e);
+            if (notifyUser) {
+                vscode.window.showErrorMessage(
+                    `Failed to load state: ${e instanceof Error ? e.message : String(e)}`
+                );
+            }
+        }
+    }
+
+    static async getExtensionState(): Promise<StoredSakeState | undefined> {
+        return await this.loadFromWorkspaceFolder('state.json')
             .then((state) => {
                 if (state == undefined) {
                     throw new Error('State file not found');
@@ -22,19 +41,8 @@ export class StorageHandler {
             })
             .catch((e) => {
                 console.error('Failed to load state:', e);
-                if (notifyUser) {
-                    vscode.window.showErrorMessage(
-                        `Failed to load state: ${e instanceof Error ? e.message : String(e)}`
-                    );
-                }
                 return undefined;
             });
-
-        if (state == undefined) {
-            return;
-        }
-
-        await sakeProviderManager.loadState(state, notifyUser);
     }
 
     static async saveExtensionState(notifyUser: boolean = true) {
@@ -46,6 +54,8 @@ export class StorageHandler {
             }
             return undefined;
         });
+
+        console.log('save state', state);
 
         if (state == undefined) {
             return;
@@ -60,6 +70,9 @@ export class StorageHandler {
         // also save to storageUri
         try {
             await this.saveToWorkspaceFolder('state.json', encodedState);
+            if (notifyUser) {
+                vscode.window.showInformationMessage('Extension state saved');
+            }
         } catch (e) {
             if (notifyUser) {
                 vscode.window.showErrorMessage(
