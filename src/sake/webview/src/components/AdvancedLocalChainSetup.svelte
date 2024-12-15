@@ -23,6 +23,8 @@
         uri: undefined
     };
 
+    let displayNameInput: ValidableTextInput;
+
     let loading = false;
 
     const processChainSetup = async (chainSetup: () => Promise<boolean>) => {
@@ -96,6 +98,7 @@
                 <ValidableTextInput
                     label="Display Name"
                     validate={validateNonEmptyString}
+                    autofocus={true}
                     bind:value={form.displayName}
                 />
             </div>

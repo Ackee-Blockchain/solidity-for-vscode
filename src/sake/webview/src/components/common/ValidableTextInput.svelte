@@ -10,6 +10,7 @@
     export let transform: (value: string | undefined) => string = (value) => value ?? '';
 
     let stringValue: string | undefined = undefined;
+    export let autofocus: boolean = false;
 
     const valueChangeHandler = (event: any) => {
         stringValue = event.target.value;
@@ -35,10 +36,12 @@
             {/if}
         </div>
     {/if}
+    <!-- svelte-ignore a11y-autofocus -->
     <vscode-text-field
         class="w-full"
         {placeholder}
         value={value ?? stringValue ?? ''}
+        {autofocus}
         on:change={valueChangeHandler}
     />
     {#if error}
