@@ -239,7 +239,7 @@ export const sakeProviderManager = {
                                         }`
                                     );
                                     vscode.window.showErrorMessage(
-                                        `Unable to fetch ABI from ${address}`
+                                        `Unable to fetch ABI for ${address}`
                                     );
                                 });
                         });
@@ -416,7 +416,22 @@ export const sakeProviderManager = {
                                 e instanceof Error ? e.message : String(e)
                             }`
                         );
-                        vscode.window.showErrorMessage(`Unable to fetch ABI from ${address}`);
+                        vscode.window
+                            .showErrorMessage(
+                                `Unable to fetch ABI for ${address}. Do you wish to add it as a contract with an empty ABI?`,
+                                'Add with empty ABI'
+                            )
+                            .then((selected) => {
+                                if (selected === 'Add with empty ABI') {
+                                    this.state?.deployment.add({
+                                        type: DeployedContractType.OnChain,
+                                        address: address,
+                                        abi: [],
+                                        name: 'Unknown',
+                                        balance: undefined
+                                    });
+                                }
+                            });
                     });
             });
     },
