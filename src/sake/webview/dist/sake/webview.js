@@ -20877,22 +20877,24 @@ async function reconnectChain() {
     };
     return await client.messageHandler.request(request.command, request.payload);
 }
-async function createNewLocalChain(displayName, networkCreationConfig) {
+async function createNewLocalChain(displayName, networkCreationConfig, onlySuccessful = false) {
     const request = {
         command: WebviewMessageId.createNewLocalChain,
         payload: {
             displayName,
-            networkCreationConfig
+            networkCreationConfig,
+            onlySuccessful
         }
     };
     return await client.messageHandler.request(request.command, request.payload);
 }
-async function connectToLocalChain(displayName, uri) {
+async function connectToLocalChain(displayName, uri, onlySuccessful = false) {
     const request = {
         command: WebviewMessageId.connectToLocalChain,
         payload: {
             displayName,
-            uri
+            uri,
+            onlySuccessful
         }
     };
     return await client.messageHandler.request(request.command, request.payload);
@@ -37471,11 +37473,11 @@ function create_if_block$2(ctx) {
 			t1 = space();
 			if (if_block) if_block.c();
 			attr_dev(div0, "class", "flex flex-col gap-1");
-			add_location(div0, file$2, 85, 12, 2982);
+			add_location(div0, file$2, 85, 12, 2986);
 			attr_dev(div1, "class", "flex flex-col gap-3");
-			add_location(div1, file$2, 84, 8, 2936);
+			add_location(div1, file$2, 84, 8, 2940);
 			attr_dev(div2, "class", "p-2");
-			add_location(div2, file$2, 82, 4, 2853);
+			add_location(div2, file$2, 82, 4, 2857);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div2, anchor);
@@ -37579,7 +37581,7 @@ function create_if_block$2(ctx) {
 	return block;
 }
 
-// (170:62) 
+// (174:62) 
 function create_if_block_2$2(ctx) {
 	let validabletextinput;
 	let updating_value;
@@ -37621,7 +37623,7 @@ function create_if_block_2$2(ctx) {
 			t1 = text(t1_value);
 			set_custom_element_data(vscode_button, "appearance", "primary");
 			set_custom_element_data(vscode_button, "disabled", /*loading*/ ctx[1]);
-			add_location(vscode_button, file$2, 180, 16, 7361);
+			add_location(vscode_button, file$2, 184, 16, 7525);
 		},
 		m: function mount(target, anchor) {
 			mount_component(validabletextinput, target, anchor);
@@ -37673,7 +37675,7 @@ function create_if_block_2$2(ctx) {
 		block,
 		id: create_if_block_2$2.name,
 		type: "if",
-		source: "(170:62) ",
+		source: "(174:62) ",
 		ctx
 	});
 
@@ -37856,10 +37858,10 @@ function create_if_block_1$2(ctx) {
 			vscode_button = element("vscode-button");
 			t6 = text(t6_value);
 			attr_dev(div, "class", "flex flex-col gap-1");
-			add_location(div, file$2, 103, 16, 3732);
+			add_location(div, file$2, 103, 16, 3736);
 			set_custom_element_data(vscode_button, "appearance", "primary");
 			set_custom_element_data(vscode_button, "disabled", /*loading*/ ctx[1]);
-			add_location(vscode_button, file$2, 152, 16, 5938);
+			add_location(vscode_button, file$2, 152, 16, 5942);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -38082,7 +38084,7 @@ function instance$2($$self, $$props, $$invalidate) {
 	const processChainSetup = async chainSetup => {
 		$$invalidate(1, loading = true);
 
-		await chainSetup().then(success => {
+		await chainSetup().then(({ success }) => {
 			if (success) {
 				chainNavigator.clear();
 			}
@@ -38148,14 +38150,18 @@ function instance$2($$self, $$props, $$invalidate) {
 		}
 	}
 
-	const click_handler = () => processChainSetup(() => createNewLocalChain(form.displayName, {
-		accounts: form.accounts,
-		chainId: form.chainId,
-		fork: form.fork,
-		hardfork: form.hardfork,
-		minGasPrice: form.minGasPrice,
-		blockBaseFeePerGas: form.blockBaseFeePerGas
-	}));
+	const click_handler = () => processChainSetup(() => createNewLocalChain(
+		form.displayName,
+		{
+			accounts: form.accounts,
+			chainId: form.chainId,
+			fork: form.fork,
+			hardfork: form.hardfork,
+			minGasPrice: form.minGasPrice,
+			blockBaseFeePerGas: form.blockBaseFeePerGas
+		},
+		true
+	));
 
 	function validabletextinput_value_binding_1(value) {
 		if ($$self.$$.not_equal(form.uri, value)) {
@@ -38164,7 +38170,7 @@ function instance$2($$self, $$props, $$invalidate) {
 		}
 	}
 
-	const click_handler_1 = () => processChainSetup(() => connectToLocalChain(form.displayName, form.uri ?? '')); // @dev silence typing error
+	const click_handler_1 = () => processChainSetup(() => connectToLocalChain(form.displayName, form.uri ?? '', true)); // @dev silence typing error
 
 	$$self.$$set = $$props => {
 		if ('form' in $$props) $$invalidate(0, form = $$props.form);

@@ -22,7 +22,7 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
 
     async connect(): Promise<void> {
         if (this.connected) {
-            throw new SakeError('Cannot connect provider, already connected');
+            throw new SakeError('Cannot connect, already connected');
         }
 
         let accounts = [];
