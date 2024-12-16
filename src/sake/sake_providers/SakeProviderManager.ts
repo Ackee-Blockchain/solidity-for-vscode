@@ -33,25 +33,32 @@ export const sakeProviderManager = {
     initialize() {
         this.pingWakeServer();
 
+        // set provider automatically when no provider is set
         providerRegistry.subscribeAdd((id) => {
             if (this.currentChainId === undefined) {
                 this.setProvider(id);
-                vscode.window.showInformationMessage(
-                    `New local chain '${this.provider!.displayName}' created.`
-                );
-                return;
             }
-            vscode.window
-                .showInformationMessage(
-                    `New local chain '${chainRegistry.get(id)?.name}' created.`,
-                    'Switch to chain'
-                )
-                .then((selected) => {
-                    if (selected === 'Switch to chain') {
-                        this.setProvider(id);
-                    }
-                });
         });
+
+        // providerRegistry.subscribeAdd((id) => {
+        //     if (this.currentChainId === undefined) {
+        //         this.setProvider(id);
+        //         vscode.window.showInformationMessage(
+        //             `New local chain '${this.provider!.displayName}' created.`
+        //         );
+        //         return;
+        //     }
+        //     vscode.window
+        //         .showInformationMessage(
+        //             `New local chain '${chainRegistry.get(id)?.name}' created.`,
+        //             'Switch to chain'
+        //         )
+        //         .then((selected) => {
+        //             if (selected === 'Switch to chain') {
+        //                 this.setProvider(id);
+        //             }
+        //         });
+        // });
     },
 
     async pingWakeServer() {
@@ -447,28 +454,23 @@ export const sakeProviderManager = {
             return;
         }
 
-        await SakeProviderFactory.createNewLocalProvider(chainName);
+        return await SakeProviderFactory.createNewLocalProvider(chainName);
     },
 
     async createNewLocalChain(
         displayName: string,
-        networkCreationConfig?: NetworkCreationConfiguration
+        networkCreationConfig?: NetworkCreationConfiguration,
+        onlySuccessful: boolean = false
     ) {
-        try {
-            await SakeProviderFactory.createNewLocalProvider(displayName, networkCreationConfig);
-        } catch (e) {
-            return false;
-        }
-        return true; // always return true, so even unconnected chains can be added
+        return await SakeProviderFactory.createNewLocalProvider(
+            displayName,
+            networkCreationConfig,
+            onlySuccessful
+        );
     },
 
-    async connectToLocalChain(displayName: string, uri: string) {
-        try {
-            const provider = await SakeProviderFactory.connectToLocalChain(displayName, uri);
-        } catch (e) {
-            return false;
-        }
-        return true;
+    async connectToLocalChain(displayName: string, uri: string, onlySuccessful: boolean = false) {
+        return await SakeProviderFactory.connectToLocalChain(displayName, uri, onlySuccessful);
     },
 
     async requestNewAdvancedLocalProvider() {

@@ -27,9 +27,9 @@
 
     let loading = false;
 
-    const processChainSetup = async (chainSetup: () => Promise<boolean>) => {
+    const processChainSetup = async (chainSetup: () => Promise<{ success: boolean }>) => {
         loading = true;
-        await chainSetup().then((success) => {
+        await chainSetup().then(({ success }) => {
             if (success) {
                 chainNavigator.clear();
             }
@@ -166,14 +166,18 @@
                     disabled={loading}
                     on:click={() =>
                         processChainSetup(() =>
-                            createNewLocalChain(form.displayName, {
-                                accounts: form.accounts,
-                                chainId: form.chainId,
-                                fork: form.fork,
-                                hardfork: form.hardfork,
-                                minGasPrice: form.minGasPrice,
-                                blockBaseFeePerGas: form.blockBaseFeePerGas
-                            })
+                            createNewLocalChain(
+                                form.displayName,
+                                {
+                                    accounts: form.accounts,
+                                    chainId: form.chainId,
+                                    fork: form.fork,
+                                    hardfork: form.hardfork,
+                                    minGasPrice: form.minGasPrice,
+                                    blockBaseFeePerGas: form.blockBaseFeePerGas
+                                },
+                                true
+                            )
                         )}
                 >
                     {loading ? 'Creating...' : 'Create'}
@@ -196,7 +200,8 @@
                         processChainSetup(() =>
                             connectToLocalChain(
                                 form.displayName,
-                                form.uri ?? '' // @dev silence typing error
+                                form.uri ?? '', // @dev silence typing error
+                                true
                             )
                         )}
                 >

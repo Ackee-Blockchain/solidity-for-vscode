@@ -357,10 +357,14 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.createNewLocalChain: {
-                const success = await sakeProviderManager.createNewLocalChain(
-                    message.payload.displayName,
-                    message.payload.networkCreationConfig
-                );
+                const success =
+                    (await sakeProviderManager.createNewLocalChain(
+                        message.payload.displayName,
+                        message.payload.networkCreationConfig,
+                        message.payload.onlySuccessful
+                    )) !== undefined;
+
+                console.log('success in basewebviewprovider', success);
 
                 webviewView.webview.postMessage({
                     command: message.command,
@@ -373,10 +377,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.connectToLocalChain: {
-                const success = await sakeProviderManager.connectToLocalChain(
-                    message.payload.displayName,
-                    message.payload.uri
-                );
+                const success =
+                    (await sakeProviderManager.connectToLocalChain(
+                        message.payload.displayName,
+                        message.payload.uri,
+                        message.payload.onlySuccessful
+                    )) !== undefined;
 
                 webviewView.webview.postMessage({
                     command: message.command,

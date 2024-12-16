@@ -248,24 +248,31 @@ export async function reconnectChain(): Promise<boolean> {
 
 export async function createNewLocalChain(
     displayName: string,
-    networkCreationConfig?: NetworkCreationConfiguration
+    networkCreationConfig?: NetworkCreationConfiguration,
+    onlySuccessful: boolean = false
 ) {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.createNewLocalChain,
         payload: {
             displayName,
-            networkCreationConfig
+            networkCreationConfig,
+            onlySuccessful
         }
     };
     return await messageHandler.request<boolean>(request.command, request.payload);
 }
 
-export async function connectToLocalChain(displayName: string, uri: string) {
+export async function connectToLocalChain(
+    displayName: string,
+    uri: string,
+    onlySuccessful: boolean = false
+) {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.connectToLocalChain,
         payload: {
             displayName,
-            uri
+            uri,
+            onlySuccessful
         }
     };
     return await messageHandler.request<boolean>(request.command, request.payload);

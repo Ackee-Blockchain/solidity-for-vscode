@@ -170,6 +170,7 @@ export type WebviewMessageRequest =
           payload: {
               displayName: string;
               networkCreationConfig?: NetworkCreationConfiguration;
+              onlySuccessful?: boolean;
           };
       } & BaseWebviewMessageRequest)
     | ({
@@ -177,6 +178,7 @@ export type WebviewMessageRequest =
           payload: {
               displayName: string;
               uri: string;
+              onlySuccessful: boolean;
           };
       } & BaseWebviewMessageRequest)
     | ({
