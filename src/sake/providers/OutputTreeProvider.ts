@@ -86,7 +86,7 @@ export class OutputViewManager {
                     message = `✓ Successfully called ${_called}`;
                     break;
                 }
-                message = `✗ Failed to call ${_called}`;
+                message = `✗ Reverted call to ${_called}`;
                 break;
 
             default:
