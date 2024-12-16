@@ -447,7 +447,7 @@ export const sakeProviderManager = {
         // get input from user
         const chainName = await getTextFromInputBox(
             'Select a name for the new chain',
-            'Local Chain'
+            await this.getProposedChainName()
         );
 
         if (!chainName) {
@@ -455,6 +455,15 @@ export const sakeProviderManager = {
         }
 
         return await SakeProviderFactory.createNewLocalProvider(chainName);
+    },
+
+    async getProposedChainName() {
+        let name = 'Local Chain 1';
+        let i = 1;
+        while (this.providers.some((provider) => provider.displayName === name)) {
+            name = `Local Chain ${i++}`;
+        }
+        return name;
     },
 
     async createNewLocalChain(
