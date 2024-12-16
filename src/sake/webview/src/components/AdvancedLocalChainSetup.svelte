@@ -23,8 +23,6 @@
         uri: undefined
     };
 
-    let displayNameInput: ValidableTextInput;
-
     let loading = false;
 
     const processChainSetup = async (chainSetup: () => Promise<{ success: boolean }>) => {

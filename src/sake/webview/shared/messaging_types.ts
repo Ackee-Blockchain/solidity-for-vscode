@@ -265,6 +265,11 @@ export type WebviewMessageResponse =
           signalId: SignalId;
       } & BaseWebviewMessageResponse);
 
+export type WebviewMessageResponsePayload<T extends WebviewMessageId> =
+    T extends WebviewMessageResponse['command']
+        ? Extract<WebviewMessageResponse, { command: T }>['payload']
+        : never;
+
 export enum SignalId {
     showAdvancedLocalChainSetup = 'showAdvancedLocalChainSetup'
 }

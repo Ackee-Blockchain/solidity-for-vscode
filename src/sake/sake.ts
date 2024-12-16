@@ -110,7 +110,7 @@ async function loadChains() {
         });
     } else {
         // Start with a default local chain
-        await sakeProviderManager.createNewLocalChain('Local Chain');
+        await sakeProviderManager.createNewLocalChain('Local Chain 1');
     }
 }
 

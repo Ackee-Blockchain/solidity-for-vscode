@@ -10,7 +10,8 @@ import {
     type Address,
     type DeployedContract,
     type GetBytecodeResponse,
-    type NetworkCreationConfiguration
+    type NetworkCreationConfiguration,
+    type WebviewMessageResponsePayload
 } from '../../shared/types';
 import { deployedContracts } from './stores';
 
@@ -89,9 +90,9 @@ export async function getInputFromTopBar(
             title
         }
     };
-    return await messageHandler.request<{
-        value?: string;
-    }>(request.command, request.payload);
+    const response: WebviewMessageResponsePayload<WebviewMessageId.getTextFromInputBox> =
+        await messageHandler.request(request.command, request.payload);
+    return response;
 }
 
 export async function compileContracts() {
@@ -99,7 +100,9 @@ export async function compileContracts() {
         command: WebviewMessageId.compile,
         payload: undefined
     };
-    await messageHandler.request(request.command, request.payload);
+    const response: WebviewMessageResponsePayload<WebviewMessageId.compile> =
+        await messageHandler.request(request.command, request.payload);
+    return response;
 }
 
 export async function removeDeployedContract(address: Address) {
@@ -166,14 +169,16 @@ export async function openSettings(settingsUrl: string) {
     messageHandler.send(request.command, request.payload);
 }
 
-export async function getBytecode(contractFqn: string): Promise<GetBytecodeResponse> {
+export async function getBytecode(contractFqn: string) {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.getBytecode,
         payload: {
             contractFqn
         }
     };
-    return await messageHandler.request<GetBytecodeResponse>(request.command, request.payload);
+    const response: WebviewMessageResponsePayload<WebviewMessageId.getBytecode> =
+        await messageHandler.request(request.command, request.payload);
+    return response;
 }
 
 // export async function requestNewProvider() {
@@ -192,13 +197,15 @@ export async function selectChain(chainId: string) {
     messageHandler.send(request.command, request.payload);
 }
 
-export async function restartWakeServer(): Promise<boolean> {
+export async function restartWakeServer() {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.restartWakeServer,
         payload: undefined
     };
     // TODO this can be send, does not neet to be a request
-    return await messageHandler.request<boolean>(request.command, request.payload);
+    const response: WebviewMessageResponsePayload<WebviewMessageId.restartWakeServer> =
+        await messageHandler.request(request.command, request.payload);
+    return response;
 }
 
 export function openChainsQuickPick() {
@@ -243,7 +250,9 @@ export async function reconnectChain(): Promise<boolean> {
         command: WebviewMessageId.reconnectChain,
         payload: undefined
     };
-    return await messageHandler.request<boolean>(request.command, request.payload);
+    const response: WebviewMessageResponsePayload<WebviewMessageId.reconnectChain> =
+        await messageHandler.request(request.command, request.payload);
+    return response.success;
 }
 
 export async function createNewLocalChain(
@@ -259,7 +268,9 @@ export async function createNewLocalChain(
             onlySuccessful
         }
     };
-    return await messageHandler.request<boolean>(request.command, request.payload);
+    const response: WebviewMessageResponsePayload<WebviewMessageId.createNewLocalChain> =
+        await messageHandler.request(request.command, request.payload);
+    return response;
 }
 
 export async function connectToLocalChain(
@@ -275,5 +286,7 @@ export async function connectToLocalChain(
             onlySuccessful
         }
     };
-    return await messageHandler.request<boolean>(request.command, request.payload);
+    const response: WebviewMessageResponsePayload<WebviewMessageId.connectToLocalChain> =
+        await messageHandler.request(request.command, request.payload);
+    return response;
 }
