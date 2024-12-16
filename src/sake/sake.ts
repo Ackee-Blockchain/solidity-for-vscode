@@ -6,7 +6,8 @@ import {
     DeploymentRequest,
     SetAccountBalanceRequest,
     SetAccountLabelRequest,
-    GetBytecodeRequest
+    GetBytecodeRequest,
+    WakeCrashDumpStateResponse
 } from './webview/shared/types';
 import { LanguageClient, State } from 'vscode-languageclient/node';
 import { SakeOutputItem } from './providers/OutputTreeProvider';
@@ -73,8 +74,8 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     /* Wake Crash Dump */
 
-    client.onNotification('wake/sake/dumpState', (dump: any) => {
-        console.log('Wake Crash Dump', dump);
+    client.onNotification('wake/sake/dumpState', (dump: WakeCrashDumpStateResponse) => {
+        // StorageHandler.saveExtensionState(dump.chain_dump);
     });
 
     /* Register Commands */

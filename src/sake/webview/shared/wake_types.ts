@@ -86,6 +86,12 @@ export interface WakeDumpStateResponse extends WakeBaseResponse {
     chainDump: string;
 }
 
+export interface WakeCrashDumpStateResponse extends WakeBaseResponse {
+    metadata: WakeSakeStateMetadata;
+    chainDump: string;
+    sessionId: string;
+}
+
 export interface WakeLoadStateRequestParams extends WakeBaseRequestParams {
     metadata: WakeSakeStateMetadata;
     chainDump: string;
