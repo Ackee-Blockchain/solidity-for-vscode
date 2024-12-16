@@ -231,4 +231,10 @@ function registerCommands(context: vscode.ExtensionContext) {
             StorageHandler.saveExtensionState()
         )
     );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.delete-state', () =>
+            StorageHandler.deleteExtensionState()
+        )
+    );
 }
