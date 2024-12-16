@@ -597,6 +597,10 @@
                 "command": "Tools-for-Solidity.sake.save-state",
                 "title": "Solidity: Save Chains State",
                 "icon": "$(save)"
+            },
+            {
+                "command": "Tools-for-Solidity.sake.delete-state",
+                "title": "Solidity: Delete Chains State"
             }
         ],
         "viewsContainers": {

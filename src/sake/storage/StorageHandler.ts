@@ -55,8 +55,6 @@ export class StorageHandler {
             return undefined;
         });
 
-        console.log('save state', state);
-
         if (state == undefined) {
             return;
         }
@@ -80,6 +78,10 @@ export class StorageHandler {
                 );
             }
         }
+    }
+
+    static async deleteExtensionState() {
+        await this.deleteFromWorkspaceFolder('state.json');
     }
 
     // private static async saveToStorageUri(json: string) {
@@ -133,6 +135,17 @@ export class StorageHandler {
         } catch (e) {
             return undefined;
         }
+    }
+
+    private static async deleteFromWorkspaceFolder(filename: string) {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri;
+        if (workspaceFolder == undefined) {
+            throw new Error('Workspace folder is undefined');
+        }
+
+        const solidityFolder = vscode.Uri.joinPath(workspaceFolder, ...this.storageFolder);
+        const file = vscode.Uri.joinPath(solidityFolder, filename);
+        await vscode.workspace.fs.delete(file);
     }
 
     private static get context() {
