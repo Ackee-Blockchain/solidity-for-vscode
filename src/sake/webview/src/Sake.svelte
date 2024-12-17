@@ -148,116 +148,115 @@
 </script>
 
 <main class="h-full my-0 overflow-hidden flex flex-col">
-    {#if $loadingShown}
-        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
-            <vscode-progress-ring />
-            <span>{$loadingMessage ?? 'Loading...'}</span>
-        </div>
-    {:else if $stateLoadState === 'loading' || $extensionConnectionState === 'connecting'}
-        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
-            <span>Initializing extension...</span>
-        </div>
-    {:else if $stateLoadState === 'failed' || $extensionConnectionState === 'failed'}
-        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
-            <span>
-                Unexpected error loading state from the extension. Please try restarting VS Code.
-            </span>
-        </div>
-        <!-- {:else if !$appState.isInitialized} -->
-        <!-- <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+    <ChainNavigator />
+    <div class="flex-grow overflow-hidden">
+        {#if $loadingShown}
+            <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+                <vscode-progress-ring />
+                <span>{$loadingMessage ?? 'Loading...'}</span>
+            </div>
+        {:else if $stateLoadState === 'loading' || $extensionConnectionState === 'connecting'}
+            <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+                <span>Initializing extension...</span>
+            </div>
+        {:else if $stateLoadState === 'failed' || $extensionConnectionState === 'failed'}
+            <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+                <span>
+                    Unexpected error loading state from the extension. Please try restarting VS
+                    Code.
+                </span>
+            </div>
+            <!-- {:else if !$appState.isInitialized} -->
+            <!-- <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
             <vscode-progress-ring />
             <span>Setting up Deploy and Interact UI...</span>
         </div> -->
-    {:else if $appState.initializationState === 'loadingChains'}
-        <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
-            <span>Loading chains...</span>
-        </div>
-    {:else if $chainState.chains.length === 0}
-        <div class="flex flex-col gap-4 h-full w-full p-4">
-            <h3 class="uppercase font-bold text-base">No chains found</h3>
-            <span>No chains set up. Please set up a chain first. </span>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <vscode-button appearance="primary" on:click={openChainsQuickPick}>
-                Setup new chain
-            </vscode-button>
-        </div>
-    {:else if $chainState.currentChainId === undefined}
-        <div class="flex flex-col gap-4 h-full w-full p-4">
-            <h3 class="uppercase font-bold text-base">No chain selected</h3>
-            <span>No chain selected. Please select a chain to get started. </span>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <vscode-button appearance="primary" on:click={selectChain}>
-                Select chain
-            </vscode-button>
-        </div>
-    {:else if $appState.isOpenWorkspace === 'closed'}
-        <div class="flex flex-col gap-4 h-full w-full p-4">
-            <h3 class="uppercase font-bold text-base">No workspace opened</h3>
-            <span>
-                The Deploy and Interact UI requires an open workspace containing Solidity files.
-                Please open a project with Solidity contracts to use this feature.
-            </span>
-        </div>
-    {:else if $appState.isOpenWorkspace === 'tooManyWorkspaces'}
-        <div class="flex flex-col gap-4 h-full w-full p-4">
-            <h3 class="uppercase font-bold text-base">Too many workspaces opened</h3>
-            <span>
-                The Deploy and Interact UI can only be used with a single workspace opened. Please
-                close other workspaces to use this feature.
-            </span>
-        </div>
-    {:else if $appState.isWakeServerRunning === false}
-        <div class="flex flex-col gap-4 h-full w-full p-4">
-            <h3 class="uppercase font-bold text-base">Wake Server is not running</h3>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-missing-attribute -->
-            <span>
-                The Wake LSP server is not responding. Please ensure Wake is properly installed and
-                running. If issues persist,
-                <span
-                    class="cursor-pointer underline"
-                    on:click={() => openSettings('Tools-for-Solidity.Wake.installationMethod')}
-                >
-                    try changing its installation method</span
-                >.
-            </span>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <vscode-button appearance="primary" on:click={tryWakeServerRestart}>
-                Restart Connection
-            </vscode-button>
-        </div>
-    {:else if $appState.isAnvilInstalled === false}
-        <div class="flex flex-col gap-4 h-full w-full p-4">
-            <h3 class="uppercase font-bold text-base">Anvil is not installed</h3>
-            <span
-                >To use the <span class="italic">Deploy and Interact UI</span>, Froundry's Anvil is
-                required to be installed on your device in order to start a local chain. Please
-                install Anvil and restart VS Code.
-            </span>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <vscode-button appearance="primary" on:click={installAnvil}>
-                Visit Anvil Installation Page
-            </vscode-button>
-        </div>
-    {:else}
-        <ChainNavigator />
-        <div class="flex-grow overflow-hidden">
-            {#if $currentChain?.connected}
-                <Tabs {tabs}></Tabs>
-            {:else}
-                <div class="flex flex-col gap-4 h-full w-full p-4">
-                    <h3 class="uppercase font-bold text-base">Chain is not connected to network</h3>
+        {:else if $appState.initializationState === 'loadingChains'}
+            <div class="flex flex-col items-center justify-center gap-3 h-full w-full">
+                <span>Loading chains...</span>
+            </div>
+        {:else if $chainState.chains.length === 0}
+            <div class="flex flex-col gap-4 h-full w-full p-4">
+                <h3 class="uppercase font-bold text-base">No chains set up</h3>
+                <span>Please set up a chain first. </span>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <vscode-button appearance="primary" on:click={openChainsQuickPick}>
+                    Setup new chain
+                </vscode-button>
+            </div>
+        {:else if $chainState.currentChainId === undefined}
+            <div class="flex flex-col gap-4 h-full w-full p-4">
+                <h3 class="uppercase font-bold text-base">No chain selected</h3>
+                <span>Please select a chain to get started. </span>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <vscode-button appearance="primary" on:click={selectChain}>
+                    Select chain
+                </vscode-button>
+            </div>
+        {:else if $appState.isOpenWorkspace === 'closed'}
+            <div class="flex flex-col gap-4 h-full w-full p-4">
+                <h3 class="uppercase font-bold text-base">No workspace opened</h3>
+                <span>
+                    The Deploy and Interact UI requires an open workspace containing Solidity files.
+                    Please open a project with Solidity contracts to use this feature.
+                </span>
+            </div>
+        {:else if $appState.isOpenWorkspace === 'tooManyWorkspaces'}
+            <div class="flex flex-col gap-4 h-full w-full p-4">
+                <h3 class="uppercase font-bold text-base">Too many workspaces opened</h3>
+                <span>
+                    The Deploy and Interact UI can only be used with a single workspace opened.
+                    Please close other workspaces to use this feature.
+                </span>
+            </div>
+        {:else if $appState.isWakeServerRunning === false}
+            <div class="flex flex-col gap-4 h-full w-full p-4">
+                <h3 class="uppercase font-bold text-base">Wake Server is not running</h3>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-missing-attribute -->
+                <span>
+                    The Wake LSP server is not responding. Please ensure Wake is properly installed
+                    and running. If issues persist,
                     <span
-                        >The selected chain is not connected. Please try reconnecting to continue.</span
+                        class="cursor-pointer underline"
+                        on:click={() => openSettings('Tools-for-Solidity.Wake.installationMethod')}
                     >
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
-                    <vscode-button appearance="primary" on:click={reconnectChain}>
-                        Try to reconnect
-                    </vscode-button>
-                </div>
-            {/if}
-        </div>
-    {/if}
+                        try changing its installation method</span
+                    >.
+                </span>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <vscode-button appearance="primary" on:click={tryWakeServerRestart}>
+                    Restart Connection
+                </vscode-button>
+            </div>
+        {:else if $appState.isAnvilInstalled === false}
+            <div class="flex flex-col gap-4 h-full w-full p-4">
+                <h3 class="uppercase font-bold text-base">Anvil is not installed</h3>
+                <span
+                    >To use the <span class="italic">Deploy and Interact UI</span>, Froundry's Anvil
+                    is required to be installed on your device in order to start a local chain.
+                    Please install Anvil and restart VS Code.
+                </span>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <vscode-button appearance="primary" on:click={installAnvil}>
+                    Visit Anvil Installation Page
+                </vscode-button>
+            </div>
+        {:else if $currentChain?.connected}
+            <Tabs {tabs}></Tabs>
+        {:else}
+            <div class="flex flex-col gap-4 h-full w-full p-4">
+                <h3 class="uppercase font-bold text-base">Chain is not connected to network</h3>
+                <span
+                    >The selected chain is not connected. Please try reconnecting to continue.</span
+                >
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <vscode-button appearance="primary" on:click={reconnectChain}>
+                    Try to reconnect
+                </vscode-button>
+            </div>
+        {/if}
+    </div>
 </main>
 
 <style global>
