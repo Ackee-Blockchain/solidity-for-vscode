@@ -312,14 +312,14 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.openAddAbiQuickPick: {
-                sakeProviderManager.showAddAbiQuickPick(message.payload.contractFqn);
+                sakeProviderManager.showAddAbiQuickPick(message.payload.contractAddress);
                 break;
             }
 
             case WebviewMessageId.removeProxy: {
                 sakeProviderManager.removeProxy(
-                    message.payload.contractFqn,
-                    message.payload.proxyAddress
+                    message.payload.contractAddress,
+                    message.payload.proxyId
                 );
                 break;
             }
@@ -363,8 +363,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                         message.payload.networkCreationConfig,
                         message.payload.onlySuccessful
                     )) !== undefined;
-
-                console.log('success in basewebviewprovider', success);
 
                 webviewView.webview.postMessage({
                     command: message.command,

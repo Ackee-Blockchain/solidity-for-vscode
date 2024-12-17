@@ -216,22 +216,22 @@ export function openChainsQuickPick() {
     messageHandler.send(request.command, request.payload);
 }
 
-export function openAddAbiQuickPick(contractFqn: string) {
+export function openAddAbiQuickPick(contractAddress: Address) {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.openAddAbiQuickPick,
         payload: {
-            contractFqn
+            contractAddress
         }
     };
     messageHandler.send(request.command, request.payload);
 }
 
-export function removeProxy(contractFqn: string, proxyAddress?: Address) {
+export function removeProxy(contractAddress: Address, proxyId: string) {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.removeProxy,
         payload: {
-            contractFqn,
-            proxyAddress
+            contractAddress,
+            proxyId
         }
     };
     messageHandler.send(request.command, request.payload);

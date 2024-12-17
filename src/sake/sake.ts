@@ -96,6 +96,10 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 }
 
 export function deactivateSake() {
+    const sakeContext = SakeContext.getInstance();
+    console.log('deactivating sake');
+    sakeContext.context?.workspaceState.update('sake', 'deactivated');
+    console.log(sakeContext.context?.workspaceState.get('sake'));
     StorageHandler.saveExtensionState(false);
     // TODO save state
 }

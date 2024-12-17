@@ -268,6 +268,11 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         return abiResponse;
     }
 
+    async fetchContract(address: Address) {
+        const deployedContract = await this.getOnchainContract(address);
+        this.states.deployment.add(deployedContract);
+    }
+
     /* Event handling */
 
     async onActivateProvider() {

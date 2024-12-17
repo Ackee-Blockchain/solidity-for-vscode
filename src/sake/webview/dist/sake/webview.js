@@ -20847,21 +20847,21 @@ function openChainsQuickPick() {
     };
     client.messageHandler.send(request.command, request.payload);
 }
-function openAddAbiQuickPick(contractFqn) {
+function openAddAbiQuickPick(contractAddress) {
     const request = {
         command: WebviewMessageId.openAddAbiQuickPick,
         payload: {
-            contractFqn
+            contractAddress
         }
     };
     client.messageHandler.send(request.command, request.payload);
 }
-function removeProxy(contractFqn, proxyAddress) {
+function removeProxy(contractAddress, proxyId) {
     const request = {
         command: WebviewMessageId.removeProxy,
         payload: {
-            contractFqn,
-            proxyAddress
+            contractAddress,
+            proxyId
         }
     };
     client.messageHandler.send(request.command, request.payload);
@@ -23157,7 +23157,7 @@ function get_each_context$8(ctx, list, i) {
 }
 
 // (126:0) {:else}
-function create_else_block_1$4(ctx) {
+function create_else_block_1$3(ctx) {
 	let div;
 	let warningicon;
 	let t0;
@@ -23202,7 +23202,7 @@ function create_else_block_1$4(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block_1$4.name,
+		id: create_else_block_1$3.name,
 		type: "else",
 		source: "(126:0) {:else}",
 		ctx
@@ -23867,7 +23867,7 @@ function create_fragment$D(ctx) {
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block$f, create_else_block_1$4];
+	const if_block_creators = [create_if_block$f, create_else_block_1$3];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -26955,7 +26955,7 @@ function create_if_block_4$4(ctx) {
 	let current_block_type_index;
 	let if_block;
 	let current;
-	const if_block_creators = [create_if_block_5$3, create_else_block_2];
+	const if_block_creators = [create_if_block_5$2, create_else_block_2];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -27099,7 +27099,7 @@ function create_else_block_2(ctx) {
 }
 
 // (44:12) {#if input.internalType === InputTypesInternal.LEAF}
-function create_if_block_5$3(ctx) {
+function create_if_block_5$2(ctx) {
 	let iconspacer;
 	let current;
 	iconspacer = new IconSpacer({ $$inline: true });
@@ -27129,7 +27129,7 @@ function create_if_block_5$3(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_5$3.name,
+		id: create_if_block_5$2.name,
 		type: "if",
 		source: "(44:12) {#if input.internalType === InputTypesInternal.LEAF}",
 		ctx
@@ -27153,7 +27153,7 @@ function create_else_block$a(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block_2$7, create_if_block_3$6, create_else_block_1$3];
+	const if_block_creators = [create_if_block_2$7, create_if_block_3$6, create_else_block_1$2];
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
@@ -27374,7 +27374,7 @@ function create_if_block$d(ctx) {
 }
 
 // (113:20) {:else}
-function create_else_block_1$3(ctx) {
+function create_else_block_1$2(ctx) {
 	let div;
 	let span;
 	let svg;
@@ -27423,7 +27423,7 @@ function create_else_block_1$3(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block_1$3.name,
+		id: create_else_block_1$2.name,
 		type: "else",
 		source: "(113:20) {:else}",
 		ctx
@@ -28461,7 +28461,7 @@ function get_each_context$6(ctx, list, i) {
 }
 
 // (53:8) {:else}
-function create_else_block_1$2(ctx) {
+function create_else_block_1$1(ctx) {
 	let iconspacer;
 	let current;
 	iconspacer = new IconSpacer({ $$inline: true });
@@ -28491,7 +28491,7 @@ function create_else_block_1$2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block_1$2.name,
+		id: create_else_block_1$1.name,
 		type: "else",
 		source: "(53:8) {:else}",
 		ctx
@@ -28925,7 +28925,7 @@ function create_fragment$s(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block_3$5, create_else_block_1$2];
+	const if_block_creators = [create_if_block_3$5, create_else_block_1$1];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -29837,87 +29837,7 @@ function create_default_slot_2$2(ctx) {
 	return block;
 }
 
-// (40:20) {#if contract.type === DeployedContractType.Compiled}
-function create_if_block_4$3(ctx) {
-	let current_block_type_index;
-	let if_block;
-	let if_block_anchor;
-	let current;
-	const if_block_creators = [create_if_block_5$2, create_else_block$8];
-	const if_blocks = [];
-
-	function select_block_type(ctx, dirty) {
-		if (/*isProxy*/ ctx[3]) return 0;
-		return 1;
-	}
-
-	current_block_type_index = select_block_type(ctx);
-	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-
-	const block = {
-		c: function create() {
-			if_block.c();
-			if_block_anchor = empty();
-		},
-		m: function mount(target, anchor) {
-			if_blocks[current_block_type_index].m(target, anchor);
-			insert_dev(target, if_block_anchor, anchor);
-			current = true;
-		},
-		p: function update(ctx, dirty) {
-			let previous_block_index = current_block_type_index;
-			current_block_type_index = select_block_type(ctx);
-
-			if (current_block_type_index === previous_block_index) {
-				if_blocks[current_block_type_index].p(ctx, dirty);
-			} else {
-				group_outros();
-
-				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-					if_blocks[previous_block_index] = null;
-				});
-
-				check_outros();
-				if_block = if_blocks[current_block_type_index];
-
-				if (!if_block) {
-					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-					if_block.c();
-				} else {
-					if_block.p(ctx, dirty);
-				}
-
-				transition_in(if_block, 1);
-				if_block.m(if_block_anchor.parentNode, if_block_anchor);
-			}
-		},
-		i: function intro(local) {
-			if (current) return;
-			transition_in(if_block);
-			current = true;
-		},
-		o: function outro(local) {
-			transition_out(if_block);
-			current = false;
-		},
-		d: function destroy(detaching) {
-			if_blocks[current_block_type_index].d(detaching);
-			if (detaching) detach_dev(if_block_anchor);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_4$3.name,
-		type: "if",
-		source: "(40:20) {#if contract.type === DeployedContractType.Compiled}",
-		ctx
-	});
-
-	return block;
-}
-
-// (49:24) {:else}
+// (51:20) {:else}
 function create_else_block$8(ctx) {
 	let defaultbutton;
 	let current;
@@ -29967,15 +29887,15 @@ function create_else_block$8(ctx) {
 		block,
 		id: create_else_block$8.name,
 		type: "else",
-		source: "(49:24) {:else}",
+		source: "(51:20) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (41:24) {#if isProxy}
-function create_if_block_5$2(ctx) {
+// (40:20) {#if isProxy}
+function create_if_block_4$3(ctx) {
 	let defaultbutton;
 	let current;
 
@@ -30022,16 +29942,16 @@ function create_if_block_5$2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_5$2.name,
+		id: create_if_block_4$3.name,
 		type: "if",
-		source: "(41:24) {#if isProxy}",
+		source: "(40:20) {#if isProxy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (50:28) <DefaultButton callback={() => openAddAbiQuickPick(contract.fqn)}>
+// (52:24) <DefaultButton callback={() => openAddAbiQuickPick(contract.address)}>
 function create_default_slot_1$4(ctx) {
 	let radiotowericon;
 	let current;
@@ -30063,14 +29983,14 @@ function create_default_slot_1$4(ctx) {
 		block,
 		id: create_default_slot_1$4.name,
 		type: "slot",
-		source: "(50:28) <DefaultButton callback={() => openAddAbiQuickPick(contract.fqn)}>",
+		source: "(52:24) <DefaultButton callback={() => openAddAbiQuickPick(contract.address)}>",
 		ctx
 	});
 
 	return block;
 }
 
-// (43:28) <DefaultButton                                 callback={() =>                                     removeProxy(contract.fqn, contract.proxyFor?.[0]?.address)}                             >
+// (42:24) <DefaultButton                             callback={() => {                                 if (contract.proxyFor?.[0]?.id) {                                     removeProxy(contract.address, contract.proxyFor[0].id);                                 }                             }}                         >
 function create_default_slot$7(ctx) {
 	let radiotowercrossedicon;
 	let current;
@@ -30102,14 +30022,14 @@ function create_default_slot$7(ctx) {
 		block,
 		id: create_default_slot$7.name,
 		type: "slot",
-		source: "(43:28) <DefaultButton                                 callback={() =>                                     removeProxy(contract.fqn, contract.proxyFor?.[0]?.address)}                             >",
+		source: "(42:24) <DefaultButton                             callback={() => {                                 if (contract.proxyFor?.[0]?.id) {                                     removeProxy(contract.address, contract.proxyFor[0].id);                                 }                             }}                         >",
 		ctx
 	});
 
 	return block;
 }
 
-// (60:12) {#if expanded}
+// (61:12) {#if expanded}
 function create_if_block_3$4(ctx) {
 	let div;
 	let span;
@@ -30139,9 +30059,9 @@ function create_if_block_3$4(ctx) {
 			t1 = space();
 			create_component(copyablespan.$$.fragment);
 			attr_dev(span, "class", "text-sm");
-			add_location(span, file$m, 61, 20, 3225);
+			add_location(span, file$m, 62, 20, 3210);
 			attr_dev(div, "class", "w-full flex flex-row gap-1 items-center justify-between pb-1");
-			add_location(div, file$m, 60, 16, 3130);
+			add_location(div, file$m, 61, 16, 3115);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -30179,14 +30099,14 @@ function create_if_block_3$4(ctx) {
 		block,
 		id: create_if_block_3$4.name,
 		type: "if",
-		source: "(60:12) {#if expanded}",
+		source: "(61:12) {#if expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (78:4) {#if expanded}
+// (79:4) {#if expanded}
 function create_if_block$b(ctx) {
 	let if_block_anchor;
 	let current;
@@ -30245,14 +30165,14 @@ function create_if_block$b(ctx) {
 		block,
 		id: create_if_block$b.name,
 		type: "if",
-		source: "(78:4) {#if expanded}",
+		source: "(79:4) {#if expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (79:8) {#if filteredAbi.length > 0}
+// (80:8) {#if filteredAbi.length > 0}
 function create_if_block_1$7(ctx) {
 	let div;
 	let t0;
@@ -30292,7 +30212,7 @@ function create_if_block_1$7(ctx) {
 			t1 = space();
 			create_component(calldatabytes.$$.fragment);
 			attr_dev(div, "class", "flex flex-col gap-1");
-			add_location(div, file$m, 79, 12, 4029);
+			add_location(div, file$m, 80, 12, 4014);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -30395,14 +30315,14 @@ function create_if_block_1$7(ctx) {
 		block,
 		id: create_if_block_1$7.name,
 		type: "if",
-		source: "(79:8) {#if filteredAbi.length > 0}",
+		source: "(80:8) {#if filteredAbi.length > 0}",
 		ctx
 	});
 
 	return block;
 }
 
-// (81:16) {#if isProxy}
+// (82:16) {#if isProxy}
 function create_if_block_2$5(ctx) {
 	let each_1_anchor;
 	let current;
@@ -30493,14 +30413,14 @@ function create_if_block_2$5(ctx) {
 		block,
 		id: create_if_block_2$5.name,
 		type: "if",
-		source: "(81:16) {#if isProxy}",
+		source: "(82:16) {#if isProxy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (84:28) {#each proxy.abi as func}
+// (85:28) {#each proxy.abi as func}
 function create_each_block_2(ctx) {
 	let contractfunction;
 	let current;
@@ -30545,14 +30465,14 @@ function create_each_block_2(ctx) {
 		block,
 		id: create_each_block_2.name,
 		type: "each",
-		source: "(84:28) {#each proxy.abi as func}",
+		source: "(85:28) {#each proxy.abi as func}",
 		ctx
 	});
 
 	return block;
 }
 
-// (82:20) {#each filteredProxies as proxy}
+// (83:20) {#each filteredProxies as proxy}
 function create_each_block_1(ctx) {
 	let div;
 	let t;
@@ -30579,7 +30499,7 @@ function create_each_block_1(ctx) {
 
 			t = space();
 			attr_dev(div, "class", "flex flex-col gap-1");
-			add_location(div, file$m, 82, 24, 4170);
+			add_location(div, file$m, 83, 24, 4155);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -30650,14 +30570,14 @@ function create_each_block_1(ctx) {
 		block,
 		id: create_each_block_1.name,
 		type: "each",
-		source: "(82:20) {#each filteredProxies as proxy}",
+		source: "(83:20) {#each filteredProxies as proxy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (95:16) {#each filteredAbi as func}
+// (96:16) {#each filteredAbi as func}
 function create_each_block$5(ctx) {
 	let contractfunction;
 	let current;
@@ -30701,7 +30621,7 @@ function create_each_block$5(ctx) {
 		block,
 		id: create_each_block$5.name,
 		type: "each",
-		source: "(95:16) {#each filteredAbi as func}",
+		source: "(96:16) {#each filteredAbi as func}",
 		ctx
 	});
 
@@ -30719,6 +30639,8 @@ function create_fragment$n(ctx) {
 	let clickablespan;
 	let t1;
 	let div0;
+	let current_block_type_index;
+	let if_block0;
 	let t2;
 	let deletebutton;
 	let t3;
@@ -30751,7 +30673,16 @@ function create_fragment$n(ctx) {
 			$$inline: true
 		});
 
-	let if_block0 = /*contract*/ ctx[0].type === DeployedContractType.Compiled && create_if_block_4$3(ctx);
+	const if_block_creators = [create_if_block_4$3, create_else_block$8];
+	const if_blocks = [];
+
+	function select_block_type(ctx, dirty) {
+		if (/*isProxy*/ ctx[3]) return 0;
+		return 1;
+	}
+
+	current_block_type_index = select_block_type(ctx);
+	if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 
 	deletebutton = new DeleteButton({
 			props: { callback: /*func_3*/ ctx[12] },
@@ -30772,7 +30703,7 @@ function create_fragment$n(ctx) {
 			create_component(clickablespan.$$.fragment);
 			t1 = space();
 			div0 = element("div");
-			if (if_block0) if_block0.c();
+			if_block0.c();
 			t2 = space();
 			create_component(deletebutton.$$.fragment);
 			t3 = space();
@@ -30803,7 +30734,7 @@ function create_fragment$n(ctx) {
 			mount_component(clickablespan, div1, null);
 			append_dev(div1, t1);
 			append_dev(div1, div0);
-			if (if_block0) if_block0.m(div0, null);
+			if_blocks[current_block_type_index].m(div0, null);
 			append_dev(div0, t2);
 			mount_component(deletebutton, div0, null);
 			append_dev(div2, t3);
@@ -30830,28 +30761,30 @@ function create_fragment$n(ctx) {
 			}
 
 			clickablespan.$set(clickablespan_changes);
+			let previous_block_index = current_block_type_index;
+			current_block_type_index = select_block_type(ctx);
 
-			if (/*contract*/ ctx[0].type === DeployedContractType.Compiled) {
-				if (if_block0) {
-					if_block0.p(ctx, dirty);
-
-					if (dirty & /*contract*/ 1) {
-						transition_in(if_block0, 1);
-					}
-				} else {
-					if_block0 = create_if_block_4$3(ctx);
-					if_block0.c();
-					transition_in(if_block0, 1);
-					if_block0.m(div0, t2);
-				}
-			} else if (if_block0) {
+			if (current_block_type_index === previous_block_index) {
+				if_blocks[current_block_type_index].p(ctx, dirty);
+			} else {
 				group_outros();
 
-				transition_out(if_block0, 1, 1, () => {
-					if_block0 = null;
+				transition_out(if_blocks[previous_block_index], 1, 1, () => {
+					if_blocks[previous_block_index] = null;
 				});
 
 				check_outros();
+				if_block0 = if_blocks[current_block_type_index];
+
+				if (!if_block0) {
+					if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+					if_block0.c();
+				} else {
+					if_block0.p(ctx, dirty);
+				}
+
+				transition_in(if_block0, 1);
+				if_block0.m(div0, t2);
 			}
 
 			const deletebutton_changes = {};
@@ -30927,7 +30860,7 @@ function create_fragment$n(ctx) {
 			if (detaching) detach_dev(div4);
 			destroy_component(expandbutton);
 			destroy_component(clickablespan);
-			if (if_block0) if_block0.d();
+			if_blocks[current_block_type_index].d();
 			destroy_component(deletebutton);
 			if (if_block1) if_block1.d();
 			if (if_block2) if_block2.d();
@@ -30983,8 +30916,14 @@ function instance$n($$self, $$props, $$invalidate) {
 	}
 
 	const func = () => requestLabel(contract.address);
-	const func_1 = () => removeProxy(contract.fqn, contract.proxyFor?.[0]?.address);
-	const func_2 = () => openAddAbiQuickPick(contract.fqn);
+
+	const func_1 = () => {
+		if (contract.proxyFor?.[0]?.id) {
+			removeProxy(contract.address, contract.proxyFor[0].id);
+		}
+	};
+
+	const func_2 = () => openAddAbiQuickPick(contract.address);
 	const func_3 = () => removeDeployedContract(contract.address);
 
 	$$self.$$set = $$props => {
@@ -35884,7 +35823,7 @@ function create_if_block$3(ctx) {
 }
 
 // (63:20) {:else}
-function create_else_block_1$1(ctx) {
+function create_else_block_1(ctx) {
 	let chevronright;
 	let t0;
 	let span0;
@@ -35961,7 +35900,7 @@ function create_else_block_1$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block_1$1.name,
+		id: create_else_block_1.name,
 		type: "else",
 		source: "(63:20) {:else}",
 		ctx
@@ -36028,7 +35967,7 @@ function create_header_slot_2(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block_1$3, create_else_block_1$1];
+	const if_block_creators = [create_if_block_1$3, create_else_block_1];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
@@ -39122,635 +39061,8 @@ const { Error: Error_1 } = globals;
 
 const file = "src/Sake.svelte";
 
-// (181:4) {:else}
+// (186:8) {:else}
 function create_else_block(ctx) {
-	let chainnavigator;
-	let t;
-	let div;
-	let current_block_type_index;
-	let if_block;
-	let current;
-	chainnavigator = new ChainNavigator({ $$inline: true });
-	const if_block_creators = [create_if_block_10, create_else_block_1];
-	const if_blocks = [];
-
-	function select_block_type_1(ctx, dirty) {
-		if (/*$currentChain*/ ctx[6]?.connected) return 0;
-		return 1;
-	}
-
-	current_block_type_index = select_block_type_1(ctx);
-	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-
-	const block = {
-		c: function create() {
-			create_component(chainnavigator.$$.fragment);
-			t = space();
-			div = element("div");
-			if_block.c();
-			attr_dev(div, "class", "flex-grow overflow-hidden");
-			add_location(div, file, 182, 8, 8513);
-		},
-		m: function mount(target, anchor) {
-			mount_component(chainnavigator, target, anchor);
-			insert_dev(target, t, anchor);
-			insert_dev(target, div, anchor);
-			if_blocks[current_block_type_index].m(div, null);
-			current = true;
-		},
-		p: function update(ctx, dirty) {
-			let previous_block_index = current_block_type_index;
-			current_block_type_index = select_block_type_1(ctx);
-
-			if (current_block_type_index === previous_block_index) {
-				if_blocks[current_block_type_index].p(ctx, dirty);
-			} else {
-				group_outros();
-
-				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-					if_blocks[previous_block_index] = null;
-				});
-
-				check_outros();
-				if_block = if_blocks[current_block_type_index];
-
-				if (!if_block) {
-					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-					if_block.c();
-				} else {
-					if_block.p(ctx, dirty);
-				}
-
-				transition_in(if_block, 1);
-				if_block.m(div, null);
-			}
-		},
-		i: function intro(local) {
-			if (current) return;
-			transition_in(chainnavigator.$$.fragment, local);
-			transition_in(if_block);
-			current = true;
-		},
-		o: function outro(local) {
-			transition_out(chainnavigator.$$.fragment, local);
-			transition_out(if_block);
-			current = false;
-		},
-		d: function destroy(detaching) {
-			destroy_component(chainnavigator, detaching);
-			if (detaching) detach_dev(t);
-			if (detaching) detach_dev(div);
-			if_blocks[current_block_type_index].d();
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_else_block.name,
-		type: "else",
-		source: "(181:4) {:else}",
-		ctx
-	});
-
-	return block;
-}
-
-// (168:51) 
-function create_if_block_9(ctx) {
-	let div;
-	let h3;
-	let t1;
-	let span1;
-	let t2;
-	let span0;
-	let t4;
-	let t5;
-	let vscode_button;
-	let mounted;
-	let dispose;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			h3 = element("h3");
-			h3.textContent = "Anvil is not installed";
-			t1 = space();
-			span1 = element("span");
-			t2 = text("To use the ");
-			span0 = element("span");
-			span0.textContent = "Deploy and Interact UI";
-			t4 = text(", Froundry's Anvil is\n                required to be installed on your device in order to start a local chain. Please\n                install Anvil and restart VS Code.");
-			t5 = space();
-			vscode_button = element("vscode-button");
-			vscode_button.textContent = "Visit Anvil Installation Page";
-			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 169, 12, 7879);
-			attr_dev(span0, "class", "italic");
-			add_location(span0, file, 171, 28, 7995);
-			add_location(span1, file, 170, 12, 7961);
-			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 176, 12, 8315);
-			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 168, 8, 7815);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, h3);
-			append_dev(div, t1);
-			append_dev(div, span1);
-			append_dev(span1, t2);
-			append_dev(span1, span0);
-			append_dev(span1, t4);
-			append_dev(div, t5);
-			append_dev(div, vscode_button);
-
-			if (!mounted) {
-				dispose = listen_dev(vscode_button, "click", /*installAnvil*/ ctx[9], false, false, false, false);
-				mounted = true;
-			}
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-			mounted = false;
-			dispose();
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_9.name,
-		type: "if",
-		source: "(168:51) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (148:54) 
-function create_if_block_8(ctx) {
-	let div;
-	let h3;
-	let t1;
-	let span1;
-	let t2;
-	let span0;
-	let t4;
-	let t5;
-	let vscode_button;
-	let mounted;
-	let dispose;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			h3 = element("h3");
-			h3.textContent = "Wake Server is not running";
-			t1 = space();
-			span1 = element("span");
-			t2 = text("The Wake LSP server is not responding. Please ensure Wake is properly installed and\n                running. If issues persist,\n                ");
-			span0 = element("span");
-			span0.textContent = "try changing its installation method";
-			t4 = text(".");
-			t5 = space();
-			vscode_button = element("vscode-button");
-			vscode_button.textContent = "Restart Connection";
-			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 149, 12, 6871);
-			attr_dev(span0, "class", "cursor-pointer underline");
-			add_location(span0, file, 155, 16, 7251);
-			add_location(span1, file, 152, 12, 7084);
-			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 163, 12, 7607);
-			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 148, 8, 6807);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, h3);
-			append_dev(div, t1);
-			append_dev(div, span1);
-			append_dev(span1, t2);
-			append_dev(span1, span0);
-			append_dev(span1, t4);
-			append_dev(div, t5);
-			append_dev(div, vscode_button);
-
-			if (!mounted) {
-				dispose = [
-					listen_dev(span0, "click", /*click_handler*/ ctx[11], false, false, false, false),
-					listen_dev(vscode_button, "click", /*tryWakeServerRestart*/ ctx[8], false, false, false, false)
-				];
-
-				mounted = true;
-			}
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-			mounted = false;
-			run_all(dispose);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_8.name,
-		type: "if",
-		source: "(148:54) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (140:64) 
-function create_if_block_7(ctx) {
-	let div;
-	let h3;
-	let t1;
-	let span;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			h3 = element("h3");
-			h3.textContent = "Too many workspaces opened";
-			t1 = space();
-			span = element("span");
-			span.textContent = "The Deploy and Interact UI can only be used with a single workspace opened. Please\n                close other workspaces to use this feature.";
-			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 141, 12, 6457);
-			add_location(span, file, 142, 12, 6543);
-			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 140, 8, 6393);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, h3);
-			append_dev(div, t1);
-			append_dev(div, span);
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_7.name,
-		type: "if",
-		source: "(140:64) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (132:53) 
-function create_if_block_6(ctx) {
-	let div;
-	let h3;
-	let t1;
-	let span;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			h3 = element("h3");
-			h3.textContent = "No workspace opened";
-			t1 = space();
-			span = element("span");
-			span.textContent = "The Deploy and Interact UI requires an open workspace containing Solidity files.\n                Please open a project with Solidity contracts to use this feature.";
-			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 133, 12, 6019);
-			add_location(span, file, 134, 12, 6098);
-			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 132, 8, 5955);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, h3);
-			append_dev(div, t1);
-			append_dev(div, span);
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_6.name,
-		type: "if",
-		source: "(132:53) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (123:55) 
-function create_if_block_5(ctx) {
-	let div;
-	let h3;
-	let t1;
-	let span;
-	let t3;
-	let vscode_button;
-	let mounted;
-	let dispose;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			h3 = element("h3");
-			h3.textContent = "No chain selected";
-			t1 = space();
-			span = element("span");
-			span.textContent = "No chain selected. Please select a chain to get started.";
-			t3 = space();
-			vscode_button = element("vscode-button");
-			vscode_button.textContent = "Select chain";
-			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 124, 12, 5531);
-			add_location(span, file, 125, 12, 5608);
-			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 127, 12, 5760);
-			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 123, 8, 5467);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, h3);
-			append_dev(div, t1);
-			append_dev(div, span);
-			append_dev(div, t3);
-			append_dev(div, vscode_button);
-
-			if (!mounted) {
-				dispose = listen_dev(vscode_button, "click", selectChain, false, false, false, false);
-				mounted = true;
-			}
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-			mounted = false;
-			dispose();
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_5.name,
-		type: "if",
-		source: "(123:55) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (114:46) 
-function create_if_block_4(ctx) {
-	let div;
-	let h3;
-	let t1;
-	let span;
-	let t3;
-	let vscode_button;
-	let mounted;
-	let dispose;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			h3 = element("h3");
-			h3.textContent = "No chains found";
-			t1 = space();
-			span = element("span");
-			span.textContent = "No chains set up. Please set up a chain first.";
-			t3 = space();
-			vscode_button = element("vscode-button");
-			vscode_button.textContent = "Setup new chain";
-			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 115, 12, 5042);
-			add_location(span, file, 116, 12, 5117);
-			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 118, 12, 5259);
-			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 114, 8, 4978);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, h3);
-			append_dev(div, t1);
-			append_dev(div, span);
-			append_dev(div, t3);
-			append_dev(div, vscode_button);
-
-			if (!mounted) {
-				dispose = listen_dev(vscode_button, "click", openChainsQuickPick, false, false, false, false);
-				mounted = true;
-			}
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-			mounted = false;
-			dispose();
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_4.name,
-		type: "if",
-		source: "(114:46) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (110:64) 
-function create_if_block_3(ctx) {
-	let div;
-	let span;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			span = element("span");
-			span.textContent = "Loading chains...";
-			add_location(span, file, 111, 12, 4877);
-			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 110, 8, 4789);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, span);
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_3.name,
-		type: "if",
-		source: "(110:64) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (99:85) 
-function create_if_block_2(ctx) {
-	let div;
-	let span;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			span = element("span");
-			span.textContent = "Unexpected error loading state from the extension. Please try restarting VS Code.";
-			add_location(span, file, 100, 12, 4316);
-			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 99, 8, 4228);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, span);
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_2.name,
-		type: "if",
-		source: "(99:85) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (95:90) 
-function create_if_block_1(ctx) {
-	let div;
-	let span;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			span = element("span");
-			span.textContent = "Initializing extension...";
-			add_location(span, file, 96, 12, 4080);
-			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 95, 8, 3992);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, span);
-		},
-		p: noop,
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_1.name,
-		type: "if",
-		source: "(95:90) ",
-		ctx
-	});
-
-	return block;
-}
-
-// (90:4) {#if $loadingShown}
-function create_if_block(ctx) {
-	let div;
-	let vscode_progress_ring;
-	let t0;
-	let span;
-	let t1_value = (/*$loadingMessage*/ ctx[2] ?? 'Loading...') + "";
-	let t1;
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			vscode_progress_ring = element("vscode-progress-ring");
-			t0 = space();
-			span = element("span");
-			t1 = text(t1_value);
-			add_location(vscode_progress_ring, file, 91, 12, 3794);
-			add_location(span, file, 92, 12, 3831);
-			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 90, 8, 3706);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			append_dev(div, vscode_progress_ring);
-			append_dev(div, t0);
-			append_dev(div, span);
-			append_dev(span, t1);
-		},
-		p: function update(ctx, dirty) {
-			if (dirty & /*$loadingMessage*/ 4 && t1_value !== (t1_value = (/*$loadingMessage*/ ctx[2] ?? 'Loading...') + "")) set_data_dev(t1, t1_value);
-		},
-		i: noop,
-		o: noop,
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block.name,
-		type: "if",
-		source: "(90:4) {#if $loadingShown}",
-		ctx
-	});
-
-	return block;
-}
-
-// (186:12) {:else}
-function create_else_block_1(ctx) {
 	let div;
 	let h3;
 	let t1;
@@ -39772,12 +39084,12 @@ function create_else_block_1(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Try to reconnect";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 187, 20, 8741);
-			add_location(span, file, 188, 20, 8842);
+			add_location(h3, file, 187, 16, 9042);
+			add_location(span, file, 188, 16, 9139);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 192, 20, 9072);
+			add_location(vscode_button, file, 192, 16, 9353);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 186, 16, 8669);
+			add_location(div, file, 186, 12, 8974);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39804,16 +39116,16 @@ function create_else_block_1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_else_block_1.name,
+		id: create_else_block.name,
 		type: "else",
-		source: "(186:12) {:else}",
+		source: "(186:8) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (184:12) {#if $currentChain?.connected}
+// (184:43) 
 function create_if_block_10(ctx) {
 	let tabs_1;
 	let current;
@@ -39850,7 +39162,541 @@ function create_if_block_10(ctx) {
 		block,
 		id: create_if_block_10.name,
 		type: "if",
-		source: "(184:12) {#if $currentChain?.connected}",
+		source: "(184:43) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (171:55) 
+function create_if_block_9(ctx) {
+	let div;
+	let h3;
+	let t1;
+	let span1;
+	let t2;
+	let span0;
+	let t4;
+	let t5;
+	let vscode_button;
+	let mounted;
+	let dispose;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			h3 = element("h3");
+			h3.textContent = "Anvil is not installed";
+			t1 = space();
+			span1 = element("span");
+			t2 = text("To use the ");
+			span0 = element("span");
+			span0.textContent = "Deploy and Interact UI";
+			t4 = text(", Froundry's Anvil\n                    is required to be installed on your device in order to start a local chain.\n                    Please install Anvil and restart VS Code.");
+			t5 = space();
+			vscode_button = element("vscode-button");
+			vscode_button.textContent = "Visit Anvil Installation Page";
+			attr_dev(h3, "class", "uppercase font-bold text-base");
+			add_location(h3, file, 172, 16, 8242);
+			attr_dev(span0, "class", "italic");
+			add_location(span0, file, 174, 32, 8366);
+			add_location(span1, file, 173, 16, 8328);
+			set_custom_element_data(vscode_button, "appearance", "primary");
+			add_location(vscode_button, file, 179, 16, 8706);
+			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
+			add_location(div, file, 171, 12, 8174);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, h3);
+			append_dev(div, t1);
+			append_dev(div, span1);
+			append_dev(span1, t2);
+			append_dev(span1, span0);
+			append_dev(span1, t4);
+			append_dev(div, t5);
+			append_dev(div, vscode_button);
+
+			if (!mounted) {
+				dispose = listen_dev(vscode_button, "click", /*installAnvil*/ ctx[9], false, false, false, false);
+				mounted = true;
+			}
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+			mounted = false;
+			dispose();
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_9.name,
+		type: "if",
+		source: "(171:55) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (151:58) 
+function create_if_block_8(ctx) {
+	let div;
+	let h3;
+	let t1;
+	let span1;
+	let t2;
+	let span0;
+	let t4;
+	let t5;
+	let vscode_button;
+	let mounted;
+	let dispose;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			h3 = element("h3");
+			h3.textContent = "Wake Server is not running";
+			t1 = space();
+			span1 = element("span");
+			t2 = text("The Wake LSP server is not responding. Please ensure Wake is properly installed\n                    and running. If issues persist,\n                    ");
+			span0 = element("span");
+			span0.textContent = "try changing its installation method";
+			t4 = text(".");
+			t5 = space();
+			vscode_button = element("vscode-button");
+			vscode_button.textContent = "Restart Connection";
+			attr_dev(h3, "class", "uppercase font-bold text-base");
+			add_location(h3, file, 152, 16, 7154);
+			attr_dev(span0, "class", "cursor-pointer underline");
+			add_location(span0, file, 158, 20, 7558);
+			add_location(span1, file, 155, 16, 7379);
+			set_custom_element_data(vscode_button, "appearance", "primary");
+			add_location(vscode_button, file, 166, 16, 7946);
+			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
+			add_location(div, file, 151, 12, 7086);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, h3);
+			append_dev(div, t1);
+			append_dev(div, span1);
+			append_dev(span1, t2);
+			append_dev(span1, span0);
+			append_dev(span1, t4);
+			append_dev(div, t5);
+			append_dev(div, vscode_button);
+
+			if (!mounted) {
+				dispose = [
+					listen_dev(span0, "click", /*click_handler*/ ctx[11], false, false, false, false),
+					listen_dev(vscode_button, "click", /*tryWakeServerRestart*/ ctx[8], false, false, false, false)
+				];
+
+				mounted = true;
+			}
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+			mounted = false;
+			run_all(dispose);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_8.name,
+		type: "if",
+		source: "(151:58) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (143:68) 
+function create_if_block_7(ctx) {
+	let div;
+	let h3;
+	let t1;
+	let span;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			h3 = element("h3");
+			h3.textContent = "Too many workspaces opened";
+			t1 = space();
+			span = element("span");
+			span.textContent = "The Deploy and Interact UI can only be used with a single workspace opened.\n                    Please close other workspaces to use this feature.";
+			attr_dev(h3, "class", "uppercase font-bold text-base");
+			add_location(h3, file, 144, 16, 6708);
+			add_location(span, file, 145, 16, 6798);
+			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
+			add_location(div, file, 143, 12, 6640);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, h3);
+			append_dev(div, t1);
+			append_dev(div, span);
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_7.name,
+		type: "if",
+		source: "(143:68) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (135:57) 
+function create_if_block_6(ctx) {
+	let div;
+	let h3;
+	let t1;
+	let span;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			h3 = element("h3");
+			h3.textContent = "No workspace opened";
+			t1 = space();
+			span = element("span");
+			span.textContent = "The Deploy and Interact UI requires an open workspace containing Solidity files.\n                    Please open a project with Solidity contracts to use this feature.";
+			attr_dev(h3, "class", "uppercase font-bold text-base");
+			add_location(h3, file, 136, 16, 6238);
+			add_location(span, file, 137, 16, 6321);
+			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
+			add_location(div, file, 135, 12, 6170);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, h3);
+			append_dev(div, t1);
+			append_dev(div, span);
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_6.name,
+		type: "if",
+		source: "(135:57) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (126:59) 
+function create_if_block_5(ctx) {
+	let div;
+	let h3;
+	let t1;
+	let span;
+	let t3;
+	let vscode_button;
+	let mounted;
+	let dispose;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			h3 = element("h3");
+			h3.textContent = "No chain selected";
+			t1 = space();
+			span = element("span");
+			span.textContent = "Please select a chain to get started.";
+			t3 = space();
+			vscode_button = element("vscode-button");
+			vscode_button.textContent = "Select chain";
+			attr_dev(h3, "class", "uppercase font-bold text-base");
+			add_location(h3, file, 127, 16, 5733);
+			add_location(span, file, 128, 16, 5814);
+			set_custom_element_data(vscode_button, "appearance", "primary");
+			add_location(vscode_button, file, 130, 16, 5955);
+			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
+			add_location(div, file, 126, 12, 5665);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, h3);
+			append_dev(div, t1);
+			append_dev(div, span);
+			append_dev(div, t3);
+			append_dev(div, vscode_button);
+
+			if (!mounted) {
+				dispose = listen_dev(vscode_button, "click", selectChain, false, false, false, false);
+				mounted = true;
+			}
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+			mounted = false;
+			dispose();
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_5.name,
+		type: "if",
+		source: "(126:59) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (117:50) 
+function create_if_block_4(ctx) {
+	let div;
+	let h3;
+	let t1;
+	let span;
+	let t3;
+	let vscode_button;
+	let mounted;
+	let dispose;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			h3 = element("h3");
+			h3.textContent = "No chains set up";
+			t1 = space();
+			span = element("span");
+			span.textContent = "Please set up a chain first.";
+			t3 = space();
+			vscode_button = element("vscode-button");
+			vscode_button.textContent = "Setup new chain";
+			attr_dev(h3, "class", "uppercase font-bold text-base");
+			add_location(h3, file, 118, 16, 5225);
+			add_location(span, file, 119, 16, 5305);
+			set_custom_element_data(vscode_button, "appearance", "primary");
+			add_location(vscode_button, file, 121, 16, 5437);
+			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
+			add_location(div, file, 117, 12, 5157);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, h3);
+			append_dev(div, t1);
+			append_dev(div, span);
+			append_dev(div, t3);
+			append_dev(div, vscode_button);
+
+			if (!mounted) {
+				dispose = listen_dev(vscode_button, "click", openChainsQuickPick, false, false, false, false);
+				mounted = true;
+			}
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+			mounted = false;
+			dispose();
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_4.name,
+		type: "if",
+		source: "(117:50) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (113:68) 
+function create_if_block_3(ctx) {
+	let div;
+	let span;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			span = element("span");
+			span.textContent = "Loading chains...";
+			add_location(span, file, 114, 16, 5044);
+			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
+			add_location(div, file, 113, 12, 4952);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, span);
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_3.name,
+		type: "if",
+		source: "(113:68) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (101:89) 
+function create_if_block_2(ctx) {
+	let div;
+	let span;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			span = element("span");
+			span.textContent = "Unexpected error loading state from the extension. Please try restarting VS\n                    Code.";
+			add_location(span, file, 102, 16, 4431);
+			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
+			add_location(div, file, 101, 12, 4339);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, span);
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_2.name,
+		type: "if",
+		source: "(101:89) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (97:94) 
+function create_if_block_1(ctx) {
+	let div;
+	let span;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			span = element("span");
+			span.textContent = "Initializing extension...";
+			add_location(span, file, 98, 16, 4179);
+			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
+			add_location(div, file, 97, 12, 4087);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, span);
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_1.name,
+		type: "if",
+		source: "(97:94) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (92:8) {#if $loadingShown}
+function create_if_block(ctx) {
+	let div;
+	let vscode_progress_ring;
+	let t0;
+	let span;
+	let t1_value = (/*$loadingMessage*/ ctx[2] ?? 'Loading...') + "";
+	let t1;
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			vscode_progress_ring = element("vscode-progress-ring");
+			t0 = space();
+			span = element("span");
+			t1 = text(t1_value);
+			add_location(vscode_progress_ring, file, 93, 16, 3873);
+			add_location(span, file, 94, 16, 3914);
+			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
+			add_location(div, file, 92, 12, 3781);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+			append_dev(div, vscode_progress_ring);
+			append_dev(div, t0);
+			append_dev(div, span);
+			append_dev(span, t1);
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*$loadingMessage*/ 4 && t1_value !== (t1_value = (/*$loadingMessage*/ ctx[2] ?? 'Loading...') + "")) set_data_dev(t1, t1_value);
+		},
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block.name,
+		type: "if",
+		source: "(92:8) {#if $loadingShown}",
 		ctx
 	});
 
@@ -39859,9 +39705,13 @@ function create_if_block_10(ctx) {
 
 function create_fragment(ctx) {
 	let main;
+	let chainnavigator;
+	let t;
+	let div;
 	let current_block_type_index;
 	let if_block;
 	let current;
+	chainnavigator = new ChainNavigator({ $$inline: true });
 
 	const if_block_creators = [
 		create_if_block,
@@ -39874,6 +39724,7 @@ function create_fragment(ctx) {
 		create_if_block_7,
 		create_if_block_8,
 		create_if_block_9,
+		create_if_block_10,
 		create_else_block
 	];
 
@@ -39890,7 +39741,8 @@ function create_fragment(ctx) {
 		if (/*$appState*/ ctx[0].isOpenWorkspace === 'tooManyWorkspaces') return 7;
 		if (/*$appState*/ ctx[0].isWakeServerRunning === false) return 8;
 		if (/*$appState*/ ctx[0].isAnvilInstalled === false) return 9;
-		return 10;
+		if (/*$currentChain*/ ctx[6]?.connected) return 10;
+		return 11;
 	}
 
 	current_block_type_index = select_block_type(ctx);
@@ -39899,7 +39751,12 @@ function create_fragment(ctx) {
 	const block = {
 		c: function create() {
 			main = element("main");
+			create_component(chainnavigator.$$.fragment);
+			t = space();
+			div = element("div");
 			if_block.c();
+			attr_dev(div, "class", "flex-grow overflow-hidden");
+			add_location(div, file, 90, 4, 3701);
 			attr_dev(main, "class", "h-full my-0 overflow-hidden flex flex-col");
 			add_location(main, file, 88, 0, 3617);
 		},
@@ -39908,7 +39765,10 @@ function create_fragment(ctx) {
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, main, anchor);
-			if_blocks[current_block_type_index].m(main, null);
+			mount_component(chainnavigator, main, null);
+			append_dev(main, t);
+			append_dev(main, div);
+			if_blocks[current_block_type_index].m(div, null);
 			current = true;
 		},
 		p: function update(ctx, [dirty]) {
@@ -39935,20 +39795,23 @@ function create_fragment(ctx) {
 				}
 
 				transition_in(if_block, 1);
-				if_block.m(main, null);
+				if_block.m(div, null);
 			}
 		},
 		i: function intro(local) {
 			if (current) return;
+			transition_in(chainnavigator.$$.fragment, local);
 			transition_in(if_block);
 			current = true;
 		},
 		o: function outro(local) {
+			transition_out(chainnavigator.$$.fragment, local);
 			transition_out(if_block);
 			current = false;
 		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(main);
+			destroy_component(chainnavigator);
 			if_blocks[current_block_type_index].d();
 		}
 	};

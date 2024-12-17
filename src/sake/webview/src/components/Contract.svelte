@@ -59,20 +59,21 @@
                     {contract.label ? `${contract.label} (${contract.name})` : contract.name}
                 </ClickableSpan>
                 <div class="flex fex-row pr-1 opacity-0 group-hover:opacity-100">
-                    {#if contract.type === DeployedContractType.Compiled}
-                        {#if isProxy}
-                            <!-- @dev currently only supports one proxy -->
-                            <DefaultButton
-                                callback={() =>
-                                    removeProxy(contract.fqn, contract.proxyFor?.[0]?.address)}
-                            >
-                                <RadioTowerCrossedIcon />
-                            </DefaultButton>
-                        {:else}
-                            <DefaultButton callback={() => openAddAbiQuickPick(contract.fqn)}>
-                                <RadioTowerIcon />
-                            </DefaultButton>
-                        {/if}
+                    {#if isProxy}
+                        <!-- @dev currently only supports one proxy -->
+                        <DefaultButton
+                            callback={() => {
+                                if (contract.proxyFor?.[0]?.id) {
+                                    removeProxy(contract.address, contract.proxyFor[0].id);
+                                }
+                            }}
+                        >
+                            <RadioTowerCrossedIcon />
+                        </DefaultButton>
+                    {:else}
+                        <DefaultButton callback={() => openAddAbiQuickPick(contract.address)}>
+                            <RadioTowerIcon />
+                        </DefaultButton>
                     {/if}
 
                     <DeleteButton callback={() => removeDeployedContract(contract.address)} />
