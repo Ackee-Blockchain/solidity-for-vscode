@@ -184,14 +184,14 @@ export type WebviewMessageRequest =
     | ({
           command: WebviewMessageId.openAddAbiQuickPick;
           payload: {
-              contractFqn: string;
+              contractAddress: Address;
           };
       } & BaseWebviewMessageRequest)
     | ({
           command: WebviewMessageId.removeProxy;
           payload: {
-              contractFqn: string;
-              proxyAddress?: Address;
+              contractAddress: Address;
+              proxyId: string;
           };
       } & BaseWebviewMessageRequest)
     | ({

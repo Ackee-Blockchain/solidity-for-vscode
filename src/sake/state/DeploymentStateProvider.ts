@@ -4,9 +4,11 @@ import {
     DeployedContract,
     DeployedContractType,
     DeploymentState,
+    ImplementationContract,
     StateId
 } from '../webview/shared/types';
 import BaseStateProvider from './BaseStateProvider';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class DeploymentStateProvider extends BaseStateProvider<DeploymentState> {
     constructor() {
@@ -44,30 +46,29 @@ export default class DeploymentStateProvider extends BaseStateProvider<Deploymen
     }
 
     public extendProxySupport(
-        contractFqn: string,
-        implementation: {
-            address?: Address;
-            abi: ContractAbi;
-            name?: string;
-        }
+        address: Address,
+        implementation: Omit<ImplementationContract, 'id'>
     ) {
+        // @dev specific id has to be generated, because abi can be fetched onchain (only has address),
+        // taken from compiled contract (only has fqn) or even copy pasted (has nothing identifiable)
+        const implementationWithId = { ...implementation, id: uuidv4() };
         this.state = this.state.map((c) => {
-            if (c.type === DeployedContractType.Compiled && c.fqn === contractFqn) {
+            if (c.type === DeployedContractType.Compiled && c.address === address) {
                 if (c.proxyFor) {
-                    c.proxyFor.push(implementation);
+                    c.proxyFor.push(implementationWithId);
                 } else {
-                    c.proxyFor = [implementation];
+                    c.proxyFor = [implementationWithId];
                 }
             }
             return c;
         });
     }
 
-    public removeProxy(contractFqn: string, address?: Address) {
+    public removeProxy(address: Address, proxyId: string) {
         this.state = this.state.map((c) => {
-            if (c.type === DeployedContractType.Compiled && c.fqn === contractFqn) {
-                if (address) {
-                    c.proxyFor = c.proxyFor?.filter((p) => p.address !== address);
+            if (c.type === DeployedContractType.Compiled && c.address === address) {
+                if (proxyId) {
+                    c.proxyFor = c.proxyFor?.filter((p) => p.id !== proxyId);
                 } else {
                     c.proxyFor = undefined;
                 }

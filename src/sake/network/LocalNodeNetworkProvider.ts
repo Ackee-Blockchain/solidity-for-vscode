@@ -31,6 +31,7 @@ import {
     WakeSetBalancesResponse
 } from '../webview/shared/wake_types';
 import { NetworkProvider } from './NetworkProvider';
+import { v4 as uuidv4 } from 'uuid';
 
 export class LocalNodeNetworkProvider extends NetworkProvider {
     constructor(public config: NetworkConfiguration) {
@@ -231,6 +232,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
             address: address,
             sessionId: this.config.sessionId
         });
+
         return {
             abi: response.abi,
             name: response.name
@@ -251,6 +253,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
             proxyFor: response.proxyAbi
                 ? [
                       {
+                          id: uuidv4(),
                           address: response.implementationAddress ?? undefined,
                           abi: response.proxyAbi!,
                           name: response.proxyName ?? undefined

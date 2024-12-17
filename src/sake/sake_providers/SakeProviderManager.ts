@@ -145,11 +145,11 @@ export const sakeProviderManager = {
         }
     },
 
-    removeProxy(contractFqn: string, proxyAddress?: Address) {
-        this.state?.deployment.removeProxy(contractFqn, proxyAddress);
+    removeProxy(address: Address, proxyId: string) {
+        this.state?.deployment.removeProxy(address, proxyId);
     },
 
-    showAddAbiQuickPick(contractFqn: string) {
+    showAddAbiQuickPick(contractAddress: Address) {
         const _provider = this.provider;
 
         if (this.state === undefined || _provider === undefined) {
@@ -164,7 +164,7 @@ export const sakeProviderManager = {
                         description: 'Add an ABI from a compiled contract'
                     },
                     {
-                        label: 'Fetch ABI from chain',
+                        label: 'Fetch ABI for on-chain contract',
                         description:
                             _provider.network.type === NetworkType.Local &&
                             (_provider.network as LocalNodeNetworkProvider).config.fork !==
@@ -206,47 +206,47 @@ export const sakeProviderManager = {
                         )
                         .then((selected) => {
                             if (selected) {
-                                const abi = this.state?.compilation.get(selected)?.abi;
-                                if (abi) {
-                                    this.state?.deployment.extendProxySupport(contractFqn, {
+                                const compiledContract = this.state?.compilation.get(selected);
+                                if (compiledContract) {
+                                    this.state?.deployment.extendProxySupport(contractAddress, {
                                         address: undefined,
-                                        abi,
+                                        abi: compiledContract.abi,
                                         name: selected
                                     });
                                 }
                             }
                         });
-                } else if (selected.label === 'Fetch ABI from chain') {
+                } else if (selected.label === 'Fetch ABI for on-chain contract') {
                     vscode.window
                         .showInputBox({
-                            prompt: 'Enter the address of the contract to fetch the ABI from',
+                            prompt: 'Enter the address of the contract to fetch the ABI for',
                             value: ''
                         })
-                        .then((address) => {
-                            if (!address) {
+                        .then((implementationAddress) => {
+                            if (!implementationAddress) {
                                 return;
                             }
 
                             this.provider
-                                ?.getAbi(address)
+                                ?.getAbi(implementationAddress)
                                 .then((contract) => {
-                                    this.state?.deployment.extendProxySupport(contractFqn, {
-                                        address,
+                                    this.state?.deployment.extendProxySupport(contractAddress, {
+                                        address: implementationAddress,
                                         abi: contract.abi,
                                         name: contract.name
                                     });
                                     vscode.window.showInformationMessage(
-                                        `Successfully fetched ABI from ${contract.name} and added to ${contractFqn}`
+                                        `Successfully fetched ABI for ${contract.name} and added to ${contractAddress}`
                                     );
                                 })
                                 .catch((e) => {
                                     console.error(
-                                        `Failed to fetch ABI from ${address}: ${
+                                        `Failed to fetch ABI for ${implementationAddress}: ${
                                             e instanceof Error ? e.message : String(e)
                                         }`
                                     );
                                     vscode.window.showErrorMessage(
-                                        `Unable to fetch ABI for ${address}`
+                                        `Unable to fetch ABI for ${implementationAddress}`
                                     );
                                 });
                         });
@@ -262,7 +262,7 @@ export const sakeProviderManager = {
                                 try {
                                     const abi = JSON.parse(abiString);
                                     // @todo missing validation, add zod
-                                    this.state?.deployment.extendProxySupport(contractFqn, {
+                                    this.state?.deployment.extendProxySupport(contractAddress, {
                                         address: undefined,
                                         abi,
                                         name: undefined
@@ -391,7 +391,7 @@ export const sakeProviderManager = {
 
         vscode.window
             .showInputBox({
-                title: 'Input the contract address to retrieve from onchain',
+                title: 'Input the contract address to retrieve from on-chain',
                 value: ''
             })
             .then((address) => {
@@ -403,43 +403,43 @@ export const sakeProviderManager = {
                     // @todo show info message when native messaging is implemented
                     return;
                 }
-                this.provider
-                    ?.getAbi(address)
-                    .then((contract) => {
-                        this.provider?.states?.deployment.add({
-                            type: DeployedContractType.OnChain,
-                            address: address,
-                            abi: contract.abi,
-                            name: contract.name,
-                            balance: undefined
-                        });
-                        vscode.window.showInformationMessage(
-                            `Successfully fetched ${contract.name} from ${address}`
-                        );
-                    })
-                    .catch((e) => {
-                        console.error(
-                            `Failed to fetch ABI from ${address}: ${
-                                e instanceof Error ? e.message : String(e)
-                            }`
-                        );
-                        vscode.window
-                            .showErrorMessage(
-                                `Unable to fetch ABI for ${address}. Do you wish to add it as a contract with an empty ABI?`,
-                                'Add with empty ABI'
-                            )
-                            .then((selected) => {
-                                if (selected === 'Add with empty ABI') {
-                                    this.state?.deployment.add({
-                                        type: DeployedContractType.OnChain,
-                                        address: address,
-                                        abi: [],
-                                        name: 'Unknown',
-                                        balance: undefined
-                                    });
-                                }
-                            });
-                    });
+                this.provider?.fetchContract(address);
+                // ?.getAbi(address)
+                // .then((contract) => {
+                //     this.provider?.states?.deployment.add({
+                //         type: DeployedContractType.OnChain,
+                //         address: address,
+                //         abi: contract.abi,
+                //         name: contract.name,
+                //         balance: undefined
+                //     });
+                //     vscode.window.showInformationMessage(
+                //         `Successfully fetched ${contract.name} from ${address}`
+                //     );
+                // })
+                // .catch((e) => {
+                //     console.error(
+                //         `Failed to fetch ABI for ${address}: ${
+                //             e instanceof Error ? e.message : String(e)
+                //         }`
+                //     );
+                //     vscode.window
+                //         .showErrorMessage(
+                //             `Unable to fetch ABI for ${address}. Do you wish to add it as a contract with an empty ABI?`,
+                //             'Add with empty ABI'
+                //         )
+                //         .then((selected) => {
+                //             if (selected === 'Add with empty ABI') {
+                //                 this.state?.deployment.add({
+                //                     type: DeployedContractType.OnChain,
+                //                     address: address,
+                //                     abi: [],
+                //                     name: 'Unknown',
+                //                     balance: undefined
+                //                 });
+                //             }
+                //         });
+                // });
             });
     },
 

@@ -21,17 +21,20 @@ export enum DeployedContractType {
     OnChain = 'onchain'
 }
 
+export interface ImplementationContract {
+    id: string;
+    abi: ContractAbi;
+    address?: Address;
+    name?: string;
+}
+
 type BaseDeployedContract = {
     type: DeployedContractType;
     name: string;
     address: Address;
     balance?: number;
     abi: ContractAbi;
-    proxyFor?: {
-        abi: ContractAbi;
-        address?: Address;
-        name?: string;
-    }[];
+    proxyFor?: ImplementationContract[];
 } & Omit<ExtendedAccount, 'balance'>;
 
 export type DeployedContract =
