@@ -145,10 +145,6 @@ export const sakeProviderManager = {
         }
     },
 
-    removeProxy(address: Address, proxyId: string) {
-        this.state?.deployment.removeProxy(address, proxyId);
-    },
-
     showAddAbiQuickPick(contractAddress: Address) {
         const _provider = this.provider;
 
@@ -368,20 +364,6 @@ export const sakeProviderManager = {
             providerSelector.dispose();
         });
         providerSelector.show();
-
-        // vscode.window.showQuickPick(quickPickItems).then((selected) => {
-        //     if (selected) {
-        //         if (selected.label === 'Create new local chain') {
-        //             this.requestNewProvider();
-        //         } else if (selected.label === 'Create new local chain (advanced)') {
-        //             // pass
-        //         } else if (selected.label === 'Connect to remote node') {
-        //             // pass
-        //         } else {
-        //             this.setProvider(selected.label);
-        //         }
-        //     }
-        // });
     },
 
     requestAddDeployedContract() {
@@ -398,48 +380,14 @@ export const sakeProviderManager = {
                 if (!address) {
                     return;
                 }
+
                 // check if the addess is not already in the deployment state
                 if (this.state?.deployment.state.find((c) => c.address === address)) {
-                    // @todo show info message when native messaging is implemented
+                    // @todo show info notification when native notifications are implemented
                     return;
                 }
+
                 this.provider?.fetchContract(address);
-                // ?.getAbi(address)
-                // .then((contract) => {
-                //     this.provider?.states?.deployment.add({
-                //         type: DeployedContractType.OnChain,
-                //         address: address,
-                //         abi: contract.abi,
-                //         name: contract.name,
-                //         balance: undefined
-                //     });
-                //     vscode.window.showInformationMessage(
-                //         `Successfully fetched ${contract.name} from ${address}`
-                //     );
-                // })
-                // .catch((e) => {
-                //     console.error(
-                //         `Failed to fetch ABI for ${address}: ${
-                //             e instanceof Error ? e.message : String(e)
-                //         }`
-                //     );
-                //     vscode.window
-                //         .showErrorMessage(
-                //             `Unable to fetch ABI for ${address}. Do you wish to add it as a contract with an empty ABI?`,
-                //             'Add with empty ABI'
-                //         )
-                //         .then((selected) => {
-                //             if (selected === 'Add with empty ABI') {
-                //                 this.state?.deployment.add({
-                //                     type: DeployedContractType.OnChain,
-                //                     address: address,
-                //                     abi: [],
-                //                     name: 'Unknown',
-                //                     balance: undefined
-                //                 });
-                //             }
-                //         });
-                // });
             });
     },
 

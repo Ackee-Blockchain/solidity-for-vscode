@@ -317,7 +317,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.removeProxy: {
-                sakeProviderManager.removeProxy(
+                sakeProviderManager.provider?.removeProxy(
                     message.payload.contractAddress,
                     message.payload.proxyId
                 );
