@@ -11707,7 +11707,6 @@ var WebviewMessageId;
     WebviewMessageId["getBytecode"] = "getBytecode";
     WebviewMessageId["requestNewProvider"] = "requestNewProvider";
     WebviewMessageId["restartWakeServer"] = "restartWakeServer";
-    WebviewMessageId["selectChain"] = "selectChain";
     WebviewMessageId["openSettings"] = "openSettings";
     WebviewMessageId["openChainsQuickPick"] = "openChainsQuickPick";
     WebviewMessageId["openAddAbiQuickPick"] = "openAddAbiQuickPick";
@@ -20824,13 +20823,13 @@ async function openSettings(settingsUrl) {
 //     };
 //     messageHandler.send(request.command, request.payload);
 // }
-async function selectChain(chainId) {
-    const request = {
-        command: WebviewMessageId.selectChain,
-        payload: undefined
-    };
-    client.messageHandler.send(request.command, request.payload);
-}
+// export async function selectChain(chainId: string) {
+//     const request: WebviewMessageRequest = {
+//         command: WebviewMessageId.selectChain,
+//         payload: undefined
+//     };
+//     messageHandler.send(request.command, request.payload);
+// }
 async function restartWakeServer() {
     const request = {
         command: WebviewMessageId.restartWakeServer,
@@ -23311,8 +23310,8 @@ function create_if_block_1$a(ctx) {
 		each_blocks[i] = create_each_block$8(get_each_context$8(ctx, each_value, i));
 	}
 
-	let if_block0 = /*$selectedAccountId*/ ctx[3] !== null && create_if_block_4$5(ctx);
-	let if_block1 = /*$selectedAccount*/ ctx[0] !== null && create_if_block_3$7(ctx);
+	let if_block0 = /*$selectedAccountId*/ ctx[3] !== null && create_if_block_4$4(ctx);
+	let if_block1 = /*$selectedAccount*/ ctx[0] !== null && create_if_block_3$6(ctx);
 
 	infotooltip = new InfoTooltip({
 			props: {
@@ -23460,7 +23459,7 @@ function create_if_block_1$a(ctx) {
 				if (if_block0) {
 					if_block0.p(ctx, dirty);
 				} else {
-					if_block0 = create_if_block_4$5(ctx);
+					if_block0 = create_if_block_4$4(ctx);
 					if_block0.c();
 					if_block0.m(span2, null);
 				}
@@ -23477,7 +23476,7 @@ function create_if_block_1$a(ctx) {
 						transition_in(if_block1, 1);
 					}
 				} else {
-					if_block1 = create_if_block_3$7(ctx);
+					if_block1 = create_if_block_3$6(ctx);
 					if_block1.c();
 					transition_in(if_block1, 1);
 					if_block1.m(div0, null);
@@ -23597,7 +23596,7 @@ function create_each_block$8(ctx) {
 }
 
 // (70:24) {#if $selectedAccountId !== null}
-function create_if_block_4$5(ctx) {
+function create_if_block_4$4(ctx) {
 	let t_value = (/*$selectedAccount*/ ctx[0]?.label ?? `Account ${/*$selectedAccountId*/ ctx[3]}`) + "";
 	let t;
 
@@ -23618,7 +23617,7 @@ function create_if_block_4$5(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4$5.name,
+		id: create_if_block_4$4.name,
 		type: "if",
 		source: "(70:24) {#if $selectedAccountId !== null}",
 		ctx
@@ -23628,7 +23627,7 @@ function create_if_block_4$5(ctx) {
 }
 
 // (76:16) {#if $selectedAccount !== null}
-function create_if_block_3$7(ctx) {
+function create_if_block_3$6(ctx) {
 	let div2;
 	let div0;
 	let copyablespan;
@@ -23711,7 +23710,7 @@ function create_if_block_3$7(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3$7.name,
+		id: create_if_block_3$6.name,
 		type: "if",
 		source: "(76:16) {#if $selectedAccount !== null}",
 		ctx
@@ -26950,7 +26949,7 @@ function get_each_context$7(ctx, list, i) {
 }
 
 // (42:4) {#if expandable}
-function create_if_block_4$4(ctx) {
+function create_if_block_4$3(ctx) {
 	let div;
 	let current_block_type_index;
 	let if_block;
@@ -27022,7 +27021,7 @@ function create_if_block_4$4(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4$4.name,
+		id: create_if_block_4$3.name,
 		type: "if",
 		source: "(42:4) {#if expandable}",
 		ctx
@@ -27153,7 +27152,7 @@ function create_else_block$a(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block_2$7, create_if_block_3$6, create_else_block_1$2];
+	const if_block_creators = [create_if_block_2$7, create_if_block_3$5, create_else_block_1$2];
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
@@ -27433,7 +27432,7 @@ function create_else_block_1$2(ctx) {
 }
 
 // (109:52) 
-function create_if_block_3$6(ctx) {
+function create_if_block_3$5(ctx) {
 	let inputissueindicator;
 	let current;
 
@@ -27479,7 +27478,7 @@ function create_if_block_3$6(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3$6.name,
+		id: create_if_block_3$5.name,
 		type: "if",
 		source: "(109:52) ",
 		ctx
@@ -27945,7 +27944,7 @@ function create_fragment$v(ctx) {
 	let current_block_type_index;
 	let if_block1;
 	let current;
-	let if_block0 = /*expandable*/ ctx[2] && create_if_block_4$4(ctx);
+	let if_block0 = /*expandable*/ ctx[2] && create_if_block_4$3(ctx);
 	const if_block_creators = [create_if_block$d, create_else_block$a];
 	const if_blocks = [];
 
@@ -27985,7 +27984,7 @@ function create_fragment$v(ctx) {
 						transition_in(if_block0, 1);
 					}
 				} else {
-					if_block0 = create_if_block_4$4(ctx);
+					if_block0 = create_if_block_4$3(ctx);
 					if_block0.c();
 					transition_in(if_block0, 1);
 					if_block0.m(div, t);
@@ -28501,7 +28500,7 @@ function create_else_block_1$1(ctx) {
 }
 
 // (50:8) {#if inputRoot.hasInputs()}
-function create_if_block_3$5(ctx) {
+function create_if_block_3$4(ctx) {
 	let expandbutton;
 	let updating_expanded;
 	let current;
@@ -28558,7 +28557,7 @@ function create_if_block_3$5(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3$5.name,
+		id: create_if_block_3$4.name,
 		type: "if",
 		source: "(50:8) {#if inputRoot.hasInputs()}",
 		ctx
@@ -28925,7 +28924,7 @@ function create_fragment$s(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block_3$5, create_else_block_1$1];
+	const if_block_creators = [create_if_block_3$4, create_else_block_1$1];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -29895,7 +29894,7 @@ function create_else_block$8(ctx) {
 }
 
 // (40:20) {#if isProxy}
-function create_if_block_4$3(ctx) {
+function create_if_block_2$5(ctx) {
 	let defaultbutton;
 	let current;
 
@@ -29942,7 +29941,7 @@ function create_if_block_4$3(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4$3.name,
+		id: create_if_block_2$5.name,
 		type: "if",
 		source: "(40:20) {#if isProxy}",
 		ctx
@@ -30030,7 +30029,7 @@ function create_default_slot$7(ctx) {
 }
 
 // (61:12) {#if expanded}
-function create_if_block_3$4(ctx) {
+function create_if_block_1$7(ctx) {
 	let div;
 	let span;
 
@@ -30097,7 +30096,7 @@ function create_if_block_3$4(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3$4.name,
+		id: create_if_block_1$7.name,
 		type: "if",
 		source: "(61:12) {#if expanded}",
 		ctx
@@ -30109,10 +30108,33 @@ function create_if_block_3$4(ctx) {
 // (79:4) {#if expanded}
 function create_if_block$b(ctx) {
 	let div;
-	let t;
+	let t0;
+	let t1;
 	let calldatabytes;
 	let current;
-	let if_block = /*filteredAbi*/ ctx[4].length > 0 && create_if_block_1$7(ctx);
+	let each_value_1 = /*filteredProxies*/ ctx[2];
+	validate_each_argument(each_value_1);
+	let each_blocks_1 = [];
+
+	for (let i = 0; i < each_value_1.length; i += 1) {
+		each_blocks_1[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
+	}
+
+	const out = i => transition_out(each_blocks_1[i], 1, 1, () => {
+		each_blocks_1[i] = null;
+	});
+
+	let each_value = /*filteredAbi*/ ctx[4];
+	validate_each_argument(each_value);
+	let each_blocks = [];
+
+	for (let i = 0; i < each_value.length; i += 1) {
+		each_blocks[i] = create_each_block$5(get_each_context$5(ctx, each_value, i));
+	}
+
+	const out_1 = i => transition_out(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
 
 	calldatabytes = new CalldataBytes({
 			props: {
@@ -30124,134 +30146,68 @@ function create_if_block$b(ctx) {
 	const block = {
 		c: function create() {
 			div = element("div");
-			if (if_block) if_block.c();
-			t = space();
+
+			for (let i = 0; i < each_blocks_1.length; i += 1) {
+				each_blocks_1[i].c();
+			}
+
+			t0 = space();
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			t1 = space();
 			create_component(calldatabytes.$$.fragment);
 			attr_dev(div, "class", "flex flex-col gap-1");
 			add_location(div, file$m, 79, 8, 3973);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
-			if (if_block) if_block.m(div, null);
-			append_dev(div, t);
+
+			for (let i = 0; i < each_blocks_1.length; i += 1) {
+				if (each_blocks_1[i]) {
+					each_blocks_1[i].m(div, null);
+				}
+			}
+
+			append_dev(div, t0);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				if (each_blocks[i]) {
+					each_blocks[i].m(div, null);
+				}
+			}
+
+			append_dev(div, t1);
 			mount_component(calldatabytes, div, null);
 			current = true;
 		},
 		p: function update(ctx, dirty) {
-			if (/*filteredAbi*/ ctx[4].length > 0) {
-				if (if_block) {
-					if_block.p(ctx, dirty);
+			if (dirty & /*filteredProxies, _onFunctionCall*/ 36) {
+				each_value_1 = /*filteredProxies*/ ctx[2];
+				validate_each_argument(each_value_1);
+				let i;
 
-					if (dirty & /*filteredAbi*/ 16) {
-						transition_in(if_block, 1);
+				for (i = 0; i < each_value_1.length; i += 1) {
+					const child_ctx = get_each_context_1(ctx, each_value_1, i);
+
+					if (each_blocks_1[i]) {
+						each_blocks_1[i].p(child_ctx, dirty);
+						transition_in(each_blocks_1[i], 1);
+					} else {
+						each_blocks_1[i] = create_each_block_1(child_ctx);
+						each_blocks_1[i].c();
+						transition_in(each_blocks_1[i], 1);
+						each_blocks_1[i].m(div, t0);
 					}
-				} else {
-					if_block = create_if_block_1$7(ctx);
-					if_block.c();
-					transition_in(if_block, 1);
-					if_block.m(div, t);
 				}
-			} else if (if_block) {
+
 				group_outros();
 
-				transition_out(if_block, 1, 1, () => {
-					if_block = null;
-				});
-
-				check_outros();
-			}
-		},
-		i: function intro(local) {
-			if (current) return;
-			transition_in(if_block);
-			transition_in(calldatabytes.$$.fragment, local);
-			current = true;
-		},
-		o: function outro(local) {
-			transition_out(if_block);
-			transition_out(calldatabytes.$$.fragment, local);
-			current = false;
-		},
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-			if (if_block) if_block.d();
-			destroy_component(calldatabytes);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block$b.name,
-		type: "if",
-		source: "(79:4) {#if expanded}",
-		ctx
-	});
-
-	return block;
-}
-
-// (81:12) {#if filteredAbi.length > 0}
-function create_if_block_1$7(ctx) {
-	let t;
-	let each_1_anchor;
-	let current;
-	let if_block = /*isProxy*/ ctx[3] && create_if_block_2$5(ctx);
-	let each_value = /*filteredAbi*/ ctx[4];
-	validate_each_argument(each_value);
-	let each_blocks = [];
-
-	for (let i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$5(get_each_context$5(ctx, each_value, i));
-	}
-
-	const out = i => transition_out(each_blocks[i], 1, 1, () => {
-		each_blocks[i] = null;
-	});
-
-	const block = {
-		c: function create() {
-			if (if_block) if_block.c();
-			t = space();
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-
-			each_1_anchor = empty();
-		},
-		m: function mount(target, anchor) {
-			if (if_block) if_block.m(target, anchor);
-			insert_dev(target, t, anchor);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				if (each_blocks[i]) {
-					each_blocks[i].m(target, anchor);
+				for (i = each_value_1.length; i < each_blocks_1.length; i += 1) {
+					out(i);
 				}
-			}
-
-			insert_dev(target, each_1_anchor, anchor);
-			current = true;
-		},
-		p: function update(ctx, dirty) {
-			if (/*isProxy*/ ctx[3]) {
-				if (if_block) {
-					if_block.p(ctx, dirty);
-
-					if (dirty & /*isProxy*/ 8) {
-						transition_in(if_block, 1);
-					}
-				} else {
-					if_block = create_if_block_2$5(ctx);
-					if_block.c();
-					transition_in(if_block, 1);
-					if_block.m(t.parentNode, t);
-				}
-			} else if (if_block) {
-				group_outros();
-
-				transition_out(if_block, 1, 1, () => {
-					if_block = null;
-				});
 
 				check_outros();
 			}
@@ -30271,116 +30227,14 @@ function create_if_block_1$7(ctx) {
 						each_blocks[i] = create_each_block$5(child_ctx);
 						each_blocks[i].c();
 						transition_in(each_blocks[i], 1);
-						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
+						each_blocks[i].m(div, t1);
 					}
 				}
 
 				group_outros();
 
 				for (i = each_value.length; i < each_blocks.length; i += 1) {
-					out(i);
-				}
-
-				check_outros();
-			}
-		},
-		i: function intro(local) {
-			if (current) return;
-			transition_in(if_block);
-
-			for (let i = 0; i < each_value.length; i += 1) {
-				transition_in(each_blocks[i]);
-			}
-
-			current = true;
-		},
-		o: function outro(local) {
-			transition_out(if_block);
-			each_blocks = each_blocks.filter(Boolean);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				transition_out(each_blocks[i]);
-			}
-
-			current = false;
-		},
-		d: function destroy(detaching) {
-			if (if_block) if_block.d(detaching);
-			if (detaching) detach_dev(t);
-			destroy_each(each_blocks, detaching);
-			if (detaching) detach_dev(each_1_anchor);
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block_1$7.name,
-		type: "if",
-		source: "(81:12) {#if filteredAbi.length > 0}",
-		ctx
-	});
-
-	return block;
-}
-
-// (82:16) {#if isProxy}
-function create_if_block_2$5(ctx) {
-	let each_1_anchor;
-	let current;
-	let each_value_1 = /*filteredProxies*/ ctx[2];
-	validate_each_argument(each_value_1);
-	let each_blocks = [];
-
-	for (let i = 0; i < each_value_1.length; i += 1) {
-		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
-	}
-
-	const out = i => transition_out(each_blocks[i], 1, 1, () => {
-		each_blocks[i] = null;
-	});
-
-	const block = {
-		c: function create() {
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-
-			each_1_anchor = empty();
-		},
-		m: function mount(target, anchor) {
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				if (each_blocks[i]) {
-					each_blocks[i].m(target, anchor);
-				}
-			}
-
-			insert_dev(target, each_1_anchor, anchor);
-			current = true;
-		},
-		p: function update(ctx, dirty) {
-			if (dirty & /*filteredProxies, _onFunctionCall*/ 36) {
-				each_value_1 = /*filteredProxies*/ ctx[2];
-				validate_each_argument(each_value_1);
-				let i;
-
-				for (i = 0; i < each_value_1.length; i += 1) {
-					const child_ctx = get_each_context_1(ctx, each_value_1, i);
-
-					if (each_blocks[i]) {
-						each_blocks[i].p(child_ctx, dirty);
-						transition_in(each_blocks[i], 1);
-					} else {
-						each_blocks[i] = create_each_block_1(child_ctx);
-						each_blocks[i].c();
-						transition_in(each_blocks[i], 1);
-						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
-					}
-				}
-
-				group_outros();
-
-				for (i = each_value_1.length; i < each_blocks.length; i += 1) {
-					out(i);
+					out_1(i);
 				}
 
 				check_outros();
@@ -30390,38 +30244,52 @@ function create_if_block_2$5(ctx) {
 			if (current) return;
 
 			for (let i = 0; i < each_value_1.length; i += 1) {
+				transition_in(each_blocks_1[i]);
+			}
+
+			for (let i = 0; i < each_value.length; i += 1) {
 				transition_in(each_blocks[i]);
 			}
 
+			transition_in(calldatabytes.$$.fragment, local);
 			current = true;
 		},
 		o: function outro(local) {
+			each_blocks_1 = each_blocks_1.filter(Boolean);
+
+			for (let i = 0; i < each_blocks_1.length; i += 1) {
+				transition_out(each_blocks_1[i]);
+			}
+
 			each_blocks = each_blocks.filter(Boolean);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				transition_out(each_blocks[i]);
 			}
 
+			transition_out(calldatabytes.$$.fragment, local);
 			current = false;
 		},
 		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+			destroy_each(each_blocks_1, detaching);
 			destroy_each(each_blocks, detaching);
-			if (detaching) detach_dev(each_1_anchor);
+			destroy_component(calldatabytes);
 		}
 	};
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_2$5.name,
+		id: create_if_block$b.name,
 		type: "if",
-		source: "(82:16) {#if isProxy}",
+		source: "(79:4) {#if expanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (85:28) {#each proxy.abi as func}
+// (82:16) {#each proxy.abi as func}
 function create_each_block_2(ctx) {
 	let contractfunction;
 	let current;
@@ -30466,17 +30334,16 @@ function create_each_block_2(ctx) {
 		block,
 		id: create_each_block_2.name,
 		type: "each",
-		source: "(85:28) {#each proxy.abi as func}",
+		source: "(82:16) {#each proxy.abi as func}",
 		ctx
 	});
 
 	return block;
 }
 
-// (83:20) {#each filteredProxies as proxy}
+// (81:12) {#each filteredProxies as proxy}
 function create_each_block_1(ctx) {
-	let div;
-	let t;
+	let each_1_anchor;
 	let current;
 	let each_value_2 = /*proxy*/ ctx[17].abi;
 	validate_each_argument(each_value_2);
@@ -30492,26 +30359,20 @@ function create_each_block_1(ctx) {
 
 	const block = {
 		c: function create() {
-			div = element("div");
-
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			t = space();
-			attr_dev(div, "class", "flex flex-col gap-1");
-			add_location(div, file$m, 83, 24, 4155);
+			each_1_anchor = empty();
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				if (each_blocks[i]) {
-					each_blocks[i].m(div, null);
+					each_blocks[i].m(target, anchor);
 				}
 			}
 
-			append_dev(div, t);
+			insert_dev(target, each_1_anchor, anchor);
 			current = true;
 		},
 		p: function update(ctx, dirty) {
@@ -30530,7 +30391,7 @@ function create_each_block_1(ctx) {
 						each_blocks[i] = create_each_block_2(child_ctx);
 						each_blocks[i].c();
 						transition_in(each_blocks[i], 1);
-						each_blocks[i].m(div, t);
+						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
 					}
 				}
 
@@ -30562,8 +30423,8 @@ function create_each_block_1(ctx) {
 			current = false;
 		},
 		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
 			destroy_each(each_blocks, detaching);
+			if (detaching) detach_dev(each_1_anchor);
 		}
 	};
 
@@ -30571,14 +30432,14 @@ function create_each_block_1(ctx) {
 		block,
 		id: create_each_block_1.name,
 		type: "each",
-		source: "(83:20) {#each filteredProxies as proxy}",
+		source: "(81:12) {#each filteredProxies as proxy}",
 		ctx
 	});
 
 	return block;
 }
 
-// (96:16) {#each filteredAbi as func}
+// (87:12) {#each filteredAbi as func}
 function create_each_block$5(ctx) {
 	let contractfunction;
 	let current;
@@ -30622,7 +30483,7 @@ function create_each_block$5(ctx) {
 		block,
 		id: create_each_block$5.name,
 		type: "each",
-		source: "(96:16) {#each filteredAbi as func}",
+		source: "(87:12) {#each filteredAbi as func}",
 		ctx
 	});
 
@@ -30674,7 +30535,7 @@ function create_fragment$n(ctx) {
 			$$inline: true
 		});
 
-	const if_block_creators = [create_if_block_4$3, create_else_block$8];
+	const if_block_creators = [create_if_block_2$5, create_else_block$8];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -30690,7 +30551,7 @@ function create_fragment$n(ctx) {
 			$$inline: true
 		});
 
-	let if_block1 = /*expanded*/ ctx[1] && create_if_block_3$4(ctx);
+	let if_block1 = /*expanded*/ ctx[1] && create_if_block_1$7(ctx);
 	let if_block2 = /*expanded*/ ctx[1] && create_if_block$b(ctx);
 
 	const block = {
@@ -30800,7 +30661,7 @@ function create_fragment$n(ctx) {
 						transition_in(if_block1, 1);
 					}
 				} else {
-					if_block1 = create_if_block_3$4(ctx);
+					if_block1 = create_if_block_1$7(ctx);
 					if_block1.c();
 					transition_in(if_block1, 1);
 					if_block1.m(div2, null);
@@ -38233,7 +38094,7 @@ function getCssVarWithOpacity(cssVar, opacity = 0.5) {
 /* src/components/ChainNavigator.svelte generated by Svelte v3.59.2 */
 const file$1 = "src/components/ChainNavigator.svelte";
 
-// (28:4) {#if $chainNavigator.state === 'advancedLocalChainSetup'}
+// (25:4) {#if $chainNavigator.state === 'advancedLocalChainSetup'}
 function create_if_block_5$1(ctx) {
 	let div;
 
@@ -38242,7 +38103,7 @@ function create_if_block_5$1(ctx) {
 			div = element("div");
 			attr_dev(div, "class", "fixed inset-0 z-[5]");
 			set_style(div, "background", getCssVarWithOpacity('--vscode-sideBar-background', 0.8));
-			add_location(div, file$1, 29, 8, 1254);
+			add_location(div, file$1, 26, 8, 1106);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -38257,14 +38118,14 @@ function create_if_block_5$1(ctx) {
 		block,
 		id: create_if_block_5$1.name,
 		type: "if",
-		source: "(28:4) {#if $chainNavigator.state === 'advancedLocalChainSetup'}",
+		source: "(25:4) {#if $chainNavigator.state === 'advancedLocalChainSetup'}",
 		ctx
 	});
 
 	return block;
 }
 
-// (121:70) 
+// (118:70) 
 function create_if_block_4$1(ctx) {
 	let div;
 	let defaultbutton;
@@ -38305,9 +38166,9 @@ function create_if_block_4$1(ctx) {
 			t4 = space();
 			create_component(advancedlocalchainsetup.$$.fragment);
 			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 127, 16, 5998);
+			add_location(span, file$1, 124, 16, 5858);
 			attr_dev(div, "class", "flex gap-1 items-center text-sm h-[26px] justify-between");
-			add_location(div, file$1, 121, 12, 5740);
+			add_location(div, file$1, 118, 12, 5600);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -38361,14 +38222,14 @@ function create_if_block_4$1(ctx) {
 		block,
 		id: create_if_block_4$1.name,
 		type: "if",
-		source: "(121:70) ",
+		source: "(118:70) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (41:8) {#if $chainNavigator.state === 'default'}
+// (38:8) {#if $chainNavigator.state === 'default'}
 function create_if_block$1(ctx) {
 	let div;
 	let defaultbutton;
@@ -38392,7 +38253,7 @@ function create_if_block$1(ctx) {
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
-		if (/*$stateLoadState*/ ctx[1] === 'loading') return 0;
+		if (/*$appState*/ ctx[1].initializationState !== 'ready') return 0;
 		if (!/*$currentChain*/ ctx[2]) return 1;
 		if (/*$currentChain*/ ctx[2].connected) return 2;
 		return 3;
@@ -38411,7 +38272,7 @@ function create_if_block$1(ctx) {
 			t1 = space();
 			create_component(blankicon.$$.fragment);
 			attr_dev(div, "class", "flex gap-1 items-center text-sm h-[26px] justify-between");
-			add_location(div, file$1, 41, 12, 1641);
+			add_location(div, file$1, 38, 12, 1493);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -38481,14 +38342,14 @@ function create_if_block$1(ctx) {
 		block,
 		id: create_if_block$1.name,
 		type: "if",
-		source: "(41:8) {#if $chainNavigator.state === 'default'}",
+		source: "(38:8) {#if $chainNavigator.state === 'default'}",
 		ctx
 	});
 
 	return block;
 }
 
-// (123:16) <DefaultButton callback={chainNavigator.clear}>
+// (120:16) <DefaultButton callback={chainNavigator.clear}>
 function create_default_slot_2(ctx) {
 	let closeicon;
 	let current;
@@ -38520,14 +38381,14 @@ function create_default_slot_2(ctx) {
 		block,
 		id: create_default_slot_2.name,
 		type: "slot",
-		source: "(123:16) <DefaultButton callback={chainNavigator.clear}>",
+		source: "(120:16) <DefaultButton callback={chainNavigator.clear}>",
 		ctx
 	});
 
 	return block;
 }
 
-// (47:16) <DefaultButton callback={openChainsQuickPick}>
+// (44:16) <DefaultButton callback={openChainsQuickPick}>
 function create_default_slot_1(ctx) {
 	let multiplewindowsicon;
 	let current;
@@ -38559,14 +38420,14 @@ function create_default_slot_1(ctx) {
 		block,
 		id: create_default_slot_1.name,
 		type: "slot",
-		source: "(47:16) <DefaultButton callback={openChainsQuickPick}>",
+		source: "(44:16) <DefaultButton callback={openChainsQuickPick}>",
 		ctx
 	});
 
 	return block;
 }
 
-// (57:16) {:else}
+// (54:16) {:else}
 function create_else_block$1(ctx) {
 	let span1;
 	let warningicon;
@@ -38586,9 +38447,9 @@ function create_else_block$1(ctx) {
 			span0 = element("span");
 			t1 = text("Disconnected from ");
 			t2 = text(t2_value);
-			add_location(span0, file$1, 59, 24, 2542);
+			add_location(span0, file$1, 56, 24, 2402);
 			attr_dev(span1, "class", "truncate flex gap-1");
-			add_location(span1, file$1, 57, 20, 2443);
+			add_location(span1, file$1, 54, 20, 2303);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span1, anchor);
@@ -38621,14 +38482,14 @@ function create_else_block$1(ctx) {
 		block,
 		id: create_else_block$1.name,
 		type: "else",
-		source: "(57:16) {:else}",
+		source: "(54:16) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (55:50) 
+// (52:50) 
 function create_if_block_3$1(ctx) {
 	let span;
 	let t0;
@@ -38641,7 +38502,7 @@ function create_if_block_3$1(ctx) {
 			t0 = text("Connected to ");
 			t1 = text(t1_value);
 			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 55, 20, 2329);
+			add_location(span, file$1, 52, 20, 2189);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -38662,14 +38523,14 @@ function create_if_block_3$1(ctx) {
 		block,
 		id: create_if_block_3$1.name,
 		type: "if",
-		source: "(55:50) ",
+		source: "(52:50) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (53:41) 
+// (50:41) 
 function create_if_block_2$1(ctx) {
 	let span;
 
@@ -38678,7 +38539,7 @@ function create_if_block_2$1(ctx) {
 			span = element("span");
 			span.textContent = "No chain selected";
 			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 53, 20, 2210);
+			add_location(span, file$1, 50, 20, 2070);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -38695,23 +38556,23 @@ function create_if_block_2$1(ctx) {
 		block,
 		id: create_if_block_2$1.name,
 		type: "if",
-		source: "(53:41) ",
+		source: "(50:41) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (51:16) {#if $stateLoadState === 'loading'}
+// (48:16) {#if $appState.initializationState !== 'ready'}
 function create_if_block_1$1(ctx) {
 	let span;
 
 	const block = {
 		c: function create() {
 			span = element("span");
-			span.textContent = "Loading chains...";
+			span.textContent = "Chain Manager";
 			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 51, 20, 2100);
+			add_location(span, file$1, 48, 20, 1964);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -38728,14 +38589,14 @@ function create_if_block_1$1(ctx) {
 		block,
 		id: create_if_block_1$1.name,
 		type: "if",
-		source: "(51:16) {#if $stateLoadState === 'loading'}",
+		source: "(48:16) {#if $appState.initializationState !== 'ready'}",
 		ctx
 	});
 
 	return block;
 }
 
-// (36:4) <TextContainer         classList="chain-navigator-container {$chainNavigator.expanded             ? 'chain-navigator-container--expanded'             : ''}"     >
+// (33:4) <TextContainer         classList="chain-navigator-container {$chainNavigator.expanded             ? 'chain-navigator-container--expanded'             : ''}"     >
 function create_default_slot(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -38825,7 +38686,7 @@ function create_default_slot(ctx) {
 		block,
 		id: create_default_slot.name,
 		type: "slot",
-		source: "(36:4) <TextContainer         classList=\\\"chain-navigator-container {$chainNavigator.expanded             ? 'chain-navigator-container--expanded'             : ''}\\\"     >",
+		source: "(33:4) <TextContainer         classList=\\\"chain-navigator-container {$chainNavigator.expanded             ? 'chain-navigator-container--expanded'             : ''}\\\"     >",
 		ctx
 	});
 
@@ -38861,9 +38722,9 @@ function create_fragment$1(ctx) {
 			t1 = space();
 			create_component(textcontainer.$$.fragment);
 			attr_dev(div0, "class", "h-[26px]");
-			add_location(div0, file$1, 24, 4, 1059);
+			add_location(div0, file$1, 21, 4, 911);
 			attr_dev(div1, "class", "p-2");
-			add_location(div1, file$1, 22, 0, 987);
+			add_location(div1, file$1, 19, 0, 839);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -38897,7 +38758,7 @@ function create_fragment$1(ctx) {
 			? 'chain-navigator-container--expanded'
 			: '');
 
-			if (dirty & /*$$scope, $stateLoadState, $currentChain, $chainNavigator*/ 15) {
+			if (dirty & /*$$scope, $appState, $currentChain, $chainNavigator*/ 15) {
 				textcontainer_changes.$$scope = { dirty, ctx };
 			}
 
@@ -38932,12 +38793,12 @@ function create_fragment$1(ctx) {
 
 function instance$1($$self, $$props, $$invalidate) {
 	let $chainNavigator;
-	let $stateLoadState;
+	let $appState;
 	let $currentChain;
 	validate_store(chainNavigator, 'chainNavigator');
 	component_subscribe($$self, chainNavigator, $$value => $$invalidate(0, $chainNavigator = $$value));
-	validate_store(stateLoadState, 'stateLoadState');
-	component_subscribe($$self, stateLoadState, $$value => $$invalidate(1, $stateLoadState = $$value));
+	validate_store(appState, 'appState');
+	component_subscribe($$self, appState, $$value => $$invalidate(1, $appState = $$value));
 	validate_store(currentChain, 'currentChain');
 	component_subscribe($$self, currentChain, $$value => $$invalidate(2, $currentChain = $$value));
 	let { $$slots: slots = {}, $$scope } = $$props;
@@ -38949,6 +38810,7 @@ function instance$1($$self, $$props, $$invalidate) {
 	});
 
 	$$self.$capture_state = () => ({
+		appState,
 		currentChain,
 		stateLoadState,
 		TextContainer,
@@ -38959,19 +38821,16 @@ function instance$1($$self, $$props, $$invalidate) {
 		ExpandButton,
 		DefaultButton,
 		Divider,
-		ClickableSpan,
 		CloseIcon,
 		AdvancedLocalChainSetup,
 		getCssVarWithOpacity,
 		WarningIcon,
-		ErrorIcon,
-		NetworkType,
 		$chainNavigator,
-		$stateLoadState,
+		$appState,
 		$currentChain
 	});
 
-	return [$chainNavigator, $stateLoadState, $currentChain];
+	return [$chainNavigator, $appState, $currentChain];
 }
 
 class ChainNavigator extends SvelteComponentDev {
@@ -39022,6 +38881,7 @@ async function requestState(stateIds) {
 function setupListeners() {
     window.addEventListener('message', (event) => {
         const message = event.data;
+        console.log('message', message);
         switch (message.command) {
             case WebviewMessageId.onGetState: {
                 handleStateResponse(message);
@@ -39124,12 +38984,12 @@ function create_else_block(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Try to reconnect";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 187, 16, 9042);
-			add_location(span, file, 188, 16, 9139);
+			add_location(h3, file, 187, 16, 9037);
+			add_location(span, file, 188, 16, 9134);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 192, 16, 9353);
+			add_location(vscode_button, file, 192, 16, 9348);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 186, 12, 8974);
+			add_location(div, file, 186, 12, 8969);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39238,14 +39098,14 @@ function create_if_block_9(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Visit Anvil Installation Page";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 172, 16, 8242);
+			add_location(h3, file, 172, 16, 8237);
 			attr_dev(span0, "class", "italic");
-			add_location(span0, file, 174, 32, 8366);
-			add_location(span1, file, 173, 16, 8328);
+			add_location(span0, file, 174, 32, 8361);
+			add_location(span1, file, 173, 16, 8323);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 179, 16, 8706);
+			add_location(vscode_button, file, 179, 16, 8701);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 171, 12, 8174);
+			add_location(div, file, 171, 12, 8169);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39313,14 +39173,14 @@ function create_if_block_8(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Restart Connection";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 152, 16, 7154);
+			add_location(h3, file, 152, 16, 7149);
 			attr_dev(span0, "class", "cursor-pointer underline");
-			add_location(span0, file, 158, 20, 7558);
-			add_location(span1, file, 155, 16, 7379);
+			add_location(span0, file, 158, 20, 7553);
+			add_location(span1, file, 155, 16, 7374);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 166, 16, 7946);
+			add_location(vscode_button, file, 166, 16, 7941);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 151, 12, 7086);
+			add_location(div, file, 151, 12, 7081);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39379,10 +39239,10 @@ function create_if_block_7(ctx) {
 			span = element("span");
 			span.textContent = "The Deploy and Interact UI can only be used with a single workspace opened.\n                    Please close other workspaces to use this feature.";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 144, 16, 6708);
-			add_location(span, file, 145, 16, 6798);
+			add_location(h3, file, 144, 16, 6703);
+			add_location(span, file, 145, 16, 6793);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 143, 12, 6640);
+			add_location(div, file, 143, 12, 6635);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39425,10 +39285,10 @@ function create_if_block_6(ctx) {
 			span = element("span");
 			span.textContent = "The Deploy and Interact UI requires an open workspace containing Solidity files.\n                    Please open a project with Solidity contracts to use this feature.";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 136, 16, 6238);
-			add_location(span, file, 137, 16, 6321);
+			add_location(h3, file, 136, 16, 6233);
+			add_location(span, file, 137, 16, 6316);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 135, 12, 6170);
+			add_location(div, file, 135, 12, 6165);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39478,12 +39338,12 @@ function create_if_block_5(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Select chain";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 127, 16, 5733);
-			add_location(span, file, 128, 16, 5814);
+			add_location(h3, file, 127, 16, 5720);
+			add_location(span, file, 128, 16, 5801);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 130, 16, 5955);
+			add_location(vscode_button, file, 130, 16, 5942);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 126, 12, 5665);
+			add_location(div, file, 126, 12, 5652);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39494,7 +39354,7 @@ function create_if_block_5(ctx) {
 			append_dev(div, vscode_button);
 
 			if (!mounted) {
-				dispose = listen_dev(vscode_button, "click", selectChain, false, false, false, false);
+				dispose = listen_dev(vscode_button, "click", openChainsQuickPick, false, false, false, false);
 				mounted = true;
 			}
 		},
@@ -39542,12 +39402,12 @@ function create_if_block_4(ctx) {
 			vscode_button = element("vscode-button");
 			vscode_button.textContent = "Setup new chain";
 			attr_dev(h3, "class", "uppercase font-bold text-base");
-			add_location(h3, file, 118, 16, 5225);
-			add_location(span, file, 119, 16, 5305);
+			add_location(h3, file, 118, 16, 5212);
+			add_location(span, file, 119, 16, 5292);
 			set_custom_element_data(vscode_button, "appearance", "primary");
-			add_location(vscode_button, file, 121, 16, 5437);
+			add_location(vscode_button, file, 121, 16, 5424);
 			attr_dev(div, "class", "flex flex-col gap-4 h-full w-full p-4");
-			add_location(div, file, 117, 12, 5157);
+			add_location(div, file, 117, 12, 5144);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39593,9 +39453,9 @@ function create_if_block_3(ctx) {
 			div = element("div");
 			span = element("span");
 			span.textContent = "Loading chains...";
-			add_location(span, file, 114, 16, 5044);
+			add_location(span, file, 114, 16, 5031);
 			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 113, 12, 4952);
+			add_location(div, file, 113, 12, 4939);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39630,9 +39490,9 @@ function create_if_block_2(ctx) {
 			div = element("div");
 			span = element("span");
 			span.textContent = "Unexpected error loading state from the extension. Please try restarting VS\n                    Code.";
-			add_location(span, file, 102, 16, 4431);
+			add_location(span, file, 102, 16, 4418);
 			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 101, 12, 4339);
+			add_location(div, file, 101, 12, 4326);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39667,9 +39527,9 @@ function create_if_block_1(ctx) {
 			div = element("div");
 			span = element("span");
 			span.textContent = "Initializing extension...";
-			add_location(span, file, 98, 16, 4179);
+			add_location(span, file, 98, 16, 4166);
 			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 97, 12, 4087);
+			add_location(div, file, 97, 12, 4074);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39710,10 +39570,10 @@ function create_if_block(ctx) {
 			t0 = space();
 			span = element("span");
 			t1 = text(t1_value);
-			add_location(vscode_progress_ring, file, 93, 16, 3873);
-			add_location(span, file, 94, 16, 3914);
+			add_location(vscode_progress_ring, file, 93, 16, 3860);
+			add_location(span, file, 94, 16, 3901);
 			attr_dev(div, "class", "flex flex-col items-center justify-center gap-3 h-full w-full");
-			add_location(div, file, 92, 12, 3781);
+			add_location(div, file, 92, 12, 3768);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39796,9 +39656,9 @@ function create_fragment(ctx) {
 			div = element("div");
 			if_block.c();
 			attr_dev(div, "class", "flex-grow overflow-hidden");
-			add_location(div, file, 90, 4, 3701);
+			add_location(div, file, 90, 4, 3688);
 			attr_dev(main, "class", "h-full my-0 overflow-hidden flex flex-col");
-			add_location(main, file, 88, 0, 3617);
+			add_location(main, file, 88, 0, 3604);
 		},
 		l: function claim(nodes) {
 			throw new Error_1("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -40001,7 +39861,6 @@ function instance($$self, $$props, $$invalidate) {
 		ping,
 		reconnectChain,
 		restartWakeServer,
-		selectChain,
 		showErrorMessage,
 		Interaction,
 		Deployment,

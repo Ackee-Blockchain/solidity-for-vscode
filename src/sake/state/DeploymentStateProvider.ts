@@ -53,7 +53,7 @@ export default class DeploymentStateProvider extends BaseStateProvider<Deploymen
         // taken from compiled contract (only has fqn) or even copy pasted (has nothing identifiable)
         const implementationWithId = { ...implementation, id: uuidv4() };
         this.state = this.state.map((c) => {
-            if (c.type === DeployedContractType.Compiled && c.address === address) {
+            if (c.address === address) {
                 if (c.proxyFor) {
                     c.proxyFor.push(implementationWithId);
                 } else {
@@ -66,7 +66,7 @@ export default class DeploymentStateProvider extends BaseStateProvider<Deploymen
 
     public removeProxy(address: Address, proxyId: string) {
         this.state = this.state.map((c) => {
-            if (c.type === DeployedContractType.Compiled && c.address === address) {
+            if (c.type && c.address === address) {
                 if (proxyId) {
                     c.proxyFor = c.proxyFor?.filter((p) => p.id !== proxyId);
                 } else {

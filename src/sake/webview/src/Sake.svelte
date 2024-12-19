@@ -40,7 +40,6 @@
         ping,
         reconnectChain,
         restartWakeServer,
-        selectChain,
         showErrorMessage
     } from './helpers/api';
     import type { ComponentType } from 'svelte';
@@ -189,7 +188,7 @@
                 <h3 class="uppercase font-bold text-base">No chain selected</h3>
                 <span>Please select a chain to get started. </span>
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <vscode-button appearance="primary" on:click={selectChain}>
+                <vscode-button appearance="primary" on:click={openChainsQuickPick}>
                     Select chain
                 </vscode-button>
             </div>

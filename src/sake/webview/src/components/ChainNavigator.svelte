@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentChain, stateLoadState } from '../helpers/stores';
+    import { appState, currentChain, stateLoadState } from '../helpers/stores';
     import TextContainer from './TextContainer.svelte';
     import MultipleWindowsIcon from './icons/MultipleWindowsIcon.svelte';
     import BlankIcon from './icons/BlankIcon.svelte';
@@ -8,13 +8,10 @@
     import ExpandButton from './icons/ExpandButton.svelte';
     import DefaultButton from './icons/DefaultButton.svelte';
     import Divider from './Divider.svelte';
-    import ClickableSpan from './ClickableSpan.svelte';
     import CloseIcon from './icons/CloseIcon.svelte';
     import AdvancedLocalChainSetup from './AdvancedLocalChainSetup.svelte';
     import { getCssVarWithOpacity } from '../helpers/helpers';
     import WarningIcon from './icons/WarningIcon.svelte';
-    import ErrorIcon from './icons/ErrorIcon.svelte';
-    import { NetworkType } from '../../shared/state_types';
 </script>
 
 <!-- <ViewHeader>
@@ -49,8 +46,8 @@
                     <MultipleWindowsIcon />
                 </DefaultButton>
 
-                {#if $stateLoadState === 'loading'}
-                    <span class="truncate">Loading chains...</span>
+                {#if $appState.initializationState !== 'ready'}
+                    <span class="truncate">Chain Manager</span>
                 {:else if !$currentChain}
                     <span class="truncate">No chain selected</span>
                 {:else if $currentChain.connected}

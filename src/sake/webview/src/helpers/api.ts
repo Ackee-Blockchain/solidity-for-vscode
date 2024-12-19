@@ -189,13 +189,13 @@ export async function getBytecode(contractFqn: string) {
 //     messageHandler.send(request.command, request.payload);
 // }
 
-export async function selectChain(chainId: string) {
-    const request: WebviewMessageRequest = {
-        command: WebviewMessageId.selectChain,
-        payload: undefined
-    };
-    messageHandler.send(request.command, request.payload);
-}
+// export async function selectChain(chainId: string) {
+//     const request: WebviewMessageRequest = {
+//         command: WebviewMessageId.selectChain,
+//         payload: undefined
+//     };
+//     messageHandler.send(request.command, request.payload);
+// }
 
 export async function restartWakeServer() {
     const request: WebviewMessageRequest = {

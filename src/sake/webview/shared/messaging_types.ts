@@ -35,7 +35,6 @@ export enum WebviewMessageId {
     getBytecode = 'getBytecode',
     requestNewProvider = 'requestNewProvider', // TODO remove
     restartWakeServer = 'restartWakeServer',
-    selectChain = 'selectChain',
     openSettings = 'openSettings',
     openChainsQuickPick = 'openChainsQuickPick',
     openAddAbiQuickPick = 'openAddAbiQuickPick',
@@ -143,10 +142,6 @@ export type WebviewMessageRequest =
       } & BaseWebviewMessageRequest)
     | ({
           command: WebviewMessageId.restartWakeServer;
-          payload: undefined;
-      } & BaseWebviewMessageRequest)
-    | ({
-          command: WebviewMessageId.selectChain;
           payload: undefined;
       } & BaseWebviewMessageRequest)
     | ({

@@ -260,7 +260,9 @@ export function showAddAbiQuickPick(contractAddress: Address) {
                     )
                     .then((selected) => {
                         if (selected) {
+                            console.log('selected', selected);
                             const compiledContract = provider.states.compilation.get(selected);
+                            console.log('compiledContract', compiledContract);
                             if (compiledContract) {
                                 provider.states.deployment.extendProxySupport(contractAddress, {
                                     address: undefined,

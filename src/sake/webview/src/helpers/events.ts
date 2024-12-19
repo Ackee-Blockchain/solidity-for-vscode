@@ -81,6 +81,8 @@ export function setupListeners() {
     window.addEventListener('message', (event) => {
         const message = event.data as WebviewMessageResponse;
 
+        console.log('message', message);
+
         switch (message.command) {
             case WebviewMessageId.onGetState: {
                 handleStateResponse(message);
