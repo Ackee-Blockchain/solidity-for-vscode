@@ -99,8 +99,8 @@
         </div>
     </div>
     {#if expanded}
-        {#if filteredAbi.length > 0}
-            <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1">
+            {#if filteredAbi.length > 0}
                 {#if isProxy}
                     {#each filteredProxies as proxy}
                         <div class="flex flex-col gap-1">
@@ -118,9 +118,8 @@
                 {#each filteredAbi as func}
                     <ContractFunction {func} onFunctionCall={_onFunctionCall} />
                 {/each}
-
-                <CalldataBytes onFunctionCall={_onFunctionCall} />
-            </div>
-        {/if}
+            {/if}
+            <CalldataBytes onFunctionCall={_onFunctionCall} />
+        </div>
     {/if}
 </div>
