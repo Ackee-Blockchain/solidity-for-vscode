@@ -26955,7 +26955,7 @@ function create_if_block_4$4(ctx) {
 	let current_block_type_index;
 	let if_block;
 	let current;
-	const if_block_creators = [create_if_block_5$2, create_else_block_2];
+	const if_block_creators = [create_if_block_5$3, create_else_block_2];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -27099,7 +27099,7 @@ function create_else_block_2(ctx) {
 }
 
 // (44:12) {#if input.internalType === InputTypesInternal.LEAF}
-function create_if_block_5$2(ctx) {
+function create_if_block_5$3(ctx) {
 	let iconspacer;
 	let current;
 	iconspacer = new IconSpacer({ $$inline: true });
@@ -27129,7 +27129,7 @@ function create_if_block_5$2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_5$2.name,
+		id: create_if_block_5$3.name,
 		type: "if",
 		source: "(44:12) {#if input.internalType === InputTypesInternal.LEAF}",
 		ctx
@@ -34278,7 +34278,7 @@ function create_else_block$4(ctx) {
 }
 
 // (19:4) {#if expandable}
-function create_if_block_5$1(ctx) {
+function create_if_block_5$2(ctx) {
 	let expandbutton;
 	let updating_expanded;
 	let current;
@@ -34335,7 +34335,7 @@ function create_if_block_5$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_5$1.name,
+		id: create_if_block_5$2.name,
 		type: "if",
 		source: "(19:4) {#if expandable}",
 		ctx
@@ -35034,7 +35034,7 @@ function create_fragment$a(ctx) {
 	let t;
 	let textcontainer;
 	let current;
-	const if_block_creators = [create_if_block_5$1, create_else_block$4];
+	const if_block_creators = [create_if_block_5$2, create_else_block$4];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -38234,7 +38234,7 @@ function getCssVarWithOpacity(cssVar, opacity = 0.5) {
 const file$1 = "src/components/ChainNavigator.svelte";
 
 // (28:4) {#if $chainNavigator.state === 'advancedLocalChainSetup'}
-function create_if_block_4$1(ctx) {
+function create_if_block_5$1(ctx) {
 	let div;
 
 	const block = {
@@ -38242,7 +38242,7 @@ function create_if_block_4$1(ctx) {
 			div = element("div");
 			attr_dev(div, "class", "fixed inset-0 z-[5]");
 			set_style(div, "background", getCssVarWithOpacity('--vscode-sideBar-background', 0.8));
-			add_location(div, file$1, 29, 8, 1238);
+			add_location(div, file$1, 29, 8, 1254);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -38255,7 +38255,7 @@ function create_if_block_4$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4$1.name,
+		id: create_if_block_5$1.name,
 		type: "if",
 		source: "(28:4) {#if $chainNavigator.state === 'advancedLocalChainSetup'}",
 		ctx
@@ -38264,8 +38264,8 @@ function create_if_block_4$1(ctx) {
 	return block;
 }
 
-// (119:70) 
-function create_if_block_3$1(ctx) {
+// (121:70) 
+function create_if_block_4$1(ctx) {
 	let div;
 	let defaultbutton;
 	let t0;
@@ -38305,9 +38305,9 @@ function create_if_block_3$1(ctx) {
 			t4 = space();
 			create_component(advancedlocalchainsetup.$$.fragment);
 			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 125, 16, 5857);
+			add_location(span, file$1, 127, 16, 5998);
 			attr_dev(div, "class", "flex gap-1 items-center text-sm h-[26px] justify-between");
-			add_location(div, file$1, 119, 12, 5599);
+			add_location(div, file$1, 121, 12, 5740);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -38325,7 +38325,7 @@ function create_if_block_3$1(ctx) {
 		p: function update(ctx, dirty) {
 			const defaultbutton_changes = {};
 
-			if (dirty & /*$$scope*/ 4) {
+			if (dirty & /*$$scope*/ 8) {
 				defaultbutton_changes.$$scope = { dirty, ctx };
 			}
 
@@ -38359,9 +38359,9 @@ function create_if_block_3$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3$1.name,
+		id: create_if_block_4$1.name,
 		type: "if",
-		source: "(119:70) ",
+		source: "(121:70) ",
 		ctx
 	});
 
@@ -38388,13 +38388,14 @@ function create_if_block$1(ctx) {
 			$$inline: true
 		});
 
-	const if_block_creators = [create_if_block_1$1, create_if_block_2$1, create_else_block$1];
+	const if_block_creators = [create_if_block_1$1, create_if_block_2$1, create_if_block_3$1, create_else_block$1];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
-		if (!/*$currentChain*/ ctx[1]) return 0;
-		if (/*$currentChain*/ ctx[1].connected) return 1;
-		return 2;
+		if (/*$stateLoadState*/ ctx[1] === 'loading') return 0;
+		if (!/*$currentChain*/ ctx[2]) return 1;
+		if (/*$currentChain*/ ctx[2].connected) return 2;
+		return 3;
 	}
 
 	current_block_type_index = select_block_type_1(ctx);
@@ -38410,7 +38411,7 @@ function create_if_block$1(ctx) {
 			t1 = space();
 			create_component(blankicon.$$.fragment);
 			attr_dev(div, "class", "flex gap-1 items-center text-sm h-[26px] justify-between");
-			add_location(div, file$1, 41, 12, 1625);
+			add_location(div, file$1, 41, 12, 1641);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -38424,7 +38425,7 @@ function create_if_block$1(ctx) {
 		p: function update(ctx, dirty) {
 			const defaultbutton_changes = {};
 
-			if (dirty & /*$$scope*/ 4) {
+			if (dirty & /*$$scope*/ 8) {
 				defaultbutton_changes.$$scope = { dirty, ctx };
 			}
 
@@ -38487,7 +38488,7 @@ function create_if_block$1(ctx) {
 	return block;
 }
 
-// (121:16) <DefaultButton callback={chainNavigator.clear}>
+// (123:16) <DefaultButton callback={chainNavigator.clear}>
 function create_default_slot_2(ctx) {
 	let closeicon;
 	let current;
@@ -38519,7 +38520,7 @@ function create_default_slot_2(ctx) {
 		block,
 		id: create_default_slot_2.name,
 		type: "slot",
-		source: "(121:16) <DefaultButton callback={chainNavigator.clear}>",
+		source: "(123:16) <DefaultButton callback={chainNavigator.clear}>",
 		ctx
 	});
 
@@ -38565,14 +38566,14 @@ function create_default_slot_1(ctx) {
 	return block;
 }
 
-// (55:16) {:else}
+// (57:16) {:else}
 function create_else_block$1(ctx) {
 	let span1;
 	let warningicon;
 	let t0;
 	let span0;
 	let t1;
-	let t2_value = /*$currentChain*/ ctx[1]?.chainName + "";
+	let t2_value = /*$currentChain*/ ctx[2]?.chainName + "";
 	let t2;
 	let current;
 	warningicon = new WarningIcon({ $$inline: true });
@@ -38585,9 +38586,9 @@ function create_else_block$1(ctx) {
 			span0 = element("span");
 			t1 = text("Disconnected from ");
 			t2 = text(t2_value);
-			add_location(span0, file$1, 57, 24, 2401);
+			add_location(span0, file$1, 59, 24, 2542);
 			attr_dev(span1, "class", "truncate flex gap-1");
-			add_location(span1, file$1, 55, 20, 2302);
+			add_location(span1, file$1, 57, 20, 2443);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span1, anchor);
@@ -38599,7 +38600,7 @@ function create_else_block$1(ctx) {
 			current = true;
 		},
 		p: function update(ctx, dirty) {
-			if ((!current || dirty & /*$currentChain*/ 2) && t2_value !== (t2_value = /*$currentChain*/ ctx[1]?.chainName + "")) set_data_dev(t2, t2_value);
+			if ((!current || dirty & /*$currentChain*/ 4) && t2_value !== (t2_value = /*$currentChain*/ ctx[2]?.chainName + "")) set_data_dev(t2, t2_value);
 		},
 		i: function intro(local) {
 			if (current) return;
@@ -38620,18 +38621,18 @@ function create_else_block$1(ctx) {
 		block,
 		id: create_else_block$1.name,
 		type: "else",
-		source: "(55:16) {:else}",
+		source: "(57:16) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (53:50) 
-function create_if_block_2$1(ctx) {
+// (55:50) 
+function create_if_block_3$1(ctx) {
 	let span;
 	let t0;
-	let t1_value = /*$currentChain*/ ctx[1]?.chainName + "";
+	let t1_value = /*$currentChain*/ ctx[2]?.chainName + "";
 	let t1;
 
 	const block = {
@@ -38640,7 +38641,7 @@ function create_if_block_2$1(ctx) {
 			t0 = text("Connected to ");
 			t1 = text(t1_value);
 			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 53, 20, 2188);
+			add_location(span, file$1, 55, 20, 2329);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -38648,8 +38649,41 @@ function create_if_block_2$1(ctx) {
 			append_dev(span, t1);
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*$currentChain*/ 2 && t1_value !== (t1_value = /*$currentChain*/ ctx[1]?.chainName + "")) set_data_dev(t1, t1_value);
+			if (dirty & /*$currentChain*/ 4 && t1_value !== (t1_value = /*$currentChain*/ ctx[2]?.chainName + "")) set_data_dev(t1, t1_value);
 		},
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(span);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_3$1.name,
+		type: "if",
+		source: "(55:50) ",
+		ctx
+	});
+
+	return block;
+}
+
+// (53:41) 
+function create_if_block_2$1(ctx) {
+	let span;
+
+	const block = {
+		c: function create() {
+			span = element("span");
+			span.textContent = "No chain selected";
+			attr_dev(span, "class", "truncate");
+			add_location(span, file$1, 53, 20, 2210);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, span, anchor);
+		},
+		p: noop,
 		i: noop,
 		o: noop,
 		d: function destroy(detaching) {
@@ -38661,23 +38695,23 @@ function create_if_block_2$1(ctx) {
 		block,
 		id: create_if_block_2$1.name,
 		type: "if",
-		source: "(53:50) ",
+		source: "(53:41) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (51:16) {#if !$currentChain}
+// (51:16) {#if $stateLoadState === 'loading'}
 function create_if_block_1$1(ctx) {
 	let span;
 
 	const block = {
 		c: function create() {
 			span = element("span");
-			span.textContent = "No chain selected";
+			span.textContent = "Loading chains...";
 			attr_dev(span, "class", "truncate");
-			add_location(span, file$1, 51, 20, 2069);
+			add_location(span, file$1, 51, 20, 2100);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -38694,7 +38728,7 @@ function create_if_block_1$1(ctx) {
 		block,
 		id: create_if_block_1$1.name,
 		type: "if",
-		source: "(51:16) {#if !$currentChain}",
+		source: "(51:16) {#if $stateLoadState === 'loading'}",
 		ctx
 	});
 
@@ -38707,7 +38741,7 @@ function create_default_slot(ctx) {
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block$1, create_if_block_3$1];
+	const if_block_creators = [create_if_block$1, create_if_block_4$1];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -38805,7 +38839,7 @@ function create_fragment$1(ctx) {
 	let t1;
 	let textcontainer;
 	let current;
-	let if_block = /*$chainNavigator*/ ctx[0].state === 'advancedLocalChainSetup' && create_if_block_4$1(ctx);
+	let if_block = /*$chainNavigator*/ ctx[0].state === 'advancedLocalChainSetup' && create_if_block_5$1(ctx);
 
 	textcontainer = new TextContainer({
 			props: {
@@ -38827,9 +38861,9 @@ function create_fragment$1(ctx) {
 			t1 = space();
 			create_component(textcontainer.$$.fragment);
 			attr_dev(div0, "class", "h-[26px]");
-			add_location(div0, file$1, 24, 4, 1043);
+			add_location(div0, file$1, 24, 4, 1059);
 			attr_dev(div1, "class", "p-2");
-			add_location(div1, file$1, 22, 0, 971);
+			add_location(div1, file$1, 22, 0, 987);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -38848,7 +38882,7 @@ function create_fragment$1(ctx) {
 				if (if_block) {
 					if_block.p(ctx, dirty);
 				} else {
-					if_block = create_if_block_4$1(ctx);
+					if_block = create_if_block_5$1(ctx);
 					if_block.c();
 					if_block.m(div1, t1);
 				}
@@ -38863,7 +38897,7 @@ function create_fragment$1(ctx) {
 			? 'chain-navigator-container--expanded'
 			: '');
 
-			if (dirty & /*$$scope, $currentChain, $chainNavigator*/ 7) {
+			if (dirty & /*$$scope, $stateLoadState, $currentChain, $chainNavigator*/ 15) {
 				textcontainer_changes.$$scope = { dirty, ctx };
 			}
 
@@ -38898,11 +38932,14 @@ function create_fragment$1(ctx) {
 
 function instance$1($$self, $$props, $$invalidate) {
 	let $chainNavigator;
+	let $stateLoadState;
 	let $currentChain;
 	validate_store(chainNavigator, 'chainNavigator');
 	component_subscribe($$self, chainNavigator, $$value => $$invalidate(0, $chainNavigator = $$value));
+	validate_store(stateLoadState, 'stateLoadState');
+	component_subscribe($$self, stateLoadState, $$value => $$invalidate(1, $stateLoadState = $$value));
 	validate_store(currentChain, 'currentChain');
-	component_subscribe($$self, currentChain, $$value => $$invalidate(1, $currentChain = $$value));
+	component_subscribe($$self, currentChain, $$value => $$invalidate(2, $currentChain = $$value));
 	let { $$slots: slots = {}, $$scope } = $$props;
 	validate_slots('ChainNavigator', slots, []);
 	const writable_props = [];
@@ -38913,6 +38950,7 @@ function instance$1($$self, $$props, $$invalidate) {
 
 	$$self.$capture_state = () => ({
 		currentChain,
+		stateLoadState,
 		TextContainer,
 		MultipleWindowsIcon,
 		BlankIcon,
@@ -38929,10 +38967,11 @@ function instance$1($$self, $$props, $$invalidate) {
 		ErrorIcon,
 		NetworkType,
 		$chainNavigator,
+		$stateLoadState,
 		$currentChain
 	});
 
-	return [$chainNavigator, $currentChain];
+	return [$chainNavigator, $stateLoadState, $currentChain];
 }
 
 class ChainNavigator extends SvelteComponentDev {
