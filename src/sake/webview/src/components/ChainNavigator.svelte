@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentChain } from '../helpers/stores';
+    import { currentChain, stateLoadState } from '../helpers/stores';
     import TextContainer from './TextContainer.svelte';
     import MultipleWindowsIcon from './icons/MultipleWindowsIcon.svelte';
     import BlankIcon from './icons/BlankIcon.svelte';
@@ -49,7 +49,9 @@
                     <MultipleWindowsIcon />
                 </DefaultButton>
 
-                {#if !$currentChain}
+                {#if $stateLoadState === 'loading'}
+                    <span class="truncate">Loading chains...</span>
+                {:else if !$currentChain}
                     <span class="truncate">No chain selected</span>
                 {:else if $currentChain.connected}
                     <span class="truncate">Connected to {$currentChain?.chainName}</span>

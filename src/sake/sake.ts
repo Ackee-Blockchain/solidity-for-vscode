@@ -83,13 +83,14 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     registerCommands(context);
 
     /* Load Chains */
-
+    console.log('loading chains');
     appState.setLazy({
         initializationState: 'loadingChains'
     });
 
     await loadChains();
 
+    console.log('setting ready');
     appState.setLazy({
         initializationState: 'ready'
     });
