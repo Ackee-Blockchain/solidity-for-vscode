@@ -17,6 +17,8 @@ import AppStateProvider, { appState } from './state/AppStateProvider';
 import { SakeContext } from './context';
 import { StorageHandler } from './storage/StorageHandler';
 import { WakeChainDump } from './webview/shared/storage_types';
+import { pingWakeServer } from './utils/helpers';
+import { providerRegistry } from './sake_providers/ProviderRegistry';
 export async function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     /* Register Context */
     const sakeContext = SakeContext.getInstance();
@@ -28,13 +30,39 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
         initializationState: 'initializing'
     });
 
-    appState.setLazy({ isWakeServerRunning: client.state === State.Running });
+    appState.setLazy({
+        isWakeServerRunning: client.state === State.Running && (await pingWakeServer())
+    });
     client.onDidChangeState((state) => {
         appState.setLazy({ isWakeServerRunning: state.newState === State.Running });
     });
 
-    /* Initialize Sake Provider */
-    sakeProviderManager.initialize();
+    // set provider automatically when no provider is set
+    providerRegistry.subscribeAdd((id) => {
+        if (sakeProviderManager.currentChainId === undefined) {
+            sakeProviderManager.setProvider(id);
+        }
+    });
+
+    // providerRegistry.subscribeAdd((id) => {
+    //     if (this.currentChainId === undefined) {
+    //         this.setProvider(id);
+    //         vscode.window.showInformationMessage(
+    //             `New local chain '${this.provider!.displayName}' created.`
+    //         );
+    //         return;
+    //     }
+    //     vscode.window
+    //         .showInformationMessage(
+    //             `New local chain '${chainRegistry.get(id)?.name}' created.`,
+    //             'Switch to chain'
+    //         )
+    //         .then((selected) => {
+    //             if (selected === 'Switch to chain') {
+    //                 this.setProvider(id);
+    //             }
+    //         });
+    // });
 
     /* Register Webview */
     const sidebarSakeProvider = new SakeWebviewProvider(context.extensionUri);
