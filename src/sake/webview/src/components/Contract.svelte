@@ -100,25 +100,16 @@
     </div>
     {#if expanded}
         <div class="flex flex-col gap-1">
-            {#if filteredAbi.length > 0}
-                {#if isProxy}
-                    {#each filteredProxies as proxy}
-                        <div class="flex flex-col gap-1">
-                            {#each proxy.abi as func}
-                                <ContractFunction
-                                    {func}
-                                    onFunctionCall={_onFunctionCall}
-                                    isProxy={true}
-                                />
-                            {/each}
-                        </div>
-                    {/each}
-                {/if}
-
-                {#each filteredAbi as func}
-                    <ContractFunction {func} onFunctionCall={_onFunctionCall} />
+            {#each filteredProxies as proxy}
+                {#each proxy.abi as func}
+                    <ContractFunction {func} onFunctionCall={_onFunctionCall} isProxy={true} />
                 {/each}
-            {/if}
+            {/each}
+
+            {#each filteredAbi as func}
+                <ContractFunction {func} onFunctionCall={_onFunctionCall} />
+            {/each}
+
             <CalldataBytes onFunctionCall={_onFunctionCall} />
         </div>
     {/if}

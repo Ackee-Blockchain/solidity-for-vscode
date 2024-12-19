@@ -8,7 +8,10 @@ import {
     navigateTo,
     openExternal,
     openSettings,
-    showErrorMessage
+    requestAddDeployedContract,
+    showAddAbiQuickPick,
+    showErrorMessage,
+    showProviderSelectionQuickPick
 } from '../commands';
 import {
     StateId,
@@ -251,11 +254,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             //     break;
             // }
 
-            case WebviewMessageId.selectChain: {
-                sakeProviderManager.showProviderSelectionQuickPick();
-                break;
-            }
-
             case WebviewMessageId.restartWakeServer: {
                 const client = SakeContext.getInstance().client;
                 if (!client) {
@@ -307,12 +305,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.openChainsQuickPick: {
-                sakeProviderManager.showProviderSelectionQuickPick();
+                showProviderSelectionQuickPick();
                 break;
             }
 
             case WebviewMessageId.openAddAbiQuickPick: {
-                sakeProviderManager.showAddAbiQuickPick(message.payload.contractAddress);
+                showAddAbiQuickPick(message.payload.contractAddress);
                 break;
             }
 
@@ -394,7 +392,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.requestAddDeployedContract: {
-                sakeProviderManager.requestAddDeployedContract();
+                requestAddDeployedContract();
                 break;
             }
 
