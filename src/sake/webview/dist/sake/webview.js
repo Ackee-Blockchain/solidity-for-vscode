@@ -30108,18 +30108,33 @@ function create_if_block_3$4(ctx) {
 
 // (79:4) {#if expanded}
 function create_if_block$b(ctx) {
-	let if_block_anchor;
+	let div;
+	let t;
+	let calldatabytes;
 	let current;
 	let if_block = /*filteredAbi*/ ctx[4].length > 0 && create_if_block_1$7(ctx);
 
+	calldatabytes = new CalldataBytes({
+			props: {
+				onFunctionCall: /*_onFunctionCall*/ ctx[5]
+			},
+			$$inline: true
+		});
+
 	const block = {
 		c: function create() {
+			div = element("div");
 			if (if_block) if_block.c();
-			if_block_anchor = empty();
+			t = space();
+			create_component(calldatabytes.$$.fragment);
+			attr_dev(div, "class", "flex flex-col gap-1");
+			add_location(div, file$m, 79, 8, 3973);
 		},
 		m: function mount(target, anchor) {
-			if (if_block) if_block.m(target, anchor);
-			insert_dev(target, if_block_anchor, anchor);
+			insert_dev(target, div, anchor);
+			if (if_block) if_block.m(div, null);
+			append_dev(div, t);
+			mount_component(calldatabytes, div, null);
 			current = true;
 		},
 		p: function update(ctx, dirty) {
@@ -30134,7 +30149,7 @@ function create_if_block$b(ctx) {
 					if_block = create_if_block_1$7(ctx);
 					if_block.c();
 					transition_in(if_block, 1);
-					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+					if_block.m(div, t);
 				}
 			} else if (if_block) {
 				group_outros();
@@ -30149,15 +30164,18 @@ function create_if_block$b(ctx) {
 		i: function intro(local) {
 			if (current) return;
 			transition_in(if_block);
+			transition_in(calldatabytes.$$.fragment, local);
 			current = true;
 		},
 		o: function outro(local) {
 			transition_out(if_block);
+			transition_out(calldatabytes.$$.fragment, local);
 			current = false;
 		},
 		d: function destroy(detaching) {
-			if (if_block) if_block.d(detaching);
-			if (detaching) detach_dev(if_block_anchor);
+			if (detaching) detach_dev(div);
+			if (if_block) if_block.d();
+			destroy_component(calldatabytes);
 		}
 	};
 
@@ -30172,12 +30190,10 @@ function create_if_block$b(ctx) {
 	return block;
 }
 
-// (80:8) {#if filteredAbi.length > 0}
+// (81:12) {#if filteredAbi.length > 0}
 function create_if_block_1$7(ctx) {
-	let div;
-	let t0;
-	let t1;
-	let calldatabytes;
+	let t;
+	let each_1_anchor;
 	let current;
 	let if_block = /*isProxy*/ ctx[3] && create_if_block_2$5(ctx);
 	let each_value = /*filteredAbi*/ ctx[4];
@@ -30192,41 +30208,28 @@ function create_if_block_1$7(ctx) {
 		each_blocks[i] = null;
 	});
 
-	calldatabytes = new CalldataBytes({
-			props: {
-				onFunctionCall: /*_onFunctionCall*/ ctx[5]
-			},
-			$$inline: true
-		});
-
 	const block = {
 		c: function create() {
-			div = element("div");
 			if (if_block) if_block.c();
-			t0 = space();
+			t = space();
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			t1 = space();
-			create_component(calldatabytes.$$.fragment);
-			attr_dev(div, "class", "flex flex-col gap-1");
-			add_location(div, file$m, 80, 12, 4014);
+			each_1_anchor = empty();
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, div, anchor);
-			if (if_block) if_block.m(div, null);
-			append_dev(div, t0);
+			if (if_block) if_block.m(target, anchor);
+			insert_dev(target, t, anchor);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				if (each_blocks[i]) {
-					each_blocks[i].m(div, null);
+					each_blocks[i].m(target, anchor);
 				}
 			}
 
-			append_dev(div, t1);
-			mount_component(calldatabytes, div, null);
+			insert_dev(target, each_1_anchor, anchor);
 			current = true;
 		},
 		p: function update(ctx, dirty) {
@@ -30241,7 +30244,7 @@ function create_if_block_1$7(ctx) {
 					if_block = create_if_block_2$5(ctx);
 					if_block.c();
 					transition_in(if_block, 1);
-					if_block.m(div, t0);
+					if_block.m(t.parentNode, t);
 				}
 			} else if (if_block) {
 				group_outros();
@@ -30268,7 +30271,7 @@ function create_if_block_1$7(ctx) {
 						each_blocks[i] = create_each_block$5(child_ctx);
 						each_blocks[i].c();
 						transition_in(each_blocks[i], 1);
-						each_blocks[i].m(div, t1);
+						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
 					}
 				}
 
@@ -30289,7 +30292,6 @@ function create_if_block_1$7(ctx) {
 				transition_in(each_blocks[i]);
 			}
 
-			transition_in(calldatabytes.$$.fragment, local);
 			current = true;
 		},
 		o: function outro(local) {
@@ -30300,14 +30302,13 @@ function create_if_block_1$7(ctx) {
 				transition_out(each_blocks[i]);
 			}
 
-			transition_out(calldatabytes.$$.fragment, local);
 			current = false;
 		},
 		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-			if (if_block) if_block.d();
+			if (if_block) if_block.d(detaching);
+			if (detaching) detach_dev(t);
 			destroy_each(each_blocks, detaching);
-			destroy_component(calldatabytes);
+			if (detaching) detach_dev(each_1_anchor);
 		}
 	};
 
@@ -30315,7 +30316,7 @@ function create_if_block_1$7(ctx) {
 		block,
 		id: create_if_block_1$7.name,
 		type: "if",
-		source: "(80:8) {#if filteredAbi.length > 0}",
+		source: "(81:12) {#if filteredAbi.length > 0}",
 		ctx
 	});
 
