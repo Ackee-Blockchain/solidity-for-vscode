@@ -269,8 +269,33 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
     }
 
     async fetchContract(address: Address) {
-        const deployedContract = await this.getOnchainContract(address);
-        this.states.deployment.add(deployedContract);
+        try {
+            const deployedContract = await this.getOnchainContract(address);
+            this.states.deployment.add(deployedContract);
+        } catch (e) {
+            vscode.window
+                .showErrorMessage(
+                    `Unable to fetch ABI for ${address}. Do you wish to add it as a contract with an empty ABI?`,
+                    'Add with empty ABI'
+                )
+                .then((selected) => {
+                    if (selected === 'Add with empty ABI') {
+                        this.states.deployment.add({
+                            type: DeployedContractType.OnChain,
+                            address: address,
+                            abi: [],
+                            name: 'Unknown',
+                            balance: undefined
+                        });
+                    }
+                });
+        }
+    }
+
+    /* Proxy management */
+
+    removeProxy(address: Address, proxyId: string) {
+        this.states.deployment.removeProxy(address, proxyId);
     }
 
     /* Event handling */
