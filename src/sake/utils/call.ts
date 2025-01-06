@@ -1,6 +1,6 @@
 import { decodeParameters } from 'web3-eth-abi';
-import { AbiFunctionFragment, TransactionDecodedReturnValue } from '../webview/shared/types';
 import { AbiInput } from 'web3-types';
+import { AbiFunctionFragment, TransactionDecodedReturnValue } from '../webview/shared/types';
 
 export function decodeCallReturnValue(
     returnValue: string,

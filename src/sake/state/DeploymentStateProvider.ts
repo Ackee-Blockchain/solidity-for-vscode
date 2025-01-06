@@ -1,14 +1,12 @@
+import { v4 as uuidv4 } from 'uuid';
 import {
     Address,
-    ContractAbi,
     DeployedContract,
-    DeployedContractType,
     DeploymentState,
     ImplementationContract,
     StateId
 } from '../webview/shared/types';
 import BaseStateProvider from './BaseStateProvider';
-import { v4 as uuidv4 } from 'uuid';
 
 export default class DeploymentStateProvider extends BaseStateProvider<DeploymentState> {
     constructor() {

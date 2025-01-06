@@ -1,7 +1,7 @@
-import * as WakeApi from '../api/wake';
+import { v4 as uuidv4 } from 'uuid';
+import * as vscode from 'vscode';
 import { showErrorMessage } from '../commands';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
-import AppStateProvider from '../state/AppStateProvider';
 import { SakeError } from '../webview/shared/errors';
 import {
     NetworkConfiguration,
@@ -14,9 +14,6 @@ import {
     SakeProviderInitializationRequestType
 } from '../webview/shared/storage_types';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
-import { v4 as uuidv4 } from 'uuid';
-import * as vscode from 'vscode';
-import { providerRegistry } from './ProviderRegistry';
 import sakeProviderManager from './SakeProviderManager';
 
 async function _newLocalProvider(

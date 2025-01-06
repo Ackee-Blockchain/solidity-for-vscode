@@ -1,7 +1,7 @@
-import { SakeContext } from '../context';
-import SakeProviderManager, { sakeProviderManager } from '../sake_providers/SakeProviderManager';
 import * as vscode from 'vscode';
-import { ProviderState, StoredSakeState } from '../webview/shared/storage_types';
+import { SakeContext } from '../context';
+import { sakeProviderManager } from '../sake_providers/SakeProviderManager';
+import { StoredSakeState } from '../webview/shared/storage_types';
 
 export class StorageHandler {
     // USE EITHER CONTEXT.workspaceState OR CONTEXT.storageUri

@@ -1,14 +1,14 @@
-import { SetAccountLabelRequest } from '../webview/shared/types';
 import * as vscode from 'vscode';
-import { BaseSakeProvider } from './SakeProvider';
-import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
-import SakeProviderManager, { sakeProviderManager } from './SakeProviderManager';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
+import { SakeError } from '../webview/shared/errors';
+import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import {
     SakeLocalNodeProviderInitializationRequest,
     SakeProviderInitializationRequestType
 } from '../webview/shared/storage_types';
-import { SakeError } from '../webview/shared/errors';
+import { SetAccountLabelRequest } from '../webview/shared/types';
+import { BaseSakeProvider } from './BaseSakeProvider';
+import { sakeProviderManager } from './SakeProviderManager';
 
 export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProvider> {
     constructor(

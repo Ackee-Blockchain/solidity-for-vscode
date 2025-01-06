@@ -1,3 +1,22 @@
+import * as vscode from 'vscode';
+import * as WakeApi from '../api/wake';
+import { showTimedInfoMessage } from '../commands';
+import { NetworkProvider } from '../network/NetworkProvider';
+import { OutputViewManager } from '../providers/OutputTreeProvider';
+import { ChainHook, chainRegistry } from '../state/ChainRegistry';
+import { decodeCallReturnValue } from '../utils/call';
+import {
+    getNameFromContractFqn,
+    parseCompilationIssues,
+    parseCompilationSkipped,
+    parseCompiledContracts
+} from '../utils/compilation';
+import { fingerprint } from '../utils/hash';
+import { SakeError } from '../webview/shared/errors';
+import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
+import {
+    SakeProviderInitializationRequest
+} from '../webview/shared/storage_types';
 import {
     AbiFunctionFragment,
     Account,
@@ -5,7 +24,9 @@ import {
     CallOperation,
     CallRequest,
     CallType,
-    AppState,
+    ContractAbi,
+    DeployedContract,
+    DeployedContractType,
     DeploymentRequest,
     DeploymentResponse,
     GetBytecodeRequest,
@@ -14,38 +35,12 @@ import {
     SetAccountLabelRequest,
     TransactionCallResult,
     TransactionDecodedReturnValue,
-    TransactionDeploymentResult,
-    ContractAbi,
-    DeployedContractType,
-    DeployedContract,
-    NetworkConfiguration
+    TransactionDeploymentResult
 } from '../webview/shared/types';
-import * as vscode from 'vscode';
-import * as WakeApi from '../api/wake';
-import { OutputViewManager } from '../providers/OutputTreeProvider';
-import {
-    getNameFromContractFqn,
-    parseCompilationIssues,
-    parseCompilationSkipped,
-    parseCompiledContracts
-} from '../utils/compilation';
-import { decodeCallReturnValue } from '../utils/call';
-import { showTimedInfoMessage } from '../commands';
-import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
-import {
-    NetworkState,
-    SakeProviderInitializationRequest,
-    SharedState
-} from '../webview/shared/storage_types';
-import SakeState from './SakeState';
-import { SakeError } from '../webview/shared/errors';
-import { NetworkProvider } from '../network/NetworkProvider';
-import { ChainHook, chainRegistry, ChainState } from '../state/ChainRegistry';
-import { providerRegistry } from './ProviderRegistry';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
-import { fingerprint } from '../utils/hash';
+import { providerRegistry } from './ProviderRegistry';
+import SakeState from './SakeState';
 
-// TODO consider renaming to BaseSakeProvider
 export abstract class BaseSakeProvider<T extends NetworkProvider> {
     private _hook: ChainHook;
 
@@ -186,7 +181,6 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
                 balance: balance
             });
 
-            // TODO
             showTimedInfoMessage(
                 `Deployed contract ${compilation.name} at address ${deploymentResponse.deployedAddress}`
             );
@@ -301,13 +295,11 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
     /* Event handling */
 
     async onActivateProvider() {
-        // TODO save state
         this.states.subscribe();
         this.network.onActivate();
     }
 
     async onDeactivateProvider() {
-        // TODO save state
         this.states.unsubscribe();
         this.network.onDeactivate();
     }

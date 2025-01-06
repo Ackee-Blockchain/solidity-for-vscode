@@ -1,9 +1,7 @@
-import { State } from 'vscode-languageclient';
-import { SakeContext } from '../context';
-import BaseStateProvider from './BaseStateProvider';
 import { AppState, ChainState, StateId } from '../webview/shared/types';
-import { additionalSakeState, chainRegistry } from './ChainRegistry';
 import appState from './AppStateProvider';
+import BaseStateProvider from './BaseStateProvider';
+import { additionalSakeState, chainRegistry } from './ChainRegistry';
 
 /*
  * Only helper classes to provide chain state from hooks to webviews.
