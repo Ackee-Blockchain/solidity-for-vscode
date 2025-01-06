@@ -32,20 +32,4 @@ export function decodeCallReturnValue(
     }
 
     return _out;
-
-    // for (const key in decoded) {
-    //     if (decoded.hasOwnProperty(key) && key !== '__length__') {
-    //         const _value = decoded[key]?.toString();
-    //         returnDataDecodedNode.setChildren([
-    //             ...returnDataDecodedNode.children,
-    //             new SakeOutputItem(
-    //                 key,
-    //                 _value,
-    //                 vscode.TreeItemCollapsibleState.None
-    //             ) as BaseOutputItem
-    //         ]);
-    //     }
-    // }
-
-    // return decodeParameters(func.outputs!, returnValue);
 }

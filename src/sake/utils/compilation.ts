@@ -27,8 +27,6 @@ export function parseCompiledContracts(
             isDeployable: compilationResult[key].isDeployable
         };
 
-        // console.log('contract', contract.fqn, contract.isDeployable);
-
         if (contract.isDeployable) {
             contracts.push(contract);
         }

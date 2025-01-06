@@ -40,6 +40,9 @@ export enum WebviewMessageId {
     openAddAbiQuickPick = 'openAddAbiQuickPick',
     removeProxy = 'removeProxy',
     requestAddDeployedContract = 'requestAddDeployedContract',
+    toggleAutosave = 'toggleAutosave',
+    saveState = 'saveState',
+    deleteStateSave = 'deleteStateSave',
 
     // connection
     reconnectChain = 'reconnectChain',
@@ -192,6 +195,18 @@ export type WebviewMessageRequest =
     | ({
           command: WebviewMessageId.requestAddDeployedContract;
           payload: undefined;
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.toggleAutosave;
+          payload: undefined;
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.saveState;
+          payload: undefined;
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.deleteStateSave;
+          payload: undefined;
       } & BaseWebviewMessageRequest);
 
 export type WebviewMessageResponse =
@@ -266,7 +281,8 @@ export type WebviewMessageResponsePayload<T extends WebviewMessageId> =
         : never;
 
 export enum SignalId {
-    showAdvancedLocalChainSetup = 'showAdvancedLocalChainSetup'
+    showAdvancedLocalChainSetup = 'showAdvancedLocalChainSetup',
+    showNotification = 'showNotification'
 }
 
 // export type WebviewMessageRequest<T extends keyof WebviewMessageRequestPayload> = {

@@ -4,14 +4,14 @@ import { copyToClipboard, showErrorMessage } from './commands';
 import { SakeContext } from './context';
 import { SakeOutputItem } from './providers/OutputTreeProvider';
 import { SakeWebviewProvider } from './providers/WebviewProviders';
-import { providerRegistry } from './sake_providers/ProviderRegistry';
 import { sakeProviderManager } from './sake_providers/SakeProviderManager';
-import { appState } from './state/AppStateProvider';
-import { StorageHandler } from './storage/StorageHandler';
 import { pingWakeServer } from './utils/helpers';
-import {
-    WakeCrashDumpStateResponse
-} from './webview/shared/types';
+import { NetworkType, WakeCrashDumpStateResponse } from './webview/shared/types';
+import { chainRegistry } from './state/shared/ChainRegistry';
+import * as SakeProviderFactory from './sake_providers/SakeProviderFactory';
+import appState from './state/shared/AppState';
+import { loadFullState, saveFullState } from './storage/stateHandler';
+import { SakeProviderType } from './webview/shared/storage_types';
 
 export async function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     /* Register Context */
@@ -29,13 +29,6 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     });
     client.onDidChangeState((state) => {
         appState.setLazy({ isWakeServerRunning: state.newState === State.Running });
-    });
-
-    // set provider automatically when no provider is set
-    providerRegistry.subscribeOnAdd((id) => {
-        if (sakeProviderManager.currentChainId === undefined) {
-            sakeProviderManager.setProvider(id);
-        }
     });
 
     /* Register Webview */
@@ -71,6 +64,28 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     });
     workspaceWatcher();
 
+    /*
+     * Event listeners
+     */
+
+    // If Wake server is not running, disconnect all local node providers
+    appState.subscribe((state) => {
+        if (!state.isWakeServerRunning) {
+            chainRegistry.getAll().forEach((provider) => {
+                if (provider.type === SakeProviderType.LocalNode && provider.connected) {
+                    provider.disconnect();
+                }
+            });
+        }
+    });
+
+    // Set provider automatically when no provider is set
+    chainRegistry.subscribeOnAdd((id) => {
+        if (sakeProviderManager.currentChainId === undefined) {
+            sakeProviderManager.setProvider(id);
+        }
+    });
+
     /* Wake Crash Dump */
 
     client.onNotification('wake/sake/dumpState', (dump: WakeCrashDumpStateResponse) => {
@@ -94,18 +109,15 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 export function deactivateSake() {}
 
 async function loadChains() {
-    // Check if there is was any state saved
-    if (await StorageHandler.hasAnySavedState()) {
-        await StorageHandler.loadExtensionState(false).catch((e) => {
-            showErrorMessage(
-                'Saved extension state could not be loaded. Chain state save file was found but seems to be corrupted and could not be loaded.'
-            );
-            console.error('Failed to load saved state', e);
-        });
-    } else {
-        // Start with a default local chain
-        await sakeProviderManager.createNewLocalChain('Local Chain 1');
+    await loadFullState();
+
+    // Skip if any providers were loaded from state
+    if (chainRegistry.getAll().length > 0) {
+        return;
     }
+
+    // Start with a default local chain
+    await SakeProviderFactory.createNewLocalProvider('Local Chain 1');
 }
 
 function registerCommands(context: vscode.ExtensionContext) {
@@ -117,7 +129,7 @@ function registerCommands(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('Tools-for-Solidity.sake.show_history', () =>
-            sakeProviderManager.state?.history.show()
+            sakeProviderManager.provider?.chainState.history.show()
         )
     );
 
@@ -130,20 +142,14 @@ function registerCommands(context: vscode.ExtensionContext) {
 
     vscode.workspace.onDidChangeTextDocument((e) => {
         if (e.document.languageId == 'solidity' && !e.document.isDirty) {
-            sakeProviderManager.state?.compilation.makeDirty();
+            sakeProviderManager.provider?.chainState.compilation.makeDirty();
         }
         // @todo might need to rework using vscode.workspace.createFileSystemWatcher
     });
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.save-state', () =>
-            StorageHandler.saveExtensionState()
-        )
-    );
-
-    context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.delete-state', () =>
-            StorageHandler.deleteExtensionState()
+        vscode.commands.registerCommand('Tools-for-Solidity.sake.force-save-state', () =>
+            saveFullState()
         )
     );
 }

@@ -1,15 +1,11 @@
 import type {
-    DeploymentState,
     AccountState,
-    TransactionHistoryState,
-    ChainState,
-    AppState,
-    CompilationState,
-    NetworkType,
-    WakeDumpStateResponse,
+    ChainPersistence,
+    DeploymentState,
     NetworkConfiguration,
-    WakeSakeStateMetadata,
-    NetworkCreationConfiguration
+    NetworkType,
+    TransactionHistoryState,
+    WakeDumpStateResponse
 } from './types';
 
 export interface StoredSakeState {
@@ -17,16 +13,54 @@ export interface StoredSakeState {
     providerStates: ProviderState[];
 }
 
-export interface ProviderState {
+export enum SakeProviderType {
+    LocalNode = 'local_node',
+    Connection = 'connection'
+}
+
+type BaseProviderState = {
     id: string;
+    type: SakeProviderType;
     displayName: string;
-    state: {
-        accounts: AccountState;
-        deployment: DeploymentState;
-        history: TransactionHistoryState;
-    };
-    network: NetworkState;
-    stateFingerprint: string;
+    persistence: ChainPersistence;
+};
+
+export type ProviderState =
+    | ({
+          type: SakeProviderType.LocalNode;
+          state: {
+              accounts: AccountState;
+              deployment: DeploymentState;
+              history: TransactionHistoryState;
+          };
+          stateFingerprint: string;
+          network: BaseWakeNetworkState;
+      } & BaseProviderState)
+    | ({
+          type: SakeProviderType.Connection;
+          state: {
+              accounts: AccountState;
+              //   deployment: DeploymentState;
+              //   history: TransactionHistoryState;
+          };
+          stateFingerprint: string;
+          network: Omit<BaseWakeNetworkState, 'wakeDump'>;
+      } & BaseProviderState);
+
+export type NetworkState = BaseWakeNetworkState | Omit<BaseWakeNetworkState, 'wakeDump'>;
+
+export interface BaseWakeNetworkState {
+    type: NetworkType.Local;
+    wakeDump: WakeChainDump;
+    // @dev currently wake cannot recreate on the same uri, on chain creation these 2 params are returned
+    config: Omit<NetworkConfiguration, 'type' | 'uri'>;
+}
+
+export interface WakeChainDump extends Omit<WakeDumpStateResponse, 'success'> {}
+
+export enum SakeProviderInitializationRequestType {
+    CreateNew = 'CreateNew',
+    LoadFromState = 'LoadFromState'
 }
 
 export interface SharedState {
@@ -35,38 +69,14 @@ export interface SharedState {
     // compilation: CompilationState;
 }
 
-export type NetworkState = LocalNodeNetworkState; // | other network types
-
-export interface BaseNetworkState {
-    type: NetworkType;
-}
-
-export interface WakeChainDump extends Omit<WakeDumpStateResponse, 'success'> {}
-
-export interface LocalNodeNetworkState extends BaseNetworkState {
-    type: NetworkType.Local;
-    wakeDump: WakeChainDump;
-    // @dev currently wake cannot recreate on the same uri, on chain creation these 2 params are returned
-    config: Omit<NetworkConfiguration, 'type' | 'uri'>;
-}
-
-export enum SakeProviderInitializationRequestType {
-    CreateNewChain = 'CreateNewChain',
-    ConnectToChain = 'ConnectToChain',
-    LoadFromState = 'LoadFromState'
-}
-
 export type SakeProviderInitializationRequest = SakeLocalNodeProviderInitializationRequest; // | other provider types
 
 export type SakeLocalNodeProviderInitializationRequest =
     | {
-          type: SakeProviderInitializationRequestType.CreateNewChain;
+          type: SakeProviderInitializationRequestType.CreateNew;
           accounts?: number;
       }
     | {
           type: SakeProviderInitializationRequestType.LoadFromState;
           state: ProviderState;
-      }
-    | {
-          type: SakeProviderInitializationRequestType.ConnectToChain;
       };

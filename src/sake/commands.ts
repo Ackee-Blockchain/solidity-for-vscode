@@ -1,12 +1,10 @@
 import * as vscode from 'vscode';
-import { SakeContext } from './context';
-import { sakeProviderManager } from './sake_providers/SakeProviderManager';
-import { BaseSakeProvider } from './sake_providers/BaseSakeProvider';
-import { NetworkProvider } from './network/NetworkProvider';
-import { SakeProviderQuickPickItem } from './webview/shared/helper_types';
-import { NetworkType } from './webview/shared/types';
-import { Address } from './webview/shared/types';
 import { LocalNodeNetworkProvider } from './network/LocalNodeNetworkProvider';
+import { ISakeProvider } from './sake_providers/BaseSakeProvider';
+import { sakeProviderManager } from './sake_providers/SakeProviderManager';
+import { chainRegistry } from './state/shared/ChainRegistry';
+import { SakeProviderQuickPickItem } from './webview/shared/helper_types';
+import { Address, NetworkType } from './webview/shared/types';
 
 export async function copyToClipboard(text: string | undefined) {
     if (!text) {
@@ -84,6 +82,10 @@ export function showTimedInfoMessage(message: string, milliseconds: number = 500
     );
 }
 
+export function showInfoMessage(message: string) {
+    vscode.window.showInformationMessage(message);
+}
+
 export function openSettings(settingsUrl: string) {
     vscode.commands.executeCommand('workbench.action.openSettings', settingsUrl);
 }
@@ -91,9 +93,9 @@ export function openSettings(settingsUrl: string) {
 export function showProviderSelectionQuickPick() {
     const quickPickItems: vscode.QuickPickItem[] = [];
 
-    const providerItems = sakeProviderManager.providers.map(
-        (provider: BaseSakeProvider<NetworkProvider>) => provider._getQuickPickItem()
-    );
+    const providerItems = chainRegistry
+        .getAll()
+        .map((provider: ISakeProvider) => provider.getQuickPickItem());
 
     // extend with provider specific items
     quickPickItems.push(...providerItems);
@@ -198,7 +200,7 @@ export function requestAddDeployedContract() {
             }
 
             // check if the addess is not already in the deployment state
-            if (provider.states.deployment.state.find((c) => c.address === address)) {
+            if (provider.chainState.deployment.get().find((c) => c.address === address)) {
                 // @todo show info notification when native notifications are implemented
                 return;
             }
@@ -245,7 +247,7 @@ export function showAddAbiQuickPick(contractAddress: Address) {
             }
 
             if (selected.label === 'Add from compiled contract') {
-                if (provider.states.compilation.state.contracts.length === 0) {
+                if (provider.chainState.compilation.get().contracts.length === 0) {
                     showErrorMessage(
                         'Cannot add ABI from compiled contract: No compiled contracts found'
                     );
@@ -253,18 +255,19 @@ export function showAddAbiQuickPick(contractAddress: Address) {
                 }
                 vscode.window
                     .showQuickPick(
-                        provider.states.compilation.state.contracts.map((contract) => contract.fqn),
+                        provider.chainState.compilation
+                            .get()
+                            .contracts.map((contract) => contract.fqn),
                         {
                             title: 'Select the contract to add the ABI from'
                         }
                     )
                     .then((selected) => {
                         if (selected) {
-                            console.log('selected', selected);
-                            const compiledContract = provider.states.compilation.get(selected);
-                            console.log('compiledContract', compiledContract);
+                            const compiledContract =
+                                provider.chainState.compilation.getContract(selected);
                             if (compiledContract) {
-                                provider.states.deployment.extendProxySupport(contractAddress, {
+                                provider.chainState.deployment.extendProxySupport(contractAddress, {
                                     address: undefined,
                                     abi: compiledContract.abi,
                                     name: selected
@@ -286,7 +289,7 @@ export function showAddAbiQuickPick(contractAddress: Address) {
                         provider
                             .getAbi(implementationAddress)
                             .then((contract) => {
-                                provider.states.deployment.extendProxySupport(contractAddress, {
+                                provider.chainState.deployment.extendProxySupport(contractAddress, {
                                     address: implementationAddress,
                                     abi: contract.abi,
                                     name: contract.name
@@ -318,7 +321,7 @@ export function showAddAbiQuickPick(contractAddress: Address) {
                             try {
                                 const abi = JSON.parse(abiString);
                                 // @todo missing validation, add zod
-                                provider.states.deployment.extendProxySupport(contractAddress, {
+                                provider.chainState.deployment.extendProxySupport(contractAddress, {
                                     address: undefined,
                                     abi,
                                     name: undefined
