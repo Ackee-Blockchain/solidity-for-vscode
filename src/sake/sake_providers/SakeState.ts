@@ -1,18 +1,17 @@
-import AccountStateProvider from '../state/AccountStateProvider';
-import DeploymentStateProvider from '../state/DeploymentStateProvider';
-import CompilationStateProvider from '../state/CompilationStateProvider';
-import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
-import TransactionHistoryStateProvider from '../state/TransactionHistoryStateProvider';
-import AppStateProvider from '../state/AppStateProvider';
 import { SakeContext } from '../context';
-import { ProviderState, SharedState } from '../webview/shared/storage_types';
+import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
+import AccountStateProvider from '../state/AccountStateProvider';
+import CompilationStateProvider from '../state/CompilationStateProvider';
+import DeploymentStateProvider from '../state/DeploymentStateProvider';
+import { ChainStateProvider } from '../state/HookStateConnectors';
+import TransactionHistoryStateProvider from '../state/TransactionHistoryStateProvider';
+import { fingerprint } from '../utils/hash';
 import {
     AccountState,
     DeploymentState,
     TransactionHistoryState
 } from '../webview/shared/state_types';
-import { ChainStateProvider } from '../state/HookStateConnectors';
-import { fingerprint } from '../utils/hash';
+import { SharedState } from '../webview/shared/storage_types';
 
 export default class SakeState {
     accounts: AccountStateProvider;

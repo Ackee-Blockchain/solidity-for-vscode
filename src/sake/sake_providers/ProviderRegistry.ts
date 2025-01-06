@@ -5,22 +5,18 @@ export const providerRegistry = {
     addSubscribers: new Set<(id: string) => void>(),
     deleteSubscribers: new Set<(id: string) => void>(),
 
-    subscribeAdd(callback: (id: string) => void): () => void {
+    subscribeOnAdd(callback: (id: string) => void): () => void {
         this.addSubscribers.add(callback);
         return () => {
             this.addSubscribers.delete(callback);
         };
     },
 
-    subscribeDelete(callback: (id: string) => void): () => void {
+    subscribeOnDelete(callback: (id: string) => void): () => void {
         this.deleteSubscribers.add(callback);
         return () => {
             this.deleteSubscribers.delete(callback);
         };
-    },
-
-    unsubscribeDelete(callback: (id: string) => void): void {
-        this.deleteSubscribers.delete(callback);
     },
 
     get(id: string): LocalNodeSakeProvider {

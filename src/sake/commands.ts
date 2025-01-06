@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { SakeContext } from './context';
 import { sakeProviderManager } from './sake_providers/SakeProviderManager';
-import { BaseSakeProvider } from './sake_providers/SakeProvider';
+import { BaseSakeProvider } from './sake_providers/BaseSakeProvider';
 import { NetworkProvider } from './network/NetworkProvider';
 import { SakeProviderQuickPickItem } from './webview/shared/helper_types';
 import { NetworkType } from './webview/shared/types';

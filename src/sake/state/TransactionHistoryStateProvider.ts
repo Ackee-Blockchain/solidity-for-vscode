@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import { OutputViewManager } from '../providers/OutputTreeProvider';
 import {
     CallOperation,
@@ -6,7 +7,6 @@ import {
     TransactionResult
 } from '../webview/shared/types';
 import BaseStateProvider from './BaseStateProvider';
-import * as vscode from 'vscode';
 
 export default class TransactionHistoryStateProvider extends BaseStateProvider<TransactionHistoryState> {
     private output: OutputViewManager;
