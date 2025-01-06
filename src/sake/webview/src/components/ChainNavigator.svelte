@@ -140,7 +140,7 @@
                 <div class="text-sm opacity-75 text-center mt-1">Persistence</div>
 
                 <div class="flex flex-col gap-3 p-2 font-sm">
-                    {#if $currentChain?.type === SakeProviderType.LocalNode}
+                    {#if $currentChain?.type === SakeProviderType.Connection}
                         <div class="flex flex-row gap-3 items-center">
                             <InfoIcon />
 

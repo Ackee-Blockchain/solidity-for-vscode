@@ -38833,9 +38833,9 @@ function create_if_block_13(ctx) {
 			t4 = space();
 			create_component(advancedlocalchainsetup.$$.fragment);
 			attr_dev(span, "class", "truncate");
-			add_location(span, file$2, 203, 16, 9281);
+			add_location(span, file$2, 203, 16, 9282);
 			attr_dev(div, "class", "flex gap-1 items-center text-sm h-[26px] justify-between");
-			add_location(div, file$2, 197, 12, 9023);
+			add_location(div, file$2, 197, 12, 9024);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39335,7 +39335,7 @@ function create_if_block_1$1(ctx) {
 			$$inline: true
 		});
 
-	let if_block1 = /*$currentChain*/ ctx[2]?.type === SakeProviderType.LocalNode && create_if_block_4$1(ctx);
+	let if_block1 = /*$currentChain*/ ctx[2]?.type === SakeProviderType.Connection && create_if_block_4$1(ctx);
 
 	clickablespan0 = new ClickableSpan({
 			props: {
@@ -39421,7 +39421,7 @@ function create_if_block_1$1(ctx) {
 				check_outros();
 			}
 
-			if (/*$currentChain*/ ctx[2]?.type === SakeProviderType.LocalNode) {
+			if (/*$currentChain*/ ctx[2]?.type === SakeProviderType.Connection) {
 				if (if_block1) {
 					if (dirty & /*$currentChain*/ 4) {
 						transition_in(if_block1, 1);
@@ -39894,7 +39894,7 @@ function create_if_block_6$1(ctx) {
 	return block;
 }
 
-// (137:20) {#if $currentChain?.type === SakeProviderType.LocalNode}
+// (137:20) {#if $currentChain?.type === SakeProviderType.Connection}
 function create_if_block_4$1(ctx) {
 	let div;
 	let infoicon;
@@ -39917,11 +39917,11 @@ function create_if_block_4$1(ctx) {
 			span0.textContent = "connected to";
 			t3 = text(" don't support\n                                state persistence and only save the connection URI.");
 			attr_dev(span0, "class", "italic");
-			add_location(span0, file$2, 141, 49, 6408);
+			add_location(span0, file$2, 141, 49, 6409);
 			attr_dev(span1, "class", "text-sm opacity-75");
-			add_location(span1, file$2, 140, 28, 6325);
+			add_location(span1, file$2, 140, 28, 6326);
 			attr_dev(div, "class", "flex flex-row gap-3 items-center");
-			add_location(div, file$2, 137, 24, 6208);
+			add_location(div, file$2, 137, 24, 6209);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -39952,7 +39952,7 @@ function create_if_block_4$1(ctx) {
 		block,
 		id: create_if_block_4$1.name,
 		type: "if",
-		source: "(137:20) {#if $currentChain?.type === SakeProviderType.LocalNode}",
+		source: "(137:20) {#if $currentChain?.type === SakeProviderType.Connection}",
 		ctx
 	});
 
@@ -39972,7 +39972,7 @@ function create_if_block_3$1(ctx) {
 			t0 = text("Last saved:\n                                    ");
 			t1 = text(t1_value);
 			attr_dev(span, "class", "text-xs");
-			add_location(span, file$2, 162, 32, 7465);
+			add_location(span, file$2, 162, 32, 7466);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -40024,9 +40024,9 @@ function create_default_slot_3(ctx) {
 			t1 = text(t1_value);
 			t2 = space();
 			if (if_block) if_block.c();
-			add_location(span, file$2, 154, 28, 7021);
+			add_location(span, file$2, 154, 28, 7022);
 			attr_dev(div, "class", "flex flex-col");
-			add_location(div, file$2, 153, 24, 6965);
+			add_location(div, file$2, 153, 24, 6966);
 		},
 		m: function mount(target, anchor) {
 			mount_component(saveicon, target, anchor);
@@ -40154,7 +40154,7 @@ function create_default_slot_2(ctx) {
 			t0 = space();
 			span = element("span");
 			span.textContent = "Delete state save";
-			add_location(span, file$2, 175, 28, 8089);
+			add_location(span, file$2, 175, 28, 8090);
 		},
 		m: function mount(target, anchor) {
 			mount_component(deleteicon, target, anchor);
