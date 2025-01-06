@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
 import { StateId, WebviewMessageId } from '../webview/shared/types';
 

@@ -1,7 +1,6 @@
-import * as vscode from 'vscode';
-import { getNonce } from '../utils/getNonce';
-import { getBasePage } from '../utils/getBasePage';
 import { MessageHandlerData } from '@estruyf/vscode';
+import * as vscode from 'vscode';
+import { restartWakeClient } from '../../commands';
 import {
     copyToClipboard,
     getTextFromInputBox,
@@ -13,21 +12,20 @@ import {
     showErrorMessage,
     showProviderSelectionQuickPick
 } from '../commands';
+import { SakeContext } from '../context';
+import { sakeProviderManager } from '../sake_providers/SakeProviderManager';
+import BaseStateProvider from '../state/BaseStateProvider';
+import CompilationStateProvider from '../state/CompilationStateProvider';
+import { AppStateProvider, ChainStateProvider } from '../state/HookStateConnectors';
+import { getBasePage } from '../utils/getBasePage';
+import { getNonce } from '../utils/getNonce';
 import {
+    GetBytecodeResponse,
     StateId,
     WebviewMessageId,
-    WakeGetBytecodeResponse,
-    GetBytecodeResponse,
     WebviewMessageRequest,
     WebviewMessageResponse
 } from '../webview/shared/types';
-import BaseStateProvider from '../state/BaseStateProvider';
-import SakeProviderManager, { sakeProviderManager } from '../sake_providers/SakeProviderManager';
-import CompilationStateProvider from '../state/CompilationStateProvider';
-import { ChainStateProvider, AppStateProvider } from '../state/HookStateConnectors';
-import { restartWakeClient } from '../../commands';
-import { SakeContext } from '../context';
-import { providerRegistry } from '../sake_providers/ProviderRegistry';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;

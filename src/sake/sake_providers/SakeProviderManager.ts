@@ -12,7 +12,7 @@ import {
 import appState from '../state/AppStateProvider';
 import * as vscode from 'vscode';
 import { getTextFromInputBox, showErrorMessage } from '../commands';
-import { BaseSakeProvider } from './SakeProvider';
+import { BaseSakeProvider } from './BaseSakeProvider';
 
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import { SakeContext } from '../context';

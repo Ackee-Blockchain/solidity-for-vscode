@@ -1,8 +1,6 @@
-import { State } from 'vscode-languageclient';
 import { SakeContext } from '../context';
-import { StateId, AppState } from '../webview/shared/types';
-import BaseStateProvider from './BaseStateProvider';
 import { Hook } from '../utils/hook';
+import { AppState } from '../webview/shared/types';
 
 export const appState = new Hook<AppState>({
     isAnvilInstalled: undefined,
@@ -10,7 +8,5 @@ export const appState = new Hook<AppState>({
     isOpenWorkspace: undefined,
     initializationState: undefined
 });
-
-const _client = SakeContext.getInstance().client;
 
 export default appState;

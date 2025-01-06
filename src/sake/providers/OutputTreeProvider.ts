@@ -1,13 +1,12 @@
 import * as vscode from 'vscode';
+import { SakeContext } from '../context';
 import {
     CallOperation,
     TransactionCallResult,
     TransactionDeploymentResult,
-    TransactionReceipt,
     TransactionResult,
     WakeCallTrace
 } from '../webview/shared/types';
-import { SakeContext } from '../context';
 
 class BaseOutputItem extends vscode.TreeItem {
     children: BaseOutputItem[] = [];
