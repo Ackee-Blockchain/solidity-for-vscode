@@ -290,3 +290,27 @@ export async function connectToLocalChain(
         await messageHandler.request(request.command, request.payload);
     return response;
 }
+
+export async function saveState() {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.saveState,
+        payload: undefined
+    };
+    messageHandler.send(request.command, request.payload);
+}
+
+export async function toggleAutosave() {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.toggleAutosave,
+        payload: undefined
+    };
+    messageHandler.send(request.command, request.payload);
+}
+
+export async function deleteStateSave() {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.deleteStateSave,
+        payload: undefined
+    };
+    messageHandler.send(request.command, request.payload);
+}

@@ -1,10 +1,7 @@
-import { SakeContext } from '../context';
-import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
-import AccountStateProvider from '../state/AccountStateProvider';
-import CompilationStateProvider from '../state/CompilationStateProvider';
-import DeploymentStateProvider from '../state/DeploymentStateProvider';
-import { ChainStateProvider } from '../state/HookStateConnectors';
-import TransactionHistoryStateProvider from '../state/TransactionHistoryStateProvider';
+import { AccountStateProvider } from '../state/local/AccountState';
+import { compilationState, CompilationStateProvider } from '../state/shared/CompilationState';
+import { DeploymentStateProvider } from '../state/local/DeploymentState';
+import { TransactionHistoryStateProvider } from '../state/local/TransactionHistoryState';
 import { fingerprint } from '../utils/hash';
 import {
     AccountState,
@@ -18,16 +15,6 @@ export default class SakeState {
     deployment: DeploymentStateProvider;
     compilation: CompilationStateProvider;
     history: TransactionHistoryStateProvider;
-    chains: ChainStateProvider;
-    subscribed: boolean;
-
-    private get _webviewProvider(): BaseWebviewProvider {
-        const _webviewProvider = SakeContext.getInstance().webviewProvider;
-        if (_webviewProvider === undefined) {
-            throw Error();
-        }
-        return _webviewProvider;
-    }
 
     constructor() {
         // network-specific state
@@ -36,57 +23,38 @@ export default class SakeState {
         this.history = new TransactionHistoryStateProvider();
 
         // shared state
-        this.compilation = CompilationStateProvider.getInstance();
-        this.chains = ChainStateProvider.getInstance();
-
-        this.subscribed = false;
+        this.compilation = compilationState;
     }
 
-    subscribe() {
-        this.accounts.subscribe(this._webviewProvider);
-        this.deployment.subscribe(this._webviewProvider);
-        this.history.subscribe(this._webviewProvider);
-
-        this.subscribed = true;
-    }
-
-    unsubscribe() {
-        this.accounts.unsubscribe(this._webviewProvider);
-        this.deployment.unsubscribe(this._webviewProvider);
-        this.history.unsubscribe(this._webviewProvider);
-
-        this.subscribed = false;
-    }
-
-    sendToWebview() {
-        if (!this.subscribed) {
-            console.error('Cannot force state update, webview not subscribed');
-            return;
-        }
-
-        this.accounts.sendToWebview();
-        this.deployment.sendToWebview();
-        this.history.sendToWebview();
-        this.chains.sendToWebview();
-        this.compilation.sendToWebview();
-    }
-
-    dumpProviderState() {
+    dumpState() {
         return {
-            accounts: this.accounts.state,
-            deployment: this.deployment.state,
-            history: this.history.state
+            accounts: this.accounts.get(),
+            deployment: this.deployment.get(),
+            history: this.history.get()
         };
     }
 
-    loadProviderState(state: {
-        accounts: AccountState;
-        deployment: DeploymentState;
-        history: TransactionHistoryState;
+    loadStateFrom(state: {
+        accounts?: AccountState;
+        deployment?: DeploymentState;
+        history?: TransactionHistoryState;
     }) {
-        this.accounts.state = state.accounts;
-        this.deployment.state = state.deployment;
-        this.history.state = state.history;
+        if (state.accounts) {
+            this.accounts.set(state.accounts);
+        }
+        if (state.deployment) {
+            this.deployment.set(state.deployment);
+        }
+        if (state.history) {
+            this.history.set(state.history);
+        }
+    }
+
+    reset() {
+        // destroy old
+        this.accounts.reset();
+        this.deployment.reset();
+        this.history.reset();
     }
 
     static dumpSharedState() {
@@ -105,6 +73,6 @@ export default class SakeState {
     }
 
     fingerprint() {
-        return fingerprint(this.dumpProviderState());
+        return fingerprint(this.dumpState());
     }
 }

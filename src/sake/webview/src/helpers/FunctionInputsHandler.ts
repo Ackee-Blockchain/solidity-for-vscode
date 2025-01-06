@@ -196,18 +196,6 @@ export abstract class InputHandler extends InputHandlerInterface {
 
             return false;
         } finally {
-            // console.log(
-            //     'value set',
-            //     this._value,
-            //     'in',
-            //     this.name,
-            //     this.internalType,
-            //     this.type,
-            //     'with state',
-            //     this.state,
-            //     'parent state',
-            //     this.parent?.state
-            // );
             // @todo move state update here
         }
     }

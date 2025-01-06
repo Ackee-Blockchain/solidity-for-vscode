@@ -11,6 +11,7 @@ import {
     CallRequest,
     CallResponse,
     DeploymentRequest,
+    NetworkConfiguration,
     SetAccountBalanceRequest,
     SetAccountBalanceResponse
 } from '../webview/shared/network_types';
@@ -47,4 +48,5 @@ export abstract class NetworkProvider {
     abstract getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }>;
     abstract getOnchainContract(address: Address): Promise<DeployedContract>;
     abstract getInfo(): NetworkInfo;
+    abstract config: NetworkConfiguration;
 }

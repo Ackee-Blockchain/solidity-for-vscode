@@ -1,4 +1,11 @@
-import type { Address, ContractAbi, ExtendedAccount, TransactionResult } from './types';
+import type { SakeProviderType } from './storage_types';
+import type {
+    Address,
+    ContractAbi,
+    ExtendedAccount,
+    NetworkConfiguration,
+    TransactionResult
+} from './types';
 
 export enum StateId {
     DeployedContracts = 'DeployedContracts',
@@ -98,9 +105,7 @@ export enum NetworkType {
 
 export type NetworkInfo = {
     type: NetworkType.Local;
-    uri?: string;
-    chainId?: number;
-    fork?: string;
+    config: NetworkConfiguration;
 };
 
 export interface ChainState {
@@ -108,11 +113,19 @@ export interface ChainState {
     currentChainId: string | undefined;
 }
 
+export interface ChainPersistence {
+    isDirty: boolean;
+    isAutosaveEnabled: boolean;
+    lastSaveTimestamp: number | undefined;
+}
+
 export interface ChainInfo {
+    type: SakeProviderType;
     chainId: string;
     chainName: string;
     network: NetworkInfo;
     connected: boolean;
+    persistence: ChainPersistence;
 }
 
 /* Transaction History */

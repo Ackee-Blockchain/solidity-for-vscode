@@ -14,9 +14,6 @@ import {
 } from '../commands';
 import { SakeContext } from '../context';
 import { sakeProviderManager } from '../sake_providers/SakeProviderManager';
-import BaseStateProvider from '../state/BaseStateProvider';
-import CompilationStateProvider from '../state/CompilationStateProvider';
-import { AppStateProvider, ChainStateProvider } from '../state/HookStateConnectors';
 import { getBasePage } from '../utils/getBasePage';
 import { getNonce } from '../utils/getNonce';
 import {
@@ -26,24 +23,37 @@ import {
     WebviewMessageRequest,
     WebviewMessageResponse
 } from '../webview/shared/types';
+import * as SakeProviderFactory from '../sake_providers/SakeProviderFactory';
+import {
+    accountConnector,
+    appConnector,
+    BaseStateConnector,
+    chainStateConnector,
+    compilationConnector,
+    deploymentConnector,
+    historyConnector
+} from '../state/StateConnectors';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
     _doc?: vscode.TextDocument;
-    _stateSubscriptions: Map<StateId, BaseStateProvider<any>> = new Map();
+    _stateSubscriptions: Map<StateId, BaseStateConnector<any>> = new Map();
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
         private readonly _targetPath: string
     ) {
         // Subscribe to shared state
-        this._subscribeToSharedState();
+        this._subscribeConnectors();
     }
 
-    private _subscribeToSharedState() {
-        CompilationStateProvider.getInstance().subscribe(this);
-        ChainStateProvider.getInstance().subscribe(this);
-        AppStateProvider.getInstance().subscribe(this);
+    private _subscribeConnectors() {
+        compilationConnector.subscribe(this);
+        chainStateConnector.subscribe(this);
+        accountConnector.subscribe(this);
+        deploymentConnector.subscribe(this);
+        historyConnector.subscribe(this);
+        appConnector.subscribe(this);
     }
 
     public resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -100,11 +110,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         this._view?.webview.postMessage(message);
     }
 
-    public setSubscribedState(subscribedState: BaseStateProvider<any>) {
+    public setSubscribedState(subscribedState: BaseStateConnector<any>) {
         this._stateSubscriptions.set(subscribedState.stateId, subscribedState);
     }
 
-    public unsetSubscribedState(subscribedState: BaseStateProvider<any>) {
+    public unsetSubscribedState(subscribedState: BaseStateConnector<any>) {
         this._stateSubscriptions.delete(subscribedState.stateId);
     }
 
@@ -112,7 +122,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
         switch (message.command) {
             case WebviewMessageId.requestState: {
                 const state = this._stateSubscriptions.get(message.payload);
-
                 state?.sendToWebview();
 
                 webviewView.webview.postMessage({
@@ -261,12 +270,13 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
                 await restartWakeClient(client);
 
-                // reconnect the current provider
-                // try {
-                //     await sakeProviderManager.provider?.connect();
-                // } catch (error) {
-                //     showErrorMessage(error as string);
-                // }
+                try {
+                    if (!sakeProviderManager.provider?.connected) {
+                        await sakeProviderManager.provider?.connect();
+                    }
+                } catch (error) {
+                    showErrorMessage(error as string);
+                }
 
                 // try to reconnect all providers
                 // providerRegistry.getAll().forEach((provider) => {
@@ -279,7 +289,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 //         );
                 //     }
                 // });
-                await sakeProviderManager.reloadState();
+                // await sakeProviderManager.reloadState();
 
                 webviewView.webview.postMessage({
                     command: message.command,
@@ -354,7 +364,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
             case WebviewMessageId.createNewLocalChain: {
                 const success =
-                    (await sakeProviderManager.createNewLocalChain(
+                    (await SakeProviderFactory.createNewLocalProvider(
                         message.payload.displayName,
                         message.payload.networkCreationConfig,
                         message.payload.onlySuccessful
@@ -372,7 +382,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
             case WebviewMessageId.connectToLocalChain: {
                 const success =
-                    (await sakeProviderManager.connectToLocalChain(
+                    (await SakeProviderFactory.connectToLocalChain(
                         message.payload.displayName,
                         message.payload.uri,
                         message.payload.onlySuccessful
@@ -394,9 +404,30 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
+            case WebviewMessageId.toggleAutosave: {
+                const provider = sakeProviderManager.provider;
+                if (!provider) {
+                    console.error('Cannot toggle autosave, no provider found');
+                    return;
+                }
+                const autosave = !provider.providerState.persistence.isAutosaveEnabled;
+                provider.setAutosave(!provider.providerState.persistence.isAutosaveEnabled);
+                break;
+            }
+
+            case WebviewMessageId.saveState: {
+                sakeProviderManager.provider?.saveState();
+                break;
+            }
+
+            case WebviewMessageId.deleteStateSave: {
+                sakeProviderManager.provider?.deleteStateSave();
+                break;
+            }
+
             default: {
-                // Pass the message to the inheriting class
-                this._onDidReceiveMessage(message);
+                console.error('Unhandled webview message', message);
+                // this._onDidReceiveMessage(message);
             }
         }
     }

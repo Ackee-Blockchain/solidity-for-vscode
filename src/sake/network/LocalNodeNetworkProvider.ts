@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import * as WakeApi from '../api/wake';
 import { NetworkError } from '../webview/shared/errors';
 import {
@@ -11,7 +12,7 @@ import {
     SetAccountBalanceResponse,
     SetAccountLabelRequest
 } from '../webview/shared/network_types';
-import { LocalNodeNetworkState, WakeChainDump } from '../webview/shared/storage_types';
+import { BaseWakeNetworkState, WakeChainDump } from '../webview/shared/storage_types';
 import {
     Account,
     Address,
@@ -31,7 +32,6 @@ import {
     WakeSetBalancesResponse
 } from '../webview/shared/wake_types';
 import { NetworkProvider } from './NetworkProvider';
-import { v4 as uuidv4 } from 'uuid';
 
 export class LocalNodeNetworkProvider extends NetworkProvider {
     constructor(public config: NetworkConfiguration) {
@@ -195,20 +195,24 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
         return response;
     }
 
-    async dumpState(): Promise<LocalNodeNetworkState> {
-        const response: WakeDumpStateResponse = await WakeApi.dumpState({
-            sessionId: this.config.sessionId
-        });
+    async dumpState(includeWakeDump: boolean = true): Promise<any> {
+        let wakeDump;
+        if (includeWakeDump) {
+            const response: WakeDumpStateResponse = await WakeApi.dumpState({
+                sessionId: this.config.sessionId
+            });
 
-        if (!response.success) {
-            throw new NetworkError('Failed to dump state');
+            if (!response.success) {
+                throw new NetworkError('Failed to dump state');
+            }
+            wakeDump = {
+                metadata: response.metadata,
+                chainDump: response.chainDump
+            };
         }
 
         return {
-            wakeDump: {
-                metadata: response.metadata,
-                chainDump: response.chainDump
-            },
+            wakeDump,
             type: this.type,
             config: this.config
         };
@@ -266,9 +270,7 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
     getInfo(): NetworkInfo {
         return {
             type: NetworkType.Local,
-            uri: this.config.uri,
-            chainId: this.config.chainId,
-            fork: this.config.fork
+            config: this.config
         };
     }
 }

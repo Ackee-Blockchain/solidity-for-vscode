@@ -5,13 +5,11 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<span
+<div
     class="{disabled
         ? 'cursor-default opacity-50'
-        : 'cursor-pointer hover:underline'} {className} flex flex-row gap-2 items-center"
-    on:click={() => {
-        if (!disabled) {
-            callback();
-        }
-    }}><slot /></span
+        : 'cursor-pointer hover:underline'} {className} flex flex-row gap-1 w-full"
+    on:click={callback}
 >
+    <slot />
+</div>
