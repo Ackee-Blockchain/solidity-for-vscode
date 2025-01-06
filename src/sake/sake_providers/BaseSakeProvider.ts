@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 import * as WakeApi from '../api/wake';
-import { showTimedInfoMessage } from '../commands';
+import { showInfoMessage, showTimedInfoMessage } from '../commands';
 import { NetworkProvider } from '../network/NetworkProvider';
 import { OutputViewManager } from '../providers/OutputTreeProvider';
-import { ChainHook, chainRegistry } from '../state/ChainRegistry';
+import { chainRegistry } from '../state/shared/ChainRegistry';
+import { autosaver } from '../storage/autosave';
+import { deleteChainState, loadChainState, saveChainState } from '../storage/stateHandler';
 import { decodeCallReturnValue } from '../utils/call';
 import {
     getNameFromContractFqn,
@@ -11,11 +13,13 @@ import {
     parseCompilationSkipped,
     parseCompiledContracts
 } from '../utils/compilation';
-import { fingerprint } from '../utils/hash';
+import { GenericHook } from '../utils/hook';
 import { SakeError } from '../webview/shared/errors';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import {
-    SakeProviderInitializationRequest
+    SakeProviderInitializationRequest,
+    SakeProviderType,
+    ProviderState as StoredProviderState
 } from '../webview/shared/storage_types';
 import {
     AbiFunctionFragment,
@@ -24,6 +28,7 @@ import {
     CallOperation,
     CallRequest,
     CallType,
+    ChainPersistence,
     ContractAbi,
     DeployedContract,
     DeployedContractType,
@@ -35,28 +40,101 @@ import {
     SetAccountLabelRequest,
     TransactionCallResult,
     TransactionDecodedReturnValue,
-    TransactionDeploymentResult
+    TransactionDeploymentResult,
+    WakeCompilationResponse
 } from '../webview/shared/types';
-import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
-import { providerRegistry } from './ProviderRegistry';
+import sakeProviderManager from './SakeProviderManager';
 import SakeState from './SakeState';
 
-export abstract class BaseSakeProvider<T extends NetworkProvider> {
-    private _hook: ChainHook;
+export interface ISakeProvider {
+    id: string;
+    type: SakeProviderType;
+    displayName: string;
+    network: NetworkProvider;
+    connected: boolean;
+    initializationRequest: SakeProviderInitializationRequest;
+    chainState: SakeState;
+    providerState: Readonly<ProviderState>;
+    disconnect(): void;
+    connect(): Promise<void>;
+    getBytecode(request: GetBytecodeRequest): Promise<GetBytecodeResponse | undefined>;
+    compile(): Promise<WakeCompilationResponse>;
+    setAccountBalance(request: SetAccountBalanceRequest): Promise<void>;
+    setAccountLabel(request: SetAccountLabelRequest): Promise<void>;
+    refreshAccount(address: string): Promise<void>;
+    deployContract(deploymentRequest: DeploymentRequest): Promise<void>;
+    removeDeployedContract(address: Address): Promise<void>;
+    callContract(callRequest: CallRequest): Promise<void>;
+    getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }>;
+    getOnchainContract(address: Address): Promise<DeployedContract>;
+    fetchContract(address: Address): Promise<void>;
+    removeProxy(address: Address, proxyId: string): void;
+    onActivateProvider(): Promise<void>;
+    onDeactivateProvider(): Promise<void>;
+    onDeleteProvider(): Promise<void>;
+    dumpState(): Promise<StoredProviderState>; // @todo add specific type
+    getQuickPickItem(): SakeProviderQuickPickItem;
+    saveState(): Promise<void>;
+    deleteStateSave(): Promise<void>;
+    setAutosave(autosave: boolean): void;
+    subscribe(callback: () => void): () => void;
+}
+export interface ProviderState {
+    type: SakeProviderType;
+    id: string;
+    name: string;
+    network: NetworkProvider;
+    connected: boolean;
+    persistence: ChainPersistence;
+}
+
+export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
+    implements ISakeProvider
+{
+    private _providerStateHook: GenericHook<ProviderState>;
+    private _didFirstConnect: boolean = false;
+
+    // also contains providerState: ProviderState via hook
+    public chainState: SakeState;
 
     constructor(
-        public id: string,
-        public displayName: string,
-        public network: T,
-        public initializationRequest: SakeProviderInitializationRequest
+        type: SakeProviderType,
+        id: string,
+        displayName: string, // @todo rename to name
+        network: TNetworkProvider,
+        public initializationRequest: SakeProviderInitializationRequest,
+        persistence: {
+            isDirty: boolean;
+            isAutosaveEnabled: boolean;
+            lastSaveTimestamp: number | undefined;
+        }
     ) {
-        // check if chain already exists
-        if (chainRegistry.contains(this.id)) {
-            throw new Error('Provider with id ' + this.id + ' already exists');
+        if (chainRegistry.contains(id)) {
+            throw new Error('Provider with id ' + id + ' already exists');
         }
 
-        this._hook = chainRegistry.add(this.id, displayName, network.getInfo());
-        providerRegistry.add(this.id, this as any as LocalNodeSakeProvider); // @todo currently a hotfix to ignore type error
+        this._providerStateHook = new GenericHook<ProviderState>({
+            type: type,
+            id: id,
+            connected: false,
+            name: displayName,
+            network: network,
+            persistence
+        });
+
+        // @dev base sake provider has to be fully initialized before being added to chainRegistry
+        // due to chainregistry listeners
+        this.chainState = new SakeState();
+        chainRegistry.add(this.id, this);
+
+        // wrap all methods which require autosaving in a wrapper that saves the state with a delay
+        // load vscode settings - autosave.enabled
+        this.deployContract = this.persistenceWrapper(this.deployContract.bind(this));
+        this.callContract = this.persistenceWrapper(this.callContract.bind(this));
+        this.setAccountBalance = this.persistenceWrapper(this.setAccountBalance.bind(this));
+        this.setAccountLabel = this.persistenceWrapper(this.setAccountLabel.bind(this));
+
+        // wrap all methods that might throw errors in a wrapper that shows a message in vscode
         this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
         this.setAccountLabel = showVSCodeMessageOnErrorWrapper(this.setAccountLabel.bind(this));
         this.refreshAccount = showVSCodeMessageOnErrorWrapper(this.refreshAccount.bind(this));
@@ -65,23 +143,63 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
             this.removeDeployedContract.bind(this)
         );
         this.callContract = showVSCodeMessageOnErrorWrapper(this.callContract.bind(this));
+
         // this.transactContract = showVSCodeMessageOnErrorWrapper(this.transactContract.bind(this));
     }
 
-    abstract connect(): Promise<void>;
+    get type(): Readonly<SakeProviderType> {
+        return this.providerState.type;
+    }
 
-    get connected(): boolean {
-        return this._hook.get().connected;
+    // @dev providerState variables got via this are readonly, to set any value on providerstate use the setter
+    get providerState(): Readonly<ProviderState> {
+        return this._providerStateHook.get();
+    }
+
+    set providerState(subState: Partial<ProviderState>) {
+        this._providerStateHook.setLazy(subState);
+    }
+
+    get connected(): Readonly<boolean> {
+        return this.providerState.connected;
     }
 
     set connected(connected: boolean) {
-        this._hook.setLazy({
-            connected: connected
-        });
+        this.providerState = {
+            connected
+        };
     }
 
-    get states(): SakeState {
-        return this._hook.get().states;
+    get persistence(): Readonly<ChainPersistence> {
+        return this.providerState.persistence;
+    }
+
+    set persistence(persistence: Partial<ChainPersistence>) {
+        this.providerState = {
+            ...this.providerState,
+            persistence: {
+                ...this.providerState.persistence,
+                ...persistence
+            }
+        };
+    }
+
+    get id(): string {
+        return this.providerState.id;
+    }
+
+    get displayName(): string {
+        return this.providerState.name;
+    }
+
+    get network(): TNetworkProvider {
+        return this.providerState.network as TNetworkProvider;
+    }
+
+    disconnect() {
+        this.providerState = {
+            connected: false
+        };
     }
 
     /* Compilation */
@@ -96,7 +214,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         const parsedContracts = parseCompiledContracts(compilationResponse.contracts);
         const parsedErrors = parseCompilationIssues(compilationResponse.errors);
         const parsedSkipped = parseCompilationSkipped(compilationResponse.skipped);
-        this.states.compilation.set(parsedContracts, [...parsedErrors, ...parsedSkipped]);
+        this.chainState.compilation.setBoth(parsedContracts, [...parsedErrors, ...parsedSkipped]);
 
         return compilationResponse;
     }
@@ -110,7 +228,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
 
     // async addAccount(address: string) {
     //     // check if account is already in the list
-    //     if (this.states.accounts.includes(address)) {
+    //     if (this.state.accounts.includes(address)) {
     //         return;
     //     }
 
@@ -118,25 +236,25 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
     //     const account: Account | undefined = await this.network.registerAccount(address);
 
     //     if (account) {
-    //         this.states.accounts.add(account);
+    //         this.state.accounts.add(account);
     //     }
     // }
 
     // async removeAccount(address: string) {
-    //     this.states.accounts.remove(address);
+    //     this.state.accounts.remove(address);
     // }
 
     async setAccountBalance(request: SetAccountBalanceRequest) {
         const success = await this.network.setAccountBalance(request);
 
         if (success) {
-            this.states.accounts.setBalance(request.address, request.balance);
+            this.chainState.accounts.setBalance(request.address, request.balance);
         }
     }
 
     async setAccountLabel(request: SetAccountLabelRequest) {
-        this.states.accounts.setLabel(request.address, request.label);
-        this.states.deployment.setLabel(request.address, request.label);
+        this.chainState.accounts.setLabel(request.address, request.label);
+        this.chainState.deployment.setLabel(request.address, request.label);
     }
 
     async refreshAccount(address: string) {
@@ -146,22 +264,24 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
             return;
         }
 
-        if (this.states.accounts.includes(address)) {
-            this.states.accounts.update({
+        if (this.chainState.accounts.includes(address)) {
+            this.chainState.accounts.update({
                 ...account,
-                label: this.states.accounts.get(address)?.label
+                label: this.chainState.accounts.getAccount(address)?.label
             });
         } else {
-            this.states.accounts.add(account);
+            this.chainState.accounts.add(account);
         }
     }
 
     /* Deployment management */
 
     async deployContract(deploymentRequest: DeploymentRequest) {
-        const compilation = this.states.compilation.get(deploymentRequest.contractFqn);
+        const compiledContract = this.chainState.compilation.getContract(
+            deploymentRequest.contractFqn
+        );
 
-        if (!compilation) {
+        if (!compiledContract) {
             throw new SakeError('Deployment failed: Contract ABI was not found');
         }
 
@@ -172,17 +292,17 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
                 await this.network.getAccountDetails(deploymentResponse.deployedAddress)
             ).balance;
 
-            this.states.deployment.add({
+            this.chainState.deployment.add({
                 type: DeployedContractType.Compiled,
-                name: compilation.name,
+                name: compiledContract.name,
                 address: deploymentResponse.deployedAddress,
-                abi: compilation.abi,
+                abi: compiledContract.abi,
                 fqn: deploymentRequest.contractFqn,
                 balance: balance
             });
 
             showTimedInfoMessage(
-                `Deployed contract ${compilation.name} at address ${deploymentResponse.deployedAddress}`
+                `Deployed contract ${compiledContract.name} at address ${deploymentResponse.deployedAddress}`
             );
         }
 
@@ -201,11 +321,11 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         };
 
         OutputViewManager.getInstance().set(transaction);
-        this.states.history.add(transaction);
+        this.chainState.history.add(transaction);
     }
 
     async removeDeployedContract(address: Address) {
-        this.states.deployment.remove(address);
+        this.chainState.deployment.remove(address);
     }
 
     /* Interactions */
@@ -245,7 +365,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
         };
 
         OutputViewManager.getInstance().set(transaction);
-        this.states.history.add(transaction);
+        this.chainState.history.add(transaction);
 
         // TODO consider check and update balance of caller and callee
     }
@@ -265,7 +385,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
     async fetchContract(address: Address) {
         try {
             const deployedContract = await this.getOnchainContract(address);
-            this.states.deployment.add(deployedContract);
+            this.chainState.deployment.add(deployedContract);
         } catch (e) {
             vscode.window
                 .showErrorMessage(
@@ -274,7 +394,7 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
                 )
                 .then((selected) => {
                     if (selected === 'Add with empty ABI') {
-                        this.states.deployment.add({
+                        this.chainState.deployment.add({
                             type: DeployedContractType.OnChain,
                             address: address,
                             abi: [],
@@ -289,36 +409,104 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
     /* Proxy management */
 
     removeProxy(address: Address, proxyId: string) {
-        this.states.deployment.removeProxy(address, proxyId);
+        this.chainState.deployment.removeProxy(address, proxyId);
     }
 
     /* Event handling */
 
     async onActivateProvider() {
-        this.states.subscribe();
         this.network.onActivate();
     }
 
     async onDeactivateProvider() {
-        this.states.unsubscribe();
         this.network.onDeactivate();
     }
 
     async onDeleteProvider(): Promise<void> {
         chainRegistry.delete(this.id);
-        providerRegistry.delete(this.id);
+        if (this.connected) {
+            await this.network.deleteChain();
+        }
     }
 
     /* State Handling */
 
-    async dumpState() {
-        const providerState = this.states.dumpProviderState();
+    async saveState() {
+        const tempLastSaveTimestamp = this.persistence.lastSaveTimestamp;
+        const tempIsDirty = this.persistence.isDirty;
+        this.persistence = {
+            isDirty: false,
+            lastSaveTimestamp: Date.now()
+        };
+        const success = await saveChainState(this);
+        if (!success) {
+            this.persistence = {
+                isDirty: tempIsDirty,
+                lastSaveTimestamp: tempLastSaveTimestamp
+            };
+        }
+    }
+
+    async getSavedState(): Promise<StoredProviderState | undefined> {
+        return loadChainState(this);
+    }
+
+    async deleteStateSave() {
+        const success = await deleteChainState(this);
+        if (success) {
+            this.persistence = {
+                isDirty: false,
+                lastSaveTimestamp: undefined
+            };
+        }
+    }
+
+    setAutosave(autosave: boolean) {
+        if (this.persistence.isAutosaveEnabled === autosave) {
+            return;
+        }
+
+        this.persistence = {
+            ...this.persistence,
+            isAutosaveEnabled: autosave
+        };
+
+        if (!autosave) {
+            // remove any leftover timeout when autosave is disabled
+            autosaver.removeTimeout(this);
+        } else if (this.persistence.isDirty || this.persistence.lastSaveTimestamp === undefined) {
+            // automatically save state when autosave is enabled
+            this.saveState();
+        }
+    }
+
+    getQuickPickItem(): SakeProviderQuickPickItem {
+        const buttons = [
+            {
+                iconPath: new vscode.ThemeIcon('trash'),
+                tooltip: 'Delete'
+            }
+        ];
+        // if (!this.connected) {
+        //     buttons.push({
+        //         iconPath: new vscode.ThemeIcon('refresh'),
+        //         tooltip: 'Reconnect'
+        //     });
+        // }
         return {
-            id: this.id,
-            displayName: this.displayName,
-            state: providerState,
-            network: await this.network.dumpState(),
-            stateFingerprint: fingerprint(providerState)
+            providerId: this.id,
+            label: this.displayName,
+            detail: this.connected ? 'Connected' : 'Disconnected',
+            description: this.network.type,
+            iconPath: this.connected
+                ? new vscode.ThemeIcon('vm-active')
+                : new vscode.ThemeIcon('vm-outline'),
+            buttons,
+            itemButtonClick: (button: vscode.QuickInputButton) => {
+                if (button.tooltip === 'Delete') {
+                    sakeProviderManager.removeProvider(this);
+                }
+            }
         };
     }
 
@@ -327,11 +515,50 @@ export abstract class BaseSakeProvider<T extends NetworkProvider> {
     //     throw new Error('Method not implemented.');
     // }
 
-    /* Helper functions */
+    async connect() {
+        if (this._didFirstConnect) {
+            await this._reconnect();
+        } else {
+            await this._connect();
+            if (this.connected) {
+                this._didFirstConnect = true;
+            }
+        }
+    }
 
-    abstract _getQuickPickItem(): SakeProviderQuickPickItem;
+    /* To be implemented by subclasses */
 
-    abstract _getStatusBarItemText(): string;
+    abstract dumpState(): Promise<StoredProviderState>;
+
+    protected abstract _connect(): Promise<void>;
+
+    protected abstract _reconnect(): Promise<void>;
+
+    /* Subscribable */
+
+    subscribe(callback: () => void): () => void {
+        return this._providerStateHook.subscribe(callback);
+    }
+
+    /* Helpers */
+    persistenceWrapper<T, Args extends any[]>(
+        func: (...args: Args) => Promise<T>
+    ): (...args: Args) => Promise<T | undefined> {
+        return async (...args: Args) => {
+            this.persistence = {
+                isDirty: true
+            };
+            if (this.persistence.isAutosaveEnabled) {
+                autosaver.onStateChange(this);
+            }
+            return await func(...args);
+        };
+    }
+
+    sendNotificationToWebview(data: { notificationHeader: string; notificationBody: string }) {
+        showInfoMessage(data.notificationBody);
+        // sendSignalToWebview(SignalId.showNotification, data);
+    }
 }
 
 // TODO add context if needed

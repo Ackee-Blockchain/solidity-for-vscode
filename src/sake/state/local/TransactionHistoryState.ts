@@ -1,33 +1,31 @@
 import * as vscode from 'vscode';
-import { OutputViewManager } from '../providers/OutputTreeProvider';
+import { OutputViewManager } from '../../providers/OutputTreeProvider';
 import {
     CallOperation,
-    StateId,
     TransactionHistoryState,
     TransactionResult
-} from '../webview/shared/types';
-import BaseStateProvider from './BaseStateProvider';
+} from '../../webview/shared/types';
+import { GenericHook } from '../../utils/hook';
 
-export default class TransactionHistoryStateProvider extends BaseStateProvider<TransactionHistoryState> {
+export class TransactionHistoryStateProvider extends GenericHook<TransactionHistoryState> {
     private output: OutputViewManager;
 
     constructor() {
-        super(StateId.TransactionHistory, []);
+        super([]);
         this.output = OutputViewManager.getInstance();
     }
 
     public add(tx: TransactionResult) {
-        const _state = [...this.state, tx];
-        this.state = _state;
+        this.set([...this.get(), tx]);
     }
 
     public async show() {
-        if (this.state.length === 0) {
+        if (this.get().length === 0) {
             vscode.window.showInformationMessage('No transaction history available');
             return;
         }
 
-        const history = this.state;
+        const history = this.get();
         const quickPickItems = history.map((transaction) => {
             if (transaction.type === CallOperation.Deployment) {
                 return {

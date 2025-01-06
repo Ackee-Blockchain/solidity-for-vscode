@@ -60,6 +60,7 @@
         requestSharedState,
         setupListeners
     } from './helpers/events';
+    import Notifications from './components/Notifications.svelte';
 
     setupListeners();
 
@@ -120,16 +121,16 @@
 
     const tryWakeServerRestart = () => {
         loadWithTimeout(restartWakeServer(), 15, 'Restarting Wake server...')
-            .then(async () => {
-                const result = await loadWithTimeout(
-                    reconnectChain(),
-                    15,
-                    'Reconnecting to chain...'
-                );
-                if (!result) {
-                    throw new Error('Reconnecting to chain failed');
-                }
-            })
+            // .then(async () => {
+            //     const result = await loadWithTimeout(
+            //         reconnectChain(),
+            //         15,
+            //         'Reconnecting to chain...'
+            //     );
+            //     if (!result) {
+            //         throw new Error('Reconnecting to chain failed');
+            //     }
+            // })
             .then(async () => {
                 const result = await loadWithTimeout(loadState(), 15, 'Loading state...');
                 if (!result) {
@@ -256,6 +257,7 @@
             </div>
         {/if}
     </div>
+    <!-- <Notifications /> -->
 </main>
 
 <style global>

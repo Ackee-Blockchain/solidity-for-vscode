@@ -1,42 +1,42 @@
+import { SakeContext } from '../context';
+import appState from '../state/shared/AppState';
+import { chainRegistry } from '../state/shared/ChainRegistry';
+import { validate } from '../utils/validate';
 import {
-    WakeCompilationResponse,
-    WakeDeploymentRequestParams,
-    WakeDeploymentResponse,
-    WakeCallResponse,
-    WakeGetBalancesRequestParams,
-    WakeGetBalancesResponse,
-    WakeSetBalancesRequestParams,
-    WakeSetBalancesResponse,
-    WakeGetAccountsResponse,
-    WakeSetLabelRequestParams,
-    WakeSetLabelResponse,
-    CallType,
     AbiFunctionFragment,
+    CallType,
     WakeCallRequestParams,
-    WakeTransactRequestParams,
-    WakeTransactResponse,
-    WakeGetBytecodeRequestParams,
-    WakeGetBytecodeResponse,
-    WakeCreateChainResponse,
-    WakeCreateChainRequestParams,
+    WakeCallResponse,
+    WakeCompilationResponse,
     WakeConnectChainRequestParams,
     WakeConnectChainResponse,
+    WakeCreateChainRequestParams,
+    WakeCreateChainResponse,
+    WakeDeploymentRequestParams,
+    WakeDeploymentResponse,
     WakeDisconnectChainRequestParams,
     WakeDisconnectChainResponse,
-    WakeGetAccountsRequestParams,
     WakeDumpStateRequestParams,
     WakeDumpStateResponse,
-    WakeLoadStateResponse,
-    WakeLoadStateRequestParams,
-    WakeGetAbiResponse,
-    WakeGetAbiWithProxyResponse,
     WakeGetAbiRequestParams,
-    WakeGetAbiWithProxyRequestParams
+    WakeGetAbiResponse,
+    WakeGetAbiWithProxyRequestParams,
+    WakeGetAbiWithProxyResponse,
+    WakeGetAccountsRequestParams,
+    WakeGetAccountsResponse,
+    WakeGetBalancesRequestParams,
+    WakeGetBalancesResponse,
+    WakeGetBytecodeRequestParams,
+    WakeGetBytecodeResponse,
+    WakeLoadStateRequestParams,
+    WakeLoadStateResponse,
+    WakeSetBalancesRequestParams,
+    WakeSetBalancesResponse,
+    WakeSetLabelRequestParams,
+    WakeSetLabelResponse,
+    WakeTransactRequestParams,
+    WakeTransactResponse
 } from '../webview/shared/types';
-import { validate } from '../utils/validate';
-import { SakeContext } from '../context';
-import { chainRegistry } from '../state/ChainRegistry';
-import appState from '../state/AppStateProvider';
 
 export class WakeError extends Error {}
 export class WakeApiError extends WakeError {}
@@ -71,15 +71,11 @@ async function sendWakeRequest<T>(
         }
         // local wake instance
         if (message == 'Chain instance not connected') {
-            chainRegistry.getHook(params.sessionId)?.setLazy({
-                connected: false
-            });
+            chainRegistry.get(params.sessionId)?.disconnect();
         }
         // anvil instance which was connected to
         if (message == 'Connection to remote host was lost.') {
-            chainRegistry.getHook(params.sessionId)?.setLazy({
-                connected: false
-            });
+            chainRegistry.get(params.sessionId)?.disconnect();
         }
         throw new WakeApiError(message);
     }

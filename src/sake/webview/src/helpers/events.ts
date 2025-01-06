@@ -13,6 +13,7 @@ import {
     chainState,
     compilationState,
     deployedContracts,
+    notifications,
     selectedAccount,
     setSelectedAccount
 } from './stores';
@@ -81,8 +82,6 @@ export function setupListeners() {
     window.addEventListener('message', (event) => {
         const message = event.data as WebviewMessageResponse;
 
-        console.log('message', message);
-
         switch (message.command) {
             case WebviewMessageId.onGetState: {
                 handleStateResponse(message);
@@ -108,6 +107,7 @@ export function setupListeners() {
 function handleStateResponse(
     message: WebviewMessageResponse & { command: WebviewMessageId.onGetState }
 ) {
+    console.log('got message', message.stateId, message.payload);
     switch (message.stateId) {
         case StateId.DeployedContracts: {
             deployedContracts.set(message.payload);
@@ -173,6 +173,16 @@ function handleSignal(message: WebviewMessageResponse & { command: WebviewMessag
         case SignalId.showAdvancedLocalChainSetup: {
             chainNavigator.showAdvancedLocalChainSetup();
 
+            break;
+        }
+
+        case SignalId.showNotification: {
+            notifications.addNotification(message.payload);
+            break;
+        }
+
+        default: {
+            console.error(`No listener set up for signal with id ${message.signalId}`);
             break;
         }
     }

@@ -2,40 +2,70 @@ import { v4 as uuidv4 } from 'uuid';
 import * as vscode from 'vscode';
 import { showErrorMessage } from '../commands';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
+import { autosaveDefault } from '../storage/autosave';
 import { SakeError } from '../webview/shared/errors';
 import {
     NetworkConfiguration,
     NetworkCreationConfiguration
 } from '../webview/shared/network_types';
-import { NetworkType } from '../webview/shared/state_types';
+import { ChainPersistence, NetworkType } from '../webview/shared/state_types';
 import {
     ProviderState,
     SakeLocalNodeProviderInitializationRequest,
-    SakeProviderInitializationRequestType
+    SakeProviderInitializationRequestType,
+    SakeProviderType
 } from '../webview/shared/storage_types';
 import { LocalNodeSakeProvider } from './LocalNodeSakeProvider';
 import sakeProviderManager from './SakeProviderManager';
+import { ConnectionSakeProvider } from './ConnectionSakeProvider';
 
 async function _newLocalProvider(
+    type: SakeProviderType,
     providerId: string,
     displayName: string,
     networkConfig: NetworkConfiguration,
     initializationRequest: SakeLocalNodeProviderInitializationRequest,
+    persistence: ChainPersistence,
     onlySuccessful: boolean = false
 ): Promise<LocalNodeSakeProvider> {
     const networkProvider = new LocalNodeNetworkProvider(networkConfig);
 
     // @dev do not catch errors here, so it can be handled by the caller
-    const provider = new LocalNodeSakeProvider(
-        providerId,
-        displayName,
-        networkProvider,
-        initializationRequest
-    );
+    let provider;
+    switch (type) {
+        case SakeProviderType.LocalNode:
+            provider = new LocalNodeSakeProvider(
+                providerId,
+                displayName,
+                networkProvider,
+                initializationRequest,
+                persistence
+            );
+            break;
+
+        case SakeProviderType.Connection:
+            provider = new ConnectionSakeProvider(
+                providerId,
+                displayName,
+                networkProvider,
+                initializationRequest,
+                persistence
+            );
+            break;
+
+        default:
+            throw new Error('Invalid provider type');
+    }
 
     // @dev allow failing connection, so it can reconnect later
     try {
         await provider.connect();
+        if (
+            persistence.isAutosaveEnabled &&
+            (persistence.isDirty || persistence.lastSaveTimestamp == undefined)
+        ) {
+            await provider.saveState();
+        }
     } catch (e) {
         if (onlySuccessful) {
             provider.onDeleteProvider();
@@ -59,13 +89,15 @@ export async function createNewLocalProvider(
     };
 
     return _newLocalProvider(
+        SakeProviderType.LocalNode,
         providerId,
         displayName,
         networkConfig,
         {
-            type: SakeProviderInitializationRequestType.CreateNewChain,
+            type: SakeProviderInitializationRequestType.CreateNew,
             accounts: networkCreationConfig?.accounts
         },
+        getDefaultPersistence(),
         onlySuccessful
     )
         .then((provider) => {
@@ -79,8 +111,6 @@ export async function createNewLocalProvider(
             console.error(`Failed to create provider "${providerId}": ${e}`);
             return undefined;
         });
-
-    // return provider;
 }
 
 export async function connectToLocalChain(
@@ -96,12 +126,14 @@ export async function connectToLocalChain(
     };
 
     return await _newLocalProvider(
+        SakeProviderType.Connection,
         providerId,
         displayName,
         networkConfig,
         {
-            type: SakeProviderInitializationRequestType.ConnectToChain
+            type: SakeProviderInitializationRequestType.CreateNew
         },
+        getDefaultPersistence(),
         onlySuccessful
     )
         .then((provider) => {
@@ -124,10 +156,17 @@ export async function createFromState(
 ): Promise<LocalNodeSakeProvider | undefined> {
     switch (state.network.type) {
         case NetworkType.Local:
-            return await _newLocalProvider(state.id, state.displayName, state.network.config, {
-                type: SakeProviderInitializationRequestType.LoadFromState,
-                state: state
-            })
+            return await _newLocalProvider(
+                state.type,
+                state.id,
+                state.displayName,
+                state.network.config,
+                {
+                    type: SakeProviderInitializationRequestType.LoadFromState,
+                    state: state
+                },
+                state.persistence
+            )
                 .then((provider) => {
                     if (!silent) {
                         notifyUserOfNewProvider(provider);
@@ -143,6 +182,14 @@ export async function createFromState(
         default:
             throw new SakeError(`Unsupported network type: ${state.network.type}`);
     }
+}
+
+function getDefaultPersistence() {
+    return {
+        isDirty: false,
+        isAutosaveEnabled: autosaveDefault,
+        lastSaveTimestamp: undefined
+    };
 }
 
 function getNewProviderId(): string {

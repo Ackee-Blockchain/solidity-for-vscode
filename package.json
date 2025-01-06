@@ -383,6 +383,22 @@
                         "description": "Also include declarations in 'Go to references' results."
                     }
                 }
+            },
+            {
+                "title": "Deploy & Interact",
+                "order": 5,
+                "properties": {
+                    "Tools-for-Solidity.sake.autosave.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Automatically save the state of deployed contracts and transactions after state-changing events like contract deployments or transactions. This ensures your chain state persists between VS Code sessions."
+                    },
+                    "Tools-for-Solidity.sake.autosave.delay": {
+                        "type": "integer",
+                        "default": 30,
+                        "description": "Number of seconds to wait after a state-changing event (like a transaction or deployment) before automatically saving the chain state. A delay helps batch multiple changes together and reduces disk writes."
+                    }
+                }
             }
         ],
         "languages": [

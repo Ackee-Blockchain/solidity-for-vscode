@@ -1,5 +1,6 @@
-import { writable, derived, get } from 'svelte/store';
+import { derived, get, writable, type Writable } from 'svelte/store';
 import {
+    type ChainInfo,
     type AccountState,
     type AppState,
     type ChainState,
@@ -8,6 +9,7 @@ import {
     type NetworkCreationConfiguration
 } from '../../shared/types';
 import { parseComplexNumber } from '../../shared/validate';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Extension data
@@ -30,9 +32,12 @@ export const chainState = writable<ChainState>({
     chains: [],
     currentChainId: undefined
 });
-export const currentChain = derived(chainState, ($chainState) => {
-    return $chainState.chains.find((chain) => chain.chainId === $chainState.currentChainId);
-});
+export const currentChain = derived<Writable<ChainState>, ChainInfo | undefined>(
+    chainState,
+    ($chainState) => {
+        return $chainState.chains.find((chain) => chain.chainId === $chainState.currentChainId);
+    }
+);
 
 /**
  * Webview Stores
@@ -154,6 +159,32 @@ export const chainNavigator = (() => {
             if (state.state === 'advancedLocalChainSetup') {
                 set({ ...state, activeTab: tab });
             }
+        }
+    };
+})();
+
+export const notifications = (() => {
+    const { subscribe, set } = writable<
+        {
+            notificationHeader: string;
+            notificationBody: string;
+            id: string;
+        }[]
+    >([]);
+
+    return {
+        subscribe,
+        addNotification: (notification: {
+            notificationHeader: string;
+            notificationBody: string;
+        }) => {
+            set([...get(notifications), { ...notification, id: uuidv4() }]);
+        },
+        clearNotification: (id: string) => {
+            set(get(notifications).filter((notification) => notification.id !== id));
+        },
+        clearAllNotifications: () => {
+            set([]);
         }
     };
 })();

@@ -1,36 +1,22 @@
-import {
-    AccountState,
-    Address,
-    DeployedContractType,
-    DeploymentState,
-    NetworkCreationConfiguration,
-    NetworkType,
-    SignalId,
-    TransactionHistoryState,
-    WebviewMessageId
-} from '../webview/shared/types';
-import appState from '../state/AppStateProvider';
 import * as vscode from 'vscode';
 import { getTextFromInputBox, showErrorMessage } from '../commands';
-import { BaseSakeProvider } from './BaseSakeProvider';
+import { ISakeProvider } from './BaseSakeProvider';
 
-import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
-import { SakeContext } from '../context';
-import * as SakeProviderFactory from './SakeProviderFactory';
+import { chainRegistry } from '../state/shared/ChainRegistry';
+import { extensionState } from '../state/shared/ExtensionState';
 import {
     ProviderState,
     SakeProviderInitializationRequestType,
     StoredSakeState
 } from '../webview/shared/storage_types';
+import * as SakeProviderFactory from './SakeProviderFactory';
 import SakeState from './SakeState';
-import { NetworkProvider } from '../network/NetworkProvider';
-import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
-import { additionalSakeState, chainRegistry } from '../state/ChainRegistry';
-import { providerRegistry } from './ProviderRegistry';
-import { StorageHandler } from '../storage/StorageHandler';
+import { createNewLocalProvider } from './SakeProviderFactory';
+import { sendSignalToWebview } from '../utils/helpers';
+import { SignalId } from '../webview/shared/messaging_types';
 
 export const sakeProviderManager = {
-    async removeProvider(provider: BaseSakeProvider<NetworkProvider>) {
+    async removeProvider(provider: ISakeProvider) {
         if (!chainRegistry.contains(provider.id)) {
             throw new Error('Provider with id ' + provider.id + ' does not exist');
         }
@@ -43,15 +29,15 @@ export const sakeProviderManager = {
             );
         }
 
-        if (provider.id === additionalSakeState.get().currentChainId) {
-            additionalSakeState.setLazy({
+        if (provider.id === extensionState.get().currentChainId) {
+            extensionState.setLazy({
                 currentChainId: undefined
             });
         }
     },
 
     get currentChainId() {
-        return additionalSakeState.get().currentChainId;
+        return extensionState.get().currentChainId;
     },
 
     get provider() {
@@ -59,20 +45,12 @@ export const sakeProviderManager = {
             return undefined;
         }
 
-        return providerRegistry.get(this.currentChainId);
+        return chainRegistry.get(this.currentChainId);
     },
 
     get providers() {
-        return providerRegistry.getAll();
+        return chainRegistry.getAll();
     },
-
-    get state() {
-        return this.provider?.states;
-    },
-
-    // get network() {
-    //     return this.provider.network;
-    // }
 
     setProvider(id: string) {
         if (!chainRegistry.contains(id)) {
@@ -84,16 +62,13 @@ export const sakeProviderManager = {
         }
 
         this.provider?.onDeactivateProvider();
-        additionalSakeState.setLazy({
+        extensionState.setLazy({
             currentChainId: id
         });
         this.provider?.onActivateProvider();
 
-        // force update provider
-        this.state?.sendToWebview();
-
         // try to reconnect provider
-        if (!this.provider?.connected) {
+        if (!this.provider?.providerState.connected) {
             try {
                 this.provider?.connect();
             } catch (e) {
@@ -102,62 +77,6 @@ export const sakeProviderManager = {
                 );
             }
         }
-    },
-
-    async requestNewLocalProvider() {
-        // get input from user
-        const chainName = await getTextFromInputBox(
-            'Select a name for the new chain',
-            await this.getProposedChainName()
-        );
-
-        if (!chainName) {
-            return;
-        }
-
-        return await SakeProviderFactory.createNewLocalProvider(chainName);
-    },
-
-    async getProposedChainName() {
-        let name = 'Local Chain 1';
-        let i = 1;
-        while (this.providers.some((provider) => provider.displayName === name)) {
-            name = `Local Chain ${i++}`;
-        }
-        return name;
-    },
-
-    async createNewLocalChain(
-        displayName: string,
-        networkCreationConfig?: NetworkCreationConfiguration,
-        onlySuccessful: boolean = false
-    ) {
-        return await SakeProviderFactory.createNewLocalProvider(
-            displayName,
-            networkCreationConfig,
-            onlySuccessful
-        );
-    },
-
-    async connectToLocalChain(displayName: string, uri: string, onlySuccessful: boolean = false) {
-        return await SakeProviderFactory.connectToLocalChain(displayName, uri, onlySuccessful);
-    },
-
-    async requestNewAdvancedLocalProvider() {
-        this.sendSignalToWebview(SignalId.showAdvancedLocalChainSetup);
-    },
-
-    sendSignalToWebview(signal: SignalId, data?: any) {
-        const webview = SakeContext.getInstance().webviewProvider;
-        if (!webview) {
-            console.error(`A signal (${signal}) was requested but no webview was found.`);
-            return;
-        }
-        webview.postMessageToWebview({
-            command: WebviewMessageId.onSignal,
-            signalId: signal,
-            payload: data
-        });
     },
 
     /* State Handling */
@@ -180,11 +99,9 @@ export const sakeProviderManager = {
                     }
                 })
             );
-            // filter out undefined states
+            // filter out undefined state
             providerStates = _providerStates.filter((state) => state !== undefined);
         }
-
-        console.log('providerStates', providerStates);
 
         // Load shared state
         const sharedState = SakeState.dumpSharedState();
@@ -216,54 +133,32 @@ export const sakeProviderManager = {
         }
     },
 
-    async reloadState(): Promise<void> {
-        // try {
-        //     await this.resetChains();
-        //     await StorageHandler.loadExtensionState();
-        // } catch (error) {
-        //     console.error('Failed to reload state:', error);
-        //     showErrorMessage(
-        //         `Failed to reload state: ${error instanceof Error ? error.message : String(error)}`
-        //     );
-        //     return false;
-        // }
-        // return true;
+    async requestNewLocalProvider() {
+        // get input from user
+        const chainName = await getTextFromInputBox(
+            'Select a name for the new chain',
+            this.proposeChainName()
+        );
 
-        const storedState = await StorageHandler.getExtensionState();
-        const getStoredState = (providerId: string) => {
-            return storedState?.providerStates.find((state) => state.id === providerId);
-        };
+        if (!chainName) {
+            return;
+        }
 
-        this.providers.forEach((provider) => {
-            if (
-                // only try to reconnect to existing chains
-                provider.initializationRequest.type ==
-                SakeProviderInitializationRequestType.ConnectToChain
-            ) {
-                provider.connect();
-            } else {
-                // otherwise state was created via wake and has to be recreated
-                this.removeProvider(provider);
-                const providerState = getStoredState(provider.id);
-                if (providerState == undefined) {
-                    vscode.window.showErrorMessage(
-                        `Failed to reload chain "${provider.displayName}": No state found`
-                    );
-                    return;
-                }
-                this.createProviderFromState(providerState, true);
-            }
-        });
+        return await createNewLocalProvider(chainName);
     },
 
-    async resetChains() {
-        providerRegistry.getAll().forEach((provider) => {
-            provider.onDeleteProvider();
-        });
+    proposeChainName() {
+        let name = 'Local Chain 1';
+        let i = 1;
+        const providers = chainRegistry.getAll();
+        while (providers.some((provider) => provider.displayName === name)) {
+            name = `Local Chain ${i++}`;
+        }
+        return name;
+    },
 
-        additionalSakeState.setLazy({
-            currentChainId: undefined
-        });
+    async requestNewAdvancedLocalProvider() {
+        sendSignalToWebview(SignalId.showAdvancedLocalChainSetup);
     }
 };
 

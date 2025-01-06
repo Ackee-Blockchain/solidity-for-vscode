@@ -1,106 +1,134 @@
-import * as vscode from 'vscode';
 import { LocalNodeNetworkProvider } from '../network/LocalNodeNetworkProvider';
+import { fingerprint } from '../utils/hash';
 import { SakeError } from '../webview/shared/errors';
-import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import {
     SakeLocalNodeProviderInitializationRequest,
-    SakeProviderInitializationRequestType
+    SakeProviderInitializationRequestType,
+    SakeProviderType,
+    ProviderState as StoredProviderState,
+    WakeChainDump
 } from '../webview/shared/storage_types';
-import { SetAccountLabelRequest } from '../webview/shared/types';
+import { ChainPersistence, SetAccountLabelRequest } from '../webview/shared/types';
 import { BaseSakeProvider } from './BaseSakeProvider';
-import { sakeProviderManager } from './SakeProviderManager';
 
 export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProvider> {
     constructor(
         id: string,
         displayName: string,
         network: LocalNodeNetworkProvider,
-        initializationRequest: SakeLocalNodeProviderInitializationRequest
+        initializationRequest: SakeLocalNodeProviderInitializationRequest,
+        persistence: ChainPersistence
     ) {
-        super(id, displayName, network, initializationRequest);
+        super(
+            SakeProviderType.LocalNode,
+            id,
+            displayName,
+            network,
+            initializationRequest,
+            persistence
+        );
     }
 
-    async connect(): Promise<void> {
+    async _connect(): Promise<void> {
         if (this.connected) {
             throw new SakeError('Cannot connect, already connected');
         }
 
-        let accounts = [];
         switch (this.initializationRequest.type) {
-            case SakeProviderInitializationRequestType.CreateNewChain:
+            case SakeProviderInitializationRequestType.CreateNew:
                 await this.network.createChain(this.initializationRequest.accounts);
-
-                accounts = await this.network.getAccounts();
+                const accounts = await this.network.getAccounts();
                 for (const account of accounts) {
                     const accountDetails = await this.network.getAccountDetails(account);
                     if (accountDetails) {
-                        this.states.accounts.add(accountDetails);
+                        this.chainState.accounts.add(accountDetails);
                     }
                 }
                 break;
 
             case SakeProviderInitializationRequestType.LoadFromState:
+                if (this.initializationRequest.state.type !== SakeProviderType.LocalNode) {
+                    throw new Error('Invalid initialization request type for local node provider');
+                }
+
                 await this.network.createChain();
                 await this.network.loadState(this.initializationRequest.state.network.wakeDump);
-                this.states.loadProviderState(this.initializationRequest.state.state);
+                this.chainState.loadStateFrom(this.initializationRequest.state.state);
                 break;
 
-            case SakeProviderInitializationRequestType.ConnectToChain:
-                await this.network.connectChain();
-
-                accounts = await this.network.getAccounts();
-                for (const account of accounts) {
-                    const accountDetails = await this.network.getAccountDetails(account);
-                    if (accountDetails) {
-                        this.states.accounts.add(accountDetails);
-                    }
-                }
-                break;
+            default:
+                throw new Error('Invalid initialization request type for local node provider');
         }
 
         this.connected = true;
     }
 
-    async onDeleteProvider(): Promise<void> {
-        await super.onDeleteProvider();
+    async _reconnect(): Promise<void> {
         if (this.connected) {
-            await this.network.deleteChain();
+            throw new SakeError('Cannot reconnect, already connected');
         }
-    }
 
-    _getQuickPickItem(): SakeProviderQuickPickItem {
-        const buttons = [
-            {
-                iconPath: new vscode.ThemeIcon('trash'),
-                tooltip: 'Delete'
-            }
-        ];
-        // if (!this.connected) {
-        //     buttons.push({
-        //         iconPath: new vscode.ThemeIcon('refresh'),
-        //         tooltip: 'Reconnect'
-        //     });
-        // }
-        return {
-            providerId: this.id,
-            label: this.displayName,
-            detail: this.connected ? 'Connected' : 'Disconnected',
-            description: this.network.type,
-            iconPath: this.connected
-                ? new vscode.ThemeIcon('vm-active')
-                : new vscode.ThemeIcon('vm-outline'),
-            buttons,
-            itemButtonClick: (button: vscode.QuickInputButton) => {
-                if (button.tooltip === 'Delete') {
-                    sakeProviderManager.removeProvider(this);
+        const savedState = await this.getSavedState();
+        if (savedState !== undefined && savedState.type !== SakeProviderType.LocalNode) {
+            throw new Error('Invalid saved state type for local node provider');
+        }
+
+        await this.network.createChain();
+
+        // check if state if dirty
+        if (this.persistence.isDirty) {
+            if (this.persistence.lastSaveTimestamp !== undefined) {
+                if (!savedState) {
+                    console.error('No saved state found during reconnect');
+                    return;
                 }
+
+                await this.network.loadState(savedState.network.wakeDump);
+                this.chainState.loadStateFrom(savedState.state);
+
+                this.sendNotificationToWebview({
+                    notificationHeader: 'Chain state partially restored',
+                    notificationBody:
+                        'The chain was disconnected. Your last saved state has been restored successfully from last save.'
+                });
+            } else {
+                this.chainState.reset();
+                this.sendNotificationToWebview({
+                    notificationHeader: 'Chain state was lost',
+                    notificationBody:
+                        'The chain was disconnected and no saved state was found. The chain has been reset to its initial state.'
+                });
             }
-        };
+        } else {
+            if (this.persistence.lastSaveTimestamp !== undefined) {
+                if (!savedState) {
+                    console.error('No saved state found during reconnect');
+                    return;
+                }
+
+                // reload state in wake
+                await this.network.createChain();
+                await this.network.loadState(savedState.network.wakeDump);
+                this.chainState.loadStateFrom(savedState.state);
+            } else {
+                // no state to reload
+            }
+        }
+
+        this.connected = true;
     }
 
-    _getStatusBarItemText() {
-        const icon = this.connected ? '$(vm-active)' : '$(vm-outline)';
-        return `${icon} ${this.displayName}`;
+    async dumpState(): Promise<StoredProviderState> {
+        const providerState = this.chainState.dumpState();
+        return {
+            type: SakeProviderType.LocalNode,
+            id: this.id,
+            displayName: this.displayName,
+            state: providerState,
+            network: await this.network.dumpState(),
+            stateFingerprint: fingerprint(providerState),
+            persistence: this.persistence
+        };
     }
 
     /* Overrides */
