@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 /** Storage folder path segments */
-const storageFolder = ['.wake', 'extension'];
+export const storageFolder = ['.wake', 'extension'];
 
 /**
  * Checks if a file exists in the workspace state storage

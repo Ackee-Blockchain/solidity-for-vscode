@@ -1,10 +1,13 @@
+import * as vscode from 'vscode';
 import { ProviderState, SharedState, StoredSakeState } from '../webview/shared/storage_types';
 import {
     deleteFromWorkspaceState,
     listFilesInWorkspaceState,
     loadFromWorkspaceState,
-    saveToWorkspaceState
+    saveToWorkspaceState,
+    storageFolder
 } from './fileHandler';
+import { SakeContext } from '../context';
 
 const providerStatePrefix = 'local';
 const sharedStatePrefix = 'shared';
@@ -141,4 +144,27 @@ export function providerStateFilename(state: { id: string }) {
  */
 export function sharedStateFilename() {
     return sharedStatePrefix + '.json';
+}
+
+export function createChainStateFileWatcher(state: { id: string }, callback: () => void) {
+    const workspaces = vscode.workspace.workspaceFolders;
+    if (workspaces === undefined || workspaces.length > 1) {
+        return;
+    }
+
+    const workspace = workspaces[0];
+    const fileWatcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(
+            workspace,
+            storageFolder.join('/') + '/' + providerStateFilename(state)
+        ),
+        true,
+        true
+    );
+
+    SakeContext.getInstance().context?.subscriptions.push(fileWatcher);
+
+    fileWatcher.onDidDelete(() => {
+        callback();
+    });
 }

@@ -45,6 +45,7 @@ import {
 } from '../webview/shared/types';
 import sakeProviderManager from './SakeProviderManager';
 import SakeState from './SakeState';
+import { createChainStateFileWatcher } from '../storage/stateUtils';
 
 export interface ISakeProvider {
     id: string;
@@ -143,8 +144,15 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
             this.removeDeployedContract.bind(this)
         );
         this.callContract = showVSCodeMessageOnErrorWrapper(this.callContract.bind(this));
-
         // this.transactContract = showVSCodeMessageOnErrorWrapper(this.transactContract.bind(this));
+
+        // check if state file exists
+        createChainStateFileWatcher(this, () => {
+            this.persistence = {
+                isDirty: true,
+                lastSaveTimestamp: undefined
+            };
+        });
     }
 
     get type(): Readonly<SakeProviderType> {
