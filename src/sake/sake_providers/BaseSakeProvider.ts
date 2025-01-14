@@ -427,6 +427,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
         if (this.connected) {
             await this.network.deleteChain();
         }
+        await this.deleteStateSave();
     }
 
     /* State Handling */
