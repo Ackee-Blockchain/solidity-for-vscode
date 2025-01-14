@@ -8,6 +8,8 @@
 - Enabled connecting to existing local blockchain nodes
 - Added events in transaction output
 - Added input tooltips for better UX
+- Implemented autosaving chain state in intervals after chain-state change in favor of autosaving problematic chain state on VS Code deactivation
+- Added current chain info in chain navigator
 
 ### Fixes
 - Resolved compilation issue expansion problems
