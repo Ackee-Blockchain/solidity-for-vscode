@@ -4,16 +4,12 @@ import { ISakeProvider } from './BaseSakeProvider';
 
 import { chainRegistry } from '../state/shared/ChainRegistry';
 import { extensionState } from '../state/shared/ExtensionState';
-import {
-    ProviderState,
-    SakeProviderInitializationRequestType,
-    StoredSakeState
-} from '../webview/shared/storage_types';
-import * as SakeProviderFactory from './SakeProviderFactory';
-import SakeState from './SakeState';
-import { createNewLocalProvider } from './SakeProviderFactory';
 import { sendSignalToWebview } from '../utils/helpers';
 import { SignalId } from '../webview/shared/messaging_types';
+import { ProviderState, StoredSakeState } from '../webview/shared/storage_types';
+import * as SakeProviderFactory from './SakeProviderFactory';
+import { createNewLocalProvider } from './SakeProviderFactory';
+import SakeState from './SakeState';
 
 export const sakeProviderManager = {
     async removeProvider(provider: ISakeProvider) {
@@ -145,6 +141,14 @@ export const sakeProviderManager = {
         }
 
         return await createNewLocalProvider(chainName);
+    },
+
+    async requestRenameProvider(provider: ISakeProvider) {
+        const newName = await getTextFromInputBox('Rename chain', provider.displayName);
+        if (!newName) {
+            return;
+        }
+        await provider.rename(newName);
     },
 
     proposeChainName() {

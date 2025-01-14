@@ -1,8 +1,10 @@
 <script lang="ts">
     import { SakeProviderType } from '../../shared/storage_types';
     import {
+        deleteChain,
         deleteStateSave,
         openChainsQuickPick,
+        renameChain,
         saveState,
         toggleAutosave
     } from '../helpers/api';
@@ -17,6 +19,7 @@
     import CloseIcon from './icons/CloseIcon.svelte';
     import DefaultButton from './icons/DefaultButton.svelte';
     import DeleteIcon from './icons/DeleteIcon.svelte';
+    import EditIcon from './icons/EditIcon.svelte';
     import ExpandButton from './icons/ExpandButton.svelte';
     import IconContainer from './icons/IconContainer.svelte';
     import InfoIcon from './icons/InfoIcon.svelte';
@@ -130,11 +133,29 @@
                         {/if}
                     </div>
 
+                    <!-- Chain Info and other general stuff -->
+                    <Divider className="my-0" />
+                    <div class="text-sm opacity-75 text-center mt-1">General</div>
+                    <div class="flex flex-col gap-3 p-2 font-sm">
+                        <ClickableSpan callback={deleteChain}>
+                            <DeleteIcon />
+                            <span>Delete chain</span>
+                        </ClickableSpan>
+                        <ClickableSpan callback={renameChain}>
+                            <EditIcon />
+                            <span>Rename chain</span>
+                        </ClickableSpan>
+                        <!-- <ClickableSpan callback={resetChain}>
+                            <ResetIcon />
+                            <span>Reset chain</span>
+                        </ClickableSpan> -->
+                    </div>
+
                     <!-- <div class="flex flex-col gap-3 p-2 font-sm">
-                    <ClickableSpan callback={() => {}}>
-                        <span>Reset chain</span>
-                    </ClickableSpan>
-                </div> -->
+                        <ClickableSpan callback={() => {}}>
+                            <span>Reset chain</span>
+                        </ClickableSpan>
+                    </div> -->
 
                     <!-- Persistence -->
 

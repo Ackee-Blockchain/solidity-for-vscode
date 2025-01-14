@@ -50,7 +50,7 @@ import { createChainStateFileWatcher } from '../storage/stateUtils';
 export interface ISakeProvider {
     id: string;
     type: SakeProviderType;
-    displayName: string;
+    displayName: Readonly<string>;
     network: NetworkProvider;
     connected: boolean;
     initializationRequest: SakeProviderInitializationRequest;
@@ -58,6 +58,7 @@ export interface ISakeProvider {
     providerState: Readonly<ProviderState>;
     disconnect(): void;
     connect(): Promise<void>;
+    rename(name: string): Promise<void>;
     getBytecode(request: GetBytecodeRequest): Promise<GetBytecodeResponse | undefined>;
     compile(): Promise<WakeCompilationResponse>;
     setAccountBalance(request: SetAccountBalanceRequest): Promise<void>;
@@ -134,6 +135,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
         this.callContract = this.persistenceWrapper(this.callContract.bind(this));
         this.setAccountBalance = this.persistenceWrapper(this.setAccountBalance.bind(this));
         this.setAccountLabel = this.persistenceWrapper(this.setAccountLabel.bind(this));
+        this.rename = this.persistenceWrapper(this.rename.bind(this));
 
         // wrap all methods that might throw errors in a wrapper that shows a message in vscode
         this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
@@ -196,7 +198,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
         return this.providerState.id;
     }
 
-    get displayName(): string {
+    get displayName(): Readonly<string> {
         return this.providerState.name;
     }
 
@@ -550,6 +552,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
     }
 
     /* Helpers */
+
     persistenceWrapper<T, Args extends any[]>(
         func: (...args: Args) => Promise<T>
     ): (...args: Args) => Promise<T | undefined> {
@@ -567,6 +570,13 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
     sendNotificationToWebview(data: { notificationHeader: string; notificationBody: string }) {
         showInfoMessage(data.notificationBody);
         // sendSignalToWebview(SignalId.showNotification, data);
+    }
+
+    async rename(name: string) {
+        this.providerState = {
+            ...this.providerState,
+            name
+        };
     }
 }
 

@@ -314,3 +314,27 @@ export async function deleteStateSave() {
     };
     messageHandler.send(request.command, request.payload);
 }
+
+export async function deleteChain() {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.deleteChain,
+        payload: undefined
+    };
+    messageHandler.send(request.command, request.payload);
+}
+
+export async function resetChain() {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.resetChain,
+        payload: undefined
+    };
+    messageHandler.send(request.command, request.payload);
+}
+
+export async function renameChain() {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.renameChain,
+        payload: undefined
+    };
+    messageHandler.send(request.command, request.payload);
+}
