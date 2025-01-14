@@ -43,6 +43,9 @@ export enum WebviewMessageId {
     toggleAutosave = 'toggleAutosave',
     saveState = 'saveState',
     deleteStateSave = 'deleteStateSave',
+    deleteChain = 'deleteChain',
+    resetChain = 'resetChain',
+    renameChain = 'renameChain',
 
     // connection
     reconnectChain = 'reconnectChain',
@@ -206,6 +209,18 @@ export type WebviewMessageRequest =
       } & BaseWebviewMessageRequest)
     | ({
           command: WebviewMessageId.deleteStateSave;
+          payload: undefined;
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.deleteChain;
+          payload: undefined;
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.resetChain;
+          payload: undefined;
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.renameChain;
           payload: undefined;
       } & BaseWebviewMessageRequest);
 

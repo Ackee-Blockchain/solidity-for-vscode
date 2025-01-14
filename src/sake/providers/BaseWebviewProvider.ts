@@ -13,17 +13,8 @@ import {
     showProviderSelectionQuickPick
 } from '../commands';
 import { SakeContext } from '../context';
-import { sakeProviderManager } from '../sake_providers/SakeProviderManager';
-import { getBasePage } from '../utils/getBasePage';
-import { getNonce } from '../utils/getNonce';
-import {
-    GetBytecodeResponse,
-    StateId,
-    WebviewMessageId,
-    WebviewMessageRequest,
-    WebviewMessageResponse
-} from '../webview/shared/types';
 import * as SakeProviderFactory from '../sake_providers/SakeProviderFactory';
+import { sakeProviderManager } from '../sake_providers/SakeProviderManager';
 import {
     accountConnector,
     appConnector,
@@ -33,6 +24,15 @@ import {
     deploymentConnector,
     historyConnector
 } from '../state/StateConnectors';
+import { getBasePage } from '../utils/getBasePage';
+import { getNonce } from '../utils/getNonce';
+import {
+    GetBytecodeResponse,
+    StateId,
+    WebviewMessageId,
+    WebviewMessageRequest,
+    WebviewMessageResponse
+} from '../webview/shared/types';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -422,6 +422,32 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
             case WebviewMessageId.deleteStateSave: {
                 sakeProviderManager.provider?.deleteStateSave();
+                break;
+            }
+
+            case WebviewMessageId.deleteChain: {
+                const currentProvider = sakeProviderManager.provider;
+                if (!currentProvider) {
+                    console.error('Cannot delete chain, no provider found');
+                    return;
+                }
+                sakeProviderManager.removeProvider(currentProvider);
+                break;
+            }
+
+            case WebviewMessageId.resetChain: {
+                throw new Error('Not implemented');
+                break;
+            }
+
+            case WebviewMessageId.renameChain: {
+                const currentProvider = sakeProviderManager.provider;
+                if (!currentProvider) {
+                    console.error('Cannot rename chain, no provider found');
+                    return;
+                }
+
+                sakeProviderManager.requestRenameProvider(currentProvider);
                 break;
             }
 
