@@ -188,3 +188,9 @@ export const notifications = (() => {
         }
     };
 })();
+
+currentChain.subscribe((currentChain) => {
+    if (currentChain === undefined && get(chainNavigator).expanded) {
+        chainNavigator.toggleExpanded();
+    }
+});

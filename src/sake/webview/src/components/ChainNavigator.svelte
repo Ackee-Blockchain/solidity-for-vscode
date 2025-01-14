@@ -74,17 +74,19 @@
                     </span>
                 {/if}
 
-                <ExpandButton
-                    callback={chainNavigator.toggleExpanded}
-                    expanded={$chainNavigator.expanded}
-                    leftIcon={true}
-                />
-
-                <!-- <BlankIcon /> -->
+                {#if $currentChain}
+                    <ExpandButton
+                        callback={chainNavigator.toggleExpanded}
+                        expanded={$chainNavigator.expanded}
+                        leftIcon={true}
+                    />
+                {:else}
+                    <BlankIcon />
+                {/if}
             </div>
             {#if $chainNavigator.expanded}
-                <!-- Chain Info and other general stuff -->
                 {#if $currentChain}
+                    <!-- Chain Info and other general stuff -->
                     <Divider className="my-0" />
                     <div class="text-sm opacity-75 text-center mt-1">Chain Info</div>
                     <div class="flex flex-col gap-1 p-2">
@@ -127,68 +129,69 @@
                             </span>
                         {/if}
                     </div>
-                {/if}
 
-                <!-- <div class="flex flex-col gap-3 p-2 font-sm">
+                    <!-- <div class="flex flex-col gap-3 p-2 font-sm">
                     <ClickableSpan callback={() => {}}>
                         <span>Reset chain</span>
                     </ClickableSpan>
                 </div> -->
 
-                <!-- Persistence -->
-                <Divider className="my-0" />
-                <div class="text-sm opacity-75 text-center mt-1">Persistence</div>
+                    <!-- Persistence -->
 
-                <div class="flex flex-col gap-3 p-2 font-sm">
-                    {#if $currentChain?.type === SakeProviderType.Connection}
-                        <div class="flex flex-row gap-3 items-center">
-                            <InfoIcon />
+                    <Divider className="my-0" />
+                    <div class="text-sm opacity-75 text-center mt-1">Persistence</div>
 
-                            <span class="text-sm opacity-75">
-                                Chains which are <span class="italic">connected to</span> don't support
-                                state persistence and only save the connection URI.
-                            </span>
-                        </div>
-                    {/if}
-                    <ClickableSpan
-                        callback={saveState}
-                        disabled={!$currentChain?.persistence.isDirty &&
-                            $currentChain?.persistence.lastSaveTimestamp !== undefined}
-                    >
-                        <SaveIcon />
+                    <div class="flex flex-col gap-3 p-2 font-sm">
+                        {#if $currentChain.type === SakeProviderType.Connection}
+                            <div class="flex flex-row gap-3 items-center">
+                                <InfoIcon />
 
-                        <div class="flex flex-col">
-                            <span>
-                                {$currentChain?.persistence.isDirty ||
-                                $currentChain?.persistence.lastSaveTimestamp === undefined
-                                    ? 'Click to save state changes'
-                                    : 'All changes saved'}
-                            </span>
-
-                            {#if $currentChain?.persistence.lastSaveTimestamp}
-                                <span class="text-xs">
-                                    Last saved:
-                                    {new Date(
-                                        $currentChain.persistence.lastSaveTimestamp
-                                    ).toLocaleString()}
+                                <span class="text-sm opacity-75">
+                                    Chains which are <span class="italic">connected to</span> don't support
+                                    state persistence and only save the connection URI.
                                 </span>
-                            {/if}
-                        </div>
-                    </ClickableSpan>
+                            </div>
+                        {/if}
+                        <ClickableSpan
+                            callback={saveState}
+                            disabled={!$currentChain.persistence.isDirty &&
+                                $currentChain.persistence.lastSaveTimestamp !== undefined}
+                        >
+                            <SaveIcon />
 
-                    {#if $currentChain?.persistence.lastSaveTimestamp !== undefined}
-                        <ClickableSpan callback={deleteStateSave}>
-                            <DeleteIcon />
-                            <span>Delete state save</span>
+                            <div class="flex flex-col">
+                                <span>
+                                    {$currentChain.persistence.isDirty ||
+                                    $currentChain.persistence.lastSaveTimestamp === undefined
+                                        ? 'Click to save state changes'
+                                        : 'All changes saved'}
+                                </span>
+
+                                {#if $currentChain.persistence.lastSaveTimestamp}
+                                    <span class="text-xs">
+                                        Last saved:
+                                        {new Date(
+                                            $currentChain.persistence.lastSaveTimestamp
+                                        ).toLocaleString()}
+                                    </span>
+                                {/if}
+                            </div>
                         </ClickableSpan>
-                    {/if}
 
-                    <ClickableSpan callback={toggleAutosave}>
-                        <BlankIcon />
-                        {$currentChain?.persistence.isAutosaveEnabled ? 'Disable' : 'Enable'}
-                        state autosaving
-                    </ClickableSpan>
-                </div>
+                        {#if $currentChain.persistence.lastSaveTimestamp !== undefined}
+                            <ClickableSpan callback={deleteStateSave}>
+                                <DeleteIcon />
+                                <span>Delete state save</span>
+                            </ClickableSpan>
+                        {/if}
+
+                        <ClickableSpan callback={toggleAutosave}>
+                            <BlankIcon />
+                            {$currentChain.persistence.isAutosaveEnabled ? 'Disable' : 'Enable'}
+                            state autosaving
+                        </ClickableSpan>
+                    </div>
+                {/if}
 
                 <!-- Snapshots -->
                 <!-- <Divider className="my-0" />
