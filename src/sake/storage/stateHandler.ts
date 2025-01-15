@@ -1,4 +1,4 @@
-import { showErrorMessage } from '../commands';
+import { showErrorMessage, showInfoMessage } from '../commands';
 import { ISakeProvider } from '../sake_providers/BaseSakeProvider';
 import { createFromState } from '../sake_providers/SakeProviderFactory';
 import { chainRegistry } from '../state/shared/ChainRegistry';
@@ -34,10 +34,12 @@ export async function loadFullState(): Promise<boolean> {
         const providerStates = storedState.providerStates;
 
         for (const providerState of providerStates) {
-            await createFromState(providerState).catch((e) => {
+            await createFromState(providerState, true).catch((e) => {
                 showErrorMessage(`Failed to load provider state: ${e}`);
             });
         }
+        console.log('Reloaded saved chain states');
+        showInfoMessage(`Reloaded saved chain states`);
     } catch (e) {
         showErrorMessage(`Failed to load state: ${e}`);
         return false;
