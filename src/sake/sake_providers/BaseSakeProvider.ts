@@ -36,6 +36,7 @@ import {
     DeploymentResponse,
     GetBytecodeRequest,
     GetBytecodeResponse,
+    ImplementationContract,
     SetAccountBalanceRequest,
     SetAccountLabelRequest,
     TransactionCallResult,
@@ -70,11 +71,12 @@ export interface ISakeProvider {
     getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }>;
     getOnchainContract(address: Address): Promise<DeployedContract>;
     fetchContract(address: Address): Promise<void>;
-    removeProxy(address: Address, proxyId: string): void;
+    removeProxy(address: Address, proxyId: string): Promise<void>;
+    extendProxySupport(address: Address, proxy: Omit<ImplementationContract, 'id'>): Promise<void>;
     onActivateProvider(): Promise<void>;
     onDeactivateProvider(): Promise<void>;
     onDeleteProvider(): Promise<void>;
-    dumpState(): Promise<StoredProviderState>; // @todo add specific type
+    dumpState(): Promise<StoredProviderState>;
     getQuickPickItem(): SakeProviderQuickPickItem;
     saveState(): Promise<void>;
     deleteStateSave(): Promise<void>;
@@ -136,6 +138,12 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
         this.setAccountBalance = this.persistenceWrapper(this.setAccountBalance.bind(this));
         this.setAccountLabel = this.persistenceWrapper(this.setAccountLabel.bind(this));
         this.rename = this.persistenceWrapper(this.rename.bind(this));
+        this.removeDeployedContract = this.persistenceWrapper(
+            this.removeDeployedContract.bind(this)
+        );
+        this.removeProxy = this.persistenceWrapper(this.removeProxy.bind(this));
+        this.extendProxySupport = this.persistenceWrapper(this.extendProxySupport.bind(this));
+        this.fetchContract = this.persistenceWrapper(this.fetchContract.bind(this));
 
         // wrap all methods that might throw errors in a wrapper that shows a message in vscode
         this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
@@ -418,8 +426,12 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
 
     /* Proxy management */
 
-    removeProxy(address: Address, proxyId: string) {
+    async removeProxy(address: Address, proxyId: string) {
         this.chainState.deployment.removeProxy(address, proxyId);
+    }
+
+    async extendProxySupport(address: Address, proxy: Omit<ImplementationContract, 'id'>) {
+        this.extendProxySupport(address, proxy);
     }
 
     /* Event handling */

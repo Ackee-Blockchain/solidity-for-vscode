@@ -267,7 +267,7 @@ export function showAddAbiQuickPick(contractAddress: Address) {
                             const compiledContract =
                                 provider.chainState.compilation.getContract(selected);
                             if (compiledContract) {
-                                provider.chainState.deployment.extendProxySupport(contractAddress, {
+                                provider.extendProxySupport(contractAddress, {
                                     address: undefined,
                                     abi: compiledContract.abi,
                                     name: selected
@@ -289,7 +289,7 @@ export function showAddAbiQuickPick(contractAddress: Address) {
                         provider
                             .getAbi(implementationAddress)
                             .then((contract) => {
-                                provider.chainState.deployment.extendProxySupport(contractAddress, {
+                                provider.extendProxySupport(contractAddress, {
                                     address: implementationAddress,
                                     abi: contract.abi,
                                     name: contract.name
@@ -321,7 +321,7 @@ export function showAddAbiQuickPick(contractAddress: Address) {
                             try {
                                 const abi = JSON.parse(abiString);
                                 // @todo missing validation, add zod
-                                provider.chainState.deployment.extendProxySupport(contractAddress, {
+                                provider.extendProxySupport(contractAddress, {
                                     address: undefined,
                                     abi,
                                     name: undefined
