@@ -38,8 +38,8 @@ export async function loadFullState(): Promise<boolean> {
                 showErrorMessage(`Failed to load provider state: ${e}`);
             });
         }
-        console.log('Reloaded saved chain states');
-        showInfoMessage(`Reloaded saved chain states`);
+        // console.log('Reloaded saved chain states');
+        // showInfoMessage(`Reloaded saved chain states`);
     } catch (e) {
         showErrorMessage(`Failed to load state: ${e}`);
         return false;
