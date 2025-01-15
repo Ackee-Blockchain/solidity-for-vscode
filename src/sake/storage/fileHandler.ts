@@ -29,7 +29,7 @@ export async function saveToWorkspaceState(filename: string, json: string) {
 
     const solidityFolder = vscode.Uri.joinPath(workspaceFolder, ...storageFolder);
 
-    // check if .solidity folder exists
+    // check if extension folder exists
     await vscode.workspace.fs.createDirectory(solidityFolder);
 
     const file = vscode.Uri.joinPath(solidityFolder, filename);
@@ -89,8 +89,13 @@ export async function listFilesInWorkspaceState() {
     }
 
     const solidityFolder = vscode.Uri.joinPath(workspaceFolder, ...storageFolder);
-    const files = Array.from(
-        (await vscode.workspace.fs.readDirectory(solidityFolder)).map(([name, _]) => name)
-    );
-    return files;
+
+    try {
+        const files = Array.from(
+            (await vscode.workspace.fs.readDirectory(solidityFolder)).map(([name, _]) => name)
+        );
+        return files;
+    } catch (_) {
+        return [];
+    }
 }
