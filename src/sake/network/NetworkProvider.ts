@@ -13,10 +13,12 @@ import {
     DeploymentRequest,
     NetworkConfiguration,
     SetAccountBalanceRequest,
-    SetAccountBalanceResponse
+    SetAccountBalanceResponse,
+    TransactRequest,
+    TransactResponse
 } from '../webview/shared/network_types';
-import { Account } from '../webview/shared/types';
 import { NetworkState } from '../webview/shared/storage_types';
+import { Account } from '../webview/shared/types';
 
 export abstract class NetworkProvider {
     type: NetworkType;
@@ -39,6 +41,7 @@ export abstract class NetworkProvider {
     ): Promise<SetAccountBalanceResponse>;
     abstract deploy(params: DeploymentRequest): Promise<DeploymentResponse>;
     abstract call(params: CallRequest): Promise<CallResponse>;
+    abstract transact(params: TransactRequest): Promise<TransactResponse>;
     abstract onActivate(): Promise<void>;
     abstract onDeactivate(): Promise<void>;
     abstract onDeleteChain(): Promise<void>;

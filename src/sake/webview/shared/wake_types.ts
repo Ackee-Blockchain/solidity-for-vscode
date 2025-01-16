@@ -283,9 +283,9 @@ export interface TransactionDeploymentResult extends TransactionResultBase {
 
 export interface TransactionCallResult extends TransactionResultBase {
     type: CallOperation.FunctionCall;
-    callType: CallType;
     to: w3t.Address; // TODO maybe this could be joined with deployed address
     functionName: string;
+    callType: CallType;
     returnData: TransactionReturnData;
     error?: string;
     events?: string[];

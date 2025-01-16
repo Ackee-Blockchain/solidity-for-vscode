@@ -6,6 +6,7 @@ import { OutputViewManager } from '../providers/OutputTreeProvider';
 import { chainRegistry } from '../state/shared/ChainRegistry';
 import { autosaver } from '../storage/autosave';
 import { deleteChainState, loadChainState, saveChainState } from '../storage/stateHandler';
+import { createChainStateFileWatcher } from '../storage/stateUtils';
 import { decodeCallReturnValue } from '../utils/call';
 import {
     getNameFromContractFqn,
@@ -22,7 +23,6 @@ import {
     ProviderState as StoredProviderState
 } from '../webview/shared/storage_types';
 import {
-    AbiFunctionFragment,
     Account,
     Address,
     CallOperation,
@@ -42,11 +42,11 @@ import {
     TransactionCallResult,
     TransactionDecodedReturnValue,
     TransactionDeploymentResult,
+    TransactRequest,
     WakeCompilationResponse
 } from '../webview/shared/types';
 import sakeProviderManager from './SakeProviderManager';
 import SakeState from './SakeState';
-import { createChainStateFileWatcher } from '../storage/stateUtils';
 
 export interface ISakeProvider {
     id: string;
@@ -83,6 +83,7 @@ export interface ISakeProvider {
     setAutosave(autosave: boolean): void;
     subscribe(callback: () => void): () => void;
 }
+
 export interface ProviderState {
     type: SakeProviderType;
     id: string;
@@ -138,6 +139,9 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
         );
         this.callContract = this.persistenceWrapper<boolean, [CallRequest]>(
             this.callContract.bind(this)
+        );
+        this.transactContract = this.persistenceWrapper<boolean, [TransactRequest]>(
+            this.transactContract.bind(this)
         );
         this.setAccountBalance = this.persistenceWrapper(this.setAccountBalance.bind(this));
         this.setAccountLabel = this.persistenceWrapper(this.setAccountLabel.bind(this));
@@ -341,8 +345,6 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
             );
         }
 
-        return deploymentResponse.success;
-
         // TODO consider check and update balance of caller
 
         const transaction: TransactionDeploymentResult = {
@@ -359,6 +361,8 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
 
         OutputViewManager.getInstance().set(transaction);
         this.chainState.history.add(transaction);
+
+        return deploymentResponse.success;
     }
 
     async removeDeployedContract(address: Address) {
@@ -368,10 +372,6 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
     /* Interactions */
 
     async callContract(callRequest: CallRequest): Promise<boolean> {
-        if (callRequest.callType === undefined) {
-            callRequest.callType = specifyCallType(callRequest.functionAbi);
-        }
-
         const callResponse = await this.network.call(callRequest);
 
         let decoded: TransactionDecodedReturnValue[] | undefined;
@@ -390,12 +390,50 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
             from: callRequest.from,
             to: callRequest.to,
             functionName: callRequest.functionAbi.name,
-            callType: callRequest.callType,
+            returnData: {
+                bytes: callResponse.returnValue,
+                decoded: decoded
+            },
+            callType: CallType.Call,
+            callTrace: callResponse.callTrace
+        };
+
+        OutputViewManager.getInstance().set(transaction);
+        this.chainState.history.add(transaction);
+
+        return callResponse.success;
+
+        // TODO consider check and update balance of caller and callee
+    }
+
+    async transactContract(transactRequest: TransactRequest): Promise<boolean> {
+        const callResponse = await this.network.transact(transactRequest);
+
+        let decoded: TransactionDecodedReturnValue[] | undefined;
+
+        if (callResponse.success) {
+            try {
+                decoded = decodeCallReturnValue(
+                    callResponse.returnValue,
+                    transactRequest.functionAbi
+                );
+            } catch (e) {
+                vscode.window.showErrorMessage('Failed to decode return value: ' + e);
+            }
+        }
+
+        const transaction: TransactionCallResult = {
+            type: CallOperation.FunctionCall,
+            success: callResponse.success,
+            from: transactRequest.from,
+            to: transactRequest.to,
+            functionName: transactRequest.functionAbi.name,
             events: callResponse.events,
             returnData: {
                 bytes: callResponse.returnValue,
                 decoded: decoded
             },
+            callType: CallType.Transact,
             receipt: callResponse.receipt,
             callTrace: callResponse.callTrace,
             error: callResponse.error
@@ -626,10 +664,4 @@ function showVSCodeMessageOnErrorWrapper<T, Args extends any[]>(
             return returnOnError;
         }
     };
-}
-
-function specifyCallType(func: AbiFunctionFragment): CallType {
-    return func.stateMutability === 'view' || func.stateMutability === 'pure'
-        ? CallType.Call
-        : CallType.Transact;
 }
