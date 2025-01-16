@@ -27,12 +27,14 @@ import {
 import { getBasePage } from '../utils/getBasePage';
 import { getNonce } from '../utils/getNonce';
 import {
+    CallType,
     GetBytecodeResponse,
     StateId,
     WebviewMessageId,
     WebviewMessageRequest,
     WebviewMessageResponse
 } from '../webview/shared/types';
+import { specifyCallType } from '../utils/helpers';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -201,7 +203,26 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.contractFunctionCall: {
-                const success = await sakeProviderManager.provider?.callContract(message.payload);
+                const callType = specifyCallType(message.payload.functionAbi);
+                const provider = sakeProviderManager.provider;
+
+                let success = false;
+                if (provider) {
+                    switch (callType) {
+                        case CallType.Call:
+                            success = await provider.callContract(message.payload);
+                            break;
+                        case CallType.Transact:
+                            success = await provider.transactContract(message.payload);
+                            break;
+                        default:
+                            console.error('Invalid call type');
+                            break;
+                    }
+                } else {
+                    console.error('Cannot call contract, no provider is selected');
+                }
+
                 webviewView.webview.postMessage({
                     command: message.command,
                     requestId: message.requestId,

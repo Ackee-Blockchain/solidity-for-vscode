@@ -415,9 +415,3 @@ export async function getAbiWithProxy(
         throw new WakeApiError(`Failed to get ABI: ${e instanceof Error ? e.message : String(e)}`);
     }
 }
-
-export function specifyCallType(func: AbiFunctionFragment): CallType {
-    return func.stateMutability === 'view' || func.stateMutability === 'pure'
-        ? CallType.Call
-        : CallType.Transact;
-}

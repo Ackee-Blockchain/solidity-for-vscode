@@ -68,6 +68,7 @@ export interface ISakeProvider {
     deployContract(deploymentRequest: DeploymentRequest): Promise<boolean>;
     removeDeployedContract(address: Address): Promise<void>;
     callContract(callRequest: CallRequest): Promise<boolean>;
+    transactContract(transactRequest: TransactRequest): Promise<boolean>;
     getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }>;
     getOnchainContract(address: Address): Promise<DeployedContract>;
     fetchContract(address: Address): Promise<void>;
