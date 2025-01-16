@@ -288,6 +288,18 @@ export type WebviewMessageResponse =
           command: WebviewMessageId.onSignal;
           payload: any;
           signalId: SignalId;
+      } & BaseWebviewMessageResponse)
+    | ({
+          command: WebviewMessageId.contractFunctionCall;
+          payload: {
+              success: boolean;
+          };
+      } & BaseWebviewMessageResponse)
+    | ({
+          command: WebviewMessageId.deploy;
+          payload: {
+              success: boolean;
+          };
       } & BaseWebviewMessageResponse);
 
 export type WebviewMessageResponsePayload<T extends WebviewMessageId> =

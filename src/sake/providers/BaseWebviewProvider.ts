@@ -187,12 +187,28 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.deploy: {
-                sakeProviderManager.provider?.deployContract(message.payload);
+                const success = await sakeProviderManager.provider?.deployContract(message.payload);
+
+                webviewView.webview.postMessage({
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success
+                    }
+                } as WebviewMessageResponse);
+
                 break;
             }
 
             case WebviewMessageId.contractFunctionCall: {
-                sakeProviderManager.provider?.callContract(message.payload);
+                const success = await sakeProviderManager.provider?.callContract(message.payload);
+                webviewView.webview.postMessage({
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        success
+                    }
+                } as WebviewMessageResponse);
                 break;
             }
 

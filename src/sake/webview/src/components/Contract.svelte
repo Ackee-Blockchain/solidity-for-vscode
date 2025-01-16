@@ -1,34 +1,31 @@
 <script lang="ts">
-    import ContractFunction from './ContractFunction.svelte';
-    import ExpandButton from './icons/ExpandButton.svelte';
-    import DeleteButton from './icons/DeleteButton.svelte';
     import {
         DeployedContractType,
         type AbiFunctionFragment,
         type DeployedContract
     } from '../../shared/types';
     import {
-        removeDeployedContract,
-        requestLabel,
-        setLabel,
         openAddAbiQuickPick,
-        removeProxy
+        removeDeployedContract,
+        removeProxy,
+        requestLabel
     } from '../helpers/api';
     import CalldataBytes from './CalldataBytes.svelte';
-    import CopyableSpan from './CopyableSpan.svelte';
     import ClickableSpan from './ClickableSpan.svelte';
-    import WarningIcon from './icons/WarningIcon.svelte';
+    import ContractFunction from './ContractFunction.svelte';
+    import CopyableSpan from './CopyableSpan.svelte';
     import DefaultButton from './icons/DefaultButton.svelte';
-    import AbiIcon from './icons/AbiIcon.svelte';
-    import RadioTowerIcon from './icons/RadioTowerIcon.svelte';
+    import DeleteButton from './icons/DeleteButton.svelte';
+    import ExpandButton from './icons/ExpandButton.svelte';
     import RadioTowerCrossedIcon from './icons/RadioTowerCrossedIcon.svelte';
+    import RadioTowerIcon from './icons/RadioTowerIcon.svelte';
 
     export let contract: DeployedContract;
     export let onFunctionCall: (
         calldata: string,
         contractAddress: string,
         func: AbiFunctionFragment
-    ) => void;
+    ) => Promise<boolean>;
     let expanded = true;
     let expandedProxy = false;
     $: filteredAbi = contract.abi.filter(
@@ -43,8 +40,11 @@
             abi: proxy.abi.filter((func: any) => func.type == 'function') as AbiFunctionFragment[]
         })) ?? [];
 
-    const _onFunctionCall = (calldata: string, func: AbiFunctionFragment) => {
-        onFunctionCall(calldata, contract.address, func);
+    const _onFunctionCall = async (
+        calldata: string,
+        func: AbiFunctionFragment
+    ): Promise<boolean> => {
+        return await onFunctionCall(calldata, contract.address, func);
     };
 </script>
 

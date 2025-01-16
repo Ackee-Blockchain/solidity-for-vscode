@@ -12,11 +12,11 @@
         calldata: string,
         contractAddress: string,
         func: AbiFunctionFragment
-    ) {
+    ): Promise<boolean> {
         const _sender: string | undefined = $selectedAccount?.address;
         if (_sender === undefined) {
             showErrorMessage('Failed deployment, undefined sender');
-            return;
+            return false;
         }
 
         const _value: bigint = $selectedValue ?? BigInt(0);
@@ -29,7 +29,7 @@
             functionAbi: func
         };
 
-        functionCall(payload);
+        return await functionCall(payload);
     };
 </script>
 
