@@ -11,14 +11,14 @@
         contract.fqn.toLowerCase().includes(filterString.toLowerCase())
     );
 
-    const deploy = async function (contract: CompiledContract, calldata: string) {
+    const deploy = async function (contract: CompiledContract, calldata: string): Promise<boolean> {
         const _sender: string | undefined = $selectedAccount?.address;
         if (_sender === undefined) {
             showErrorMessage('Failed deployment, undefined sender');
-            return;
+            return false;
         }
 
-        deployContract(contract.fqn, _sender, calldata, $selectedValue || BigInt(0));
+        return await deployContract(contract.fqn, _sender, calldata, $selectedValue || BigInt(0));
     };
 
     const handleFilter = function (e: any) {
@@ -59,7 +59,7 @@
                 <Constructor
                     abi={contract.abi}
                     name={contract.name}
-                    onDeploy={(calldata) => deploy(contract, calldata)}
+                    onDeploy={async (calldata) => await deploy(contract, calldata)}
                 />
             {/each}
         </div>

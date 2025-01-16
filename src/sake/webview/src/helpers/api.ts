@@ -43,16 +43,18 @@ export function setBalance(address: string, balance: number) {
     messageHandler.send(request.command, request.payload);
 }
 
-export function functionCall(payload: CallRequest) {
+export async function functionCall(payload: CallRequest): Promise<boolean> {
     const request: WebviewMessageRequest = {
         command: WebviewMessageId.contractFunctionCall,
         payload: payload
     };
 
-    messageHandler.send(request.command, request.payload);
+    const response: WebviewMessageResponsePayload<WebviewMessageId.contractFunctionCall> =
+        await messageHandler.request(request.command, request.payload);
+    return response.success;
 }
 
-export function deployContract(
+export async function deployContract(
     contractFqn: string,
     sender: string,
     calldata: string,
@@ -68,7 +70,9 @@ export function deployContract(
         }
     };
 
-    messageHandler.send(request.command, request.payload);
+    const response: WebviewMessageResponsePayload<WebviewMessageId.deploy> =
+        await messageHandler.request(request.command, request.payload);
+    return response.success;
 }
 
 export function showErrorMessage(message: string) {

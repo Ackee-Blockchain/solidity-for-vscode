@@ -1,15 +1,15 @@
 <script lang="ts">
-    import ContractFunctionInput from './ContractFunctionInput.svelte';
-    import ExpandButton from './icons/ExpandButton.svelte';
-    import KebabButton from './icons/KebabButton.svelte';
-    import { buildTree, RootInputHandler } from '../helpers/FunctionInputsHandler';
-    import IconSpacer from './icons/IconSpacer.svelte';
     import { type AbiFunctionFragment } from '../../shared/types';
     import { showErrorMessage } from '../helpers/api';
+    import { buildTree, RootInputHandler } from '../helpers/FunctionInputsHandler';
+    import ContractFunctionInput from './ContractFunctionInput.svelte';
+    import ExpandButton from './icons/ExpandButton.svelte';
+    import IconSpacer from './icons/IconSpacer.svelte';
+    import LoadingIcon from './icons/LoadingIcon.svelte';
     import RadioTowerIcon from './icons/RadioTowerIcon.svelte';
 
     export let func: AbiFunctionFragment;
-    export let onFunctionCall: (calldata: string, func: AbiFunctionFragment) => void;
+    export let onFunctionCall: (calldata: string, func: AbiFunctionFragment) => Promise<boolean>;
     export let isConstructor: boolean = false;
     export let isCalldata: boolean = false;
     export let isProxy: boolean = false;
@@ -17,6 +17,7 @@
     let inputRoot: RootInputHandler;
     $: funcChanged(func);
     $: allowEmptyInput = isCalldata;
+    let loading: boolean = false;
 
     const funcChanged = (_func: AbiFunctionFragment) => {
         inputRoot = buildTree(_func);
@@ -44,7 +45,9 @@
             return;
         }
 
-        onFunctionCall(_encodedInput, func);
+        loading = true;
+        const success = await onFunctionCall(_encodedInput, func);
+        loading = false;
     }
 </script>
 
@@ -60,9 +63,14 @@
         <vscode-button
             class="flex-1"
             on:click={_onFunctionCall}
+            disabled={loading}
             appearance={isCalldata ? 'secondary' : 'primary'}
         >
-            {#if isProxy}
+            {#if loading}
+                <span slot="start">
+                    <LoadingIcon />
+                </span>
+            {:else if isProxy}
                 <span slot="start">
                     <RadioTowerIcon />
                 </span>

@@ -65,9 +65,9 @@ export interface ISakeProvider {
     setAccountBalance(request: SetAccountBalanceRequest): Promise<void>;
     setAccountLabel(request: SetAccountLabelRequest): Promise<void>;
     refreshAccount(address: string): Promise<void>;
-    deployContract(deploymentRequest: DeploymentRequest): Promise<void>;
+    deployContract(deploymentRequest: DeploymentRequest): Promise<boolean>;
     removeDeployedContract(address: Address): Promise<void>;
-    callContract(callRequest: CallRequest): Promise<void>;
+    callContract(callRequest: CallRequest): Promise<boolean>;
     getAbi(address: Address): Promise<{ abi: ContractAbi; name: string }>;
     getOnchainContract(address: Address): Promise<DeployedContract>;
     fetchContract(address: Address): Promise<void>;
@@ -133,8 +133,12 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
 
         // wrap all methods which require autosaving in a wrapper that saves the state with a delay
         // load vscode settings - autosave.enabled
-        this.deployContract = this.persistenceWrapper(this.deployContract.bind(this));
-        this.callContract = this.persistenceWrapper(this.callContract.bind(this));
+        this.deployContract = this.persistenceWrapper<boolean, [DeploymentRequest]>(
+            this.deployContract.bind(this)
+        );
+        this.callContract = this.persistenceWrapper<boolean, [CallRequest]>(
+            this.callContract.bind(this)
+        );
         this.setAccountBalance = this.persistenceWrapper(this.setAccountBalance.bind(this));
         this.setAccountLabel = this.persistenceWrapper(this.setAccountLabel.bind(this));
         this.rename = this.persistenceWrapper(this.rename.bind(this));
@@ -146,14 +150,27 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
         this.fetchContract = this.persistenceWrapper(this.fetchContract.bind(this));
 
         // wrap all methods that might throw errors in a wrapper that shows a message in vscode
-        this.setAccountBalance = showVSCodeMessageOnErrorWrapper(this.setAccountBalance.bind(this));
-        this.setAccountLabel = showVSCodeMessageOnErrorWrapper(this.setAccountLabel.bind(this));
-        this.refreshAccount = showVSCodeMessageOnErrorWrapper(this.refreshAccount.bind(this));
-        this.deployContract = showVSCodeMessageOnErrorWrapper(this.deployContract.bind(this));
-        this.removeDeployedContract = showVSCodeMessageOnErrorWrapper(
-            this.removeDeployedContract.bind(this)
+        this.setAccountBalance = showVSCodeMessageOnErrorWrapper(
+            this.setAccountBalance.bind(this),
+            undefined
         );
-        this.callContract = showVSCodeMessageOnErrorWrapper(this.callContract.bind(this));
+        this.setAccountLabel = showVSCodeMessageOnErrorWrapper(
+            this.setAccountLabel.bind(this),
+            undefined
+        );
+        this.refreshAccount = showVSCodeMessageOnErrorWrapper(
+            this.refreshAccount.bind(this),
+            undefined
+        );
+        this.deployContract = showVSCodeMessageOnErrorWrapper(
+            this.deployContract.bind(this),
+            false
+        );
+        this.removeDeployedContract = showVSCodeMessageOnErrorWrapper(
+            this.removeDeployedContract.bind(this),
+            undefined
+        );
+        this.callContract = showVSCodeMessageOnErrorWrapper(this.callContract.bind(this), false);
         // this.transactContract = showVSCodeMessageOnErrorWrapper(this.transactContract.bind(this));
 
         // check if state file exists
@@ -294,7 +311,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
 
     /* Deployment management */
 
-    async deployContract(deploymentRequest: DeploymentRequest) {
+    async deployContract(deploymentRequest: DeploymentRequest): Promise<boolean> {
         const compiledContract = this.chainState.compilation.getContract(
             deploymentRequest.contractFqn
         );
@@ -324,6 +341,8 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
             );
         }
 
+        return deploymentResponse.success;
+
         // TODO consider check and update balance of caller
 
         const transaction: TransactionDeploymentResult = {
@@ -348,7 +367,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
 
     /* Interactions */
 
-    async callContract(callRequest: CallRequest) {
+    async callContract(callRequest: CallRequest): Promise<boolean> {
         if (callRequest.callType === undefined) {
             callRequest.callType = specifyCallType(callRequest.functionAbi);
         }
@@ -384,6 +403,8 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
 
         OutputViewManager.getInstance().set(transaction);
         this.chainState.history.add(transaction);
+
+        return callResponse.success;
 
         // TODO consider check and update balance of caller and callee
     }
@@ -567,7 +588,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
 
     persistenceWrapper<T, Args extends any[]>(
         func: (...args: Args) => Promise<T>
-    ): (...args: Args) => Promise<T | undefined> {
+    ): (...args: Args) => Promise<T> {
         return async (...args: Args) => {
             this.persistence = {
                 isDirty: true
@@ -594,14 +615,15 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
 
 // TODO add context if needed
 function showVSCodeMessageOnErrorWrapper<T, Args extends any[]>(
-    func: (...args: Args) => Promise<T>
-): (...args: Args) => Promise<T | undefined> {
+    func: (...args: Args) => Promise<T>,
+    returnOnError: T
+): (...args: Args) => Promise<T> {
     return async (...args: Args) => {
         try {
             return await func(...args);
         } catch (e) {
             vscode.window.showErrorMessage(`${e instanceof Error ? e.message : String(e)}`);
-            return undefined;
+            return returnOnError;
         }
     };
 }

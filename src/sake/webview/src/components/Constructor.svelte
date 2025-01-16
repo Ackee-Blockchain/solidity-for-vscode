@@ -3,7 +3,7 @@
     import ContractFunction from './ContractFunction.svelte';
 
     export let abi: ContractAbi | undefined;
-    export let onDeploy: (calldata: string) => void;
+    export let onDeploy: (calldata: string) => Promise<boolean>;
     export let name: string;
     let constructor: AbiConstructorFragment | undefined;
     let deployFunction: ContractFunction;

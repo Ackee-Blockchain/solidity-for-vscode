@@ -1,23 +1,23 @@
 <script lang="ts">
+    import { displayEtherValue } from '../../shared/ether';
     import FlexContainer from '../components/common/FlexContainer.svelte';
-    import ViewStatic from '../components/common/ViewStatic.svelte';
-    import TransactionParameters from '../views/TransactionParameters.svelte';
+    import Tooltip from '../components/common/Tooltip.svelte';
     import ViewScrollable from '../components/common/ViewScrollable.svelte';
+    import ViewStatic from '../components/common/ViewStatic.svelte';
     import BlankIcon from '../components/icons/BlankIcon.svelte';
-    import Run from '../views/Run.svelte';
+    import ChevronDown from '../components/icons/ChevronDown.svelte';
+    import ChevronRight from '../components/icons/ChevronRight.svelte';
+    import HeaderButton from '../components/icons/HeaderButton.svelte';
+    import PlusIcon from '../components/icons/PlusIcon.svelte';
+    import { requestAddDeployedContract } from '../helpers/api';
     import {
         selectedAccount,
         selectedAccountId,
         selectedValue,
         txParametersExpanded
     } from '../helpers/stores';
-    import ChevronDown from '../components/icons/ChevronDown.svelte';
-    import ChevronRight from '../components/icons/ChevronRight.svelte';
-    import { displayEtherValue } from '../../shared/ether';
-    import { requestAddDeployedContract } from '../helpers/api';
-    import HeaderButton from '../components/icons/HeaderButton.svelte';
-    import PlusIcon from '../components/icons/PlusIcon.svelte';
-    import Tooltip from '../components/common/Tooltip.svelte';
+    import Run from '../views/Run.svelte';
+    import TransactionParameters from '../views/TransactionParameters.svelte';
 </script>
 
 <FlexContainer>
