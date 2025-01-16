@@ -9,7 +9,7 @@ import type {
 } from './types';
 
 export interface StoredSakeState {
-    sharedState: SharedState;
+    sharedState?: SharedState;
     providerStates: ProviderState[];
 }
 
@@ -64,6 +64,7 @@ export enum SakeProviderInitializationRequestType {
 }
 
 export interface SharedState {
+    lastUsedChain?: string;
     // chains: ChainState;
     // @hotfix: compilation state is not loaded until wake is able to save it in state dump
     // compilation: CompilationState;

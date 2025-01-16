@@ -9,6 +9,7 @@ import {
     TransactionHistoryState
 } from '../webview/shared/state_types';
 import { SharedState } from '../webview/shared/storage_types';
+import { extensionState } from '../state/shared/ExtensionState';
 
 export default class SakeState {
     accounts: AccountStateProvider;
@@ -57,16 +58,22 @@ export default class SakeState {
         this.history.reset();
     }
 
-    static dumpSharedState() {
+    // @todo move otuside of this class
+    static dumpSharedState(): SharedState {
         // app state is not dumped, since it is loaded on extension activation
         return {
+            lastUsedChain: extensionState.get().currentChainId
             // @dev chain state should not be dumped as it jsut stored
             // chains: ChainStateProvider.getInstance().state
             // compilation: CompilationStateProvider.getInstance().state
         };
     }
 
+    // @todo move otuside of this class
     static loadSharedState(state: SharedState) {
+        extensionState.setLazy({
+            currentChainId: state.lastUsedChain
+        });
         // ChainStateProvider.getInstance().state = state.chains;
         // @hotfix: compilation state is not loaded until wake is able to save it in state dump
         // CompilationStateProvider.getInstance().state = state.compilation;
