@@ -490,7 +490,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
     }
 
     async extendProxySupport(address: Address, proxy: Omit<ImplementationContract, 'id'>) {
-        this.extendProxySupport(address, proxy);
+        this.chainState.deployment.extendProxySupport(address, proxy);
     }
 
     /* Event handling */
