@@ -21,7 +21,6 @@
     import DeleteIcon from './icons/DeleteIcon.svelte';
     import EditIcon from './icons/EditIcon.svelte';
     import ExpandButton from './icons/ExpandButton.svelte';
-    import IconContainer from './icons/IconContainer.svelte';
     import InfoIcon from './icons/InfoIcon.svelte';
     import MultipleWindowsIcon from './icons/MultipleWindowsIcon.svelte';
     import SaveIcon from './icons/SaveIcon.svelte';
@@ -99,24 +98,19 @@
                         </span> -->
 
                         {#if $currentChain.network.config.uri}
-                            <span>
+                            <span class="truncate">
                                 <span class="opacity-50">Connection URI:</span>
-                                <CopyableSpan
-                                    text={$currentChain.network.config.uri}
-                                    className="truncate"
-                                />
+                                <CopyableSpan text={$currentChain.network.config.uri} />
                             </span>
                         {/if}
                         {#if $currentChain.network.config.fork}
-                            <span>
-                                <span class="opacity-50">Fork:</span>
-                                <span class="truncate">
-                                    {$currentChain.network.config.fork}
-                                </span>
+                            <span class="truncate">
+                                <span class="opacity-50">Fork URL:</span>
+                                <CopyableSpan text={$currentChain.network.config.fork} />
                             </span>
                         {/if}
                         {#if $currentChain.network.config.chainId}
-                            <span>
+                            <span class="truncate">
                                 <span class="opacity-50">Chain ID:</span>
                                 <span class="truncate">
                                     {$currentChain.network.config.chainId}
@@ -124,7 +118,7 @@
                             </span>
                         {/if}
                         {#if $currentChain.network.config.hardfork}
-                            <span>
+                            <span class="truncate">
                                 <span class="opacity-50">Hardfork:</span>
                                 <span class="truncate">
                                     {$currentChain.network.config.hardfork}
