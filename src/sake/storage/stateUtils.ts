@@ -8,6 +8,7 @@ import {
     storageFolder
 } from './fileHandler';
 import { SakeContext } from '../context';
+import { serializeDeep } from '../utils/helpers';
 
 const providerStatePrefix = 'local';
 const sharedStatePrefix = 'shared';
@@ -32,9 +33,7 @@ export function parseProviderState(state: string | undefined): ProviderState {
  * @returns string - The serialized state
  */
 export function serializeProviderState(state: ProviderState): string {
-    return JSON.stringify(state, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-    );
+    return serializeDeep(state);
 }
 
 /**
@@ -56,9 +55,7 @@ export function parseSharedState(state: string | undefined): SharedState {
  * @returns string - The serialized state
  */
 export function serializeSharedState(state: SharedState): string {
-    return JSON.stringify(state, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-    );
+    return serializeDeep(state);
 }
 
 /**
