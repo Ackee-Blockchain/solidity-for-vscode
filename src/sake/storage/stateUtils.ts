@@ -81,6 +81,14 @@ export async function saveProviderState(state: ProviderState) {
 }
 
 /**
+ * Saves the shared state
+ * @param state - The SharedState to save
+ */
+export async function saveSharedState(state: SharedState) {
+    await saveToWorkspaceState(sharedStateFilename(), serializeSharedState(state));
+}
+
+/**
  * Deletes all files in the workspace state storage
  */
 export async function deleteFullState() {
@@ -114,8 +122,13 @@ export async function readFullState(): Promise<StoredSakeState> {
             })
     );
 
+    const sharedState = await readSharedState().catch(() => {
+        console.error('Failed to read shared state');
+        return undefined;
+    });
+
     return {
-        sharedState: {},
+        sharedState,
         providerStates
     };
 }
@@ -127,6 +140,14 @@ export async function readFullState(): Promise<StoredSakeState> {
  */
 export async function readProviderState(state: { id: string }) {
     return parseProviderState(await loadFromWorkspaceState(providerStateFilename(state)));
+}
+
+/**
+ * Reads the shared state from storage
+ * @returns Promise<SharedState> - The shared state read from storage
+ */
+export async function readSharedState() {
+    return parseSharedState(await loadFromWorkspaceState(sharedStateFilename()));
 }
 
 /**

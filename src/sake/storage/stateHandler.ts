@@ -1,6 +1,7 @@
 import { showErrorMessage, showInfoMessage } from '../commands';
 import { ISakeProvider } from '../sake_providers/BaseSakeProvider';
 import { createFromState } from '../sake_providers/SakeProviderFactory';
+import SakeState from '../sake_providers/SakeState';
 import { chainRegistry } from '../state/shared/ChainRegistry';
 import { ProviderState } from '../webview/shared/storage_types';
 import {
@@ -37,6 +38,10 @@ export async function loadFullState(): Promise<boolean> {
             await createFromState(providerState, true).catch((e) => {
                 showErrorMessage(`Failed to load provider state: ${e}`);
             });
+        }
+
+        if (storedState.sharedState) {
+            SakeState.loadSharedState(storedState.sharedState);
         }
         // console.log('Reloaded saved chain states');
         // showInfoMessage(`Reloaded saved chain states`);

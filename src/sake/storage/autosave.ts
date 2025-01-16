@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ISakeProvider } from '../sake_providers/BaseSakeProvider';
+import { sakeProviderManager } from '../sake_providers/SakeProviderManager';
 
 class Autosaver {
     private delay: number;
@@ -21,6 +22,7 @@ class Autosaver {
 
         this.timeouts[provider.id] = setTimeout(() => {
             provider.saveState();
+            sakeProviderManager.saveSharedState();
         }, this.delay * 1000);
     }
 

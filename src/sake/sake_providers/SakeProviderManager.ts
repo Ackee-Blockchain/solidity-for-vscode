@@ -10,6 +10,7 @@ import { ProviderState, StoredSakeState } from '../webview/shared/storage_types'
 import * as SakeProviderFactory from './SakeProviderFactory';
 import { createNewLocalProvider } from './SakeProviderFactory';
 import SakeState from './SakeState';
+import { saveSharedState } from '../storage/stateUtils';
 
 export const sakeProviderManager = {
     async removeProvider(provider: ISakeProvider) {
@@ -77,6 +78,11 @@ export const sakeProviderManager = {
 
     /* State Handling */
 
+    async saveSharedState() {
+        const sharedState = SakeState.dumpSharedState();
+        await saveSharedState(sharedState);
+    },
+
     async dumpState(providerStates?: ProviderState[]) {
         // Load all providers
         if (providerStates === undefined) {
@@ -106,13 +112,6 @@ export const sakeProviderManager = {
             sharedState: sharedState,
             providerStates
         };
-    },
-
-    async loadState(state: StoredSakeState, silent: boolean = false) {
-        SakeState.loadSharedState(state.sharedState);
-        for (const providerState of state.providerStates) {
-            this.createProviderFromState(providerState);
-        }
     },
 
     async createProviderFromState(providerState: ProviderState, silent: boolean = false) {
