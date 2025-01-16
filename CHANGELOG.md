@@ -10,6 +10,7 @@
 - Added input tooltips for better UX
 - Implemented autosaving chain state in intervals after chain-state change in favor of autosaving problematic chain state on VS Code deactivation
 - Added current chain info in chain navigator
+- Added visual loading indicators when deploying or interacting with contracts
 
 ### Fixes
 - Resolved compilation issue expansion problems
@@ -18,12 +19,14 @@
 - Fixed `bigint` serialization and processing
 - Corrected integer value overflow handling
 - Enhanced type conversion safety for bigint operations
+- Removed excessive loading messages on extension launch
 - Improved proxy contract UI and management
 - Optimized handling of large transaction values
 - Cleaned up residual messages in output windows
 - Enhanced state persistence and recovery
 - Resolved chain session issues
 - Refactored code
+
 
 ## [1.16.7]
 ### Features
