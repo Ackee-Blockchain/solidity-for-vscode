@@ -10,7 +10,9 @@ import {
     NetworkConfiguration,
     SetAccountBalanceRequest,
     SetAccountBalanceResponse,
-    SetAccountLabelRequest
+    SetAccountLabelRequest,
+    TransactRequest,
+    TransactResponse
 } from '../webview/shared/network_types';
 import { BaseWakeNetworkState, WakeChainDump } from '../webview/shared/storage_types';
 import {
@@ -135,7 +137,8 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
             receipt: response.txReceipt,
             callTrace: response.callTrace,
             deployedAddress: response.contractAddress,
-            error: response.error
+            error: response.error,
+            events: response.events
         };
     }
 
@@ -148,31 +151,35 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
             sessionId: this.config.sessionId
         };
 
-        let response;
-        switch (params.callType) {
-            case CallType.Call:
-                response = await WakeApi.call(request);
+        const response = await WakeApi.call(request);
 
-                return {
-                    success: response.success,
-                    callTrace: response.callTrace,
-                    returnValue: response.returnValue
-                };
-            case CallType.Transact:
-                response = await WakeApi.transact(request);
-                return {
-                    success: response.success,
-                    receipt: response.txReceipt,
-                    callTrace: response.callTrace,
-                    returnValue: response.returnValue,
-                    events: response.events,
-                    error: response.error
-                };
-            default:
-                throw new NetworkError('Invalid call type');
-        }
+        return {
+            success: response.success,
+            callTrace: response.callTrace,
+            returnValue: response.returnValue
+        };
 
         // TODO include errors from response
+    }
+
+    async transact(params: TransactRequest): Promise<TransactResponse> {
+        const request: WakeCallRequestParams = {
+            contractAddress: params.to,
+            sender: params.from,
+            calldata: params.calldata,
+            value: params.value,
+            sessionId: this.config.sessionId
+        };
+
+        const response = await WakeApi.transact(request);
+        return {
+            success: response.success,
+            receipt: response.txReceipt,
+            callTrace: response.callTrace,
+            returnValue: response.returnValue,
+            events: response.events,
+            error: response.error
+        };
     }
 
     /* Additional Methods */

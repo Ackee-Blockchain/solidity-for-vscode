@@ -5,12 +5,15 @@ import type {
     WakeGetBytecodeRequestParams
 } from './wake_types';
 
-interface Transaction {
+interface BaseCallResponse {
     success: boolean;
-    receipt?: TransactionReceipt;
     callTrace: WakeCallTrace | null; // @hotfix: this is currently undefined in the response
-    error?: string; // @dev wake returns a user-friendly error message as string
-    events?: string[]; // @dev wake returns a list of events as strings
+}
+
+interface BaseTransactionResponse extends BaseCallResponse {
+    receipt: TransactionReceipt;
+    error?: string;
+    events?: string[];
 }
 
 export enum CallType {
@@ -53,10 +56,8 @@ export interface DeploymentRequest {
     value: string; // @dev encoded bigint
 }
 
-export interface DeploymentResponse extends Transaction {
+export interface DeploymentResponse extends BaseTransactionResponse {
     deployedAddress: Address;
-    error?: string;
-    events?: string[];
 }
 
 /* Call */
@@ -66,11 +67,10 @@ export interface CallRequest {
     from: Address;
     calldata: HexString;
     value: string; // @dev encoded bigint
-    callType?: CallType;
     functionAbi: AbiFunctionFragment;
 }
 
-export interface CallResponse extends Transaction {
+export interface CallResponse extends BaseCallResponse {
     returnValue: HexString;
 }
 
@@ -78,7 +78,9 @@ export interface CallResponse extends Transaction {
 
 export interface TransactRequest extends CallRequest {}
 
-export interface TransactResponse extends CallResponse {}
+export interface TransactResponse extends BaseTransactionResponse {
+    returnValue: HexString;
+}
 
 /* Network Configuration */
 
