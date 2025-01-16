@@ -260,7 +260,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         }
 
         // add events
-        if (data.events !== undefined) {
+        if (data.events !== undefined && data.events.length > 0) {
             const eventsNode = new SakeOutputItem(
                 'Events',
                 undefined,
@@ -396,7 +396,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         }
 
         // add events
-        if (data.events !== undefined) {
+        if (data.events !== undefined && data.events.length > 0) {
             const eventsNode = new SakeOutputItem(
                 'Events',
                 undefined,
