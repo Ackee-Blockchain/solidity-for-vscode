@@ -63,7 +63,10 @@
             return;
         }
 
-        setBalance($selectedAccount!.address, parsedTopUpValue);
+        // convert to number
+        const topUpValueNumber = Number(parsedTopUpValue);
+
+        setBalance($selectedAccount!.address, topUpValueNumber);
     }
 </script>
 
@@ -106,7 +109,7 @@
                         </div>
                         <div class="w-full flex flex-row gap-1 items-center h-[20px]">
                             <ClickableSpan className="text-sm flex-1" callback={topUp}>
-                                {displayEtherValue($selectedAccount.balance)}
+                                {displayEtherValue(BigInt($selectedAccount.balance))}
                             </ClickableSpan>
                             <!-- <span class="text-sm flex-1">{accounts[selectedAccountIndex].balance}ETH</span> -->
                             <!-- <IconButton callback={topUp}>+</IconButton> -->

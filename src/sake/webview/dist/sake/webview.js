@@ -31164,7 +31164,7 @@ function get_each_context$5(ctx, list, i) {
 	return child_ctx;
 }
 
-// (126:0) {:else}
+// (128:0) {:else}
 function create_else_block_1$2(ctx) {
 	let div;
 	let warningicon;
@@ -31181,9 +31181,9 @@ function create_else_block_1$2(ctx) {
 			span = element("span");
 			span.textContent = "No accounts found";
 			attr_dev(span, "class", "text-vscodeForegroundSecondary font-normal");
-			add_location(span, file$m, 128, 8, 5918);
+			add_location(span, file$m, 130, 8, 6006);
 			attr_dev(div, "class", "flex flex-row gap-1 items-center p-3");
-			add_location(div, file$m, 126, 4, 5835);
+			add_location(div, file$m, 128, 4, 5923);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -31212,14 +31212,14 @@ function create_else_block_1$2(ctx) {
 		block,
 		id: create_else_block_1$2.name,
 		type: "else",
-		source: "(126:0) {:else}",
+		source: "(128:0) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (50:0) {#if accounts !== undefined}
+// (52:0) {#if accounts !== undefined}
 function create_if_block$a(ctx) {
 	let if_block_anchor;
 	let current;
@@ -31278,14 +31278,14 @@ function create_if_block$a(ctx) {
 		block,
 		id: create_if_block$a.name,
 		type: "if",
-		source: "(50:0) {#if accounts !== undefined}",
+		source: "(52:0) {#if accounts !== undefined}",
 		ctx
 	});
 
 	return block;
 }
 
-// (51:4) {#if $txParametersExpanded}
+// (53:4) {#if $txParametersExpanded}
 function create_if_block_1$7(ctx) {
 	let section;
 	let div0;
@@ -31373,30 +31373,30 @@ function create_if_block_1$7(ctx) {
 			div2 = element("div");
 			if_block2.c();
 			attr_dev(span0, "class", "text-sm");
-			add_location(span0, file$m, 53, 16, 2290);
+			add_location(span0, file$m, 55, 16, 2370);
 			attr_dev(span1, "slot", "label");
-			add_location(span1, file$m, 59, 20, 2534);
+			add_location(span1, file$m, 61, 20, 2614);
 			attr_dev(span2, "slot", "selected-value");
-			add_location(span2, file$m, 68, 20, 2985);
+			add_location(span2, file$m, 70, 20, 3065);
 			set_custom_element_data(vscode_dropdown, "position", "below");
 			set_custom_element_data(vscode_dropdown, "class", "w-full mb-2");
-			add_location(vscode_dropdown, file$m, 54, 16, 2350);
-			add_location(div0, file$m, 52, 12, 2268);
+			add_location(vscode_dropdown, file$m, 56, 16, 2430);
+			add_location(div0, file$m, 54, 12, 2348);
 			attr_dev(span3, "class", "text-sm");
-			add_location(span3, file$m, 99, 20, 4719);
+			add_location(span3, file$m, 101, 20, 4807);
 			attr_dev(div1, "class", "flex flex-row gap-1");
-			add_location(div1, file$m, 98, 16, 4665);
+			add_location(div1, file$m, 100, 16, 4753);
 			attr_dev(div2, "slot", "end");
 			attr_dev(div2, "class", "flex items-center");
-			add_location(div2, file$m, 110, 20, 5183);
+			add_location(div2, file$m, 112, 20, 5271);
 			set_custom_element_data(vscode_text_field, "placeholder", "0 ETH");
 			set_custom_element_data(vscode_text_field, "class", "w-full");
 			set_custom_element_data(vscode_text_field, "value", /*$selectedValueString*/ ctx[4]);
-			add_location(vscode_text_field, file$m, 104, 16, 4952);
+			add_location(vscode_text_field, file$m, 106, 16, 5040);
 			attr_dev(div3, "class", "w-full");
-			add_location(div3, file$m, 97, 12, 4628);
+			add_location(div3, file$m, 99, 12, 4716);
 			attr_dev(section, "class", "flex flex-col gap-1 p-3");
-			add_location(section, file$m, 51, 8, 2214);
+			add_location(section, file$m, 53, 8, 2294);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, section, anchor);
@@ -31555,14 +31555,14 @@ function create_if_block_1$7(ctx) {
 		block,
 		id: create_if_block_1$7.name,
 		type: "if",
-		source: "(51:4) {#if $txParametersExpanded}",
+		source: "(53:4) {#if $txParametersExpanded}",
 		ctx
 	});
 
 	return block;
 }
 
-// (61:20) {#each $accounts as account, i}
+// (63:20) {#each $accounts as account, i}
 function create_each_block$5(ctx) {
 	let vscode_option;
 	let t0;
@@ -31576,7 +31576,7 @@ function create_each_block$5(ctx) {
 			t1 = text(/*i*/ ctx[11]);
 			set_custom_element_data(vscode_option, "value", /*i*/ ctx[11]);
 			set_custom_element_data(vscode_option, "selected", vscode_option_selected_value = /*account*/ ctx[9].address == /*$selectedAccount*/ ctx[0]?.address);
-			add_location(vscode_option, file$m, 61, 24, 2651);
+			add_location(vscode_option, file$m, 63, 24, 2731);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, vscode_option, anchor);
@@ -31597,14 +31597,14 @@ function create_each_block$5(ctx) {
 		block,
 		id: create_each_block$5.name,
 		type: "each",
-		source: "(61:20) {#each $accounts as account, i}",
+		source: "(63:20) {#each $accounts as account, i}",
 		ctx
 	});
 
 	return block;
 }
 
-// (70:24) {#if $selectedAccountId !== null}
+// (72:24) {#if $selectedAccountId !== null}
 function create_if_block_4$3(ctx) {
 	let t_value = (/*$selectedAccount*/ ctx[0]?.label ?? `Account ${/*$selectedAccountId*/ ctx[3]}`) + "";
 	let t;
@@ -31628,14 +31628,14 @@ function create_if_block_4$3(ctx) {
 		block,
 		id: create_if_block_4$3.name,
 		type: "if",
-		source: "(70:24) {#if $selectedAccountId !== null}",
+		source: "(72:24) {#if $selectedAccountId !== null}",
 		ctx
 	});
 
 	return block;
 }
 
-// (76:16) {#if $selectedAccount !== null}
+// (78:16) {#if $selectedAccount !== null}
 function create_if_block_3$4(ctx) {
 	let div2;
 	let div0;
@@ -31672,11 +31672,11 @@ function create_if_block_3$4(ctx) {
 			div1 = element("div");
 			create_component(clickablespan.$$.fragment);
 			attr_dev(div0, "class", "w-full flex flex-row gap-1 items-center h-[20px]");
-			add_location(div0, file$m, 77, 24, 3378);
+			add_location(div0, file$m, 79, 24, 3458);
 			attr_dev(div1, "class", "w-full flex flex-row gap-1 items-center h-[20px]");
-			add_location(div1, file$m, 86, 24, 4044);
+			add_location(div1, file$m, 88, 24, 4124);
 			attr_dev(div2, "class", "w-full px-1 mb-3");
-			add_location(div2, file$m, 76, 20, 3323);
+			add_location(div2, file$m, 78, 20, 3403);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div2, anchor);
@@ -31721,16 +31721,16 @@ function create_if_block_3$4(ctx) {
 		block,
 		id: create_if_block_3$4.name,
 		type: "if",
-		source: "(76:16) {#if $selectedAccount !== null}",
+		source: "(78:16) {#if $selectedAccount !== null}",
 		ctx
 	});
 
 	return block;
 }
 
-// (88:28) <ClickableSpan className="text-sm flex-1" callback={topUp}>
+// (90:28) <ClickableSpan className="text-sm flex-1" callback={topUp}>
 function create_default_slot_1$4(ctx) {
-	let t_value = displayEtherValue(/*$selectedAccount*/ ctx[0].balance) + "";
+	let t_value = displayEtherValue(BigInt(/*$selectedAccount*/ ctx[0].balance)) + "";
 	let t;
 
 	const block = {
@@ -31741,7 +31741,7 @@ function create_default_slot_1$4(ctx) {
 			insert_dev(target, t, anchor);
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*$selectedAccount*/ 1 && t_value !== (t_value = displayEtherValue(/*$selectedAccount*/ ctx[0].balance) + "")) set_data_dev(t, t_value);
+			if (dirty & /*$selectedAccount*/ 1 && t_value !== (t_value = displayEtherValue(BigInt(/*$selectedAccount*/ ctx[0].balance)) + "")) set_data_dev(t, t_value);
 		},
 		d: function destroy(detaching) {
 			if (detaching) detach_dev(t);
@@ -31752,14 +31752,14 @@ function create_default_slot_1$4(ctx) {
 		block,
 		id: create_default_slot_1$4.name,
 		type: "slot",
-		source: "(88:28) <ClickableSpan className=\\\"text-sm flex-1\\\" callback={topUp}>",
+		source: "(90:28) <ClickableSpan className=\\\"text-sm flex-1\\\" callback={topUp}>",
 		ctx
 	});
 
 	return block;
 }
 
-// (116:24) {:else}
+// (118:24) {:else}
 function create_else_block$7(ctx) {
 	let span;
 
@@ -31769,7 +31769,7 @@ function create_else_block$7(ctx) {
 			span.textContent = "Ξ";
 			attr_dev(span, "slot", "end");
 			attr_dev(span, "class", "flex justify-center align-middle leading-5");
-			add_location(span, file$m, 116, 28, 5542);
+			add_location(span, file$m, 118, 28, 5630);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -31785,14 +31785,14 @@ function create_else_block$7(ctx) {
 		block,
 		id: create_else_block$7.name,
 		type: "else",
-		source: "(116:24) {:else}",
+		source: "(118:24) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (112:24) {#if $selectedValue === null}
+// (114:24) {#if $selectedValue === null}
 function create_if_block_2$5(ctx) {
 	let inputissueindicator;
 	let current;
@@ -31832,14 +31832,14 @@ function create_if_block_2$5(ctx) {
 		block,
 		id: create_if_block_2$5.name,
 		type: "if",
-		source: "(112:24) {#if $selectedValue === null}",
+		source: "(114:24) {#if $selectedValue === null}",
 		ctx
 	});
 
 	return block;
 }
 
-// (113:28) <InputIssueIndicator type="danger">
+// (115:28) <InputIssueIndicator type="danger">
 function create_default_slot$7(ctx) {
 	let span;
 
@@ -31848,7 +31848,7 @@ function create_default_slot$7(ctx) {
 			span = element("span");
 			span.textContent = "Value could not be parsed";
 			attr_dev(span, "class", "text-sm");
-			add_location(span, file$m, 113, 32, 5376);
+			add_location(span, file$m, 115, 32, 5464);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -31863,7 +31863,7 @@ function create_default_slot$7(ctx) {
 		block,
 		id: create_default_slot$7.name,
 		type: "slot",
-		source: "(113:28) <InputIssueIndicator type=\\\"danger\\\">",
+		source: "(115:28) <InputIssueIndicator type=\\\"danger\\\">",
 		ctx
 	});
 
@@ -31996,7 +31996,10 @@ function instance$n($$self, $$props, $$invalidate) {
 			return;
 		}
 
-		setBalance($selectedAccount.address, parsedTopUpValue);
+		// convert to number
+		const topUpValueNumber = Number(parsedTopUpValue);
+
+		setBalance($selectedAccount.address, topUpValueNumber);
 	}
 
 	const writable_props = [];
