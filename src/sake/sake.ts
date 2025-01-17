@@ -117,7 +117,7 @@ async function loadChains() {
     }
 
     // Start with a default local chain
-    await SakeProviderFactory.createNewLocalProvider('Local Chain 1');
+    await SakeProviderFactory.createNewLocalProvider('Local Chain 1', undefined, undefined, true);
 }
 
 function registerCommands(context: vscode.ExtensionContext) {
