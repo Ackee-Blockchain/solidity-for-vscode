@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { ProviderState, SharedState, StoredSakeState } from '../webview/shared/storage_types';
 import {
     deleteFromWorkspaceState,
+    existsInWorkspaceState,
     listFilesInWorkspaceState,
     loadFromWorkspaceState,
     saveToWorkspaceState,
@@ -185,4 +186,8 @@ export function createChainStateFileWatcher(state: { id: string }, callback: () 
     fileWatcher.onDidDelete(() => {
         callback();
     });
+}
+
+export function existsProviderState(state: { id: string }) {
+    return existsInWorkspaceState(providerStateFilename(state));
 }

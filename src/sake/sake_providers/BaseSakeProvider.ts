@@ -6,7 +6,7 @@ import { OutputViewManager } from '../providers/OutputTreeProvider';
 import { chainRegistry } from '../state/shared/ChainRegistry';
 import { autosaver } from '../storage/autosave';
 import { deleteChainState, loadChainState, saveChainState } from '../storage/stateHandler';
-import { createChainStateFileWatcher } from '../storage/stateUtils';
+import { createChainStateFileWatcher, existsProviderState } from '../storage/stateUtils';
 import { decodeCallReturnValue } from '../utils/call';
 import {
     getNameFromContractFqn,
@@ -509,7 +509,9 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
         if (this.connected) {
             await this.network.deleteChain();
         }
-        await this.deleteStateSave();
+        if (await existsProviderState(this)) {
+            await this.deleteStateSave();
+        }
     }
 
     /* State Handling */
