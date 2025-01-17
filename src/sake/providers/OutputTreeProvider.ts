@@ -577,9 +577,11 @@ function buildFunctionString(callTrace: WakeCallTrace, withoutArguments = false)
 function destructureDecodedObject(item: any): BaseOutputItem {
     const needsDestructuring = typeof item.value === 'object';
 
+    console.log('item', typeof item.value, item.value);
+
     const destructured = new SakeOutputItem(
         item.name,
-        needsDestructuring ? undefined : item.value,
+        needsDestructuring ? undefined : item.value.toString(),
         needsDestructuring
             ? vscode.TreeItemCollapsibleState.Expanded
             : vscode.TreeItemCollapsibleState.None
