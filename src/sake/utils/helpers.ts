@@ -38,8 +38,6 @@ export function serializeDeep(state: any): string {
 }
 
 export function parseNestedWithBigInts(value: unknown): unknown {
-    console.log('parseNestedWithBigInts value', typeof value, value);
-
     if (value === null || value === undefined) {
         return value;
     }
