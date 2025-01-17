@@ -40849,6 +40849,7 @@ function handleStateResponse(message) {
             break;
         }
         case StateId.Accounts: {
+            console.log('aaaaaccounts', message.payload);
             const _accounts = message.payload;
             const _selectedAccount = get_store_value(selectedAccount);
             // update accounts store
