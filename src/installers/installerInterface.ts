@@ -1,6 +1,6 @@
 import { ExecaChildProcess } from 'execa';
 
-export const WAKE_MIN_VERSION = '4.13.2';
+export const WAKE_MIN_VERSION = '4.14.0';
 
 export interface Installer {
     setup(): Promise<void>;
