@@ -296,7 +296,8 @@ export type TransactionResult = TransactionDeploymentResult | TransactionCallRes
 // TODO this should probably be moved to types5
 export interface TransactionDecodedReturnValue {
     name: string;
-    value: unknown;
+    children?: TransactionDecodedReturnValue[];
+    value?: any;
 }
 
 export interface TransactionReturnData {

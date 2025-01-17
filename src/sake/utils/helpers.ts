@@ -48,9 +48,11 @@ export function parseNestedWithBigInts(value: unknown): unknown {
     }
 
     if (typeof value === 'object') {
-        return Object.entries(value).map(([key, value]) => ({
-            [key]: parseNestedWithBigInts(value)
-        }));
+        const result: Record<string, unknown> = {};
+        Object.entries(value).forEach(([key, val]) => {
+            result[key] = parseNestedWithBigInts(val);
+        });
+        return result;
     }
 
     return value;
