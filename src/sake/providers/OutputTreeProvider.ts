@@ -3,6 +3,7 @@ import { SakeContext } from '../context';
 import {
     CallOperation,
     TransactionCallResult,
+    TransactionDecodedReturnValue,
     TransactionDeploymentResult,
     TransactionResult,
     WakeCallTrace
@@ -337,7 +338,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
                     decoded.forEach((item) => {
                         returnDataDecodedNode.setChildren([
                             ...returnDataDecodedNode.children,
-                            destructureDecodedObject(item)
+                            parseDecodedObject(item)
                         ]);
                     });
                 }
@@ -574,36 +575,19 @@ function buildFunctionString(callTrace: WakeCallTrace, withoutArguments = false)
     }`;
 }
 
-function destructureDecodedObject(item: any): BaseOutputItem {
-    const needsDestructuring = typeof item.value === 'object';
-
-    console.log('item', typeof item.value, item.value);
+function parseDecodedObject(item: TransactionDecodedReturnValue): BaseOutputItem {
+    const needsDestructuring = item.children !== undefined;
 
     const destructured = new SakeOutputItem(
         item.name,
-        needsDestructuring ? undefined : item.value.toString(),
+        needsDestructuring ? undefined : item.value?.toString(),
         needsDestructuring
             ? vscode.TreeItemCollapsibleState.Expanded
             : vscode.TreeItemCollapsibleState.None
     ) as BaseOutputItem;
 
-    if (needsDestructuring) {
-        // there is a __length__ property defined if it is an object (arrays dont have __length__)
-        const hasLength = item.value.__length__ !== undefined;
-
-        Object.entries(item.value).forEach(([name, value]) => {
-            // the object will have a __length__ property, and then the values will be duplicated for each entry,
-            // first saved with the key as its index, secondly with the key being the data name
-            // skip the __length__ property and keys that are numbers (it will be a string so check if it is a number)
-            if (hasLength && (name === '__length__' || /^\d+$/.test(name))) {
-                return;
-            }
-
-            destructured.setChildren([
-                ...destructured.children,
-                destructureDecodedObject({ name, value })
-            ]);
-        });
+    if (item.children !== undefined) {
+        destructured.setChildren(item.children.map((child) => parseDecodedObject(child)));
     }
 
     return destructured;

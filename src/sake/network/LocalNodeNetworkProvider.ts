@@ -4,7 +4,6 @@ import { NetworkError } from '../webview/shared/errors';
 import {
     CallRequest,
     CallResponse,
-    CallType,
     DeploymentRequest,
     DeploymentResponse,
     NetworkConfiguration,
@@ -14,7 +13,7 @@ import {
     TransactRequest,
     TransactResponse
 } from '../webview/shared/network_types';
-import { BaseWakeNetworkState, WakeChainDump } from '../webview/shared/storage_types';
+import { WakeChainDump } from '../webview/shared/storage_types';
 import {
     Account,
     Address,
