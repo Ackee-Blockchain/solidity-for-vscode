@@ -27355,7 +27355,7 @@ function create_if_block_4$4(ctx) {
 	return block;
 }
 
-// (70:30) 
+// (70:36) 
 function create_if_block_3$5(ctx) {
 	let span;
 	let radiotowericon;
@@ -27367,7 +27367,7 @@ function create_if_block_3$5(ctx) {
 			span = element("span");
 			create_component(radiotowericon.$$.fragment);
 			attr_dev(span, "slot", "start");
-			add_location(span, file$v, 70, 16, 2299);
+			add_location(span, file$v, 70, 16, 2311);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -27393,7 +27393,7 @@ function create_if_block_3$5(ctx) {
 		block,
 		id: create_if_block_3$5.name,
 		type: "if",
-		source: "(70:30) ",
+		source: "(70:36) ",
 		ctx
 	});
 
@@ -27412,7 +27412,7 @@ function create_if_block_2$8(ctx) {
 			span = element("span");
 			create_component(loadingicon.$$.fragment);
 			attr_dev(span, "slot", "start");
-			add_location(span, file$v, 66, 16, 2172);
+			add_location(span, file$v, 66, 16, 2178);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, span, anchor);
@@ -27471,7 +27471,7 @@ function create_if_block$e(ctx) {
 			div = element("div");
 			if_block.c();
 			attr_dev(div, "class", div_class_value = "flex flex-1 flex-col gap-1 " + (/*expanded*/ ctx[3] ? 'w-full' : '') + " overflow-hidden");
-			add_location(div, file$v, 78, 8, 2500);
+			add_location(div, file$v, 78, 8, 2512);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -27777,7 +27777,7 @@ function create_fragment$x(ctx) {
 
 	function select_block_type_1(ctx, dirty) {
 		if (/*loading*/ ctx[5]) return 0;
-		if (/*isProxy*/ ctx[2]) return 1;
+		if (/*showProxyIcon*/ ctx[2]) return 1;
 		return -1;
 	}
 
@@ -27802,11 +27802,11 @@ function create_fragment$x(ctx) {
 			set_custom_element_data(vscode_button, "class", "flex-1");
 			set_custom_element_data(vscode_button, "disabled", /*loading*/ ctx[5]);
 			set_custom_element_data(vscode_button, "appearance", vscode_button_appearance_value = /*isCalldata*/ ctx[1] ? 'secondary' : 'primary');
-			add_location(vscode_button, file$v, 59, 8, 1946);
+			add_location(vscode_button, file$v, 59, 8, 1952);
 			attr_dev(div0, "class", div0_class_value = "flex flex-1 gap-1 " + (/*expanded*/ ctx[3] ? 'w-full' : '') + " overflow-hidden");
-			add_location(div0, file$v, 51, 4, 1615);
+			add_location(div0, file$v, 51, 4, 1621);
 			attr_dev(div1, "class", div1_class_value = "flex flex-1 w-full items-end gap-1 " + (/*expanded*/ ctx[3] ? 'flex-col' : 'flex-row'));
-			add_location(div1, file$v, 50, 0, 1525);
+			add_location(div1, file$v, 50, 0, 1531);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -27978,7 +27978,7 @@ function instance$x($$self, $$props, $$invalidate) {
 	let { onFunctionCall } = $$props;
 	let { isConstructor = false } = $$props;
 	let { isCalldata = false } = $$props;
-	let { isProxy = false } = $$props;
+	let { showProxyIcon = false } = $$props;
 	let expanded = false;
 	let inputRoot;
 	let loading = false;
@@ -28025,7 +28025,7 @@ function instance$x($$self, $$props, $$invalidate) {
 		}
 	});
 
-	const writable_props = ['func', 'onFunctionCall', 'isConstructor', 'isCalldata', 'isProxy'];
+	const writable_props = ['func', 'onFunctionCall', 'isConstructor', 'isCalldata', 'showProxyIcon'];
 
 	Object.keys($$props).forEach(key => {
 		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<ContractFunction> was created with unknown prop '${key}'`);
@@ -28049,7 +28049,7 @@ function instance$x($$self, $$props, $$invalidate) {
 		if ('onFunctionCall' in $$props) $$invalidate(7, onFunctionCall = $$props.onFunctionCall);
 		if ('isConstructor' in $$props) $$invalidate(8, isConstructor = $$props.isConstructor);
 		if ('isCalldata' in $$props) $$invalidate(1, isCalldata = $$props.isCalldata);
-		if ('isProxy' in $$props) $$invalidate(2, isProxy = $$props.isProxy);
+		if ('showProxyIcon' in $$props) $$invalidate(2, showProxyIcon = $$props.showProxyIcon);
 	};
 
 	$$self.$capture_state = () => ({
@@ -28065,7 +28065,7 @@ function instance$x($$self, $$props, $$invalidate) {
 		onFunctionCall,
 		isConstructor,
 		isCalldata,
-		isProxy,
+		showProxyIcon,
 		expanded,
 		inputRoot,
 		loading,
@@ -28080,7 +28080,7 @@ function instance$x($$self, $$props, $$invalidate) {
 		if ('onFunctionCall' in $$props) $$invalidate(7, onFunctionCall = $$props.onFunctionCall);
 		if ('isConstructor' in $$props) $$invalidate(8, isConstructor = $$props.isConstructor);
 		if ('isCalldata' in $$props) $$invalidate(1, isCalldata = $$props.isCalldata);
-		if ('isProxy' in $$props) $$invalidate(2, isProxy = $$props.isProxy);
+		if ('showProxyIcon' in $$props) $$invalidate(2, showProxyIcon = $$props.showProxyIcon);
 		if ('expanded' in $$props) $$invalidate(3, expanded = $$props.expanded);
 		if ('inputRoot' in $$props) $$invalidate(4, inputRoot = $$props.inputRoot);
 		if ('loading' in $$props) $$invalidate(5, loading = $$props.loading);
@@ -28104,7 +28104,7 @@ function instance$x($$self, $$props, $$invalidate) {
 	return [
 		func,
 		isCalldata,
-		isProxy,
+		showProxyIcon,
 		expanded,
 		inputRoot,
 		loading,
@@ -28126,7 +28126,7 @@ class ContractFunction extends SvelteComponentDev {
 			onFunctionCall: 7,
 			isConstructor: 8,
 			isCalldata: 1,
-			isProxy: 2
+			showProxyIcon: 2
 		});
 
 		dispatch_dev("SvelteRegisterComponent", {
@@ -28169,11 +28169,11 @@ class ContractFunction extends SvelteComponentDev {
 		throw new Error("<ContractFunction>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 
-	get isProxy() {
+	get showProxyIcon() {
 		throw new Error("<ContractFunction>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 
-	set isProxy(value) {
+	set showProxyIcon(value) {
 		throw new Error("<ContractFunction>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 }
@@ -29297,7 +29297,7 @@ function create_if_block$d(ctx) {
 				check_outros();
 			}
 
-			if (dirty & /*filteredAbi, _onFunctionCall*/ 48) {
+			if (dirty & /*filteredAbi, _onFunctionCall, filteredProxies*/ 52) {
 				each_value = /*filteredAbi*/ ctx[4];
 				validate_each_argument(each_value);
 				let i;
@@ -29382,8 +29382,7 @@ function create_each_block_2(ctx) {
 	contractfunction = new ContractFunction({
 			props: {
 				func: /*func*/ ctx[13],
-				onFunctionCall: /*_onFunctionCall*/ ctx[5],
-				isProxy: true
+				onFunctionCall: /*_onFunctionCall*/ ctx[5]
 			},
 			$$inline: true
 		});
@@ -29532,7 +29531,8 @@ function create_each_block$7(ctx) {
 	contractfunction = new ContractFunction({
 			props: {
 				func: /*func*/ ctx[13],
-				onFunctionCall: /*_onFunctionCall*/ ctx[5]
+				onFunctionCall: /*_onFunctionCall*/ ctx[5],
+				showProxyIcon: /*filteredProxies*/ ctx[2].length > 0
 			},
 			$$inline: true
 		});
@@ -29548,6 +29548,7 @@ function create_each_block$7(ctx) {
 		p: function update(ctx, dirty) {
 			const contractfunction_changes = {};
 			if (dirty & /*filteredAbi*/ 16) contractfunction_changes.func = /*func*/ ctx[13];
+			if (dirty & /*filteredProxies*/ 4) contractfunction_changes.showProxyIcon = /*filteredProxies*/ ctx[2].length > 0;
 			contractfunction.$set(contractfunction_changes);
 		},
 		i: function intro(local) {

@@ -102,12 +102,16 @@
         <div class="flex flex-col gap-1">
             {#each filteredProxies as proxy}
                 {#each proxy.abi as func}
-                    <ContractFunction {func} onFunctionCall={_onFunctionCall} isProxy={true} />
+                    <ContractFunction {func} onFunctionCall={_onFunctionCall} />
                 {/each}
             {/each}
 
             {#each filteredAbi as func}
-                <ContractFunction {func} onFunctionCall={_onFunctionCall} />
+                <ContractFunction
+                    {func}
+                    onFunctionCall={_onFunctionCall}
+                    showProxyIcon={filteredProxies.length > 0}
+                />
             {/each}
 
             <CalldataBytes onFunctionCall={_onFunctionCall} />

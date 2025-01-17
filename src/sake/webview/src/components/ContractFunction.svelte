@@ -12,7 +12,7 @@
     export let onFunctionCall: (calldata: string, func: AbiFunctionFragment) => Promise<boolean>;
     export let isConstructor: boolean = false;
     export let isCalldata: boolean = false;
-    export let isProxy: boolean = false;
+    export let showProxyIcon: boolean = false;
     let expanded: boolean = false;
     let inputRoot: RootInputHandler;
     $: funcChanged(func);
@@ -70,7 +70,7 @@
                 <span slot="start">
                     <LoadingIcon />
                 </span>
-            {:else if isProxy}
+            {:else if showProxyIcon}
                 <span slot="start">
                     <RadioTowerIcon />
                 </span>
