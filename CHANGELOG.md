@@ -24,9 +24,9 @@
 - Optimized handling of large transaction values
 - Cleaned up residual messages in output windows
 - Enhanced state persistence and recovery
-- Resolved chain session issues
+- Resolved minor chain session issues
+- Bumped required Wake version to 4.14.0
 - Refactored code
-
 
 ## [1.16.7]
 ### Features
