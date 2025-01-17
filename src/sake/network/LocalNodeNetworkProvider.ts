@@ -260,8 +260,8 @@ export class LocalNodeNetworkProvider extends NetworkProvider {
             type: DeployedContractType.OnChain,
             name: response.name,
             address: address,
-            abi: response.proxyAbi ?? [],
-            proxyFor: response.abi
+            abi: response.proxyAbi ?? response.abi,
+            proxyFor: response.proxyAbi
                 ? [
                       {
                           id: uuidv4(),
