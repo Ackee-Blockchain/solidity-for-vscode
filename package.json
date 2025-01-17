@@ -608,15 +608,6 @@
                 "command": "Tools-for-Solidity.sake.copyFromResults",
                 "title": "Solidity: Copy From Results",
                 "icon": "$(copy)"
-            },
-            {
-                "command": "Tools-for-Solidity.sake.save-state",
-                "title": "Solidity: Save Chains State",
-                "icon": "$(save)"
-            },
-            {
-                "command": "Tools-for-Solidity.sake.delete-state",
-                "title": "Solidity: Delete Chains State"
             }
         ],
         "viewsContainers": {
@@ -690,11 +681,6 @@
                 {
                     "command": "Tools-for-Solidity.sake.show_history",
                     "when": "view == sake-output",
-                    "group": "navigation"
-                },
-                {
-                    "command": "Tools-for-Solidity.sake.save-state",
-                    "when": "view == sake",
                     "group": "navigation"
                 }
             ],

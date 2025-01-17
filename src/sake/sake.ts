@@ -146,10 +146,4 @@ function registerCommands(context: vscode.ExtensionContext) {
         }
         // @todo might need to rework using vscode.workspace.createFileSystemWatcher
     });
-
-    context.subscriptions.push(
-        vscode.commands.registerCommand('Tools-for-Solidity.sake.force-save-state', () =>
-            saveFullState()
-        )
-    );
 }
