@@ -10,6 +10,8 @@ import {
 } from '../webview/shared/state_types';
 import { SharedState } from '../webview/shared/storage_types';
 import { extensionState } from '../state/shared/ExtensionState';
+import { chainRegistry } from '../state/shared/ChainRegistry';
+import sakeProviderManager from './SakeProviderManager';
 
 export default class SakeState {
     accounts: AccountStateProvider;
@@ -71,9 +73,11 @@ export default class SakeState {
 
     // @todo move otuside of this class
     static loadSharedState(state: SharedState) {
-        extensionState.setLazy({
-            currentChainId: state.lastUsedChain
-        });
+        if (state.lastUsedChain) {
+            try {
+                sakeProviderManager.setProvider(state.lastUsedChain);
+            } catch (e) {}
+        }
         // ChainStateProvider.getInstance().state = state.chains;
         // @hotfix: compilation state is not loaded until wake is able to save it in state dump
         // CompilationStateProvider.getInstance().state = state.compilation;
