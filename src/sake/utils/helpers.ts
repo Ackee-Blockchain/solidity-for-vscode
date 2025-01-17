@@ -34,13 +34,26 @@ export function serialize(state: any): string {
 }
 
 export function serializeDeep(state: any): string {
-    return JSON.stringify(state, (key, value) => {
-        if (typeof value === 'bigint') {
-            return value.toString();
-        }
-        if (typeof value === 'object' && value !== null) {
-            return serializeDeep(value);
-        }
+    return JSON.stringify(parseNestedWithBigInts(state));
+}
+
+export function parseNestedWithBigInts(value: unknown): unknown {
+    console.log('parseNestedWithBigInts value', typeof value, value);
+
+    if (value === null || value === undefined) {
         return value;
-    });
+    }
+
+    // @dev BigInt values need to be converted to strings as they cannot be serialized
+    if (typeof value === 'bigint') {
+        return value.toString();
+    }
+
+    if (typeof value === 'object') {
+        return Object.entries(value).map(([key, value]) => ({
+            [key]: parseNestedWithBigInts(value)
+        }));
+    }
+
+    return value;
 }
