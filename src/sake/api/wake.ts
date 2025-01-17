@@ -77,6 +77,7 @@ async function sendWakeRequest<T>(
         if (message == 'Connection to remote host was lost.') {
             chainRegistry.get(params.sessionId)?.disconnect();
         }
+        console.error('Wake API Error', message);
         throw new WakeApiError(message);
     }
 }

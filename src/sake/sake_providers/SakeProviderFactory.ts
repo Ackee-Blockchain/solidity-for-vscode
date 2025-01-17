@@ -60,6 +60,7 @@ async function _newLocalProvider(
     // @dev allow failing connection, so it can reconnect later
     try {
         await provider.connect();
+
         if (
             persistence.isAutosaveEnabled &&
             (persistence.isDirty || persistence.lastSaveTimestamp == undefined)
@@ -68,7 +69,7 @@ async function _newLocalProvider(
         }
     } catch (e) {
         if (onlySuccessful) {
-            provider.onDeleteProvider();
+            await provider.onDeleteProvider();
         }
         throw e;
     }
