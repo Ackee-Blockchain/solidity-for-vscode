@@ -34,12 +34,19 @@ Compile your contracts and deploy them on a local chain for testing
 
 ![Compile and deploy contracts](images/readme/sake/1-compile-deploy.gif)
 
-
 ### Interact with contracts
 
 Test your deployed contracts by interacting with them using function calls with different inputs
 
 ![Interact with contracts](images/readme/sake/2-interact.gif)
+
+### Fork mainnet chains and interact with onchain contracts with advanced chain configuration
+
+![Forking chain and fetching contracts](images/readme/sake/forking_chain_and_fetching_contracts.gif)
+
+### Seamlessly interact with proxy contracts by automatically loading implementation ABIs
+
+![Proxy support](images/readme/sake/proxy_support.gif)
 
 ## See vulnerabilities from static analysis in real-time
 
@@ -54,7 +61,7 @@ Catch potential issues early with real-time static analysis
 Get an overall overview of issues in your project
 
 ![Security overview in the sidebar](images/readme/diagnostics/3-sidebar-overview.gif)
-
+it
 ### Compilation Errors
 
 See compilation errors highlighted in code
