@@ -2,31 +2,30 @@
 
 ## [1.17.0]
 ### Features
-- Added ability to fetch contract ABIs directly from onchain
-- Added proxy contract support with implementation ABI integration
-- Introduced chain forking capabilities for local development
-- Enabled connecting to existing local blockchain nodes
-- Added events in transaction output
-- Added input tooltips for better UX
-- Implemented autosaving chain state in intervals after chain-state change in favor of autosaving problematic chain state on VS Code deactivation
-- Added current chain info in chain navigator
-- Added visual loading indicators when deploying or interacting with contracts
+- Added onchain contract ABI fetching
+- Implemented proxy contract support with implementation ABI integration
+- Added chain forking capabilities for local development
+- Added support for connecting to existing local chain nodes
+- Integrated transaction event displays in output view
+- Enhanced UX with input tooltips and loading indicators
+- Implemented configurable automatic chain state persistence
+- Added a new Chain navigator UI element with chain information display
+- Improved contract interaction feedback with visual loading states
 
 ### Fixes
-- Resolved compilation issue expansion problems
-- Addressed UI theming inconsistencies
-- Fixed handling of empty `calldata` in function calls
-- Fixed `bigint` serialization and processing
-- Corrected integer value overflow handling
-- Enhanced type conversion safety for bigint operations
-- Removed excessive loading messages on extension launch
-- Improved proxy contract UI and management
+- Fixed contract compilation expansion issues
+- Resolved UI theme consistency issues
+- Fixed empty `calldata` handling in function calls
+- Corrected `bigint` serialization and processing
+- Fixed integer overflow handling in inputs
+- Improved type safety in `bigint` operations
+- Reduced extension startup messages
 - Optimized handling of large transaction values
-- Cleaned up residual messages in output windows
-- Enhanced state persistence and recovery
-- Resolved minor chain session issues
-- Bumped required Wake version to 4.14.0
-- Refactored code
+- Cleaned up residual messages in output view
+- Improved chain state persistence reliability
+- Fixed chain session stability issues
+- Updated Wake dependency to 4.14.0
+- Refactored codebase
 
 ## [1.16.7]
 ### Features
