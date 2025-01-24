@@ -54,6 +54,7 @@ import { PipxInstaller } from './installers/pipx';
 import { PipInstaller } from './installers/pip';
 import { ManualInstaller } from './installers/manual';
 import { WakeStatusBarProvider } from './helpers/WakeStatusProvider';
+import { PrettierFormatter } from './formatters/PrettierFormatter';
 
 let client: LanguageClient | undefined = undefined;
 let wakeProcess: ExecaChildProcess | undefined = undefined;
@@ -319,8 +320,6 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.window.registerTreeDataProvider('wake-detections', wakeProvider);
     vscode.window.registerTreeDataProvider('solc-detections', solcProvider);
 
-    // registerCommands(outputChannel, context);
-
     initCoverage(outputChannel);
 
     client.start();
@@ -337,6 +336,9 @@ export async function activate(context: vscode.ExtensionContext) {
         await context.globalState.update('tools-for-solidity.force-shown-walkthrough', true);
         vscode.commands.executeCommand('Tools-for-Solidity.open_walkthrough');
     }
+
+    // register formatter
+    registerFormatter(context);
 
     // activate Sake
     activateSake(context, client);
@@ -649,6 +651,12 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
                 false
             );
         })
+    );
+}
+
+function registerFormatter(context: vscode.ExtensionContext) {
+    context.subscriptions.push(
+        vscode.languages.registerDocumentFormattingEditProvider('solidity', new PrettierFormatter())
     );
 }
 
