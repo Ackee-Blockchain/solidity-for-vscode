@@ -16,10 +16,7 @@ export class PrettierFormatter implements vscode.DocumentFormattingEditProvider 
     public async provideDocumentFormattingEdits(
         document: vscode.TextDocument
     ): Promise<vscode.TextEdit[]> {
-        console.log('Formatting document', document.uri.fsPath);
         const formattedText = await this.format(document);
-
-        console.log('Options', this._getOptions(document));
 
         const fullTextRange = new vscode.Range(
             document.lineAt(0).range.start,
@@ -35,7 +32,7 @@ export class PrettierFormatter implements vscode.DocumentFormattingEditProvider 
      * @returns A promise that resolves to the formatted text
      */
     public async format(document: vscode.TextDocument): Promise<string> {
-        const options = this._getOptions(document);
+        const options = await this._getOptions(document);
 
         return await prettier.format(document.getText(), options);
     }
@@ -47,7 +44,7 @@ export class PrettierFormatter implements vscode.DocumentFormattingEditProvider 
      * @returns The Prettier options to use for formatting
      * @private
      */
-    private _getOptions(document: vscode.TextDocument) {
+    private async _getOptions(document: vscode.TextDocument) {
         // Define required options for Solidity formatting
         const options = {
             parser: 'solidity-parse', // Use the Solidity parser from prettier-plugin-solidity
@@ -61,10 +58,10 @@ export class PrettierFormatter implements vscode.DocumentFormattingEditProvider 
             // - editorconfig: true allows .editorconfig to influence formatting
             // - Falls back to defaultConfig if no config found
             const config =
-                prettier.resolveConfig(document.uri.fsPath, {
+                (await prettier.resolveConfig(document.uri.fsPath, {
                     useCache: false,
                     editorconfig: true
-                }) ?? defaultConfig;
+                })) ?? defaultConfig;
 
             // Merge loaded/default config with required Solidity options
             // Options takes precedence to ensure parser and plugin are set
