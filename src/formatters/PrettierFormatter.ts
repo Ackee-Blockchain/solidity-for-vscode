@@ -38,10 +38,10 @@ export class PrettierFormatter implements vscode.DocumentFormattingEditProvider 
     }
 
     /**
-     * Gets the Prettier formatting options for the document
-     * Attempts to load config from the project, falling back to defaults if none found
+     * Gets the Prettier formatting options for the document.
+     * Attempts to load config from the project, falling back to defaults if none found.
      * @param document The document to get options for
-     * @returns The Prettier options to use for formatting
+     * @returns The Prettier options to use for formatting, including required Solidity parser and plugin
      * @private
      */
     private async _getOptions(document: vscode.TextDocument) {
@@ -81,16 +81,11 @@ export class PrettierFormatter implements vscode.DocumentFormattingEditProvider 
 }
 
 /**
- * Default Prettier configuration options used when no project config is found
- * Includes specific overrides for Solidity files
+ * Default Prettier configuration options used when no project config is found.
+ * These options are based on the recommended settings from prettier-plugin-solidity.
+ * See: https://github.com/prettier-solidity/prettier-plugin-solidity#configuration-file
  */
 const defaultConfig: prettier.Options = {
-    printWidth: 80,
-    tabWidth: 4,
-    useTabs: false,
-    singleQuote: false,
-    bracketSpacing: false,
-    explicitTypes: 'preserve',
     overrides: [
         {
             files: '*.sol',
@@ -100,7 +95,9 @@ const defaultConfig: prettier.Options = {
                 useTabs: false,
                 singleQuote: false,
                 bracketSpacing: false,
-                explicitTypes: 'preserve'
+                explicitTypes: 'preserve',
+                compiler: '0.8.19',
+                semi: true
             }
         }
     ]
