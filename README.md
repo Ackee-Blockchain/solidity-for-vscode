@@ -13,6 +13,8 @@ Benefits:
 - [Test and interact with your smart contracts on an Ethereum local node](#test-and-interact-with-your-smart-contracts-on-an-ethereum-local-node)
   - [Compile and deploy contracts](#compile-and-deploy-contracts)
   - [Interact with contracts](#interact-with-contracts)
+  - [Fork mainnet or L2s to interact with onchain contracts](#forking-chain-and-fetching-contracts)
+  - [Native support for proxy contracts](#native-support-for-proxy-contracts)
 - [See vulnerabilities from static analysis in real-time](#see-vulnerabilities-from-static-analysis-in-real-time)
   - [Compilation Errors](#compilation-errors)
   - [See vulnerabilities from static analysis in real-time](#see-vulnerabilities-from-static-analysis-in-real-time-1)
@@ -40,11 +42,11 @@ Test your deployed contracts by interacting with them using function calls with 
 
 ![Interact with contracts](images/readme/sake/2-interact.gif)
 
-### Fork mainnet chains and interact with onchain contracts with advanced chain configuration
+### Fork mainnet or L2s to interact with onchain contracts
 
 ![Forking chain and fetching contracts](images/readme/sake/forking_chain_and_fetching_contracts.gif)
 
-### Seamlessly interact with proxy contracts by automatically loading implementation ABIs
+### Native support for proxy contracts
 
 ![Proxy support](images/readme/sake/proxy_support.gif)
 
