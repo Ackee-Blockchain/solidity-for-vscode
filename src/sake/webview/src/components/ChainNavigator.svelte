@@ -5,6 +5,7 @@
         deleteStateSave,
         openChainsQuickPick,
         renameChain,
+        resetChain,
         saveState,
         toggleAutosave
     } from '../helpers/api';
@@ -23,6 +24,7 @@
     import ExpandButton from './icons/ExpandButton.svelte';
     import InfoIcon from './icons/InfoIcon.svelte';
     import MultipleWindowsIcon from './icons/MultipleWindowsIcon.svelte';
+    import ResetIcon from './icons/ResetIcon.svelte';
     import SaveIcon from './icons/SaveIcon.svelte';
     import WarningIcon from './icons/WarningIcon.svelte';
 </script>
@@ -141,7 +143,14 @@
                         </ClickableSpan>
                         <!-- <ClickableSpan callback={resetChain}>
                             <ResetIcon />
-                            <span>Reset chain</span>
+
+                            <div class="flex flex-col">
+                                <span> Reset chain </span>
+
+                                <span class="text-xs">
+                                    Chain state will be reset from the saved file
+                                </span>
+                            </div>
                         </ClickableSpan> -->
                     </div>
 

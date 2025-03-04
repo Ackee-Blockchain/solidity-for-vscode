@@ -30,10 +30,6 @@ export abstract class NetworkProvider {
         this.type = type;
     }
 
-    deleteChain(): Promise<void> {
-        return this.onDeleteChain();
-    }
-
     abstract registerAccount(address: string): Promise<Account | undefined>;
     abstract getAccountDetails(address: string): Promise<Account>;
     abstract setAccountBalance(
