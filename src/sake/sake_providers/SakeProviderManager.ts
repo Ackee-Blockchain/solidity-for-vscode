@@ -6,13 +6,34 @@ import { chainRegistry } from '../state/shared/ChainRegistry';
 import { extensionState } from '../state/shared/ExtensionState';
 import { sendSignalToWebview } from '../utils/helpers';
 import { SignalId } from '../webview/shared/messaging_types';
-import { ProviderState, StoredSakeState } from '../webview/shared/storage_types';
+import { ProviderState } from '../webview/shared/storage_types';
 import * as SakeProviderFactory from './SakeProviderFactory';
 import { createNewLocalProvider } from './SakeProviderFactory';
 import SakeState from './SakeState';
 import { saveSharedState } from '../storage/stateUtils';
 
 export const sakeProviderManager = {
+    async resetProvider(provider: ISakeProvider) {
+        const providerData = {
+            type: provider.type,
+            providerId: provider.id,
+            displayName: provider.displayName,
+            network: provider.network.config,
+            initializationRequest: provider.initializationRequest,
+            persistence: provider.providerState.persistence
+        };
+        console.log('resetProvider', providerData);
+        await this.removeProvider(provider);
+        console.log('removed provider');
+        const newProvider = await SakeProviderFactory.reloadFromProviderData(providerData);
+        if (newProvider === undefined) {
+            showErrorMessage(`Failed to reload provider "${provider.id}"`);
+            return;
+        }
+        console.log('reloaded provider');
+        this.setProvider(newProvider.id);
+    },
+
     async removeProvider(provider: ISakeProvider) {
         if (!chainRegistry.contains(provider.id)) {
             throw new Error('Provider with id ' + provider.id + ' does not exist');

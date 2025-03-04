@@ -59,6 +59,7 @@ export interface ISakeProvider {
     providerState: Readonly<ProviderState>;
     disconnect(): void;
     connect(): Promise<void>;
+    reset(): Promise<void>;
     rename(name: string): Promise<void>;
     getBytecode(request: GetBytecodeRequest): Promise<GetBytecodeResponse | undefined>;
     compile(): Promise<WakeCompilationResponse>;
@@ -507,7 +508,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
     async onDeleteProvider(): Promise<void> {
         chainRegistry.delete(this.id);
         if (this.connected) {
-            await this.network.deleteChain();
+            await this.network.onDeleteChain();
         }
         if (await existsProviderState(this)) {
             await this.deleteStateSave();
@@ -599,6 +600,10 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
     //     // TODO
     //     throw new Error('Method not implemented.');
     // }
+
+    async reset() {
+        await this.onDeleteProvider();
+    }
 
     async connect() {
         if (this._didFirstConnect) {

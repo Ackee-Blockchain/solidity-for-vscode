@@ -473,7 +473,12 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.resetChain: {
-                throw new Error('Not implemented');
+                const currentProvider = sakeProviderManager.provider;
+                if (!currentProvider) {
+                    console.error('Cannot reset chain, no provider found');
+                    return;
+                }
+                sakeProviderManager.resetProvider(currentProvider);
                 break;
             }
 

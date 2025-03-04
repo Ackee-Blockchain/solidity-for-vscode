@@ -150,6 +150,27 @@ export async function connectToLocalChain(
         });
 }
 
+export async function reloadFromProviderData(providerData: {
+    type: SakeProviderType;
+    providerId: string;
+    displayName: string;
+    network: NetworkConfiguration;
+    initializationRequest: SakeLocalNodeProviderInitializationRequest;
+    persistence: ChainPersistence;
+}): Promise<LocalNodeSakeProvider | undefined> {
+    return await _newLocalProvider(
+        providerData.type,
+        providerData.providerId,
+        providerData.displayName,
+        providerData.network,
+        providerData.initializationRequest,
+        providerData.persistence
+    ).catch((e) => {
+        console.error(`Failed to load provider from data "${providerData.providerId}": ${e}`);
+        return undefined;
+    });
+}
+
 // TODO: generalize to support other network providers
 export async function createFromState(
     state: ProviderState,
