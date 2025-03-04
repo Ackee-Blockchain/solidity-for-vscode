@@ -128,6 +128,9 @@ export function hideCoverageCallback() {
     }
 
     clearDecorations();
+
+    // Use hide coverage command to close the coverage view for non-legacy format
+    vscode.commands.executeCommand('testing.coverage.close');
 }
 
 function clearDecorations() {
@@ -146,7 +149,7 @@ function loadCoverage(data: Uint8Array, controller: vscode.TestController) {
     const parsedJson = JSON.parse(jsonString);
 
     // Check version to determine which format to use
-    if (parsedJson.version === "1.0") {
+    if (parsedJson.version === '1.0') {
         // Legacy format
         const legacyCoverage = parsedJson as LegacyCoverageHeader;
 
@@ -194,24 +197,32 @@ function loadCoverage(data: Uint8Array, controller: vscode.TestController) {
             windowChangeListener = undefined;
         }
 
-        const runHandler = (request: vscode.TestRunRequest, token: vscode.CancellationToken) => {
-            console.log('runHandler');
-        };
-
-        const profile = controller.createRunProfile("Coverage", vscode.TestRunProfileKind.Coverage, runHandler, true, undefined, true);
+        const profile = controller.createRunProfile(
+            'Coverage',
+            vscode.TestRunProfileKind.Coverage,
+            () => {},
+            true,
+            undefined,
+            true
+        );
 
         // Add profile to disposables for proper cleanup
         disposables.push(profile);
 
-        profile.loadDetailedCoverage = async (testRun: vscode.TestRun, fileCoverage: vscode.FileCoverage, token: vscode.CancellationToken) => {
-            const statements = coverage.data[fileCoverage.uri.fsPath].statements.covered.map(element =>
-                new vscode.StatementCoverage(
-                    element.count,
-                    new vscode.Range(
-                        new vscode.Position(element.startLine - 1, element.startColumn - 1),
-                        new vscode.Position(element.endLine - 1, element.endColumn - 1)
+        profile.loadDetailedCoverage = async (
+            testRun: vscode.TestRun,
+            fileCoverage: vscode.FileCoverage,
+            token: vscode.CancellationToken
+        ) => {
+            const statements = coverage.data[fileCoverage.uri.fsPath].statements.covered.map(
+                (element) =>
+                    new vscode.StatementCoverage(
+                        element.count,
+                        new vscode.Range(
+                            new vscode.Position(element.startLine - 1, element.startColumn - 1),
+                            new vscode.Position(element.endLine - 1, element.endColumn - 1)
+                        )
                     )
-                )
             );
             return statements;
         };
@@ -223,20 +234,25 @@ function loadCoverage(data: Uint8Array, controller: vscode.TestController) {
         );
 
         for (const file in coverage.data) {
-            run.addCoverage(new vscode.FileCoverage(
-                vscode.Uri.file(file),
-                new vscode.TestCoverageCount(
-                    coverage.data[file].statements.covered.length,
-                    coverage.data[file].statements.total
+            run.addCoverage(
+                new vscode.FileCoverage(
+                    vscode.Uri.file(file),
+                    new vscode.TestCoverageCount(
+                        coverage.data[file].statements.covered.length,
+                        coverage.data[file].statements.total
+                    )
                 )
-            ));
+            );
         }
 
         run.end();
     }
 }
 
-function buildDecorationOptions(covItem: LegacyCoverageItem, ratio: number): vscode.DecorationOptions {
+function buildDecorationOptions(
+    covItem: LegacyCoverageItem,
+    ratio: number
+): vscode.DecorationOptions {
     const coveragePercentage = (ratio * 100).toFixed(2);
     return {
         range: new vscode.Range(
@@ -246,7 +262,8 @@ function buildDecorationOptions(covItem: LegacyCoverageItem, ratio: number): vsc
             covItem.endColumn
         ),
         hoverMessage: new vscode.MarkdownString(
-            `${covItem.coverageHits} ${covItem.coverageHits > 1 ? 'hits' : 'hit'
+            `${covItem.coverageHits} ${
+                covItem.coverageHits > 1 ? 'hits' : 'hit'
             } (${coveragePercentage}%)`
         )
     };
