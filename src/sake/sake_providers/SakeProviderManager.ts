@@ -27,7 +27,7 @@ export const sakeProviderManager = {
         console.log('removed provider');
         const newProvider = await SakeProviderFactory.reloadFromProviderData(providerData);
         if (newProvider === undefined) {
-            showErrorMessage(`Failed to reload provider "${provider.id}"`);
+            showErrorMessage(`Failed to reload provider "${provider.id}"`, true);
             return;
         }
         console.log('reloaded provider');
@@ -43,7 +43,8 @@ export const sakeProviderManager = {
             await provider.onDeleteProvider();
         } catch (e) {
             showErrorMessage(
-                `Failed to delete chain: ${e instanceof Error ? e.message : String(e)}`
+                `Failed to delete chain: ${e instanceof Error ? e.message : String(e)}`,
+                true
             );
         }
 
@@ -91,7 +92,8 @@ export const sakeProviderManager = {
                 this.provider?.connect();
             } catch (e) {
                 showErrorMessage(
-                    `Failed to reconnect provider: ${e instanceof Error ? e.message : String(e)}`
+                    `Failed to reconnect provider: ${e instanceof Error ? e.message : String(e)}`,
+                    true
                 );
             }
         }
@@ -112,11 +114,9 @@ export const sakeProviderManager = {
                     try {
                         return await provider.dumpState();
                     } catch (error) {
-                        vscode.window.showErrorMessage(
-                            `Failed to dump state for provider ${provider.displayName}: ${error}`
-                        );
-                        console.error(
-                            `Failed to dump state for provider ${provider.displayName}: ${error}`
+                        showErrorMessage(
+                            `Failed to dump state for provider ${provider.displayName}: ${error}`,
+                            true
                         );
                         return undefined;
                     }
@@ -141,10 +141,11 @@ export const sakeProviderManager = {
         } catch (error) {
             console.error(`Failed to create provider "${providerState.id}": ${error}`);
 
-            vscode.window.showErrorMessage(
+            showErrorMessage(
                 `Failed to load chain "${providerState.displayName}": ${
                     error instanceof Error ? error.message : String(error)
-                }`
+                }`,
+                true
             );
         }
     },

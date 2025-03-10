@@ -5,10 +5,11 @@ import { sakeProviderManager } from './sake_providers/SakeProviderManager';
 import { chainRegistry } from './state/shared/ChainRegistry';
 import { SakeProviderQuickPickItem } from './webview/shared/helper_types';
 import { Address, NetworkType } from './webview/shared/types';
+import { analytics, EventType } from '../Analytics';
 
 export async function copyToClipboard(text: string | undefined) {
     if (!text) {
-        vscode.window.showErrorMessage('Could not copy to clipboard.');
+        showErrorMessage('Could not copy to clipboard.');
         return;
     }
     await vscode.env.clipboard.writeText(text);
@@ -61,8 +62,13 @@ export async function openExternal(path: string) {
     vscode.env.openExternal(vscode.Uri.parse(path));
 }
 
-export function showErrorMessage(message: string) {
-    vscode.window.showErrorMessage(message);
+export function showErrorMessage(error: any, sendAnalytics: boolean = false) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(errorMessage);
+    vscode.window.showErrorMessage(errorMessage);
+    if (sendAnalytics) {
+        analytics.logCrash(EventType.ERROR_SAKE, errorMessage);
+    }
 }
 
 export function showTimedInfoMessage(message: string, milliseconds: number = 5000) {
@@ -149,7 +155,7 @@ export function showProviderSelectionQuickPick() {
         try {
             event.item.itemButtonClick?.(event.button);
         } catch (e) {
-            showErrorMessage(`${e instanceof Error ? e.message : String(e)}`);
+            showErrorMessage(e);
         } finally {
             providerSelector.dispose();
         }
@@ -304,8 +310,9 @@ export function showAddAbiQuickPick(contractAddress: Address) {
                                         e instanceof Error ? e.message : String(e)
                                     }`
                                 );
-                                vscode.window.showErrorMessage(
-                                    `Unable to fetch ABI for ${implementationAddress}`
+                                showErrorMessage(
+                                    `Unable to fetch ABI for ${implementationAddress}`,
+                                    false
                                 );
                             });
                     });

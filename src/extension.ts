@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as net from 'net';
-import { Analytics, EventType } from './Analytics';
+import { analytics, Analytics, EventType } from './Analytics';
 import * as path from 'path';
 import * as os from 'os';
 const fs = require('fs');
@@ -60,7 +60,6 @@ let wakeProcess: ExecaChildProcess | undefined = undefined;
 let wakeProvider: WakeTreeDataProvider | undefined = undefined;
 let solcProvider: SolcTreeDataProvider | undefined = undefined;
 let diagnosticCollection: vscode.DiagnosticCollection;
-let analytics: Analytics;
 let errorHandler: ClientErrorHandler;
 let printers: PrintersHandler;
 let crashlog: string[] = [];
@@ -139,7 +138,7 @@ export async function activate(context: vscode.ExtensionContext) {
         throw new Error(`Unknown installation method: ${installationMethod}`);
     }
 
-    analytics = new Analytics(context, method);
+    analytics.initialize(context, method);
     errorHandler = new ClientErrorHandler(outputChannel, analytics);
 
     migrateConfig();

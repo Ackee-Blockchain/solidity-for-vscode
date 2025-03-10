@@ -1,11 +1,15 @@
 <script lang="ts">
-    import ClickableSpan from '../components/ClickableSpan.svelte';
-    import { parseComplexNumber } from '../../shared/validate';
     import { displayEtherValue } from '../../shared/ether';
+    import { parseComplexNumber } from '../../shared/validate';
+    import ClickableSpan from '../components/ClickableSpan.svelte';
     import InputIssueIndicator from '../components/InputIssueIndicator.svelte';
 
-    import { accounts } from '../helpers/stores';
+    import CopyableSpan from '../components/CopyableSpan.svelte';
+    import WarningIcon from '../components/icons/WarningIcon.svelte';
+    import InfoTooltip from '../components/InfoTooltip.svelte';
+    import { getInputFromTopBar, setBalance, showErrorMessage } from '../helpers/api';
     import {
+        accounts,
         selectedAccount,
         selectedAccountId,
         selectedValue,
@@ -13,12 +17,6 @@
         setSelectedAccount,
         txParametersExpanded
     } from '../helpers/stores';
-    import { getInputFromTopBar, setBalance, showErrorMessage } from '../helpers/api';
-    import CopyableSpan from '../components/CopyableSpan.svelte';
-    import WarningIcon from '../components/icons/WarningIcon.svelte';
-    import { validateNonEmptyString } from '../helpers/validation';
-    import ValidableTextInput from '../components/common/ValidableTextInput.svelte';
-    import InfoTooltip from '../components/InfoTooltip.svelte';
 
     function handleAccountChange(event: any) {
         const _selectedAccountIndex = event.detail.value;
@@ -59,7 +57,7 @@
             parsedTopUpValue = parseComplexNumber(topUpValue.value);
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
-            showErrorMessage('Value could not be parsed: ' + errorMessage);
+            showErrorMessage('Value could not be parsed: ' + errorMessage, true);
             return;
         }
 

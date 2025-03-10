@@ -14,7 +14,7 @@
     const deploy = async function (contract: CompiledContract, calldata: string): Promise<boolean> {
         const _sender: string | undefined = $selectedAccount?.address;
         if (_sender === undefined) {
-            showErrorMessage('Failed deployment, undefined sender');
+            showErrorMessage('Failed deployment, undefined sender', true);
             return false;
         }
 

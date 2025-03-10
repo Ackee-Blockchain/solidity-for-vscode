@@ -143,7 +143,8 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
             }
 
             case WebviewMessageId.showError: {
-                vscode.window.showErrorMessage(message.payload);
+                const { message: errorMessage, sendAnalytics } = message.payload;
+                showErrorMessage(errorMessage, sendAnalytics);
                 break;
             }
 
@@ -312,7 +313,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                         await sakeProviderManager.provider?.connect();
                     }
                 } catch (error) {
-                    showErrorMessage(error as string);
+                    showErrorMessage(error, true);
                 }
 
                 // try to reconnect all providers
@@ -374,7 +375,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                     await sakeProviderManager.provider?.connect();
                 } catch (error) {
                     success = false;
-                    showErrorMessage(error as string);
+                    showErrorMessage(error as string, true);
                 }
 
                 webviewView.webview.postMessage({

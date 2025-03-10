@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as WakeApi from '../api/wake';
-import { showInfoMessage, showTimedInfoMessage } from '../commands';
+import { showErrorMessage, showInfoMessage, showTimedInfoMessage } from '../commands';
 import { NetworkProvider } from '../network/NetworkProvider';
 import { OutputViewManager } from '../providers/OutputTreeProvider';
 import { chainRegistry } from '../state/shared/ChainRegistry';
@@ -382,7 +382,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
             try {
                 decoded = decodeCallReturnValue(callResponse.returnValue, callRequest.functionAbi);
             } catch (e) {
-                vscode.window.showErrorMessage('Failed to decode return value: ' + e);
+                showErrorMessage('Failed to decode return value: ' + e, true);
             }
         }
 
@@ -420,7 +420,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
                     transactRequest.functionAbi
                 );
             } catch (e) {
-                vscode.window.showErrorMessage('Failed to decode return value: ' + e);
+                showErrorMessage('Failed to decode return value: ' + e, true);
             }
         }
 
@@ -668,7 +668,7 @@ function showVSCodeMessageOnErrorWrapper<T, Args extends any[]>(
         try {
             return await func(...args);
         } catch (e) {
-            vscode.window.showErrorMessage(`${e instanceof Error ? e.message : String(e)}`);
+            showErrorMessage(e, true);
             return returnOnError;
         }
     };
