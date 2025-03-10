@@ -1,9 +1,9 @@
 {
     "name": "tools-for-solidity",
-    "displayName": "Solidity (Wake)",
+    "displayName": "Solidity (Wake): Write secure smart contracts",
     "version": "1.17.0",
     "publisher": "AckeeBlockchain",
-    "description": "Code fast and secure Solidity smart contracts on Ethereum with a Remix-like experience",
+    "description": "Remix-like development in VS Code with real-time security analysis, advanced testing, and local node deployment. Compile, debug, and audit fast with Wake's vulnerability detection even in your Hardhat, Foundry, and Truffle workflows.",
     "keywords": [
         "solidity",
         "ethereum",
@@ -15,7 +15,13 @@
         "remix",
         "wake",
         "evm",
-        "solhint"
+        "solhint",
+        "smart-contract",
+        "solidity-security",
+        "vulnerability",
+        "ide",
+        "productivity",
+        "code-navigation"
     ],
     "homepage": "https://ackee.xyz/solidity-extension",
     "bugs": {
