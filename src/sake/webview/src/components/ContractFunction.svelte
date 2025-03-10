@@ -41,7 +41,7 @@
         } catch (e) {
             const errorMessage = typeof e === 'string' ? e : (e as Error).message;
             const message = `Failed to encode input with error: ${errorMessage}`;
-            showErrorMessage(message);
+            showErrorMessage(message, true);
             return;
         }
 

@@ -36,7 +36,7 @@ export async function loadFullState(): Promise<boolean> {
 
         for (const providerState of providerStates) {
             await createFromState(providerState, true).catch((e) => {
-                showErrorMessage(`Failed to load provider state: ${e}`);
+                showErrorMessage(`Failed to load provider state: ${e}`, true);
             });
         }
 
@@ -46,7 +46,7 @@ export async function loadFullState(): Promise<boolean> {
         // console.log('Reloaded saved chain states');
         // showInfoMessage(`Reloaded saved chain states`);
     } catch (e) {
-        showErrorMessage(`Failed to load state: ${e}`);
+        showErrorMessage(`Failed to load state: ${e}`, true);
         return false;
     }
 
@@ -63,7 +63,7 @@ export async function saveChainState(provider: ISakeProvider): Promise<boolean> 
         const providerState = await provider.dumpState();
         saveProviderState(providerState);
     } catch (e) {
-        showErrorMessage(`Failed to dump provider state: ${e}`);
+        showErrorMessage(`Failed to dump provider state: ${e}`, true);
         return false;
     }
 
@@ -80,7 +80,7 @@ export async function loadChainState(provider: ISakeProvider): Promise<ProviderS
         const providerState = await readProviderState(provider);
         return providerState;
     } catch (e) {
-        showErrorMessage(`Failed to load chain state: ${e}`);
+        showErrorMessage(`Failed to load chain state: ${e}`, true);
         return undefined;
     }
 }
@@ -94,7 +94,7 @@ export async function deleteChainState(provider: ISakeProvider): Promise<boolean
     try {
         await deleteProviderState(provider);
     } catch (e) {
-        showErrorMessage(`Failed to delete chain state: ${e}`);
+        showErrorMessage(`Failed to delete chain state: ${e}`, true);
         return false;
     }
 

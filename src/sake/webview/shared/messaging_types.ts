@@ -83,7 +83,10 @@ export type WebviewMessageRequest =
       } & BaseWebviewMessageRequest)
     | ({
           command: WebviewMessageId.showError;
-          payload: string;
+          payload: {
+              message: string;
+              sendAnalytics: boolean;
+          };
       } & BaseWebviewMessageRequest)
     | ({
           command: WebviewMessageId.getTextFromInputBox;

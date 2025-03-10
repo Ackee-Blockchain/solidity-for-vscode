@@ -108,8 +108,7 @@ export async function createNewLocalProvider(
             return provider;
         })
         .catch((e) => {
-            showErrorMessage(`Failed to create new chain: ${e}`);
-            console.error(`Failed to create provider "${providerId}": ${e}`);
+            showErrorMessage(`Failed to create new chain: ${e}`, true);
             return undefined;
         });
 }
@@ -144,8 +143,7 @@ export async function connectToLocalChain(
             return provider;
         })
         .catch((e) => {
-            showErrorMessage(`Failed to connect to chain: ${e}`);
-            console.error(`Failed to connect to provider: ${e}`);
+            showErrorMessage(`Failed to connect to chain: ${e}`, true);
             return undefined;
         });
 }
@@ -196,8 +194,7 @@ export async function createFromState(
                     return provider;
                 })
                 .catch((e) => {
-                    showErrorMessage(`Failed to load chain ${state.displayName}: ${e}`);
-                    console.error(`Failed to load provider "${state.id}": ${e}`);
+                    showErrorMessage(`Failed to load chain ${state.displayName}: ${e}`, true);
                     return undefined;
                 });
 

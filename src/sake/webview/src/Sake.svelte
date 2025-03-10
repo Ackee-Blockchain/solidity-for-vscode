@@ -1,18 +1,18 @@
 <script lang="ts">
     import {
         provideVSCodeDesignSystem,
+        vsCodeBadge,
         vsCodeButton,
+        vsCodeCheckbox,
+        vsCodeDivider,
         vsCodeDropdown,
         vsCodeOption,
-        vsCodeDivider,
-        vsCodeCheckbox,
-        vsCodeTextField,
         vsCodePanels,
         vsCodePanelTab,
-        vsCodeBadge,
         vsCodePanelView,
         vsCodeProgressRing,
-        vsCodeTag
+        vsCodeTag,
+        vsCodeTextField
     } from '@vscode/webview-ui-toolkit';
     import { onMount } from 'svelte';
     import Tabs from './components/common/Tabs.svelte';
@@ -33,6 +33,8 @@
         vsCodeTag()
     );
 
+    import type { ComponentType } from 'svelte';
+    import ChainNavigator from './components/ChainNavigator.svelte';
     import {
         openChainsQuickPick,
         openExternal,
@@ -42,25 +44,22 @@
         restartWakeServer,
         showErrorMessage
     } from './helpers/api';
-    import type { ComponentType } from 'svelte';
-    import Interaction from './pages/Interaction.svelte';
-    import Deployment from './pages/Deployment.svelte';
-    import InteractionHeader from './pages/InteractionHeader.svelte';
-    import ChainNavigator from './components/ChainNavigator.svelte';
-    import {
-        extensionConnectionState,
-        loadingMessage,
-        loadingShown,
-        stateLoadState
-    } from './helpers/stores';
-    import { loadWithTimeout, withTimeout } from './helpers/helpers';
     import {
         requestAppState,
         requestLocalState,
         requestSharedState,
         setupListeners
     } from './helpers/events';
-    import Notifications from './components/Notifications.svelte';
+    import { loadWithTimeout, withTimeout } from './helpers/helpers';
+    import {
+        extensionConnectionState,
+        loadingMessage,
+        loadingShown,
+        stateLoadState
+    } from './helpers/stores';
+    import Deployment from './pages/Deployment.svelte';
+    import Interaction from './pages/Interaction.svelte';
+    import InteractionHeader from './pages/InteractionHeader.svelte';
 
     setupListeners();
 
@@ -138,7 +137,7 @@
                 }
             })
             .catch((e) => {
-                showErrorMessage(typeof e === 'string' ? e : (e as Error).message);
+                showErrorMessage(e, true);
             });
     };
 

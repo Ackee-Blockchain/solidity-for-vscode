@@ -1,17 +1,17 @@
 import * as vscode from 'vscode';
 import { LanguageClient, State } from 'vscode-languageclient/node';
-import { copyToClipboard, showErrorMessage } from './commands';
+import { copyToClipboard } from './commands';
 import { SakeContext } from './context';
 import { SakeOutputItem } from './providers/OutputTreeProvider';
 import { SakeWebviewProvider } from './providers/WebviewProviders';
-import { sakeProviderManager } from './sake_providers/SakeProviderManager';
-import { pingWakeServer } from './utils/helpers';
-import { NetworkType, WakeCrashDumpStateResponse } from './webview/shared/types';
-import { chainRegistry } from './state/shared/ChainRegistry';
 import * as SakeProviderFactory from './sake_providers/SakeProviderFactory';
+import { sakeProviderManager } from './sake_providers/SakeProviderManager';
 import appState from './state/shared/AppState';
-import { loadFullState, saveFullState } from './storage/stateHandler';
+import { chainRegistry } from './state/shared/ChainRegistry';
+import { loadFullState } from './storage/stateHandler';
+import { pingWakeServer } from './utils/helpers';
 import { SakeProviderType } from './webview/shared/storage_types';
+import { WakeCrashDumpStateResponse } from './webview/shared/types';
 
 export async function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     /* Register Context */

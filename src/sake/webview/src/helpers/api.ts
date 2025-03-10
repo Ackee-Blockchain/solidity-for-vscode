@@ -75,8 +75,16 @@ export async function deployContract(
     return response.success;
 }
 
-export function showErrorMessage(message: string) {
-    messageHandler.send(WebviewMessageId.showError, message);
+export function showErrorMessage(error: any, sendAnalytics: boolean = false) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.showError,
+        payload: {
+            message: errorMessage,
+            sendAnalytics
+        }
+    };
+    messageHandler.send(request.command, request.payload);
 }
 
 export function showInfoMessage(message: string) {
