@@ -8,7 +8,10 @@
 
 Ethereum Solidity and local node testing with security features for Visual Studio Code.
 
-This extension adds language support for Solidity to Visual Studio Code, and provides a Remix-like experience for testing contracts on your local network.
+Develop, test, and secure Solidity smart contracts directly in Visual Studio Code with real-time security analysis, local node testing, and advanced debugging tools. Solidity (Wake) brings a Remix-like experience to your existing workflow with tools for compilation, deployment, and contract interaction on a local Ethereum network. Catch security risks early with built-in vulnerability detection, call graphs, and contract inheritance visualization without leaving VS Code.
+
+This extension was built by a leading blockchain auditing firm that has worked with Lido, AAVE, Axelar, Safe, LayerZero, and more. It was developed for our professional needs and made open-source for a safer web3. Join us on this mission, and consider giving the extension a review!
+
 Benefits:
 - [Test and interact with your smart contracts on an Ethereum local node](#test-and-interact-with-your-smart-contracts-on-an-ethereum-local-node)
   - [Compile and deploy contracts](#compile-and-deploy-contracts)
