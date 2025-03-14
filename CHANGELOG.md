@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.18.0]
+### Features
+- Official stable release of version 1.17.0 (previously available as pre-release)
+- Added compatibility with Wake's new code coverage format
+- Enhanced analytics and telemetry capabilities
+- Refreshed README documentation and extension marketplace description
+
+### Fixes
+- Resolved an issue where Wake response parsing could cause extension failures
+
 ## [1.17.0]
 ### Features
 - Added onchain contract ABI fetching
