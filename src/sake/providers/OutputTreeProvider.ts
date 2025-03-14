@@ -114,7 +114,7 @@ export class SakeOutputItem extends vscode.TreeItem {
         this.key = key;
         this.value = value;
 
-        if (icon !== undefined) {
+        if (icon != null) {
             this.iconPath = new vscode.ThemeIcon(icon, new vscode.ThemeColor('foreground'));
         }
 
@@ -195,7 +195,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         const rootNodes: SakeOutputItem[] = [];
 
         // parse from
-        // if (data.receipt?.from !== undefined) {
+        // if (data.receipt?.from != null) {
         //     rootNodes.push(
         //         new SakeOutputItem(
         //             'From',
@@ -208,7 +208,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
 
         if (data.success) {
             // parse contract name
-            if (data.receipt?.contractAddress !== undefined) {
+            if (data.receipt?.contractAddress != null) {
                 rootNodes.push(
                     new SakeOutputItem(
                         'Contract Address',
@@ -261,7 +261,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         }
 
         // add events
-        if (data.events !== undefined && data.events.length > 0) {
+        if (data.events != null && data.events.length > 0) {
             const eventsNode = new SakeOutputItem(
                 'Events',
                 undefined,
@@ -284,7 +284,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         }
 
         // add receipt
-        if (data.receipt !== undefined) {
+        if (data.receipt != null) {
             const receiptNode = new SakeOutputItem(
                 'Receipt',
                 undefined,
@@ -310,7 +310,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
 
         if (data.success) {
             // add return data
-            if (data.returnData !== undefined) {
+            if (data.returnData != null) {
                 const hasReturnData = data.returnData.bytes !== '';
 
                 const returnDataNode = new SakeOutputItem(
@@ -324,7 +324,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
                 rootNodes.push(returnDataNode);
 
                 // decoded
-                if (hasReturnData && data.returnData.decoded !== undefined) {
+                if (hasReturnData && data.returnData.decoded != null) {
                     const returnDataDecodedNode = new SakeOutputItem(
                         'Decoded',
                         undefined,
@@ -344,7 +344,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
                 }
 
                 // bytes
-                if (hasReturnData && data.returnData.bytes !== undefined) {
+                if (hasReturnData && data.returnData.bytes != null) {
                     returnDataNode.setChildren([
                         ...returnDataNode.children,
                         new SakeOutputItem(
@@ -397,7 +397,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         }
 
         // add events
-        if (data.events !== undefined && data.events.length > 0) {
+        if (data.events != null && data.events.length > 0) {
             const eventsNode = new SakeOutputItem(
                 'Events',
                 undefined,
@@ -420,7 +420,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         }
 
         // parse from and to
-        // if (data.to !== undefined) {
+        // if (data.to != null) {
         //     rootNodes.push(
         //         new SakeOutputItem(
         //             'From',
@@ -431,7 +431,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         //     );
         // }
 
-        // if (data.from !== undefined) {
+        // if (data.from != null) {
         //     rootNodes.push(
         //         new SakeOutputItem(
         //             'To',
@@ -443,7 +443,7 @@ class SakeOutputTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         // }
 
         // add receipt
-        if (data.receipt !== undefined) {
+        if (data.receipt != null) {
             const receiptNode = new SakeOutputItem(
                 'Receipt',
                 undefined,
@@ -514,11 +514,11 @@ function parseCallTrace(callTrace: WakeCallTrace) {
         const root = new CallTraceItem(_string);
         if (callTrace.error) {
             root.setChildren([new CallTraceItem(callTrace.error)]);
-        } else if (callTrace.subtraces !== undefined) {
+        } else if (callTrace.subtraces != null) {
             root.setChildren(callTrace.subtraces.map((subtrace: any) => _parseCallTrace(subtrace)));
         }
         // add events
-        if (callTrace.events !== undefined) {
+        if (callTrace.events != null) {
             root.setChildren([
                 ...root.children,
                 ...callTrace.events.map((event) => new CallTraceEventItem(event))
@@ -576,7 +576,7 @@ function buildFunctionString(callTrace: WakeCallTrace, withoutArguments = false)
 }
 
 function parseDecodedObject(item: TransactionDecodedReturnValue): BaseOutputItem {
-    const needsDestructuring = item.children !== undefined;
+    const needsDestructuring = item.children != null;
 
     const destructured = new SakeOutputItem(
         item.name,
@@ -586,7 +586,7 @@ function parseDecodedObject(item: TransactionDecodedReturnValue): BaseOutputItem
             : vscode.TreeItemCollapsibleState.None
     ) as BaseOutputItem;
 
-    if (item.children !== undefined) {
+    if (item.children != null) {
         destructured.setChildren(item.children.map((child) => parseDecodedObject(child)));
     }
 
