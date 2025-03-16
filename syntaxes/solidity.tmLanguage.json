@@ -327,12 +327,12 @@
                            "match": "(\\*)",
                            "name": "keyword.operator.arithmetic"
                         },
-                        
+
                         {
                             "match": "\\b(from)\\b",
                             "name": "keyword.control.import.from"
                         },
-                        
+
                         {
                             "include": "#string"
                         },
@@ -721,38 +721,38 @@
         "declaration-contract": {
             "patterns": [
                 {
-                    "begin": "\\b(contract)\\b\\s+(\\w+)\\b\\s+\\b(is)\\b\\s+",
+                    "begin": "\\b(contract)\\b\\s+(\\w+)\\b(?:\\s+\\b(layout)\\b\\s+\\b(at)\\b\\s+\\(([^)]*)\\))?\\s+\\b(is)\\b\\s+",
                     "end": "(?=\\{)",
                     "beginCaptures": {
-                        "1": {
-                            "name": "storage.type.contract"
-                        },
-                        "2": {
-                            "name": "entity.name.type.contract"
-                        },
-                        "3": {
-                            "name": "storage.modifier.is"
-                        }
+                        "1": { "name": "storage.type.contract" },
+                        "2": { "name": "entity.name.type.contract" },
+                        "3": { "name": "keyword.other.layout" },
+                        "4": { "name": "keyword.other.at" },
+                        "5": { "name": "constant.numeric" },
+                        "6": { "name": "keyword.other.is" }
                     },
                     "patterns": [
                         {
-                            "match": "\\b(\\w+)\\b",
-                            "name": "entity.name.type.contract.extend"
+                            "match": "\\b(\\w+)\\b(?:\\s+\\b(layout)\\b\\s+\\b(at)\\b\\s+\\(([^)]*)\\))?",
+                            "captures": {
+                                "1": { "name": "entity.name.type.contract.extend" },
+                                "2": { "name": "keyword.other.layout" },
+                                "3": { "name": "keyword.other.at" },
+                                "4": { "name": "constant.numeric" }
+                            }
                         }
                     ]
                 },
                 {
-                    "match": "\\b(contract)(\\s+([A-Za-z_]\\w*))?\\b",
+                    "match": "\\b(contract)\\b\\s+(\\w+)\\b(?:\\s+\\b(layout)\\b\\s+\\b(at)\\b\\s+\\(([^)]*)\\))?\\b",
                     "captures": {
-                        "1": {
-                            "name": "storage.type.contract"
-                        },
-                        "2": {
-                            "name": "entity.name.type.contract"
-                        }
+                        "1": { "name": "storage.type.contract" },
+                        "2": { "name": "entity.name.type.contract" },
+                        "3": { "name": "keyword.other.layout" },
+                        "4": { "name": "keyword.other.at" },
+                        "5": { "name": "constant.numeric" }
                     }
                 }
-                
             ]
         },
         "declaration-interface": {
@@ -768,7 +768,7 @@
                             "name": "entity.name.type.interface"
                         },
                         "3": {
-                            "name": "storage.modifier.is"
+                            "name": "keyword.control.is"
                         }
                     },
                     "patterns": [
@@ -789,7 +789,7 @@
                         }
                     }
                 }
-                
+
             ]
         },
         "declaration-library": {
