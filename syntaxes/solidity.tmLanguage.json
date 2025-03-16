@@ -589,7 +589,7 @@
             "name": "storage.type.modifier.readonly"
         },
         "type-modifier-extended-scope": {
-            "match": "\\b(pure|view|inherited|indexed|storage|memory|virtual|calldata|override|abstract)\\b",
+            "match": "\\b(pure|view|inherited|indexed|storage|memory|transient|virtual|calldata|override|abstract)\\b",
             "name": "storage.type.modifier.extendedscope"
         },
         "variable": {
