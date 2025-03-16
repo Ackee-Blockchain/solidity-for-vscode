@@ -975,10 +975,41 @@
             "end": "(?=\\))",
             "patterns": [
                 {
+                    "begin": "\\b(mapping)\\b\\s*\\(",
+                    "beginCaptures": {
+                        "1": {
+                            "name": "storage.type.mapping"
+                        }
+                    },
+                    "end": "\\)\\s*((?:memory|storage|calldata)?)",
+                    "endCaptures": {
+                        "1": {
+                            "name": "storage.type.modifier.extendedscope"
+                        }
+                    },
+                    "patterns": [
+                        {
+                            "include": "#type-primitive"
+                        },
+                        {
+                            "include": "#variable"
+                        },
+                        {
+                            "include": "#operator-mapping"
+                        },
+                        {
+                            "include": "#punctuation"
+                        }
+                    ]
+                },
+                {
                     "include": "#type-primitive"
                 },
                 {
                     "include": "#type-modifier-extended-scope"
+                },
+                {
+                    "include": "#type-modifier-payable"
                 },
                 {
                     "match": "\\b([A-Z]\\w*)\\b",
@@ -1066,21 +1097,20 @@
                 {
                     "begin": "\\b(modifier)\\b\\s*(\\w+)",
                     "beginCaptures": {
-                        "1": {
-                            "name": "storage.type.function.modifier"
-                        },
-                        "2": {
-                            "name": "entity.name.function.modifier"
-                        }
+                        "1": { "name": "storage.type.function.modifier" },
+                        "2": { "name": "entity.name.function.modifier" }
                     },
-                    "end": "(?=\\{)",
+                    "end": "(?=[{;])",
                     "patterns": [
                         {
                             "include": "#declaration-function-parameters"
                         },
                         {
+                            "include": "#type-modifier-extended-scope"
+                        },
+                        {
                             "begin": "(?<=\\))",
-                            "end": "(?=\\{)",
+                            "end": "(?=[{;])",
                             "patterns": [
                                 {
                                     "include": "#declaration-function-parameters"
@@ -1113,12 +1143,8 @@
                 {
                     "match": "\\b(modifier)(\\s+([A-Za-z_]\\w*))?\\b",
                     "captures": {
-                        "1": {
-                            "name": "storage.type.modifier"
-                        },
-                        "3": {
-                            "name": "entity.name.function"
-                        }
+                        "1": { "name": "storage.type.modifier" },
+                        "3": { "name": "entity.name.function" }
                     }
                 }
             ]
