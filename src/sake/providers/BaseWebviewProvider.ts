@@ -35,9 +35,12 @@ import {
     WebviewMessageResponse
 } from '../webview/shared/types';
 import { specifyCallType } from '../utils/helpers';
+import { getChainPreconfigs } from '../utils/defaultChains';
+import { extensionState } from '../state/shared/ExtensionState';
 
 export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
+    _webview?: vscode.Webview;
     _doc?: vscode.TextDocument;
     _stateSubscriptions: Map<StateId, BaseStateConnector<any>> = new Map();
 
@@ -60,6 +63,7 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
 
     public resolveWebviewView(webviewView: vscode.WebviewView) {
         this._view = webviewView;
+        this._webview = webviewView.webview;
 
         // Set the webview's initial options
         webviewView.webview.options = {
@@ -494,6 +498,26 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 break;
             }
 
+            case WebviewMessageId.requestChainPreconfigs: {
+                const chainPreconfigs = getChainPreconfigs();
+
+                // Also update the chain state provider
+                console.log('chainPreconfigs', chainPreconfigs);
+                extensionState.setLazy({
+                    defaultPreconfigs: chainPreconfigs
+                });
+
+                webviewView.webview.postMessage({
+                    command: message.command,
+                    requestId: message.requestId,
+                    payload: {
+                        chainPreconfigs
+                    }
+                } as WebviewMessageResponse);
+
+                break;
+            }
+
             default: {
                 console.error('Unhandled webview message', message);
                 // this._onDidReceiveMessage(message);
@@ -506,4 +530,16 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
      * Expected to be overridden by inheriting classes
      */
     protected async _onDidReceiveMessage(message: WebviewMessageRequest) {}
+    public getMediaUri(path: string): vscode.Uri | undefined {
+        const _sakePath = vscode.Uri.joinPath(this._extensionUri, 'dist', 'sake');
+
+        if (!this._webview) {
+            console.warn('Cannot get media URI, webview not found');
+            return undefined;
+        }
+
+        const mediaUri = this._webview.asWebviewUri(vscode.Uri.joinPath(_sakePath, 'media', path));
+
+        return mediaUri;
+    }
 }
