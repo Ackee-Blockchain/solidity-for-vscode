@@ -108,3 +108,17 @@ export interface CreateLocalChainRequest {
 
 export interface NetworkCreationConfiguration extends Omit<CreateLocalChainRequest, 'sessionId'> {}
 export interface NetworkConnectionConfiguration {} // TODO: add fields
+
+// Chain Preconfig
+
+export interface ChainPreconfig {
+    name: string;
+    chain: string;
+    rpc: string[];
+    iconUri: string | undefined;
+    infoURL: string;
+    shortName: string;
+    chainId: number;
+    explorers: { name: string; url: string; [key: string]: any }[];
+    [key: string]: any;
+}

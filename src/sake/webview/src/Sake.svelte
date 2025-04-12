@@ -41,6 +41,7 @@
         openSettings,
         ping,
         reconnectChain,
+        requestChainPreconfigs,
         restartWakeServer,
         showErrorMessage
     } from './helpers/api';
@@ -62,6 +63,7 @@
     import InteractionHeader from './pages/InteractionHeader.svelte';
 
     setupListeners();
+    requestChainPreconfigs();
 
     enum TabId {
         CompileDeploy = 0,

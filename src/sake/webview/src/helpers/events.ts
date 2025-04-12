@@ -120,7 +120,6 @@ function handleStateResponse(
         }
 
         case StateId.Accounts: {
-            console.log('aaaaaccounts', message.payload);
             const _accounts = message.payload as AccountState;
             const _selectedAccount = get(selectedAccount);
 

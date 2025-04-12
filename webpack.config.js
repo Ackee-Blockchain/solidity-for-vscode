@@ -78,6 +78,11 @@ const config = {
         {
             from: 'src/sake/media/vscode.css',
             to: 'sake/media/vscode.css'
+        },
+        {
+            from: '**/*',
+            to: 'sake/media/chains',
+            context: 'src/sake/media/chains'
         }
       ],
     }),

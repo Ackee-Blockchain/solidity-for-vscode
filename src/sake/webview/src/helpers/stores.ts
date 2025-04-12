@@ -30,7 +30,8 @@ export const appState = writable<AppState>({
 });
 export const chainState = writable<ChainState>({
     chains: [],
-    currentChainId: undefined
+    currentChainId: undefined,
+    defaultPreconfigs: []
 });
 export const currentChain = derived<Writable<ChainState>, ChainInfo | undefined>(
     chainState,
