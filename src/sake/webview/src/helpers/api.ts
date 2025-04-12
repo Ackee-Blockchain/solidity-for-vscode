@@ -350,3 +350,11 @@ export async function renameChain() {
     };
     messageHandler.send(request.command, request.payload);
 }
+
+export async function requestChainPreconfigs() {
+    const request: WebviewMessageRequest = {
+        command: WebviewMessageId.requestChainPreconfigs,
+        payload: undefined
+    };
+    messageHandler.send(request.command, request.payload);
+}

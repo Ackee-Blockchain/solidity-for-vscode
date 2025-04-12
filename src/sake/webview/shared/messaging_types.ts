@@ -1,5 +1,6 @@
 import type {
     CallRequest,
+    ChainPreconfig,
     DeploymentRequest,
     GetBytecodeRequest,
     NetworkCreationConfiguration,
@@ -57,7 +58,10 @@ export enum WebviewMessageId {
 
     // extension -> webview
     onGetState = 'onGetState',
-    onSignal = 'onSignal'
+    onSignal = 'onSignal',
+
+    // chain manager
+    requestChainPreconfigs = 'requestChainPreconfigs'
 }
 
 export type SpecificWebviewMessageResponse<T extends WebviewMessageId> = {
@@ -225,6 +229,10 @@ export type WebviewMessageRequest =
     | ({
           command: WebviewMessageId.renameChain;
           payload: undefined;
+      } & BaseWebviewMessageRequest)
+    | ({
+          command: WebviewMessageId.requestChainPreconfigs;
+          payload: undefined;
       } & BaseWebviewMessageRequest);
 
 export type WebviewMessageResponse =
@@ -302,6 +310,12 @@ export type WebviewMessageResponse =
           command: WebviewMessageId.deploy;
           payload: {
               success: boolean;
+          };
+      } & BaseWebviewMessageResponse)
+    | ({
+          command: WebviewMessageId.requestChainPreconfigs;
+          payload: {
+              chainPreconfigs: ChainPreconfig[];
           };
       } & BaseWebviewMessageResponse);
 

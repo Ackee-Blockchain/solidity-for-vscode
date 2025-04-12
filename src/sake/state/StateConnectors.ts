@@ -2,7 +2,6 @@ import { BaseWebviewProvider } from '../providers/BaseWebviewProvider';
 import {
     AccountState,
     AppState,
-    ChainInfo,
     ChainState,
     CompilationState,
     DeploymentState,
@@ -189,6 +188,8 @@ class ChainStateConnector extends BaseStateConnector<ChainState> {
     constructor() {
         super(StateId.Chain);
 
+        const _extensionState = extensionState.get();
+
         // @dev to avoid race conditions, request state duplicately
         this.state = {
             chains: chainRegistry.getAll().map((provider) => {
@@ -202,14 +203,15 @@ class ChainStateConnector extends BaseStateConnector<ChainState> {
                     persistence: providerState.persistence
                 };
             }),
-            currentChainId: extensionState.get().currentChainId
+            currentChainId: _extensionState.currentChainId,
+            defaultPreconfigs: _extensionState.defaultPreconfigs
         };
     }
 
     protected registerConnection(): void {
         chainRegistry.subscribe(() => {
             this.state = {
-                ...(this.state ?? { chains: [], currentChainId: undefined }),
+                ...(this.state ?? { chains: [], currentChainId: undefined, defaultPreconfigs: [] }),
                 chains: chainRegistry.getAll().map((provider) => {
                     const providerState = provider.providerState;
                     return {
@@ -226,8 +228,8 @@ class ChainStateConnector extends BaseStateConnector<ChainState> {
 
         extensionState.subscribe((state) => {
             this.state = {
-                ...(this.state ?? { chains: [], currentChainId: undefined }),
-                currentChainId: state.currentChainId
+                ...(this.state ?? { chains: [], currentChainId: undefined, defaultPreconfigs: [] }),
+                ...state
             };
         });
     }

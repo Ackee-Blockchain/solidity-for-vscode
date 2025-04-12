@@ -1,6 +1,7 @@
 import type { SakeProviderType } from './storage_types';
 import type {
     Address,
+    ChainPreconfig,
     ContractAbi,
     ExtendedAccount,
     NetworkConfiguration,
@@ -111,6 +112,7 @@ export type NetworkInfo = {
 export interface ChainState {
     chains: ChainInfo[];
     currentChainId: string | undefined;
+    defaultPreconfigs: ChainPreconfig[];
 }
 
 export interface ChainPersistence {

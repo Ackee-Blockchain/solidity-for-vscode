@@ -40,10 +40,10 @@
     <!-- Backdrop overlay -->
     {#if $chainNavigator.state === 'advancedLocalChainSetup'}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
+        <!-- <div
             class="fixed inset-0 z-[5]"
             style="background: {getCssVarWithOpacity('--vscode-sideBar-background', 0.8)}"
-        />
+        /> -->
     {/if}
 
     <TextContainer

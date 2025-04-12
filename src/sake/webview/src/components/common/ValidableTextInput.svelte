@@ -8,6 +8,7 @@
     export let onChange: (value: string) => void | undefined = () => undefined;
     export let validate: (value: string | undefined) => string | null = () => null;
     export let transform: (value: string | undefined) => string = (value) => value ?? '';
+    export let disabled: boolean = false;
 
     let stringValue: string | undefined = undefined;
     export let autofocus: boolean = false;
@@ -43,6 +44,7 @@
         value={value ?? stringValue ?? ''}
         {autofocus}
         on:change={valueChangeHandler}
+        {disabled}
     />
     {#if error}
         <span class="text-xs text-red-500">{error}</span>
