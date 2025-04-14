@@ -196,7 +196,6 @@ export const getChainIconUri = (chainId: number): Uri | undefined => {
     //     console.warn(`Icon not found for chain ${chainId}: ${iconPath}`);
     //     return undefined;
     // }
-    console.log(`Icon found for chain ${chainId}: ${iconUri}`);
 
     return iconUri;
 };
