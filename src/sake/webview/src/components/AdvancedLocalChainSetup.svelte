@@ -148,6 +148,7 @@
                         on:click={() => {
                             // Reset all form values to defaults
                             form = {
+                                displayName: 'Local Chain',
                                 chainId: undefined,
                                 accounts: '10',
                                 fork: undefined,
@@ -168,6 +169,7 @@
                         on:click={() => {
                             // Reset connection form
                             form = {
+                                displayName: 'Local Chain',
                                 chainId: undefined,
                                 accounts: '10',
                                 fork: undefined,
@@ -194,7 +196,7 @@
                             on:click={() => {
                                 // Clear previous values first
                                 form = {
-                                    ...form,
+                                    displayName: preconfig.name,
                                     chainId: undefined,
                                     accounts: '10',
                                     fork: undefined,
@@ -212,10 +214,6 @@
 
                                 if (preconfig.rpc && preconfig.rpc.length > 0) {
                                     form.fork = preconfig.rpc[0];
-                                }
-
-                                if (!form.displayName && preconfig.name) {
-                                    form.displayName = preconfig.name;
                                 }
                             }}
                         />
