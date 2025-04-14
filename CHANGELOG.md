@@ -5,6 +5,10 @@
 - Added pre-configured chains for Ethereum Mainnet and popular L2 networks (Optimism, Arbitrum, Base, Polygon, etc.), significantly streamlining the forking process
 - Integrated Prettier for automatic code formatting on save, enhancing code quality and consistency
 
+## [1.19.0]
+### Features
+- Added chain preconfigurations, speeding up forking Mainnet or common L2s (Optimism, Arbitrum, Base, Polygon, ...)
+
 ## [1.18.0]
 ### Features
 - Official stable release of version 1.17.0 (previously available as pre-release)
