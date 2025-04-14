@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.19.0]
+### Features
+- Added chain preconfigurations, speeding up forking Mainnet or common L2s (Optimism, Arbitrum, Base, Polygon, ...)
+
 ## [1.18.0]
 ### Features
 - Official stable release of version 1.17.0 (previously available as pre-release)
