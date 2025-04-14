@@ -1,8 +1,8 @@
 <script lang="ts">
-    import WalletWrapper from './WalletWrapper.svelte';
+    import WalletWrapper2 from './WalletWrapper2.svelte';
     import Sake from './Sake.svelte';
 </script>
 
-<WalletWrapper>
+<WalletWrapper2>
     <Sake />
-</WalletWrapper>
+</WalletWrapper2>

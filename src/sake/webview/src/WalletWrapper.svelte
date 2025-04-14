@@ -1,18 +1,32 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { defaultConfig, connected, signerAddress, chainId, WC } from 'svelte-wagmi';
-    import { walletConnect } from 'wagmi/connectors';
+    import {
+        defaultConfig,
+        connected,
+        signerAddress,
+        chainId,
+        WC,
+        configuredConnectors,
+        disconnectWagmi
+    } from 'svelte-wagmi';
+    import { coinbaseWallet, metaMask, safe, walletConnect } from 'wagmi/connectors';
+    import {} from '@wagmi/core';
     import Sake from './Sake.svelte';
 
     // Import the child component to wrap with Wagmi functionality
     onMount(async () => {
         // Initialize Wagmi with default configuration
         const wagmiClient = defaultConfig({
-            appName: 'Tools-for-Solidity',
+            appName: 'Solidity (Wake)',
             walletConnectProjectId: '2acb5171259f8ee5730817ee8c913587',
             connectors: [
                 walletConnect({
                     projectId: '2acb5171259f8ee5730817ee8c913587'
+                }),
+                safe({}),
+                metaMask({}),
+                coinbaseWallet({
+                    appName: 'Solidity (Wake)'
                 })
             ]
         });
@@ -26,33 +40,48 @@
     }
 
     console.log('starting wagmi');
+
+    $: console.log('configuredConnectors', $configuredConnectors);
 </script>
 
-<slot />
-
-<div class="wagmi-wrapper">
-    <!-- Wallet connection status bar -->
-    <div class="wallet-status-bar">
-        {#if $connected}
-            <div class="wallet-info">
-                <span class="connection-status connected">Connected</span>
-                <span class="chain-id">Chain: {$chainId || 'Unknown'}</span>
-                <span class="wallet-address"
-                    >{$signerAddress
-                        ? `${$signerAddress.substring(0, 6)}...${$signerAddress.substring($signerAddress.length - 4)}`
-                        : ''}</span
-                >
-            </div>
-        {:else}
-            <div class="connect-button-container">
-                <button class="connect-button" on:click={connectWallet}> Connect Wallet </button>
-            </div>
-        {/if}
+<div class="flex flex-col h-full overflow-hidden">
+    <div class="flex-grow overflow-auto min-h-0">
+        <slot />
     </div>
 
+    <div class="flex-shrink-0">
+        <!-- Wallet connection status bar -->
+        <div class="wallet-status-bar">
+            <div class="flex flex-row gap-2">
+                <span>Connectors</span>
+
+                <!-- {#each $configuredConnectors as connector}
+                    <span>{connector.name}</span>
+                {/each} -->
+            </div>
+            {#if $connected}
+                <div class="wallet-info">
+                    <span class="connection-status connected">Connected</span>
+                    <span class="chain-id">Chain: {$chainId || 'Unknown'}</span>
+                    <span class="wallet-address"
+                        >{$signerAddress
+                            ? `${$signerAddress.substring(0, 6)}...${$signerAddress.substring($signerAddress.length - 4)}`
+                            : ''}</span
+                    >
+                </div>
+                <div class="connect-button-container">
+                    <button class="connect-button" on:click={disconnectWagmi}> Disconnect </button>
+                </div>
+            {:else}
+                <div class="connect-button-container">
+                    <button class="connect-button" on:click={connectWallet}>
+                        Connect Wallet
+                    </button>
+                </div>
+            {/if}
+        </div>
+    </div>
 </div>
-
-
 
 <style>
     .wagmi-wrapper {
