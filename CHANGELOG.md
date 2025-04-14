@@ -2,8 +2,13 @@
 
 ## [1.19.0]
 ### Features
-- Added pre-configured chains for Ethereum Mainnet and popular L2 networks (Optimism, Arbitrum, Base, Polygon, etc.), significantly streamlining the forking process
+- Introduced pre-configured chains, such as Ethereum Mainnet and popular L2 networks (Optimism, Arbitrum, Base, Polygon, etc.), significantly streamlining the forking process
 - Integrated Prettier for automatic code formatting on save, enhancing code quality and consistency
+- Added support for the `Osaka` EVM version
+- Implemented support for `transient` storage and `layout at` syntax in Solidity grammar
+
+### Fixes
+- Multiple grammar fixes
 
 ## [1.19.0]
 ### Features
