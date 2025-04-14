@@ -23,7 +23,7 @@
     "rollup-plugin-css-only": "^4.5.2",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-svelte": "^7.2.0",
-    "svelte": "^3.59.2",
+    "svelte": "^4.0.0",
     "svelte-check": "^3.6.8",
     "svelte-kit": "^1.2.0",
     "svelte-preprocess": "^5.1.3",

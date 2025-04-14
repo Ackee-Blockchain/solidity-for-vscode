@@ -10,7 +10,7 @@
     {#each $notifications as notification (notification.id)}
         <div
             class="flex items-start bg-white dark:bg-[#1a1a1a] rounded-lg p-3 min-w-[300px] max-w-[500px] shadow-lg"
-            transition:fly={{ x: 100, duration: 300 }}
+            transition:fly|global={{ x: 100, duration: 300 }}
             on:mouseenter={() => clearTimeout(timeoutId)}
             on:mouseleave={() => {
                 timeoutId = setTimeout(() => {
