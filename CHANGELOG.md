@@ -1,4 +1,4 @@
-# Change Log
+# Changelog
 
 ## [1.19.0]
 ### Features
