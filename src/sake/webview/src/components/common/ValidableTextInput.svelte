@@ -38,14 +38,17 @@
         </div>
     {/if}
     <!-- svelte-ignore a11y-autofocus -->
-    <vscode-text-field
-        class="w-full"
-        {placeholder}
-        value={value ?? stringValue ?? ''}
-        {autofocus}
-        on:change={valueChangeHandler}
-        {disabled}
-    />
+    <div class="flex gap-1">
+        <vscode-text-field
+            class="w-full"
+            {placeholder}
+            value={value ?? stringValue ?? ''}
+            {autofocus}
+            on:change={valueChangeHandler}
+            {disabled}
+        />
+        <slot />
+    </div>
     {#if error}
         <span class="text-xs text-red-500">{error}</span>
     {/if}

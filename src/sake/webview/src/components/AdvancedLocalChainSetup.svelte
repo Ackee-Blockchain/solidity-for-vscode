@@ -3,10 +3,11 @@
     import ValidableTextInput from './common/ValidableTextInput.svelte';
     import { validateNonEmptyString, validateNumber } from '../helpers/validation';
     import DefaultButton from './icons/DefaultButton.svelte';
-    import { connectToLocalChain, createNewLocalChain } from '../helpers/api';
+    import { connectToLocalChain, createNewLocalChain, openSettings } from '../helpers/api';
     import { chainState } from '../helpers/stores';
     import BigButton from './common/BigButton.svelte';
     import Divider from './Divider.svelte';
+    import SettingsIcon from './icons/SettingsIcon.svelte';
 
     // export let form:
     //     | (NetworkCreationConfiguration & { displayName?: string })
@@ -266,7 +267,18 @@
                                 bind:value={form.fork}
                                 disabled={!selectedChain.isBlank &&
                                     selectedChain.rpcUrl !== undefined}
-                            />
+                            >
+                                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                <vscode-button
+                                    appearance="icon"
+                                    on:click={() => {
+                                        openSettings('Tools-for-Solidity.sake.rpcUrls');
+                                    }}
+                                >
+                                    <SettingsIcon />
+                                    <!-- <span class="text-xs">Open settings</span> -->
+                                </vscode-button>
+                            </ValidableTextInput>
 
                             <ValidableTextInput
                                 label="Number of accounts"
