@@ -3,7 +3,12 @@
     import ValidableTextInput from './common/ValidableTextInput.svelte';
     import { validateNonEmptyString, validateNumber } from '../helpers/validation';
     import DefaultButton from './icons/DefaultButton.svelte';
-    import { connectToLocalChain, createNewLocalChain, openSettings } from '../helpers/api';
+    import {
+        connectToLocalChain,
+        createNewLocalChain,
+        openSettings,
+        showErrorMessage
+    } from '../helpers/api';
     import { chainState } from '../helpers/stores';
     import BigButton from './common/BigButton.svelte';
     import Divider from './Divider.svelte';
@@ -18,7 +23,7 @@
     // };
 
     export let form: {
-        displayName: string;
+        displayName?: string;
         accounts?: string;
         chainId?: string;
         fork?: string;
@@ -26,9 +31,7 @@
         minGasPrice?: string;
         blockBaseFeePerGas?: string;
         uri?: string;
-    } = {
-        displayName: 'Local Chain'
-    };
+    } = {};
 
     // Define a type for the selected chain
     interface ChainConfig {
@@ -45,6 +48,10 @@
     let showAdvanced = false;
 
     const processChainSetup = async (chainSetup: () => Promise<{ success: boolean }>) => {
+        if (!form.displayName) {
+            showErrorMessage('Cannot create chain with empty name');
+            return;
+        }
         loading = true;
         await chainSetup().then(({ success }) => {
             if (success) {
@@ -121,6 +128,7 @@
                         label="Display Name"
                         validate={validateNonEmptyString}
                         autofocus={true}
+                        placeholder="Local Chain"
                         bind:value={form.displayName}
                     />
                 </div>
@@ -140,7 +148,6 @@
                         on:click={() => {
                             // Reset all form values to defaults
                             form = {
-                                ...form,
                                 chainId: undefined,
                                 accounts: '10',
                                 fork: undefined,
@@ -161,7 +168,11 @@
                         on:click={() => {
                             // Reset connection form
                             form = {
-                                ...form,
+                                chainId: undefined,
+                                accounts: '10',
+                                fork: undefined,
+                                hardfork: 'latest',
+                                minGasPrice: '0',
                                 uri: undefined
                             };
                             selectedChain = { isConnection: true, name: 'External Connection' };
@@ -202,6 +213,10 @@
                                 if (preconfig.rpc && preconfig.rpc.length > 0) {
                                     form.fork = preconfig.rpc[0];
                                 }
+
+                                if (!form.displayName && preconfig.name) {
+                                    form.displayName = preconfig.name;
+                                }
                             }}
                         />
                     {/each}
@@ -232,10 +247,14 @@
 
                         <vscode-button
                             appearance="primary"
-                            disabled={loading || !form.uri}
+                            disabled={loading || !form.uri || !form.displayName}
                             on:click={() =>
                                 processChainSetup(() =>
-                                    connectToLocalChain(form.displayName, form.uri ?? '', true)
+                                    connectToLocalChain(
+                                        form.displayName ?? '', // @dev bypass type check
+                                        form.uri ?? '',
+                                        true
+                                    )
                                 )}
                         >
                             {loading ? 'Connecting...' : 'Connect'}
@@ -331,11 +350,11 @@
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <vscode-button
                             appearance="primary"
-                            disabled={loading}
+                            disabled={loading || !form.displayName}
                             on:click={() =>
                                 processChainSetup(() =>
                                     createNewLocalChain(
-                                        form.displayName,
+                                        form.displayName ?? '', // @dev bypass type check
                                         {
                                             accounts: form.accounts
                                                 ? parseInt(form.accounts)
