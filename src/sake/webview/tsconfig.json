@@ -1,15 +1,20 @@
 {
     "extends": "@tsconfig/svelte/tsconfig.json",
     "include": ["./**/*", "shared/*"],
-    "exclude": ["./node_modules/*"], // modified node modules from .. to .
+    "exclude": ["./node_modules/*"],
     "compilerOptions": {
         "types": ["svelte"],
         "strict": true,
         "resolveJsonModule": true,
+        "lib": ["DOM", "ES2020", "ESNext"],
+        "target": "ES2020",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true
         // TODO this wont work, something with the compilation
         // "rootDirs": ["src"],
         // "baseUrl": ".",
-
     }
 }
 

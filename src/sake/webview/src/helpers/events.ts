@@ -107,7 +107,7 @@ export function setupListeners() {
 function handleStateResponse(
     message: WebviewMessageResponse & { command: WebviewMessageId.onGetState }
 ) {
-    console.log('got message', message.stateId, message.payload);
+    // console.log('got message', message.stateId, message.payload);
     switch (message.stateId) {
         case StateId.DeployedContracts: {
             deployedContracts.set(message.payload);

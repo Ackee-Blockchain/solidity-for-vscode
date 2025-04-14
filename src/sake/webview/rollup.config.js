@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
@@ -12,7 +13,18 @@ const production = !process.env.ROLLUP_WATCH;
 
 const _defaultConfig = {
     plugins: [
-
+        resolve({
+            browser: true,
+            dedupe: ['svelte'],
+            exportConditions: ['svelte'],
+            preferBuiltins: false
+        }),
+        commonjs({
+            transformMixedEsModules: true,
+            requireReturnsDefault: 'auto',
+            ignore: ['bufferutil', 'utf-8-validate'],
+            esmExternals: true
+        }),
         svelte({
             compilerOptions: {
                 dev: !production
@@ -20,18 +32,17 @@ const _defaultConfig = {
             preprocess: sveltePreprocess({
                 sourceMap: !production,
                 postcss: true,
-                // typescript: true,
             }),
         }),
         css({ output: 'bundle.css' }),
-
-        resolve({
-            browser: true,
-            dedupe: ['svelte'],
-            exportConditions: ['svelte']
+        json(),
+        typescript({
+            sourceMap: !production,
+            compilerOptions: {
+                module: "ESNext",
+                moduleResolution: "node"
+            }
         }),
-        commonjs(),
-        typescript({ sourceMap: !production }),
         production && terser()
     ],
     watch: {
@@ -40,33 +51,15 @@ const _defaultConfig = {
 };
 
 export default [
-    // {
-    //     input: 'src/pages/run/run.ts',
-    //     output: {
-    //         sourcemap: true,
-    //         format: 'cjs',
-    //         name: 'app',
-    //         file: 'dist/run/webview.js'
-    //     },
-    //     ..._defaultConfig,
-    // },
-    // {
-    //     input: 'src/pages/compile-deploy/compile-deploy.ts',
-    //     output: {
-    //         sourcemap: true,
-    //         format: 'cjs',
-    //         name: 'app',
-    //         file: 'dist/compile-deploy/webview.js'
-    //     },
-    //     ..._defaultConfig,
-    // },
     {
         input: 'src/app.ts',
         output: {
             sourcemap: true,
-            format: 'cjs',
+            format: 'iife',
             name: 'app',
-            file: 'dist/sake/webview.js'
+            file: 'dist/sake/webview.js',
+            inlineDynamicImports: true,
+
         },
         ..._defaultConfig,
     },
