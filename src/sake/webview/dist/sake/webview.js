@@ -23512,9 +23512,9 @@ function create_if_block$f(ctx) {
 			attr_dev(div4, "class", "grid gap-2 w-full preconfig-grid-2 svelte-19z6ui9");
 			add_location(div4, file$G, 106, 16, 4064);
 			attr_dev(div5, "class", "text-sm opacity-75 text-center mt-1");
-			add_location(div5, file$G, 150, 16, 6130);
+			add_location(div5, file$G, 152, 16, 6250);
 			attr_dev(div6, "class", "grid gap-2 w-full preconfig-grid svelte-19z6ui9");
-			add_location(div6, file$G, 152, 16, 6215);
+			add_location(div6, file$G, 154, 16, 6335);
 			attr_dev(div7, "class", "flex flex-col gap-3 px-2 py-3 font-sm");
 			add_location(div7, file$G, 105, 12, 3996);
 			attr_dev(div8, "class", "flex flex-col");
@@ -23678,7 +23678,7 @@ function create_if_block$f(ctx) {
 	return block;
 }
 
-// (154:20) {#each $chainState.defaultPreconfigs as preconfig}
+// (156:20) {#each $chainState.defaultPreconfigs as preconfig}
 function create_each_block$8(ctx) {
 	let bigbutton;
 	let current;
@@ -23733,14 +23733,14 @@ function create_each_block$8(ctx) {
 		block,
 		id: create_each_block$8.name,
 		type: "each",
-		source: "(154:20) {#each $chainState.defaultPreconfigs as preconfig}",
+		source: "(156:20) {#each $chainState.defaultPreconfigs as preconfig}",
 		ctx
 	});
 
 	return block;
 }
 
-// (192:12) {#if selectedChain}
+// (190:12) {#if selectedChain}
 function create_if_block_1$b(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -23813,14 +23813,14 @@ function create_if_block_1$b(ctx) {
 		block,
 		id: create_if_block_1$b.name,
 		type: "if",
-		source: "(192:12) {#if selectedChain}",
+		source: "(190:12) {#if selectedChain}",
 		ctx
 	});
 
 	return block;
 }
 
-// (230:16) {:else}
+// (228:16) {:else}
 function create_else_block$d(ctx) {
 	let div0;
 	let a;
@@ -23874,16 +23874,16 @@ function create_else_block$d(ctx) {
 			div1 = element("div");
 			vscode_button = element("vscode-button");
 			t5 = text(t5_value);
-			add_location(span, file$G, 242, 28, 10626);
+			add_location(span, file$G, 240, 28, 10585);
 			attr_dev(a, "class", "flex gap-1 cursor-pointer items-center w-full justify-center");
-			add_location(a, file$G, 233, 24, 10182);
+			add_location(a, file$G, 231, 24, 10141);
 			attr_dev(div0, "class", div0_class_value = "text-sm opacity-75 mt-1 flex gap-1 " + (!/*showAdvanced*/ ctx[3] ? 'mb-2' : ''));
-			add_location(div0, file$G, 230, 20, 9928);
+			add_location(div0, file$G, 228, 20, 9887);
 			set_custom_element_data(vscode_button, "appearance", "primary");
 			set_custom_element_data(vscode_button, "disabled", vscode_button_disabled_value = /*loading*/ ctx[1] || !/*form*/ ctx[0].displayName);
-			add_location(vscode_button, file$G, 316, 24, 14775);
+			add_location(vscode_button, file$G, 314, 24, 14734);
 			attr_dev(div1, "class", "flex flex-col gap-3 p-2");
-			add_location(div1, file$G, 313, 20, 14585);
+			add_location(div1, file$G, 311, 20, 14544);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div0, anchor);
@@ -23997,14 +23997,14 @@ function create_else_block$d(ctx) {
 		block,
 		id: create_else_block$d.name,
 		type: "else",
-		source: "(230:16) {:else}",
+		source: "(228:16) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (194:16) {#if selectedChain.isConnection}
+// (192:16) {#if selectedChain.isConnection}
 function create_if_block_2$8(ctx) {
 	let divider0;
 	let t0;
@@ -24075,16 +24075,16 @@ function create_if_block_2$8(ctx) {
 			vscode_button = element("vscode-button");
 			t5 = text(t5_value);
 			attr_dev(div0, "class", "text-sm opacity-75 text-center mt-1");
-			add_location(div0, file$G, 196, 20, 8142);
+			add_location(div0, file$G, 194, 20, 8101);
 			attr_dev(div1, "class", "flex flex-col gap-1");
-			add_location(div1, file$G, 198, 24, 8310);
+			add_location(div1, file$G, 196, 24, 8269);
 			attr_dev(div2, "class", "flex flex-col gap-2 p-2 font-sm");
-			add_location(div2, file$G, 197, 20, 8240);
+			add_location(div2, file$G, 195, 20, 8199);
 			set_custom_element_data(vscode_button, "appearance", "primary");
 			set_custom_element_data(vscode_button, "disabled", vscode_button_disabled_value = /*loading*/ ctx[1] || !/*form*/ ctx[0].uri || !/*form*/ ctx[0].displayName);
-			add_location(vscode_button, file$G, 213, 24, 9107);
+			add_location(vscode_button, file$G, 211, 24, 9066);
 			attr_dev(div3, "class", "flex flex-col gap-2 p-2 font-sm");
-			add_location(div3, file$G, 209, 20, 8907);
+			add_location(div3, file$G, 207, 20, 8866);
 		},
 		m: function mount(target, anchor) {
 			mount_component(divider0, target, anchor);
@@ -24156,14 +24156,14 @@ function create_if_block_2$8(ctx) {
 		block,
 		id: create_if_block_2$8.name,
 		type: "if",
-		source: "(194:16) {#if selectedChain.isConnection}",
+		source: "(192:16) {#if selectedChain.isConnection}",
 		ctx
 	});
 
 	return block;
 }
 
-// (240:28) {:else}
+// (238:28) {:else}
 function create_else_block_1$5(ctx) {
 	let chevronright;
 	let current;
@@ -24195,14 +24195,14 @@ function create_else_block_1$5(ctx) {
 		block,
 		id: create_else_block_1$5.name,
 		type: "else",
-		source: "(240:28) {:else}",
+		source: "(238:28) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (238:28) {#if showAdvanced}
+// (236:28) {#if showAdvanced}
 function create_if_block_4$6(ctx) {
 	let chevrondown;
 	let current;
@@ -24234,14 +24234,14 @@ function create_if_block_4$6(ctx) {
 		block,
 		id: create_if_block_4$6.name,
 		type: "if",
-		source: "(238:28) {#if showAdvanced}",
+		source: "(236:28) {#if showAdvanced}",
 		ctx
 	});
 
 	return block;
 }
 
-// (246:20) {#if showAdvanced}
+// (244:20) {#if showAdvanced}
 function create_if_block_3$7(ctx) {
 	let div1;
 	let div0;
@@ -24414,9 +24414,9 @@ function create_if_block_3$7(ctx) {
 			t4 = space();
 			create_component(validabletextinput5.$$.fragment);
 			attr_dev(div0, "class", "flex flex-col gap-1");
-			add_location(div0, file$G, 247, 28, 10861);
+			add_location(div0, file$G, 245, 28, 10820);
 			attr_dev(div1, "class", "flex flex-col gap-2 p-2 font-sm");
-			add_location(div1, file$G, 246, 24, 10787);
+			add_location(div1, file$G, 244, 24, 10746);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div1, anchor);
@@ -24530,14 +24530,14 @@ function create_if_block_3$7(ctx) {
 		block,
 		id: create_if_block_3$7.name,
 		type: "if",
-		source: "(246:20) {#if showAdvanced}",
+		source: "(244:20) {#if showAdvanced}",
 		ctx
 	});
 
 	return block;
 }
 
-// (260:32) <ValidableTextInput                                     label="Fork URL"                                     validate={validateNonEmptyString}                                     tooltip="The fork URL is the URL of the Ethereum node to fork from."                                     placeholder="https://eth-mainnet.g.alchemy.com/v2/<api-key>"                                     bind:value={form.fork}                                     disabled={!selectedChain.isBlank &&                                         selectedChain.rpcUrl !== undefined}                                 >
+// (258:32) <ValidableTextInput                                     label="Fork URL"                                     validate={validateNonEmptyString}                                     tooltip="The fork URL is the URL of the Ethereum node to fork from."                                     placeholder="https://eth-mainnet.g.alchemy.com/v2/<api-key>"                                     bind:value={form.fork}                                     disabled={!selectedChain.isBlank &&                                         selectedChain.rpcUrl !== undefined}                                 >
 function create_default_slot$g(ctx) {
 	let vscode_button;
 	let settingsicon;
@@ -24551,7 +24551,7 @@ function create_default_slot$g(ctx) {
 			vscode_button = element("vscode-button");
 			create_component(settingsicon.$$.fragment);
 			set_custom_element_data(vscode_button, "appearance", "icon");
-			add_location(vscode_button, file$G, 269, 36, 12301);
+			add_location(vscode_button, file$G, 267, 36, 12260);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, vscode_button, anchor);
@@ -24585,7 +24585,7 @@ function create_default_slot$g(ctx) {
 		block,
 		id: create_default_slot$g.name,
 		type: "slot",
-		source: "(260:32) <ValidableTextInput                                     label=\\\"Fork URL\\\"                                     validate={validateNonEmptyString}                                     tooltip=\\\"The fork URL is the URL of the Ethereum node to fork from.\\\"                                     placeholder=\\\"https://eth-mainnet.g.alchemy.com/v2/<api-key>\\\"                                     bind:value={form.fork}                                     disabled={!selectedChain.isBlank &&                                         selectedChain.rpcUrl !== undefined}                                 >",
+		source: "(258:32) <ValidableTextInput                                     label=\\\"Fork URL\\\"                                     validate={validateNonEmptyString}                                     tooltip=\\\"The fork URL is the URL of the Ethereum node to fork from.\\\"                                     placeholder=\\\"https://eth-mainnet.g.alchemy.com/v2/<api-key>\\\"                                     bind:value={form.fork}                                     disabled={!selectedChain.isBlank &&                                         selectedChain.rpcUrl !== undefined}                                 >",
 		ctx
 	});
 
@@ -24707,6 +24707,7 @@ function instance$I($$self, $$props, $$invalidate) {
 	const click_handler = () => {
 		// Reset all form values to defaults
 		$$invalidate(0, form = {
+			displayName: 'Local Chain',
 			chainId: undefined,
 			accounts: '10',
 			fork: undefined,
@@ -24721,6 +24722,7 @@ function instance$I($$self, $$props, $$invalidate) {
 	const click_handler_1 = () => {
 		// Reset connection form
 		$$invalidate(0, form = {
+			displayName: 'Local Chain',
 			chainId: undefined,
 			accounts: '10',
 			fork: undefined,
@@ -24738,7 +24740,7 @@ function instance$I($$self, $$props, $$invalidate) {
 	const click_handler_2 = preconfig => {
 		// Clear previous values first
 		$$invalidate(0, form = {
-			...form,
+			displayName: preconfig.name,
 			chainId: undefined,
 			accounts: '10',
 			fork: undefined,
@@ -24756,10 +24758,6 @@ function instance$I($$self, $$props, $$invalidate) {
 
 		if (preconfig.rpc && preconfig.rpc.length > 0) {
 			$$invalidate(0, form.fork = preconfig.rpc[0], form);
-		}
-
-		if (!form.displayName && preconfig.name) {
-			$$invalidate(0, form.displayName = preconfig.name, form);
 		}
 	};
 
