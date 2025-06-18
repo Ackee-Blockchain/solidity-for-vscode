@@ -3,12 +3,16 @@ import { SakeContext } from '../sake/context';
 import { LanguageClient, State } from 'vscode-languageclient/node';
 import { restartWakeClient } from '../commands';
 import { MarkdownString } from 'vscode';
+import { Analytics } from '../Analytics';
 
 export class WakeStatusBarProvider {
     // private static instance: WakeStatusBarProvider;
     private _statusBarItem!: vscode.StatusBarItem;
 
-    constructor(private client: LanguageClient) {
+    constructor(
+        private client: LanguageClient,
+        private analytics: Analytics
+    ) {
         this._initializeStatusBar();
         this._initializeCommands();
         this.client.onDidChangeState((state) => {
@@ -35,24 +39,26 @@ export class WakeStatusBarProvider {
         this._statusBarItem.command = undefined;
         this._statusBarItem.show();
 
+        const version = this.analytics.wakeVersion || '';
+        const versionText = version ? ` v${version}` : '';
+
         switch (this.client.state) {
             case State.Running:
                 // this._statusBarItem.hide()
-                this._statusBarItem.text = '$(check-all) Wake';
-                this._statusBarItem.tooltip = 'Wake LSP is running';
+                this._statusBarItem.text = `$(check-all) Wake${versionText}`;
+                this._statusBarItem.tooltip = `Wake LSP is running${version ? ` (version ${version})` : ''}`;
                 break;
             case State.Stopped:
-                this._statusBarItem.text = '$(refresh) Wake';
-                this._statusBarItem.tooltip =
-                    'Cannot connect to Wake LSP required by Solidity (Wake).\nClick to restart client.';
+                this._statusBarItem.text = `$(refresh) Wake${versionText}`;
+                this._statusBarItem.tooltip = `Cannot connect to Wake LSP required by Solidity (Wake)${version ? ` (version ${version})` : ''}.\nClick to restart client.`;
                 this._statusBarItem.backgroundColor = new vscode.ThemeColor(
                     'statusBarItem.errorBackground'
                 );
                 this._statusBarItem.command = 'Tools-for-Solidity.wake.restart_client';
                 break;
             case State.Starting:
-                this._statusBarItem.text = '$(sync~spin) Wake';
-                this._statusBarItem.tooltip = 'Connecting to Wake LSP...';
+                this._statusBarItem.text = `$(sync~spin) Wake${versionText}`;
+                this._statusBarItem.tooltip = `Connecting to Wake LSP...${version ? ` (version ${version})` : ''}`;
                 break;
             default:
                 this._statusBarItem.hide();

@@ -325,7 +325,7 @@ export async function activate(context: vscode.ExtensionContext) {
     client.start();
 
     // Create the Wake status bar item
-    const statusBarProvider = new WakeStatusBarProvider(client);
+    const statusBarProvider = new WakeStatusBarProvider(client, analytics);
 
     analytics.logActivate();
 
