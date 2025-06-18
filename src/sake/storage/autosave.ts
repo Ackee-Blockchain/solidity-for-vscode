@@ -37,4 +37,4 @@ class Autosaver {
 export const autosaver = new Autosaver();
 
 export const autosaveDefault: boolean =
-    vscode.workspace.getConfiguration('Tools-for-Solidity.sake').get('autosave.enabled') ?? true;
+    vscode.workspace.getConfiguration('Tools-for-Solidity.sake').get('autosave.enabled') ?? false;

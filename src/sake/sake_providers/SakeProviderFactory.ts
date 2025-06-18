@@ -61,12 +61,13 @@ async function _newLocalProvider(
     try {
         await provider.connect();
 
-        if (
-            persistence.isAutosaveEnabled &&
-            (persistence.isDirty || persistence.lastSaveTimestamp == undefined)
-        ) {
-            await provider.saveState();
-        }
+        // Don't automatically save on creation - wait for actual state changes
+        // if (
+        //     persistence.isAutosaveEnabled &&
+        //     (persistence.isDirty || persistence.lastSaveTimestamp == undefined)
+        // ) {
+        //     await provider.saveState();
+        // }
     } catch (e) {
         if (onlySuccessful) {
             await provider.onDeleteProvider();
@@ -194,7 +195,8 @@ export async function createFromState(
                     return provider;
                 })
                 .catch((e) => {
-                    showErrorMessage(`Failed to load chain ${state.displayName}: ${e}`, true);
+                    // Don't show error here - it will be consolidated in stateHandler
+                    console.error(`Failed to load chain ${state.displayName}: ${e}`);
                     return undefined;
                 });
 

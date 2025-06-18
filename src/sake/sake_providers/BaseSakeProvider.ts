@@ -18,9 +18,10 @@ import { GenericHook } from '../utils/hook';
 import { SakeError } from '../webview/shared/errors';
 import { SakeProviderQuickPickItem } from '../webview/shared/helper_types';
 import {
+    ProviderState as StoredProviderState,
     SakeProviderInitializationRequest,
-    SakeProviderType,
-    ProviderState as StoredProviderState
+    SakeProviderInitializationRequestType,
+    SakeProviderType
 } from '../webview/shared/storage_types';
 import {
     Account,
@@ -33,7 +34,6 @@ import {
     DeployedContract,
     DeployedContractType,
     DeploymentRequest,
-    DeploymentResponse,
     GetBytecodeRequest,
     GetBytecodeResponse,
     ImplementationContract,
@@ -47,6 +47,7 @@ import {
 } from '../webview/shared/types';
 import sakeProviderManager from './SakeProviderManager';
 import SakeState from './SakeState';
+import { DeploymentResponse } from '../webview/shared/network_types';
 
 export interface ISakeProvider {
     id: string;
@@ -100,6 +101,7 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
 {
     private _providerStateHook: GenericHook<ProviderState>;
     private _didFirstConnect: boolean = false;
+    private _fileWatcherSetup: boolean = false;
 
     // also contains providerState: ProviderState via hook
     public chainState: SakeState;
@@ -180,12 +182,15 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
         // this.transactContract = showVSCodeMessageOnErrorWrapper(this.transactContract.bind(this));
 
         // check if state file exists
-        createChainStateFileWatcher(this, () => {
-            this.persistence = {
-                isDirty: true,
-                lastSaveTimestamp: undefined
-            };
-        });
+        // Only set up file watcher if we're loading from an existing state
+        if (initializationRequest.type === SakeProviderInitializationRequestType.LoadFromState) {
+            createChainStateFileWatcher(this, () => {
+                this.persistence = {
+                    isDirty: true,
+                    lastSaveTimestamp: undefined
+                };
+            });
+        }
     }
 
     get type(): Readonly<SakeProviderType> {
@@ -530,6 +535,15 @@ export abstract class BaseSakeProvider<TNetworkProvider extends NetworkProvider>
                 isDirty: tempIsDirty,
                 lastSaveTimestamp: tempLastSaveTimestamp
             };
+        } else if (!this._fileWatcherSetup) {
+            // Set up file watcher after first successful save
+            this._fileWatcherSetup = true;
+            createChainStateFileWatcher(this, () => {
+                this.persistence = {
+                    isDirty: true,
+                    lastSaveTimestamp: undefined
+                };
+            });
         }
     }
 

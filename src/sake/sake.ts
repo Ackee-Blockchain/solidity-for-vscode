@@ -13,6 +13,31 @@ import { pingWakeServer } from './utils/helpers';
 import { SakeProviderType } from './webview/shared/storage_types';
 import { WakeCrashDumpStateResponse } from './webview/shared/types';
 
+let chainsInitialized = false;
+
+export async function initializeChains() {
+    if (chainsInitialized) {
+        return;
+    }
+
+    /* Load Chains */
+    appState.setLazy({
+        initializationState: 'loadingChains'
+    });
+
+    // Only load chains if Wake server is running
+    if (appState.get().isWakeServerRunning) {
+        await loadChains();
+        chainsInitialized = true;
+    } else {
+        console.log('Wake server is not running, skipping chain loading');
+    }
+
+    appState.setLazy({
+        initializationState: 'ready'
+    });
+}
+
 export async function activateSake(context: vscode.ExtensionContext, client: LanguageClient) {
     /* Register Context */
     const sakeContext = SakeContext.getInstance();
@@ -27,8 +52,13 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
     appState.setLazy({
         isWakeServerRunning: client.state === State.Running && (await pingWakeServer())
     });
-    client.onDidChangeState((state) => {
-        appState.setLazy({ isWakeServerRunning: state.newState === State.Running });
+    client.onDidChangeState(async (state) => {
+        const wasRunning = appState.get().isWakeServerRunning;
+        const isRunning = state.newState === State.Running;
+        appState.setLazy({ isWakeServerRunning: isRunning });
+
+        // Don't automatically initialize chains here - wait for the sidebar to open
+        // The initialization will happen in BaseWebviewProvider.resolveWebviewView()
     });
 
     /* Register Webview */
@@ -96,11 +126,7 @@ export async function activateSake(context: vscode.ExtensionContext, client: Lan
 
     registerCommands(context);
 
-    /* Load Chains */
-    appState.setLazy({
-        initializationState: 'loadingChains'
-    });
-    await loadChains();
+    // Don't load chains here - wait for sidebar to open
     appState.setLazy({
         initializationState: 'ready'
     });

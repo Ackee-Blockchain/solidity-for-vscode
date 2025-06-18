@@ -52,8 +52,10 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
                 }
 
                 await this.network.createChain();
+
                 await this.network.loadState(this.initializationRequest.state.network.wakeDump);
                 this.chainState.loadStateFrom(this.initializationRequest.state.state);
+
                 break;
 
             default:
@@ -106,10 +108,15 @@ export class LocalNodeSakeProvider extends BaseSakeProvider<LocalNodeNetworkProv
                     return;
                 }
 
-                // reload state in wake
-                await this.network.createChain();
-                await this.network.loadState(savedState.network.wakeDump);
-                this.chainState.loadStateFrom(savedState.state);
+                try {
+                    // reload state in wake
+                    await this.network.createChain();
+                    await this.network.loadState(savedState.network.wakeDump);
+                    this.chainState.loadStateFrom(savedState.state);
+                } catch (e) {
+                    console.error(`Failed to reload state during reconnect: ${e}`);
+                    // State loading failed, but since persistence wasn't dirty, we can continue with fresh state
+                }
             } else {
                 // no state to reload
             }
