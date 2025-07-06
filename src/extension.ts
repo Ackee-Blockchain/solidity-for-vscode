@@ -27,6 +27,7 @@ import {
     generateInheritanceGraphHandler,
     generateLinearizedInheritanceGraphHandler,
     generateImportsGraphHandler,
+    generateAbstractionResolvedHandler,
     executeReferencesHandler,
     newDetector,
     newPrinter
@@ -39,7 +40,7 @@ import { GroupBy, Impact, Confidence } from './detections/WakeTreeDataProvider';
 import { SolcTreeDataProvider } from './detections/SolcTreeDataProvider';
 import { WakeTreeDataProvider } from './detections/WakeTreeDataProvider';
 import { Detector, WakeDetection } from './detections/model/WakeDetection';
-import { convertDiagnostics } from './detections/util';
+import { convertDiagnostics, parseIgnoreComments, shouldIgnoreDetection } from './detections/util';
 import { DetectorItem } from './detections/model/DetectorItem';
 import { ClientMiddleware } from './ClientMiddleware';
 import { ClientErrorHandler } from './ClientErrorHandler';
@@ -75,14 +76,27 @@ interface DiagnosticNotification {
     diagnostics: Diagnostic[];
 }
 
-function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification) {
+async function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification) {
     let diags = detection.diagnostics
         .map((it) => convertDiagnostics(it))
         .filter((item) => !item.data.ignored);
-    diagnosticCollection.set(vscode.Uri.parse(detection.uri), diags);
+    
+    // Parse ignore comments from the document
+    const uri = vscode.Uri.parse(detection.uri);
+    let ignoreComments: any[] = [];
+    try {
+        const document = await vscode.workspace.openTextDocument(uri);
+        ignoreComments = parseIgnoreComments(document);
+    } catch (err) {
+        // Document might not be open, ignore comments will be empty
+    }
+    
+    // Filter out detections that should be ignored based on comments
+    diags = diags.filter((item) => !shouldIgnoreDetection(item, ignoreComments));
+    
+    diagnosticCollection.set(uri, diags);
 
     try {
-        let uri = vscode.Uri.parse(detection.uri);
         let wakeDetections = diags
             .filter((item) => item.source == 'Wake')
             .map((it) => new WakeDetection(uri, it));
@@ -261,7 +275,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     diagnosticCollection = vscode.languages.createDiagnosticCollection('Wake');
 
-    client.onNotification('textDocument/publishDiagnostics', (params) => {
+    client.onNotification('textDocument/publishDiagnostics', async (params) => {
         //outputChannel.appendLine(JSON.stringify(params));
         let diag = params as DiagnosticNotification;
 
@@ -276,7 +290,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
             return true;
         });
-        onNotification(outputChannel, diag);
+        await onNotification(outputChannel, diag);
     });
     client.onNotification(ShowMessageNotification.type, (message) => {
         switch (message.type) {
@@ -406,6 +420,12 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
         vscode.commands.registerCommand(
             'Tools-for-Solidity.generate.imports_graph',
             async () => await generateImportsGraphHandler(outputChannel, graphvizGenerator)
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'Tools-for-Solidity.generate.abstraction_resolved',
+            async () => await generateAbstractionResolvedHandler(outputChannel)
         )
     );
     context.subscriptions.push(
