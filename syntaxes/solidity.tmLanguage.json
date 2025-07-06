@@ -153,6 +153,10 @@
             "match": "(?i)\\b(FIXME|TODO|CHANGED|XXX|AUDIT|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|SUPPRESS|LINT|\\w+-disable|\\w+-suppress)\\b(?-i)",
             "name": "keyword.comment.todo"
         },
+        "comment-wake-ignore": {
+            "match": "(?i)\\b(wake-ignore|wake-disable|wake-suppress)\\b(?-i)",
+            "name": "keyword.comment.wake-ignore"
+        },
         "comment-line": {
             "begin": "(?<!tp:)//",
             "end": "$",
@@ -160,6 +164,9 @@
             "patterns": [
                 {
                     "include": "#comment-todo"
+                },
+                {
+                    "include": "#comment-wake-ignore"
                 }
             ]
         },
@@ -170,6 +177,9 @@
             "patterns": [
                 {
                     "include": "#comment-todo"
+                },
+                {
+                    "include": "#comment-wake-ignore"
                 }
             ]
         },
