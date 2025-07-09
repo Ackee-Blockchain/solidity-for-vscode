@@ -23,14 +23,17 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
         let groupByConfig = this.context.workspaceState.get("detections.groupBy")
         let filterImpactConfig = this.context.workspaceState.get("detections.filterImpact")
         let filterConfidenceConfig = this.context.workspaceState.get("detections.filterConfidence")
+        let showIgnoredConfig = this.context.workspaceState.get("detections.showIgnored", false)
 
         if (groupByConfig !== undefined) this.groupBy = GroupBy[groupByConfig as keyof typeof GroupBy];
         if (filterImpactConfig !== undefined) this.filterImpact = Impact[filterImpactConfig as keyof typeof Impact];
         if (filterConfidenceConfig !== undefined) this.filterConfidence = Confidence[filterConfidenceConfig as keyof typeof Confidence];
+        this.showIgnored = showIgnoredConfig;
 
         vscode.commands.executeCommand('setContext', 'detections.group', GroupBy[this.groupBy]);
         vscode.commands.executeCommand('setContext', 'detections.filterImpact', Impact[this.filterImpact]);
         vscode.commands.executeCommand('setContext', 'detections.filterConfidence', Confidence[this.filterConfidence]);
+        vscode.commands.executeCommand('setContext', 'wake.detections.showIgnored', this.showIgnored);
     }
 
     getRoot(diagnostic: WakeDiagnostic): string {
@@ -213,7 +216,7 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
 
     setShowIgnored(showIgnored: boolean) {
         this.showIgnored = showIgnored;
-        this.refresh();
+        this.context.workspaceState.update("detections.showIgnored", showIgnored).then(() => this.refresh());
     }
 }
 

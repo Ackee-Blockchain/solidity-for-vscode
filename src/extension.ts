@@ -66,6 +66,7 @@ let printers: PrintersHandler;
 let crashlog: string[] = [];
 let graphvizGenerator: GraphvizPreviewGenerator;
 let showIgnoredDetections = false;
+let extensionContext: vscode.ExtensionContext;
 
 //export let log: Log
 
@@ -118,6 +119,7 @@ function refreshDiagnosticsVisibility() {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
+    extensionContext = context;
     const outputChannel = vscode.window.createOutputChannel(
         'Solidity: Output',
         'tools-for-solidity-output'
@@ -252,6 +254,9 @@ export async function activate(context: vscode.ExtensionContext) {
     };
     wakeProvider = new WakeTreeDataProvider(context);
     solcProvider = new SolcTreeDataProvider(context);
+    
+    // Initialize showIgnoredDetections from workspace state (already loaded by WakeTreeDataProvider)
+    showIgnoredDetections = context.workspaceState.get("detections.showIgnored", false);
 
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'solidity' }],
@@ -678,7 +683,7 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
             showIgnoredDetections = true;
             vscode.commands.executeCommand('setContext', 'wake.detections.showIgnored', true);
 
-            // Update tree provider
+            // Update tree provider (which also saves to workspaceState)
             wakeProvider?.setShowIgnored(true);
 
             // Refresh diagnostics panel by re-processing existing detections
@@ -691,7 +696,7 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
             showIgnoredDetections = false;
             vscode.commands.executeCommand('setContext', 'wake.detections.showIgnored', false);
 
-            // Update tree provider
+            // Update tree provider (which also saves to workspaceState)
             wakeProvider?.setShowIgnored(false);
 
             // Refresh diagnostics panel by re-processing existing detections
