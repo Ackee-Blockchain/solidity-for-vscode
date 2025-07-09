@@ -639,6 +639,16 @@
                 "command": "Tools-for-Solidity.sake.copyFromResults",
                 "title": "Solidity: Copy From Results",
                 "icon": "$(copy)"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.toggle_show_ignored",
+                "title": "Show Ignored Detections",
+                "icon": "$(eye)"
+            },
+            {
+                "command": "Tools-for-Solidity.detections.toggle_hide_ignored",
+                "title": "Hide Ignored Detections",
+                "icon": "$(eye-closed)"
             }
         ],
         "viewsContainers": {
@@ -693,6 +703,16 @@
                     "command": "Tools-for-Solidity.detections.force_rerun_detectors",
                     "when": "view == wake-detections",
                     "group": "navigation@3"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.toggle_show_ignored",
+                    "when": "view == wake-detections && !wake.detections.showIgnored",
+                    "group": "navigation@4"
+                },
+                {
+                    "command": "Tools-for-Solidity.detections.toggle_hide_ignored",
+                    "when": "view == wake-detections && wake.detections.showIgnored",
+                    "group": "navigation@4"
                 },
                 {
                     "submenu": "tools-for-solidity.detections.group",
