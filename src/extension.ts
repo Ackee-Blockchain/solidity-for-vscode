@@ -254,9 +254,9 @@ export async function activate(context: vscode.ExtensionContext) {
     };
     wakeProvider = new WakeTreeDataProvider(context);
     solcProvider = new SolcTreeDataProvider(context);
-    
+
     // Initialize showIgnoredDetections from workspace state (already loaded by WakeTreeDataProvider)
-    showIgnoredDetections = context.workspaceState.get("detections.showIgnored", false);
+    showIgnoredDetections = context.workspaceState.get('detections.showIgnored', false);
 
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'solidity' }],
@@ -719,7 +719,7 @@ function watchFoundryRemappings() {
 
     const workspace = workspaces[0];
     const fileWatcher = vscode.workspace.createFileSystemWatcher(
-        new vscode.RelativePattern(workspace, 'remappings.txt')
+        new vscode.RelativePattern(workspace, '.gitmodules')
     );
 
     let configWatcher: vscode.Disposable;
@@ -755,6 +755,14 @@ function watchFoundryRemappings() {
         return;
     }
 
+    // Check if this is a Foundry project by looking for .gitmodules or foundry.toml
+    // const gitmodulesPath = path.join(workspace.uri.fsPath, '.gitmodules');
+    // const foundryTomlPath = path.join(workspace.uri.fsPath, 'foundry.toml');
+
+    // if (!fs.existsSync(gitmodulesPath) && !fs.existsSync(foundryTomlPath)) {
+    //     return;
+    // }
+
     // start file system watcher
     fileWatcher.onDidChange(async () => {
         vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
@@ -763,6 +771,7 @@ function watchFoundryRemappings() {
         vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
     });
     fileWatcher.onDidDelete(async () => {
+        // When .gitmodules is deleted, clear remappings since dependencies are gone
         vscode.workspace
             .getConfiguration('wake.compiler.solc')
             .update('remappings', undefined, vscode.ConfigurationTarget.Workspace);

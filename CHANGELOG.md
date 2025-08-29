@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.19.2]
+### Fixes
+- Fixed compilation issues caused by unreliable `remappings.txt` files in Foundry projects
+
+## [1.19.1]
+### Features
+- Added Wake version information to the bottom status bar
+- Implemented filtering for ignored detections in the detections UI
+
+### Improvements
+- Store ignored detections toggle setting in workspace storage for better persistence
+
+### Fixes
+- Fixed state loading issues and disabled autosave by default
+
 ## [1.19.0]
 ### Features
 - Introduced pre-configured chains, such as Ethereum Mainnet and popular L2 networks (Optimism, Arbitrum, Base, Polygon, etc.), significantly streamlining the forking process

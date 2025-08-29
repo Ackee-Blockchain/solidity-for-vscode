@@ -92,13 +92,14 @@ export async function importFoundryRemappings(out: vscode.OutputChannel, silent:
     let remappings: string[] = [];
 
     try {
-        // First, try to read from remappings.txt
-        remappings = fs
-            .readFileSync(cwd + '/remappings.txt')
+        // First, try to execute forge from PATH
+        remappings = execFileSync('forge', ['remappings'], {
+            cwd: cwd
+        })
             .toString('utf8')
             .split(/\r?\n/);
     } catch (e) {
-        // If remappings.txt doesn't exist or can't be read, try using forge
+        // If forge is not in PATH, try specific locations
         try {
             remappings = execFileSync(os.homedir() + '/.foundry/bin/forge', ['remappings'], {
                 cwd: cwd
@@ -113,12 +114,20 @@ export async function importFoundryRemappings(out: vscode.OutputChannel, silent:
                     .toString('utf8')
                     .split(/\r?\n/);
             } catch (e) {
-                if (!silent) {
-                    vscode.window.showErrorMessage(
-                        'Failed to find `remappings.txt` file or `forge` executable.'
-                    );
+                // Fall back to reading remappings.txt
+                try {
+                    remappings = fs
+                        .readFileSync(cwd + '/remappings.txt')
+                        .toString('utf8')
+                        .split(/\r?\n/);
+                } catch (e) {
+                    if (!silent) {
+                        vscode.window.showErrorMessage(
+                            'Failed to find `forge` executable or `remappings.txt` file.'
+                        );
+                    }
+                    return;
                 }
-                return;
             }
         }
     }
