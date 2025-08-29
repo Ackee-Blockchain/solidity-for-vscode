@@ -12,6 +12,7 @@ import {
     showErrorMessage,
     showProviderSelectionQuickPick
 } from '../commands';
+import { initializeChains } from '../sake';
 import { SakeContext } from '../context';
 import * as SakeProviderFactory from '../sake_providers/SakeProviderFactory';
 import { sakeProviderManager } from '../sake_providers/SakeProviderManager';
@@ -64,6 +65,11 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
     public resolveWebviewView(webviewView: vscode.WebviewView) {
         this._view = webviewView;
         this._webview = webviewView.webview;
+
+        // Initialize chains when the sidebar is first opened
+        initializeChains().catch((e) => {
+            console.error('Failed to initialize chains:', e);
+        });
 
         // Set the webview's initial options
         webviewView.webview.options = {
@@ -502,7 +508,6 @@ export abstract class BaseWebviewProvider implements vscode.WebviewViewProvider 
                 const chainPreconfigs = getChainPreconfigs();
 
                 // Also update the chain state provider
-                console.log('chainPreconfigs', chainPreconfigs);
                 extensionState.setLazy({
                     defaultPreconfigs: chainPreconfigs
                 });

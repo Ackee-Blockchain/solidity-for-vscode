@@ -12,6 +12,7 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
     groupBy: GroupBy = GroupBy.IMPACT;
     filterImpact: Impact = Impact.INFO;
     filterConfidence: Confidence = Confidence.LOW;
+    showIgnored: boolean = false;
 
     constructor(context : vscode.ExtensionContext){
         super(context);
@@ -22,14 +23,17 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
         let groupByConfig = this.context.workspaceState.get("detections.groupBy")
         let filterImpactConfig = this.context.workspaceState.get("detections.filterImpact")
         let filterConfidenceConfig = this.context.workspaceState.get("detections.filterConfidence")
+        let showIgnoredConfig = this.context.workspaceState.get("detections.showIgnored", false)
 
         if (groupByConfig !== undefined) this.groupBy = GroupBy[groupByConfig as keyof typeof GroupBy];
         if (filterImpactConfig !== undefined) this.filterImpact = Impact[filterImpactConfig as keyof typeof Impact];
         if (filterConfidenceConfig !== undefined) this.filterConfidence = Confidence[filterConfidenceConfig as keyof typeof Confidence];
+        this.showIgnored = showIgnoredConfig;
 
         vscode.commands.executeCommand('setContext', 'detections.group', GroupBy[this.groupBy]);
         vscode.commands.executeCommand('setContext', 'detections.filterImpact', Impact[this.filterImpact]);
         vscode.commands.executeCommand('setContext', 'detections.filterConfidence', Confidence[this.filterConfidence]);
+        vscode.commands.executeCommand('setContext', 'wake.detections.showIgnored', this.showIgnored);
     }
 
     getRoot(diagnostic: WakeDiagnostic): string {
@@ -147,6 +151,11 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
     }
 
     filterDetections(detection: WakeDetection): boolean {
+        // Filter out ignored detections unless showIgnored is true
+        if (!this.showIgnored && detection.diagnostic.data.ignored) {
+            return false;
+        }
+
         var filterImpact = true;
         var filterConfidence = true;
 
@@ -203,6 +212,11 @@ export class WakeTreeDataProvider extends BaseTreeProvider {
         this.filterConfidence = minConfidence;
         this.context.workspaceState.update("detections.filterConfidence", Confidence[minConfidence]).then(() => this.refresh());
         vscode.commands.executeCommand('setContext', 'detections.filterConfidence', Confidence[minConfidence]);
+    }
+
+    setShowIgnored(showIgnored: boolean) {
+        this.showIgnored = showIgnored;
+        this.context.workspaceState.update("detections.showIgnored", showIgnored).then(() => this.refresh());
     }
 }
 

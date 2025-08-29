@@ -38,7 +38,7 @@ import waitPort = require('wait-port');
 import { GroupBy, Impact, Confidence } from './detections/WakeTreeDataProvider';
 import { SolcTreeDataProvider } from './detections/SolcTreeDataProvider';
 import { WakeTreeDataProvider } from './detections/WakeTreeDataProvider';
-import { Detector, WakeDetection } from './detections/model/WakeDetection';
+import { Detector, WakeDetection, WakeDiagnostic } from './detections/model/WakeDetection';
 import { convertDiagnostics } from './detections/util';
 import { DetectorItem } from './detections/model/DetectorItem';
 import { ClientMiddleware } from './ClientMiddleware';
@@ -65,6 +65,8 @@ let errorHandler: ClientErrorHandler;
 let printers: PrintersHandler;
 let crashlog: string[] = [];
 let graphvizGenerator: GraphvizPreviewGenerator;
+let showIgnoredDetections = false;
+let extensionContext: vscode.ExtensionContext;
 
 //export let log: Log
 
@@ -75,20 +77,28 @@ interface DiagnosticNotification {
     diagnostics: Diagnostic[];
 }
 
+// Store all diagnostics globally so we can refresh visibility
+let allDiagnosticsMap: Map<string, WakeDiagnostic[]> = new Map();
+
 function onNotification(outputChannel: vscode.OutputChannel, detection: DiagnosticNotification) {
-    let diags = detection.diagnostics
-        .map((it) => convertDiagnostics(it))
-        .filter((item) => !item.data.ignored);
-    diagnosticCollection.set(vscode.Uri.parse(detection.uri), diags);
+    let diags = detection.diagnostics.map((it) => convertDiagnostics(it));
+
+    // Store all diagnostics for later filtering
+    allDiagnosticsMap.set(detection.uri, diags);
+
+    // Store filtered diagnostics for VS Code diagnostics panel
+    let visibleDiags = diags.filter((item) => showIgnoredDetections || !item.data.ignored);
+    diagnosticCollection.set(vscode.Uri.parse(detection.uri), visibleDiags);
 
     try {
         let uri = vscode.Uri.parse(detection.uri);
+        // Pass all detections to providers (including ignored ones)
         let wakeDetections = diags
-            .filter((item) => item.source == 'Wake')
+            .filter((item) => item.source === 'Wake')
             .map((it) => new WakeDetection(uri, it));
         wakeProvider?.add(uri, wakeDetections);
         let solcDetections = diags
-            .filter((item) => item.source == 'Wake(solc)')
+            .filter((item) => item.source === 'Wake(solc)')
             .map((it) => new WakeDetection(uri, it));
         solcProvider?.add(uri, solcDetections);
     } catch (err) {
@@ -98,9 +108,18 @@ function onNotification(outputChannel: vscode.OutputChannel, detection: Diagnost
     }
 }
 
+function refreshDiagnosticsVisibility() {
+    // Re-filter all stored diagnostics based on current showIgnoredDetections state
+    for (const [uri, diags] of allDiagnosticsMap) {
+        let visibleDiags = diags.filter((item) => showIgnoredDetections || !item.data.ignored);
+        diagnosticCollection.set(vscode.Uri.parse(uri), visibleDiags);
+    }
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
+    extensionContext = context;
     const outputChannel = vscode.window.createOutputChannel(
         'Solidity: Output',
         'tools-for-solidity-output'
@@ -236,6 +255,9 @@ export async function activate(context: vscode.ExtensionContext) {
     wakeProvider = new WakeTreeDataProvider(context);
     solcProvider = new SolcTreeDataProvider(context);
 
+    // Initialize showIgnoredDetections from workspace state (already loaded by WakeTreeDataProvider)
+    showIgnoredDetections = context.workspaceState.get('detections.showIgnored', false);
+
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'solidity' }],
         synchronize: { configurationSection: 'wake' },
@@ -325,7 +347,7 @@ export async function activate(context: vscode.ExtensionContext) {
     client.start();
 
     // Create the Wake status bar item
-    const statusBarProvider = new WakeStatusBarProvider(client);
+    const statusBarProvider = new WakeStatusBarProvider(client, analytics);
 
     analytics.logActivate();
 
@@ -542,6 +564,7 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
             'Tools-for-Solidity.detections.force_rerun_detectors',
             async () => {
                 wakeProvider?.clear();
+                allDiagnosticsMap.clear();
                 vscode.commands.executeCommand('wake.lsp.force_rerun_detectors');
             }
         )
@@ -552,6 +575,7 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
             async () => {
                 solcProvider?.clear();
                 wakeProvider?.clear();
+                allDiagnosticsMap.clear();
                 vscode.commands.executeCommand('wake.lsp.force_recompile');
             }
         )
@@ -652,6 +676,39 @@ function registerCommands(outputChannel: vscode.OutputChannel, context: vscode.E
             );
         })
     );
+
+    // Register commands for toggling ignored detections
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.detections.toggle_show_ignored', () => {
+            showIgnoredDetections = true;
+            vscode.commands.executeCommand('setContext', 'wake.detections.showIgnored', true);
+
+            // Update tree provider (which also saves to workspaceState)
+            wakeProvider?.setShowIgnored(true);
+
+            // Refresh diagnostics panel by re-processing existing detections
+            refreshDiagnosticsVisibility();
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('Tools-for-Solidity.detections.toggle_hide_ignored', () => {
+            showIgnoredDetections = false;
+            vscode.commands.executeCommand('setContext', 'wake.detections.showIgnored', false);
+
+            // Update tree provider (which also saves to workspaceState)
+            wakeProvider?.setShowIgnored(false);
+
+            // Refresh diagnostics panel by re-processing existing detections
+            refreshDiagnosticsVisibility();
+        })
+    );
+}
+
+function registerFormatter(context: vscode.ExtensionContext) {
+    context.subscriptions.push(
+        vscode.languages.registerDocumentFormattingEditProvider('solidity', new PrettierFormatter())
+    );
 }
 
 function registerFormatter(context: vscode.ExtensionContext) {
@@ -668,7 +725,7 @@ function watchFoundryRemappings() {
 
     const workspace = workspaces[0];
     const fileWatcher = vscode.workspace.createFileSystemWatcher(
-        new vscode.RelativePattern(workspace, 'remappings.txt')
+        new vscode.RelativePattern(workspace, '.gitmodules')
     );
 
     let configWatcher: vscode.Disposable;
@@ -704,6 +761,14 @@ function watchFoundryRemappings() {
         return;
     }
 
+    // Check if this is a Foundry project by looking for .gitmodules or foundry.toml
+    // const gitmodulesPath = path.join(workspace.uri.fsPath, '.gitmodules');
+    // const foundryTomlPath = path.join(workspace.uri.fsPath, 'foundry.toml');
+
+    // if (!fs.existsSync(gitmodulesPath) && !fs.existsSync(foundryTomlPath)) {
+    //     return;
+    // }
+
     // start file system watcher
     fileWatcher.onDidChange(async () => {
         vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
@@ -712,6 +777,7 @@ function watchFoundryRemappings() {
         vscode.commands.executeCommand('Tools-for-Solidity.foundry.import_remappings_silent');
     });
     fileWatcher.onDidDelete(async () => {
+        // When .gitmodules is deleted, clear remappings since dependencies are gone
         vscode.workspace
             .getConfiguration('wake.compiler.solc')
             .update('remappings', undefined, vscode.ConfigurationTarget.Workspace);

@@ -33,11 +33,23 @@ export async function loadFullState(): Promise<boolean> {
         }
 
         const providerStates = storedState.providerStates;
+        const failedProviders: string[] = [];
 
         for (const providerState of providerStates) {
-            await createFromState(providerState, true).catch((e) => {
-                showErrorMessage(`Failed to load provider state: ${e}`, true);
+            const provider = await createFromState(providerState, true).catch((e) => {
+                console.error(`Failed to load provider "${providerState.displayName}": ${e}`);
+                failedProviders.push(providerState.displayName);
+                return undefined;
             });
+        }
+
+        // Show a single consolidated error message if any providers failed to load
+        if (failedProviders.length > 0) {
+            const message =
+                failedProviders.length === 1
+                    ? `Failed to restore saved state for chain: ${failedProviders[0]}. The chain will start fresh.`
+                    : `Failed to restore saved state for ${failedProviders.length} chains: ${failedProviders.join(', ')}. These chains will start fresh.`;
+            showErrorMessage(message, true);
         }
 
         if (storedState.sharedState) {
@@ -46,7 +58,8 @@ export async function loadFullState(): Promise<boolean> {
         // console.log('Reloaded saved chain states');
         // showInfoMessage(`Reloaded saved chain states`);
     } catch (e) {
-        showErrorMessage(`Failed to load state: ${e}`, true);
+        console.error('Failed to load state:', e);
+        showErrorMessage('Failed to restore saved state. The chains will start fresh.', true);
         return false;
     }
 

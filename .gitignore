@@ -7,3 +7,4 @@ env.ts
 .DS_Store
 .todo
 .vscode
+.wake
